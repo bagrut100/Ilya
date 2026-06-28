@@ -3,82 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>פיזיקה לתיכון - 5 יח"ל</title>
-    <!-- Подключаем Tailwind CSS для красивого интерфейса -->
+    <title>פיזיקה לתיכון</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
-        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
-    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
 
-    <!-- Header / כותרת ראשית -->
-    <header class="bg-blue-600 text-white shadow-md py-6 px-4 text-center">
+    <header class="bg-slate-900 text-white py-8 px-4 text-center">
         <h1 class="text-3xl font-bold">פיזיקה לתיכון - 5 יח"ל</h1>
-        <p class="text-blue-100 mt-2 text-lg">מאגר חומרי לימוד, תרגילים וסימולציות אינטראקטיביות</p>
+        <p class="text-slate-400 mt-2 text-base">מאגר חומרי לימוד ותרגילים</p>
     </header>
 
-    <!-- Main Content / תוכן מרכזי -->
-    <main class="flex-grow container mx-auto px-4 py-8 max-w-5xl">
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
         
-        <!-- Вводный блок -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100">
-            <h2 class="text-xl font-semibold mb-2 text-blue-600">ברוכים הבאים למרכז הפיזיקה</h2>
-            <p class="text-gray-600 leading-relaxed">
-                כאן תמצאו את כל החומר הנדרש לבחינת הבגרות בפיזיקה ברמת 5 יחידות לימוד. 
-                בחרו את אחד מפרקי הלימוד להלן כדי לגשת להסברים, תרסילים וסימולציות.
-            </p>
-        </div>
-
-        <!-- Сетка разделов (Каталог) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            <!-- מכניקה -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
-                <div class="p-6">
-                    <div class="text-3xl mb-3">🚗</div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">מכניקה</h3>
-                    <p class="text-gray-600 text-sm mb-4">קינמטיקה, דינמיקה, חוקי ניוטון, עבודה ואנרגיה, מתקף ותנע, תנועה מחזורית וכבידה.</p>
-                    <a href="mechanics.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2 rounded-lg transition">כניסה לפרק</a>
-                </div>
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 hover:bg-blue-100 transition">
+                <div class="text-2xl mb-2">🚗</div>
+                <h3 class="text-xl font-bold text-blue-900 mb-2">מכניקה ניוטונית</h3>
+                <p class="text-blue-700 text-sm mb-4">קינמטיקה, דינמיקה, חוקי ניוטון, עבודה ואנרגיה.</p>
+                <a href="mechanics.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg">כניסה לפרק</a>
             </div>
 
-            <!-- אלקטרומגנטיות -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
-                <div class="p-6">
-                    <div class="text-3xl mb-3">⚡</div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">אלקטרוסטטיקה ומגנטיות</h3>
-                    <p class="text-gray-600 text-sm mb-4">שדה חשמלי, פוטנציאל, מעגלי זרם ישר, שדה מגנטי, כוח לורנץ והשראה אלקטרומגנטית.</p>
-                    <a href="electricity.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2 rounded-lg transition">כניסה לפרק</a>
-                </div>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 hover:bg-amber-100 transition">
+                <div class="text-2xl mb-2">⚡</div>
+                <h3 class="text-xl font-bold text-amber-900 mb-2">חשמל ומגנטיות</h3>
+                <p class="text-amber-700 text-sm mb-4">שדה חשמלי, מעגלי זרם, שדה מגנטי והשראה.</p>
+                <a href="electricity.html" class="inline-block bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded-lg">כניסה לפרק</a>
             </div>
 
-            <!-- קרינה וחומר -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
-                <div class="p-6">
-                    <div class="text-3xl mb-3">🔬</div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">קרינה וחומר (אופטיקה ופיזיקה מודרנית)</h3>
-                    <p class="text-gray-600 text-sm mb-4">אופטיקה גיאומטרית, מודלים של האור, האפקט הפוטואלקטרי, מבנה האטום ורמות אנרגיה.</p>
-                    <a href="optics_waves.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2 rounded-lg transition">כניסה לפרק</a>
-                </div>
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-6 hover:bg-emerald-100 transition">
+                <div class="text-2xl mb-2">🔬</div>
+                <h3 class="text-xl font-bold text-emerald-900 mb-2">קרינה וחומר</h3>
+                <p class="text-emerald-700 text-sm mb-4">אופטיקה גיאומטרית, המודל החלקיקי ומבנה האטום.</p>
+                <a href="optics_waves.html" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg">כניסה לפרק</a>
             </div>
 
-            <!-- מעבדות וסימולציות -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
-                <div class="p-6">
-                    <div class="text-3xl mb-3">📊</div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">מעבדות חקר וסיмуляציות</h3>
-                    <p class="text-gray-600 text-sm mb-4">כלים אינטראקטיביות, הדמיות תלת-ממדיות (3D) והנחיות לכתיבת דוחות מעבדה בפיזיקה.</p>
-                    <a href="#" class="inline-block bg-gray-400 text-white font-medium text-sm px-4 py-2 rounded-lg cursor-not-allowed">בקרוב</a>
-                </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 hover:bg-slate-100 transition">
+                <div class="text-2xl mb-2">📊</div>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">מעבדות וסימולציות</h3>
+                <p class="text-slate-700 text-sm mb-4">הדמיות אינטראקטיביות והנחיות לכתיבת דוחות.</p>
+                <a href="simulations.html" class="inline-block bg-slate-600 hover:bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-lg">כניסה למעבדה</a>
             </div>
 
         </div>
     </main>
 
-    <!-- Footer / כותרת תחתונה -->
-    <footer class="bg-gray-800 text-gray-400 text-center py-4 text-sm border-t border-gray-700">
-        <p>© 2026 כל הזכויות שמורות לחומרי הלימוד בפיזיקה 5 יח"ל</p>
+    <footer class="bg-white text-gray-500 text-center py-4 text-xs border-t border-gray-200">
+        <p>© 2026 מרכז הפיזיקה 5 יח"ל</p>
     </footer>
 
 </body>
