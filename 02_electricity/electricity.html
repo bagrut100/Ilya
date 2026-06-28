@@ -3,47 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>חשמל ומגנטיות - 5 יח"ל</title>
+    <title>חשמל ומגנטיות - תרגילים</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
-    <!-- Навигация возврата -->
-    <nav class="bg-gray-800 text-white py-3 px-4 shadow-sm">
+    <nav class="bg-slate-900 text-white py-3 px-4 shadow-sm">
         <div class="container mx-auto max-w-5xl flex justify-between items-center">
-            <span class="font-bold">חשמל ומגנטיות</span>
-            <a href="index.html" class="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded transition">חזרה לדף הבית 🏠</a>
+            <span class="font-bold text-cyan-400">חשמל ומגנטיות | מאגר תרגילים</span>
+            <a href="../index.html" class="text-sm bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded transition">חזרה לדף הבית 🏠</a>
         </div>
     </nav>
 
-    <main class="flex-grow container mx-auto px-4 py-8 max-w-5xl">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6 border-b pb-2 border-gray-200">פרק א': אלקטרוסטטיקה וזרם ישר</h2>
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
         
-        <div class="space-y-4">
-            <!-- Карточка материала 1 -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
+            <span class="text-sm font-bold text-gray-500 block mb-2">סינון לפי נושאים (נוצר אוטומטית):</span>
+            <div class="flex flex-wrap gap-2" id="tags-container">
+                <button onclick="filterTags('all')" class="bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer">הכל (#all)</button>
+            </div>
+        </div>
+
+        <div class="space-y-4" id="materials-list">
+            
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="חוק_קולון,בגרות,אלקטרוסטטיקה">
                 <div>
-                    <h4 class="font-bold text-gray-800">תרגיל מבגרות 1990 - שאלה 1</h4>
-                    <p class="text-gray-500 text-xs mt-1">נושא: כוחות בין מטענים נקודתיים / חוק קולון</p>
+                    <h4 class="font-bold text-gray-900 text-lg">תרגיל מבגרות 1990 - שאלה 1</h4>
+                    <p class="text-gray-500 text-xs mt-1 mb-3">כוחות בין מטענים נקודתיים במרחב.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
                 </div>
-                <!-- Ссылка на ваш существующий файл -->
-                <a href="M_1990_1.HTML" class="bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium px-4 py-2 rounded-lg transition">פתח תרגיל</a>
+                <a href="M_1990_1.HTML" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center transition">פתח תרגיל</a>
             </div>
 
-            <!-- Карточка материала 2 (Для будущих файлов) -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="מגנטיות,בגרות,כוח_לורנץ">
                 <div>
-                    <h4 class="font-bold text-gray-800">חוק לנץ והשראה אלקטרומגנטית</h4>
-                    <p class="text-gray-500 text-xs mt-1">נושא: כא"מ מושרה ושינוי שטף מגנטי</p>
+                    <h4 class="font-bold text-gray-900 text-lg">כוח לורנץ ומסלול חלקיק</h4>
+                    <p class="text-gray-500 text-xs mt-1 mb-3">תנועה מעгלית של פרוטון בשדה מגנטי אחיד.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
                 </div>
-                <a href="#" class="bg-gray-100 text-gray-400 text-sm font-medium px-4 py-2 rounded-lg cursor-not-allowed">בתהליך עבודה</a>
+                <a href="#" class="bg-gray-400 text-white text-sm font-medium px-4 py-2 rounded-lg text-center cursor-not-allowed">בקרוב</a>
             </div>
+
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="חוק_לנץ,השראה_אלקטרומגנטית">
+                <div>
+                    <h4 class="font-bold text-gray-900 text-lg">ניסוי השראה עם סליל ומגנט</h4>
+                    <p class="text-gray-500 text-xs mt-1 mb-3">סימולציה של זרם מושרה וקביעת כיוונו.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="#" class="bg-gray-400 text-white text-sm font-medium px-4 py-2 rounded-lg text-center cursor-not-allowed">בקרוב</a>
+            </div>
+
         </div>
     </main>
 
-    <footer class="bg-gray-100 text-gray-500 text-center py-4 text-xs border-t border-gray-200">
-        <p>פיזיקה 5 יח"ל - עזרי למידה</p>
-    </footer>
+    <script>
+        // 1. Собираем все теги со всех карточек автоматически
+        const cards = document.querySelectorAll('.item-card');
+        const tagsContainer = document.getElementById('tags-container');
+        const allTags = new Set(); // Сет, чтобы теги не повторялись
+
+        cards.forEach(card => {
+            const rawTags = card.getAttribute('data-tags');
+            if (rawTags) {
+                const tagsArray = rawTags.split(',');
+                
+                // Отрисовываем теги внутри самой карточки, чтобы не писать их вручную в HTML
+                const visibleContainer = card.querySelector('.card-tags-visible');
+                tagsArray.forEach(tag => {
+                    allTags.add(tag); // Добавляем в общий список фильтров
+                    
+                    const tagSpan = document.createElement('span');
+                    tagSpan.className = "text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded hover:bg-cyan-100 hover:text-cyan-700 cursor-pointer";
+                    tagSpan.innerText = `#${tag}`;
+                    tagSpan.onclick = () => filterTags(tag);
+                    visibleContainer.appendChild(tagSpan);
+                });
+            }
+        });
+
+        // 2. Автоматически создаем кнопки фильтров наверху страницы
+        allTags.forEach(tag => {
+            const btn = document.createElement('button');
+            btn.className = "bg-cyan-50 hover:bg-cyan-100 text-cyan-700 text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer";
+            btn.innerText = `#${tag}`;
+            btn.onclick = () => filterTags(tag);
+            tagsContainer.appendChild(btn);
+        });
+
+        // 3. Функция самого фильтра (работает так же мгновенно)
+        function filterTags(selectedTag) {
+            cards.forEach(card => {
+                const cardTags = card.getAttribute('data-tags').split(',');
+                if (selectedTag === 'all' || cardTags.includes(selectedTag)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
 
 </body>
 </html>
