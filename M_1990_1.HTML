@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>פתרון מלא - בגרות פיזיקה 1990 שאלה 1</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Heebo & Assistant -->
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&family=Heebo:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Assistant', 'Heebo', sans-serif;
+            background-color: #f1f5f9;
+        }
+        .math-ltr {
+            direction: ltr !important;
+            display: inline-block;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 600;
+        }
+        .formula-badge {
+            direction: ltr !important;
+            unicode-bidi: embed;
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-2xl p-6 shadow-xl mb-8 relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0))]"></div>
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <span class="bg-blue-500/30 text-blue-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">פתרונות מעוצבים בפיזיקה</span>
+                    <h1 class="text-3xl font-extrabold tracking-tight mt-2">פתרון מלא: בגרות 1990, שאלה 1</h1>
+                    <p class="text-blue-100 text-sm mt-1">מכניקה | זריקה אופקית, כוחות קבועים וצורת מסלול</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl text-center border border-white/20">
+                    <span class="block text-xs text-blue-200">רמת קושי</span>
+                    <span class="text-lg font-bold">תיכון / בגרות 5 יח"ל</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Problem Card & Diagram Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- Problem Description -->
+            <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="w-2.5 h-6 bg-blue-600 rounded-full"></span>
+                        <h2 class="text-xl font-bold text-slate-900">תיאור השאלה והמערכת</h2>
+                    </div>
+                    <p class="text-slate-700 leading-relaxed mb-4 text-base">
+                        מגג בניין, שגובהו <span class="font-semibold text-blue-700">h = 5 מטרים</span> מעל לקרקע, נזרק בכיוון אופקי כדור שמסתו <span class="font-semibold text-blue-700">m = 0.1 ק"ג</span>, במהירות <span class="font-semibold text-blue-700">v<sub>0</sub> = 5 מ'/ש'</span>. 
+                        התנגדות האוויר זניחה בתנועה זו.
+                    </p>
+                    <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100">
+                        <h3 class="font-semibold text-blue-900 mb-2 text-sm">הנחות עבודה קבועות:</h3>
+                        <ul class="list-disc list-inside text-sm text-blue-800 space-y-1">
+                            <li>תאוצת הכובד: <span class="math-ltr">g = 10 m/s<sup>2</sup></span> כלפי מטה.</li>
+                            <li>נקודת המוצא בגג היא ראשית הצירים או נקודת ייחוס נוחה.</li>
+                            <li>אין איבוד אנרגיה כתוצאה מחיכוך עם האוויר.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG Vector Diagram (Self-Contained Rendering) -->
+            <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex flex-col justify-center items-center">
+                <h3 class="text-sm font-semibold text-slate-500 mb-3 text-center">תרשים פיזיקלי של המערכת</h3>
+                <svg viewBox="0 0 400 250" class="w-full max-w-xs bg-slate-50 rounded-xl border border-slate-100 p-2">
+                    <!-- Ground -->
+                    <line x1="10" y1="210" x2="390" y2="210" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M 10 210 L 390 210 M 10 210 L 0 220 M 30 210 L 20 220 M 50 210 L 40 220 M 70 210 L 60 220 M 90 210 L 80 220 M 110 210 L 100 220 M 130 210 L 120 220 M 150 210 L 140 220 M 170 210 L 160 220 M 190 210 L 180 220 M 210 210 L 200 220 M 230 210 L 220 220 M 250 210 L 240 220 M 270 210 L 260 220 M 290 210 L 280 220 M 310 210 L 300 220 M 330 210 L 320 220 M 350 210 L 340 220 M 370 210 L 360 220 M 390 210 L 380 220" stroke="#94a3b8" stroke-width="1"/>
+
+                    <!-- Cliff/Building -->
+                    <rect x="40" y="80" width="80" height="130" fill="#e2e8f0" stroke="#475569" stroke-width="2"/>
+                    <!-- Cliff Hatching pattern -->
+                    <line x1="40" y1="100" x2="120" y2="100" stroke="#cbd5e1" stroke-width="1.5" />
+                    <line x1="40" y1="120" x2="120" y2="120" stroke="#cbd5e1" stroke-width="1.5" />
+                    <line x1="40" y1="140" x2="120" y2="140" stroke="#cbd5e1" stroke-width="1.5" />
+                    <line x1="40" y1="160" x2="120" y2="160" stroke="#cbd5e1" stroke-width="1.5" />
+                    <line x1="40" y1="180" x2="120" y2="180" stroke="#cbd5e1" stroke-width="1.5" />
+                    <line x1="40" y1="200" x2="120" y2="200" stroke="#cbd5e1" stroke-width="1.5" />
+
+                    <!-- Height Dimension 5m -->
+                    <line x1="25" y1="80" x2="25" y2="210" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="2 2"/>
+                    <polygon points="25,80 21,90 29,90" fill="#0284c7" />
+                    <polygon points="25,210 21,200 29,200" fill="#0284c7" />
+                    <text x="15" y="150" fill="#0284c7" font-size="11" font-weight="bold" font-family="sans-serif" transform="rotate(-90, 15, 150)">h = 5m</text>
+
+                    <!-- Trajectory (Parabolic dash) -->
+                    <path d="M 120 72 Q 220 72 320 210" fill="none" stroke="#f43f5e" stroke-width="2" stroke-dasharray="4 4" />
+
+                    <!-- Ball -->
+                    <circle cx="120" cy="72" r="8" fill="#1e293b" stroke="#000" stroke-width="1"/>
+
+                    <!-- Velocity arrow v0 -->
+                    <line x1="128" y1="72" x2="178" y2="72" stroke="#10b981" stroke-width="2.5" />
+                    <polygon points="178,72 170,68 170,76" fill="#10b981" />
+                    <text x="145" y="60" fill="#10b981" font-size="12" font-weight="bold" font-family="sans-serif">v₀ = 5 m/s</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs Menu -->
+        <nav class="flex flex-wrap gap-2 mb-6" aria-label="Tabs">
+            <button onclick="switchTab('a')" id="btn-a" class="tab-btn px-5 py-3 rounded-xl font-bold transition-all duration-200 shadow-md bg-blue-600 text-white">
+                סעיף א' <span class="block text-xs font-normal mt-0.5">מרחק פגיעה בקרקע</span>
+            </button>
+            <button onclick="switchTab('b')" id="btn-b" class="tab-btn px-5 py-3 rounded-xl font-bold transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200">
+                סעיף ב' <span class="block text-xs font-normal mt-0.5">גודל מהירות הפגיעה</span>
+            </button>
+            <button onclick="switchTab('c')" id="btn-c" class="tab-btn px-5 py-3 rounded-xl font-bold transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200">
+                סעיף ג' <span class="block text-xs font-normal mt-0.5">מרחק עם כוח אופקי</span>
+            </button>
+            <button onclick="switchTab('d')" id="btn-d" class="tab-btn px-5 py-3 rounded-xl font-bold transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200">
+                סעיף ד' <span class="block text-xs font-normal mt-0.5">צורת מסלול ממנוחה</span>
+            </button>
+        </nav>
+
+        <!-- Dynamic Content Area -->
+        <main class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 sm:p-8">
+            
+            <!-- ====== TAB A ====== -->
+            <section id="content-a" class="tab-content">
+                <h3 class="text-2xl font-extrabold text-blue-900 mb-6 border-b border-slate-100 pb-4">סעיף א': באיזה מרחק מבסיס הבניין יפגע הכדור בקרקע?</h3>
+                
+                <!-- Data and Requested Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <h4 class="font-bold text-slate-700 mb-2">נתוני הסעיף:</h4>
+                        <ul class="space-y-1.5 text-slate-600 text-sm">
+                            <li><span class="font-semibold">גובה הגג:</span> h = 5 מטרים</li>
+                            <li><span class="font-semibold">מהירות התחלתית אופקית:</span> v<sub>0x</sub> = v<sub>0</sub> = 5 מ'/ש'</li>
+                            <li><span class="font-semibold">מהירות התחלתית אנכית:</span> v<sub>0y</sub> = 0 מ'/ש'</li>
+                            <li><span class="font-semibold">תאוצה בציר ה-y:</span> a<sub>y</sub> = -g = -10 מ'/ש'<sup>2</sup></li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <h4 class="font-bold text-slate-700 mb-2">מבוקש בסעיף:</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            המרחק האופקי של נקודת פגיעת הגוף מהבניין, המסומן כמרחק בציר ה-x ברגע הפגיעה:
+                            <span class="block font-bold mt-2 text-blue-700 text-base">x(t<sub>hit</sub>) = ?</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Formulas Badges -->
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-slate-500 mb-2">נוסחאות דף עזר (ציר שמאל):</h4>
+                    <div class="flex flex-wrap gap-2 justify-start" style="direction: ltr;">
+                        <span class="formula-badge bg-blue-50 text-blue-700 text-xs font-mono font-bold px-3 py-1.5 rounded-full border border-blue-200">y(t) = y<sub>0</sub> + v<sub>0y</sub>·t - ½·g·t<sup>2</sup></span>
+                        <span class="formula-badge bg-blue-50 text-blue-700 text-xs font-mono font-bold px-3 py-1.5 rounded-full border border-blue-200">x(t) = x<sub>0</sub> + v<sub>0x</sub>·t</span>
+                    </div>
+                </div>
+
+                <!-- Step-by-Step Solution -->
+                <div class="prose max-w-none text-slate-700 space-y-4">
+                    <h4 class="font-bold text-slate-800 text-lg">מהלך הפתרון צעד אחר צעד:</h4>
+                    
+                    <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
+                        <p class="font-semibold text-slate-800 mb-2">שלב 1: בחירת מערכת צירים ותנאי התחלה</p>
+                        <p class="text-sm">
+                            נמקם את ראשית הצירים (0,0) בבסיס הבניין שעל הקרקע. 
+                            הכיוון החיובי של ציר ה-x יהיה ימינה (עם כיוון הזריקה), והכיוון החיובי של ציר ה-y יהיה כלפי מעלה.
+                        </p>
+                        <p class="text-sm mt-1">
+                            לפי הגדרה זו, תנאי ההתחלה של התנועה ב-t=0 הם:
+                            <span class="math-ltr font-semibold text-blue-700 text-xs block mt-1">x<sub>0</sub> = 0, y<sub>0</sub> = h = 5 m, v<sub>0x</sub> = 5 m/s, v<sub>0y</sub> = 0</span>
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
+                        <p class="font-semibold text-slate-800 mb-2">שלב 2: מציאת זמן התעופה של הכדור (t)</p>
+                        <p class="text-sm mb-2">
+                            הכדור פוגע בקרקע כאשר גובהו שווה לאפס, כלומר y(t) = 0. נציב את נתונינו במשוואת המיקום לציר ה-y:
+                        </p>
+                        <div class="text-center py-4 text-base font-semibold bg-white rounded-lg border border-slate-200 my-2 leading-relaxed">
+                            <span class="math-ltr block text-blue-800">0 = y<sub>0</sub> + v<sub>0y</sub>·t - ½·g·t<sup>2</sup></span>
+                            <span class="math-ltr block text-slate-600 mt-2">0 = 5 + 0 - 5·t<sup>2</sup></span>
+                            <span class="math-ltr block text-slate-600 mt-1">5·t<sup>2</sup> = 5  →  t<sup>2</sup> = 1  →  t = 1 שנייה</span>
+                        </div>
+                        <p class="text-sm mt-1">הזמן חייב להיות חיובי, לכן זמן התעופה באוויר הוא שנייה אחת (1 ש').</p>
+                    </div>
+
+                    <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
+                        <p class="font-semibold text-slate-800 mb-2">שלב 3: חישוב המרחק האופקי (x)</p>
+                        <p class="text-sm">
+                            מכיוון שלא פועלים כוחות בציר ה-x (בהיעדר התנגדות אוויר), תנועת הגוף בציר זה היא במהירות קבועה.
+                            נציב את הזמן t = 1 ש' במשוואת המיקום האופקית:
+                        </p>
+                        <div class="text-center py-4 text-base font-semibold bg-white rounded-lg border border-slate-200 my-2">
+                            <span class="math-ltr block text-blue-800">x(1) = v<sub>0x</sub> · t = 5 m/s · 1 s = 5 m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conclusion Block -->
+                <div class="mt-8 p-5 bg-green-50 rounded-2xl border-2 border-green-200 text-green-800">
+                    <h4 class="font-bold text-green-900 text-lg mb-1">מסקנה סופית:</h4>
+                    <p class="text-base">
+                        הכדור יפגע בקרקע במרחק של <span class="font-extrabold text-green-950">5 מטרים</span> מבסיס הבניין.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ====== TAB B ====== -->
+            <section id="content-b" class="tab-content hidden">
+                <h3 class="text-2xl font-extrabold text-blue-900 mb-6 border-b border-slate-100 pb-4">סעיף ב': מהי המהירות (גודל בלבד) שבה יפגע הכדור בקרקע?</h3>
+                
+                <!-- Data and Requested Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <h4 class="font-bold text-slate-700 mb-2">נתוני הסעיף:</h4>
+                        <ul class="space-y-1.5 text-slate-600 text-sm">
+                            <li><span class="font-semibold">מהירות אופקית קבועה:</span> v<sub>x</sub> = 5 מ'/ש'</li>
+                            <li><span class="font-semibold">זמן תעופה עד הקרקע:</span> t = 1 שנייה</li>
+                            <li><span class="font-semibold">מהירות התחלתית אנכית:</span> v<sub>0y</sub> = 0 מ'/ש'</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <h4 class="font-bold text-slate-700 mb-2">מבוקש בסעיף:</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            גודל וקטור המהירות השקול של הכדור ברגע הפגיעה בקרקע:
+                            <span class="block font-bold mt-2 text-blue-700 text-base">v = √(v<sub>x</sub><sup>2</sup> + v<sub>y</sub><sup>2</sup>) = ?</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Formulas Badges -->
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-slate-500 mb-2">נוסחאות דף עזר (ציר שמאל):</h4>
+                    <div class="flex flex-wrap gap-2 justify-start" style="direction: ltr;">
+                        <span class="formula-badge bg-blue-50 text-blue-700 text-xs font-mono font-bold px-3 py-1.5 rounded-full border border-blue-200">v<sub>y</sub>(t) = v<sub>0y</sub> - g·t</span>
+                        <span class="formula-badge bg-blue-50 text-blue-700 text-xs font-mono font-bold px-3 py-1.5 rounded-full border border-blue-200">v = √(v<sub>x</sub><sup>2</sup> + v<sub>y</sub><sup>2</sup>)</span>
+                        <span class="formula-badge bg-blue-50 text-blue-700 text-xs font-mono font-bold px-3 py-1.5 rounded-full border border-blue-200">m·g·h + ½·m·v<sub>0</sub><sup>2</sup> = ½·m·v<sup>2</sup></span>
+                    </div>
+                </div>
+
+                <!-- Step-by-Step Solution -->
+                <div class="prose max-w-none text-slate-700 space-y-4">
+                    <h4 class="font-bold text-slate-800 text-lg">מהלך הפתרון (שתי שיטות פתרון אפשריות):</h4>
+                    
+                    <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
+                        <p class="font-semibold text-slate-800 mb-2">שיטה א': חישוב באמצעות רכיבי המהירות (קינמטיקה)</p>
+                        <p class="text-sm mb-2">
+                            וקטור המהירות ברגע הפגיעה מורכב משני רכיבים מאונכים:
+                        </p>
+                        <ol class="list-decimal list-inside text-sm space-y-2 mr-2">
+                            <li>
+                                <strong>הרכיב האופקי (v<sub>x</sub>):</strong> בהיעדר תאוצה אופקית, המהירות קבועה:
+                                <span class="math-ltr font-semibold text-blue-700 text-xs block mt-1">v<sub>x</sub> = v<sub>0x</sub> = 5 m/s</span>
+                            </li>
+                            <li>
+                                <strong>הרכיב האנכי (v<sub>y</sub>):</strong> המהירות האנכית שנרכשה ברגע הפגיעה בקרקע (t = 1 ש'):
+                                <span class="math-ltr font-semibold text-blue-700 text-xs block mt-1">v<sub>y</sub>(1) = v<sub>0y</sub> - g·t = 0 - 10 · 1 = -10 m/s</span>
+                                <span class="block text-xs text-slate-500 mt-1">(סימן המינוס מעיד על כך שכיוון המהירות הוא כלפי מטה).</span>
+                            </li>
+                        </ol>
+                        <p class="text-sm mt-3">נשתמש במשפט פיתגורס לחישוב גודל המהירות השקולה:</p>
+                        <div class="text-center py-4 text-base font-semibold bg-white rounded-lg border border-slate-200 my-2">
+                            <span class="math-ltr block text-blue-800">v = √(v<sub>x</sub><sup>2</sup> + v<sub>y</sub><sup>2</sup>) = √(5<sup>2</sup> + (-10)<sup>2</sup>)</span>
+                            <span class="math-ltr block text-slate-600 mt-1">v = √(25 + 100) = √125 ≈ 11.18 m/s</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
+                        <p class="font-semibold text-slate-800 mb-2">שיטה ב': שימוש בחוק שימור האנרגיה המכנית (מהיר ואלגנטי)</p>
+                        <p class="text-sm">
+                            מכיוון שאין חיכוך עם האוויר, האנרגיה המכנית של הכדור נשמרת מרגע הזריקה בגובה h ועד לפגיעה בקרקע במישור הייחוס (y=0):
+                        </p>
+                        <div class="text-center py-4 text-base font-semibold bg-white rounded-lg border border-slate-200 my-2">
+                            <span class="math-ltr block text-blue-800">E<sub>start</sub> = E<sub>ground</sub>  →  m·g·h + ½·m·v<sub>0</sub><sup>2</sup> = ½·m·v<sup>2</sup></span>
+                            <span class="text-xs text-slate-500 block mt-1">נצמצם את המסה m ונכפיל ב-2:</span>
+                            <span class="math-ltr block text-slate-600 mt-2">v = √(v<sub>0</sub><sup>2</sup> + 2·g·h)</span>
+                            <span class="math-ltr block text-slate-600 mt-1">v = √(5<sup>2</sup> + 2 · 10 · 5) = √(25 + 100) = √125 ≈ 11.18 m/s</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conclusion Block -->
+                <div class="mt-8 p-5 bg-green-50 rounded-2xl border-2 border-green-200 text-green-800">
+                    <h4 class="font-bold text-green-900 text-lg mb-1">מסקנה סופית:</h4>
+                    <p class="text-base">
+                        גודל מהירות פגיעת הכדור בקרקע הוא <span class="font-extrabold text-green-950">√125 מ'/ש' ≈ 11.18 מ'/ש'</span>.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ====== TAB C ====== -->
+            <section id="content-c" class="tab-content hidden">
+                <h3 class="text-2xl font-extrabold text-blue-900 mb-6 border-b border-slate-100 pb-4">סעיף ג': מרחק הפגיעה בתוספת כוח אופקי קבוע F = 0.2 N</h3>
+                
+                <!-- Data and Requested Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <h4 class="font-bold text-slate-700 mb-2">נתוני הסעיף:</h4>
+                        <ul class="space-y-1.5 text-slate-600 text-sm">
+                            <li><span class="font-semibold">מסת הכדור:</span> m = 0.1 ק"ג</li>
+                            <li><span class="font-semibold">כוח אופקי נוסף:</span> F = 0.2 ניוטון (בכיוון הזריקה)</li>
+                            <li><span class="font-semibold">גובה נפילה אנכי:</span> h = 5 מטרים</li>
+                            <li><span class="font-semibold">מהירות התחלתית:</span> v<sub>0x</sub> = 5 מ'/ש'</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <h4 class="font-bold text-slate-700 mb-2">מבוקש בסעיף:</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            מרחק הפגיעה החדש של הכדור מבסיס הבניין בעקבות שינוי אופי התנועה בציר האופקי:
+                            <span class="block font-bold mt-2 text-blue-700 text-base">x<sub>new</sub>(t<sub>hit</sub>) = ?</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Formulas Badges -->
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-slate-500 mb-2">נוסחאות דף עזר (ציר שמאל):</h4>
+                    <div class="flex flex-wrap gap-2 justify-start" style="direction: ltr;">
+                        <span class="formula-badge bg-blue-50 text-blue-700 text-xs font-mono font-bold px-3 py-1.5 rounded-full border border-blue-200">ΣF = m·a</span>
+                        <span class="formula-badge bg-blue-50 text-blue-700 text-xs font-mono font-bold px-3 py-1.5 rounded-full border border-blue-200">x(t) = x<sub>0</sub> + v<sub>0x</sub>·t + ½·a<sub>x</sub>·t<sup>2</sup></span>
+                    </div>
+                </div>
+
+                <!-- Step-by-Step Solution -->
+                <div class="prose max-w-none text-slate-700 space-y-4">
+                    <h4 class="font-bold text-slate-800 text-lg">מהלך הפתרון צעד אחר צעד:</h4>
+                    
+                    <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
+                        <p class="font-semibold text-slate-800 mb-2">שלב 1: חישוב התאוצה בציר ה-x (לפי חוק שני של ניוטון)</p>
+                        <p class="text-sm">
+                            הכוח הנוסף F = 0.2 ניוטון פועל אופקית, בכיוון מהירותו ההתחלתית (כלומר בכיוון ציר ה-x החיובי).
+                            מכאן, לפי החוק השני של ניוטון, נחשב את התאוצה בציר ה-x:
+                        </p>
+                        <div class="text-center py-4 text-base font-semibold bg-white rounded-lg border border-slate-200 my-2">
+                            <span class="math-ltr block text-blue-800">a<sub>x</sub> = F / m = 0.2 N / 0.1 kg = 2 m/s<sup>2</sup></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
+                        <p class="font-semibold text-slate-800 mb-2">שלב 2: ניתוח התנועה בציר ה-y וחישוב זמן התעופה</p>
+                        <p class="text-sm">
+                            הכוח החדש מופעל <strong>אך ורק אופקית</strong>. 
+                            הכוח הפועל בציר ה-y נשאר כוח הכובד בלבד. 
+                            לכן, התאוצה האנכית נותרת ללא שינוי: a<sub>y</sub> = -g = -10 מ'/ש'<sup>2</sup>.
+                        </p>
+                        <p class="text-sm mt-1">
+                            הואיל והתנועה בציר האנכי לא הושפעה כלל, זמן הנפילה של הכדור עד לפגיעתו בקרקע נשאר בדיוק כפי שהיה:
+                            <span class="math-ltr font-semibold text-blue-700 text-xs block mt-1">t = 1 s</span>
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
+                        <p class="font-semibold text-slate-800 mb-2">שלב 3: בניית משוואת התנועה בציר ה-x וחישוב המרחק</p>
+                        <p class="text-sm mb-2">
+                            כעת התנועה בציר ה-x היא תנועה שוות תאוצה (ולא במהירות קבועה).
+                            משוואת המיקום האופקית החדשה הינה:
+                        </p>
+                        <div class="text-center py-4 text-base font-semibold bg-white rounded-lg border border-slate-200 my-2">
+                            <span class="math-ltr block text-blue-800">x(t) = x<sub>0</sub> + v<sub>0x</sub>·t + ½·a<sub>x</sub>·t<sup>2</sup></span>
+                            <span class="text-xs text-slate-500 block mt-1">נציב את הנתונים ואת זמן הפגיעה t = 1 ש':</span>
+                            <span class="math-ltr block text-slate-600 mt-2">x(1) = 0 + 5 · 1 + ½ · 2 · 1<sup>2</sup> = 5 + 1 = 6 m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conclusion Block -->
+                <div class="mt-8 p-5 bg-green-50 rounded-2xl border-2 border-green-200 text-green-800">
+                    <h4 class="font-bold text-green-900 text-lg mb-1">מסקנה סופית:</h4>
+                    <p class="text-base">
+                        כאשר פועל על הכדור כוח אופקי קבוע של 0.2 ניוטון, הוא יפגע בקרקע במרחק של <span class="font-extrabold text-green-950">6 מטרים</span> מבסיס הבניין.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ====== TAB D ====== -->
+            <section id="content-d" class="tab-content hidden">
+                <h3 class="text-2xl font-extrabold text-blue-900 mb-6 border-b border-slate-100 pb-4">סעיף ד': שחרור ממנוחה בהשפעת אותו כוח אופקי קבוע</h3>
+                
+                <!-- Data and Requested Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <h4 class="font-bold text-slate-700 mb-2">נתוני הסעיף:</h4>
+                        <ul class="space-y-1.5 text-slate-600 text-sm">
+                            <li><span class="font-semibold">מצב התחלתי:</span> שוחרר ממנוחה (v<sub>0</sub> = 0)</li>
+                            <li><span class="font-semibold">תאוצה אופקית קבועה:</span> a<sub>x</sub> = 2 מ'/ש'<sup>2</sup></li>
+                            <li><span class="font-semibold">תאוצה אנכית קבועה:</span> a<sub>y</sub> = g = 10 מ'/ש'<sup>2</sup> (כלפי מטה)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <h4 class="font-bold text-slate-700 mb-2">השאלה הנשאלת:</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            מהי צורת מסלול הכדור? יש לבחור בין האפשרויות הבאות:
+                            <span class="block mt-1 font-bold text-blue-700">ישר, פרבולה, היפרבולה, או מסלול אחר?</span>
+                            כמו כן, נדרש לנמק את הבחירה באופן פיזיקלי ומתמטי.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Formulas Badges -->
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-slate-500 mb-2">נוסחאות דף עזר (ציר שמאל):</h4>
+                    <div class="flex flex-wrap gap-2 justify-start" style="direction: ltr;">
+                        <span class="formula-badge bg-blue-50 text-blue-700 text-xs font-mono font-bold px-3 py-1.5 rounded-full border border-blue-200">x(t) = ½·a<sub>x</sub>·t<sup>2</sup></span>
+                        <span class="formula-badge bg-blue-50 text-blue-700 text-xs font-mono font-bold px-3 py-1.5 rounded-full border border-blue-200">y(t) = ½·a<sub>y</sub>·t<sup>2</sup></span>
+                    </div>
+                </div>
+
+                <!-- Step-by-Step Solution -->
+                <div class="prose max-w-none text-slate-700 space-y-4">
+                    <h4 class="font-bold text-slate-800 text-lg">נימוק והוכחה מתמטית ופיזיקלית:</h4>
+                    
+                    <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
+                        <p class="font-semibold text-slate-800 mb-2">דרך א': הוכחה מתמטית (מציאת משוואת המסלול y(x))</p>
+                        <p class="text-sm mb-2">
+                            נבחר את ראשית הצירים (0,0) בנקודת השחרור על הגג, כאשר הכיוון החיובי של ציר ה-x הוא ימינה, והכיוון החיובי של ציר ה-y הוא מטה.
+                            מכיוון שהכדור משוחרר ממנוחה, תנאי ההתחלה הם v<sub>0x</sub> = v<sub>0y</sub> = 0.
+                        </p>
+                        <p class="text-sm">משוואות התנועה של המיקום של הגוף הן:</p>
+                        <div class="text-center py-4 text-base font-semibold bg-white rounded-lg border border-slate-200 my-2">
+                            <span class="math-ltr block text-slate-700">x(t) = ½ · a<sub>x</sub> · t<sup>2</sup> = ½ · 2 · t<sup>2</sup> = t<sup>2</sup></span>
+                            <span class="math-ltr block text-slate-700 mt-2">y(t) = ½ · a<sub>y</sub> · t<sup>2</sup> = ½ · 10 · t<sup>2</sup> = 5·t<sup>2</sup></span>
+                        </div>
+                        <p class="text-sm mt-2">נחלץ את הפרמטר t<sup>2</sup> מהמשוואה האופקית: t<sup>2</sup> = x. נציב אותו במשוואה האנכית:</p>
+                        <div class="text-center py-4 text-base font-semibold bg-white rounded-lg border border-slate-200 my-2">
+                            <span class="math-ltr block text-blue-800">y(x) = 5·x</span>
+                        </div>
+                        <p class="text-sm mt-2">
+                            הקשר שנוצר בין המיקום האנכי y למיקום האופקי x הוא קשר ליניארי ממעלה ראשונה מהצורה y = K·x (כאשר השיפוע הוא K = 5).
+                            קשר ליניארי זה מייצג מתמטית <strong>קו ישר</strong>.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
+                        <p class="font-semibold text-slate-800 mb-2">דרך ב': הסבר פיזיקלי וקטורי (חשוב להבנה אינטואיטיבית)</p>
+                        <p class="text-sm leading-relaxed">
+                            על הגוף פועלים שני כוחות קבועים: כוח הכובד האנכי כלפי מטה וכוח אופקי קבוע ימינה.
+                            מכיוון ששני הכוחות קבועים בגודלם ובכיוונם, גם <strong>הכוח השקול הפועל על הגוף קבוע</strong> בגודלו ובכיוונו (אלכסוני מטה וימינה).
+                        </p>
+                        <p class="text-sm mt-2 font-medium text-blue-900">
+                            מכיוון שהגוף מתחיל את תנועתו ממנוחה (v<sub>0</sub> = 0), וקטור המהירות שלו בכל רגע יהיה מכוון בדיוק בכיוון של וקטור התאוצה השקולה והקבועה. 
+                            הגוף יאיץ בקו ישר לאורך קו הפעולה של הכוח השקול, ולכן מסלולו יהיה קו ישר אלכסוני.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Conclusion Block -->
+                <div class="mt-8 p-5 bg-green-50 rounded-2xl border-2 border-green-200 text-green-800">
+                    <h4 class="font-bold text-green-900 text-lg mb-1">מסקנה סופית:</h4>
+                    <p class="text-base">
+                        צורת מסלול הכדור היא <span class="font-extrabold text-green-950">קו ישר</span> (המסלול הוא ליניארי ועובר דרך ראשית הצירים בשיפוע של 5).
+                    </p>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer Info -->
+        <footer class="text-center text-slate-400 text-xs mt-8 pb-12">
+            נכתב ועוצב עבור מורי פיזיקה ותלמידים | פתרונות מעוצבים 2026 ©
+        </footer>
+    </div>
+
+    <!-- Interactive Tabs Switch Logic -->
+    <script>
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Show current active tab content
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+
+            // Reset all buttons styles to inactive state
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+                btn.classList.add('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+            });
+
+            // Set clicked button to active state
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+            activeBtn.classList.remove('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+        }
+    </script>
+</body>
+</html>
