@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פתרון מלא: שאלה 2 \ פרק 1 - קינמטיקה ותרשים עקבות</title>
+  <!-- Google Fonts: Rubik -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+  <!-- MathJax for rendering LaTeX formulas -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #1e3a8a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --accent-red: #dc2626;
+      --accent-red-bg: #fef2f2;
+      --border-color: #e2e8f0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 24px 16px 60px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* HEADER */
+    .header-banner {
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .header-pill {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .header-title {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    .header-badge {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      text-align: center;
+      z-index: 1;
+      min-width: 160px;
+    }
+
+    .header-badge .sub {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      margin-bottom: 2px;
+    }
+
+    .header-badge .main {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    /* OVERVIEW GRID */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1.3fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 890px) {
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+      .header-banner {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      .header-badge {
+        width: 100%;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .accent-bar {
+      width: 6px;
+      height: 24px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .description-text {
+      color: #334155;
+      font-size: 1.02rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .assumptions-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+    }
+
+    .assumptions-title {
+      font-weight: 700;
+      color: var(--primary-deep);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .assumptions-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.92rem;
+      color: #1e3a8a;
+    }
+
+    .assumptions-list li {
+      position: relative;
+      padding-right: 18px;
+    }
+
+    .assumptions-list li::before {
+      content: "•";
+      color: var(--primary);
+      position: absolute;
+      right: 2px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .graph-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .graph-title {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    /* DATA TABLE */
+    .data-table-wrap {
+      margin-top: 14px;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      text-align: center;
+    }
+
+    .data-table th, .data-table td {
+      border: 1px solid var(--border-color);
+      padding: 6px 8px;
+    }
+
+    .data-table th {
+      background: #f8fafc;
+      color: var(--primary-deep);
+      font-weight: 700;
+    }
+
+    /* NAVIGATION TABS */
+    .tabs-wrapper {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--primary-deep);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    /* SECTION STYLES */
+    .section-container {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .section-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header-title {
+      color: var(--primary-deep);
+      font-size: 1.55rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    .info-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 10px;
+    }
+
+    .info-card p, .info-card li {
+      font-size: 0.95rem;
+      color: #334155;
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding-right: 0;
+    }
+
+    .info-card li {
+      margin-bottom: 6px;
+      position: relative;
+      padding-right: 16px;
+    }
+
+    .info-card li::before {
+      content: "▪";
+      color: var(--primary);
+      position: absolute;
+      right: 0;
+      font-size: 0.9rem;
+    }
+
+    .highlight-bold {
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    /* FORMULA CHIPS */
+    .formula-helper-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 16px 0 24px;
+      flex-wrap: wrap;
+    }
+
+    .formula-helper-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .formula-pill {
+      background: #eff6ff;
+      border: 1.5px solid #93c5fd;
+      border-radius: 9999px;
+      padding: 5px 18px;
+      color: var(--primary-dark);
+      font-size: 0.92rem;
+      font-weight: 600;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    /* PROOF & CALCULATION BOX */
+    .proof-section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .proof-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .step-block {
+      margin-bottom: 20px;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .math-display-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 14px 20px;
+      margin: 12px 0;
+      overflow-x: auto;
+      direction: ltr;
+      text-align: center;
+    }
+
+    /* FINAL ANSWER BOX */
+    .result-banner {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .result-icon {
+      background: var(--accent-green);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .result-text {
+      color: #065f46;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    /* SVG WRAPPER */
+    .plot-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin: 16px 0;
+    }
+
+    /* MULTIPLE CHOICE CARDS (SECTION G) */
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 18px 0;
+    }
+
+    @media (max-width: 680px) {
+      .choice-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .choice-card {
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: #ffffff;
+      transition: all 0.2s;
+    }
+
+    .choice-card.correct {
+      border-color: var(--accent-green);
+      background: #f0fdf4;
+    }
+
+    .choice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .choice-badge {
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 9999px;
+    }
+
+    .choice-badge.badge-correct {
+      background: var(--accent-green);
+      color: white;
+    }
+
+    .choice-badge.badge-wrong {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* NAV BUTTONS */
+    .nav-buttons-wrap {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .nav-step-btn {
+      background: transparent;
+      border: 1.5px solid var(--border-color);
+      padding: 8px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .nav-step-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .header-banner { box-shadow: none; }
+      .tabs-wrapper, .nav-buttons-wrap { display: none !important; }
+      .section-container { display: block !important; margin-bottom: 40px; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header-banner">
+    <div class="header-content">
+      <div class="header-pill">פתרונות מעוצבים בפיזיקה</div>
+      <h1 class="header-title">פתרון מלא: שאלה 2 \ פרק 1</h1>
+      <p class="header-subtitle">קינמטיקה | ניתוח תרשים עקבות, מהירות ממוצעת, תנועה שוות-תאוצה וגרפי תנועה</p>
+    </div>
+    <div class="header-badge">
+      <div class="sub">נושא ראשי</div>
+      <div class="main">קינמטיקה חד-ממדית</div>
+    </div>
+  </header>
+
+  <!-- OVERVIEW GRID -->
+  <div class="overview-grid">
+    <!-- Question Description Card -->
+    <div class="card">
+      <div class="card-title-wrap">
+        <div class="accent-bar"></div>
+        <h2 class="card-title">תיאור השאלה והמערכת</h2>
+      </div>
+      <p class="description-text">
+        הנקודות בתרשים שלפניך מתארות את המיקום של גוף הנע בקו ישר על ציר ה-$x$.<br>
+        בתרשים זה, מרווח הזמן בין כל שתי נקודות עוקבות הינו קבוע ושווה ל-$0.2\text{ s}$.<br>
+        נתון שהגוף מתחיל לנוע <strong>ממנוחה ב-$x = 0$</strong>, ובנקודה האחרונה <strong>($x = 21\text{ cm}$) הוא נעצר</strong>.
+        נתון גם שבקטעי המסלול בהם יש שינוי במהירות, התאוצה היא קבועה.
+      </p>
+
+      <div class="assumptions-box">
+        <div class="assumptions-title">הנחות עבודה ונתונים קבועים מהתרשים:</div>
+        <ul class="assumptions-list">
+          <li>הפרש זמן קבוע בין שתי עקבות עוקבות: $\Delta t = 0.2\text{ s}$.</li>
+          <li>יציאה ממנוחה בראשית הצירים: $x(0) = 0$ ו-$v_0 = 0$.</li>
+          <li>עצירה סופית: $x_{\text{final}} = 21\text{ cm}$ ו-$v_{\text{final}} = 0$.</li>
+          <li>מספר מרווחי הזמן הכולל עד לעצירה: $18$ פרקי זמן של $0.2\text{ s}$.</li>
+          <li>משך התנועה הכולל: $\Delta t = 18 \times 0.2\text{ s} = 3.6\text{ s}$.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Trace Ruler SVG Card -->
+    <div class="card">
+      <div class="graph-container">
+        <div class="graph-title">תרשים העקבות וסרגל המיקומים ($x$ בס"מ)</div>
+
+        <svg viewBox="0 0 540 120" width="100%" height="120" xmlns="http://www.w3.org/2000/svg">
+          <!-- Ruler base -->
+          <rect x="15" y="20" width="504" height="42" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+
+          <!-- Minor tick marks (each mm) -->
+          <g stroke="#cbd5e1" stroke-width="0.8">
+            <path d="
+              M 19.8 20 v 6 M 24.6 20 v 6 M 29.4 20 v 6 M 34.2 20 v 6 M 43.8 20 v 6 M 48.6 20 v 6 M 53.4 20 v 6 M 58.2 20 v 6
+              M 67.8 20 v 6 M 72.6 20 v 6 M 77.4 20 v 6 M 82.2 20 v 6 M 91.8 20 v 6 M 96.6 20 v 6 M 101.4 20 v 6 M 106.2 20 v 6
+              M 115.8 20 v 6 M 120.6 20 v 6 M 125.4 20 v 6 M 130.2 20 v 6 M 139.8 20 v 6 M 144.6 20 v 6 M 149.4 20 v 6 M 154.2 20 v 6
+              M 163.8 20 v 6 M 168.6 20 v 6 M 173.4 20 v 6 M 178.2 20 v 6 M 187.8 20 v 6 M 192.6 20 v 6 M 197.4 20 v 6 M 202.2 20 v 6
+              M 211.8 20 v 6 M 216.6 20 v 6 M 221.4 20 v 6 M 226.2 20 v 6 M 235.8 20 v 6 M 240.6 20 v 6 M 245.4 20 v 6 M 250.2 20 v 6
+              M 259.8 20 v 6 M 264.6 20 v 6 M 269.4 20 v 6 M 274.2 20 v 6 M 283.8 20 v 6 M 288.6 20 v 6 M 293.4 20 v 6 M 298.2 20 v 6
+              M 307.8 20 v 6 M 312.6 20 v 6 M 317.4 20 v 6 M 322.2 20 v 6 M 331.8 20 v 6 M 336.6 20 v 6 M 341.4 20 v 6 M 346.2 20 v 6
+              M 355.8 20 v 6 M 360.6 20 v 6 M 365.4 20 v 6 M 370.2 20 v 6 M 379.8 20 v 6 M 384.6 20 v 6 M 389.4 20 v 6 M 394.2 20 v 6
+              M 403.8 20 v 6 M 408.6 20 v 6 M 413.4 20 v 6 M 418.2 20 v 6 M 427.8 20 v 6 M 432.6 20 v 6 M 437.4 20 v 6 M 442.2 20 v 6
+              M 451.8 20 v 6 M 456.6 20 v 6 M 461.4 20 v 6 M 466.2 20 v 6 M 475.8 20 v 6 M 480.6 20 v 6 M 485.4 20 v 6 M 490.2 20 v 6
+              M 499.8 20 v 6 M 504.6 20 v 6 M 509.4 20 v 6 M 514.2 20 v 6
+            "/>
+          </g>
+
+          <!-- 0.5 cm marks -->
+          <g stroke="#94a3b8" stroke-width="1.1">
+            <path d="
+              M 27 20 v 10 M 51 20 v 10 M 75 20 v 10 M 99 20 v 10 M 123 20 v 10 M 147 20 v 10
+              M 171 20 v 10 M 195 20 v 10 M 219 20 v 10 M 243 20 v 10 M 267 20 v 10 M 291 20 v 10
+              M 315 20 v 10 M 339 20 v 10 M 363 20 v 10 M 387 20 v 10 M 411 20 v 10 M 435 20 v 10
+              M 459 20 v 10 M 483 20 v 10 M 507 20 v 10
+            "/>
+          </g>
+
+          <!-- Main cm Marks (Step = 24px) -->
+          <g stroke="#475569" stroke-width="1.6">
+            <line x1="15" y1="20" x2="15" y2="40" />
+            <line x1="39" y1="20" x2="39" y2="40" />
+            <line x1="63" y1="20" x2="63" y2="40" />
+            <line x1="87" y1="20" x2="87" y2="40" />
+            <line x1="111" y1="20" x2="111" y2="40" />
+            <line x1="135" y1="20" x2="135" y2="40" />
+            <line x1="159" y1="20" x2="159" y2="40" />
+            <line x1="183" y1="20" x2="183" y2="40" />
+            <line x1="207" y1="20" x2="207" y2="40" />
+            <line x1="231" y1="20" x2="231" y2="40" />
+            <line x1="255" y1="20" x2="255" y2="40" />
+            <line x1="279" y1="20" x2="279" y2="40" />
+            <line x1="303" y1="20" x2="303" y2="40" />
+            <line x1="327" y1="20" x2="327" y2="40" />
+            <line x1="351" y1="20" x2="351" y2="40" />
+            <line x1="375" y1="20" x2="375" y2="40" />
+            <line x1="399" y1="20" x2="399" y2="40" />
+            <line x1="423" y1="20" x2="423" y2="40" />
+            <line x1="447" y1="20" x2="447" y2="40" />
+            <line x1="471" y1="20" x2="471" y2="40" />
+            <line x1="495" y1="20" x2="495" y2="40" />
+            <line x1="519" y1="20" x2="519" y2="40" />
+          </g>
+
+          <!-- Numbers -->
+          <g font-family="Rubik, sans-serif" font-size="9.5" font-weight="600" fill="#1e293b" text-anchor="middle">
+            <text x="15" y="74">0</text>
+            <text x="39" y="74">1</text>
+            <text x="63" y="74">2</text>
+            <text x="87" y="74">3</text>
+            <text x="111" y="74">4</text>
+            <text x="135" y="74">5</text>
+            <text x="159" y="74">6</text>
+            <text x="183" y="74">7</text>
+            <text x="207" y="74">8</text>
+            <text x="231" y="74">9</text>
+            <text x="255" y="74">10</text>
+            <text x="279" y="74">11</text>
+            <text x="303" y="74">12</text>
+            <text x="327" y="74">13</text>
+            <text x="351" y="74">14</text>
+            <text x="375" y="74">15</text>
+            <text x="399" y="74">16</text>
+            <text x="423" y="74">17</text>
+            <text x="447" y="74">18</text>
+            <text x="471" y="74">19</text>
+            <text x="495" y="74">20</text>
+            <text x="519" y="74">21</text>
+            <text x="519" y="94" font-weight="700">cm</text>
+          </g>
+
+          <!-- Trace Dots (19 points, 18 intervals) -->
+          <!-- 1. Acceleration 0 to 5 cm: 0, 0.2, 0.8, 1.8, 3.2, 5.0 -->
+          <circle cx="15.0" cy="42" r="3.2" fill="#2563eb"/>
+          <circle cx="19.8" cy="42" r="3.2" fill="#2563eb"/>
+          <circle cx="34.2" cy="42" r="3.2" fill="#2563eb"/>
+          <circle cx="58.2" cy="42" r="3.2" fill="#2563eb"/>
+          <circle cx="91.8" cy="42" r="3.2" fill="#2563eb"/>
+          <circle cx="135.0" cy="42" r="3.2" fill="#2563eb"/>
+
+          <!-- 2. Constant speed 5 to 11 cm: 7, 9, 11 (2 cm each) -->
+          <circle cx="183.0" cy="42" r="3.2" fill="#059669"/>
+          <circle cx="231.0" cy="42" r="3.2" fill="#059669"/>
+          <circle cx="279.0" cy="42" r="3.2" fill="#059669"/>
+
+          <!-- 3. Deceleration 11 to 21 cm: 12.9, 14.6, 16.1, 17.4, 18.5, 19.4, 20.1, 20.6, 20.9, 21.0 -->
+          <circle cx="324.6" cy="42" r="3.2" fill="#dc2626"/>
+          <circle cx="365.4" cy="42" r="3.2" fill="#dc2626"/>
+          <circle cx="401.4" cy="42" r="3.2" fill="#dc2626"/>
+          <circle cx="432.6" cy="42" r="3.2" fill="#dc2626"/>
+          <circle cx="459.0" cy="42" r="3.2" fill="#dc2626"/>
+          <circle cx="480.6" cy="42" r="3.2" fill="#dc2626"/>
+          <circle cx="497.4" cy="42" r="3.2" fill="#dc2626"/>
+          <circle cx="509.4" cy="42" r="3.2" fill="#dc2626"/>
+          <circle cx="516.6" cy="42" r="3.2" fill="#dc2626"/>
+          <circle cx="519.0" cy="42" r="3.2" fill="#dc2626"/>
+        </svg>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>שלב</th>
+                <th>תחום מיקום $x$</th>
+                <th>מרווחי זמן בתרשים</th>
+                <th>משך זמן $\Delta t$</th>
+                <th>סוג התנועה והתאוצה</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>שלב I</strong></td>
+                <td>$0 - 5\text{ cm}$</td>
+                <td>$5$ פרקי זמן ($0.2\text{ s}$ כ"א)</td>
+                <td>$1.0\text{ s}$</td>
+                <td>תנועה מואצת ($a_1 = +10\text{ cm/s}^2$)</td>
+              </tr>
+              <tr>
+                <td><strong>שלב II</strong></td>
+                <td>$5 - 11\text{ cm}$</td>
+                <td>$3$ פרקי זמן ($0.2\text{ s}$ כ"א)</td>
+                <td>$0.6\text{ s}$</td>
+                <td>מהירות קבועה ($v = 10\text{ cm/s}$, $a=0$)</td>
+              </tr>
+              <tr>
+                <td><strong>שלב III</strong></td>
+                <td>$11 - 21\text{ cm}$</td>
+                <td>$10$ פרקי זמן ($0.2\text{ s}$ כ"א)</td>
+                <td>$2.0\text{ s}$</td>
+                <td>תנועה מואטת ($a_2 = -5\text{ cm/s}^2$)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION TABS -->
+  <div class="tabs-wrapper">
+    <button class="tab-btn active" onclick="switchSection('sec-a')">סעיף א'</button>
+    <button class="tab-btn" onclick="switchSection('sec-b')">סעיף ב'</button>
+    <button class="tab-btn" onclick="switchSection('sec-c')">סעיף ג'</button>
+    <button class="tab-btn" onclick="switchSection('sec-d')">סעיף ד'</button>
+    <button class="tab-btn" onclick="switchSection('sec-e')">סעיף ה'</button>
+    <button class="tab-btn" onclick="switchSection('sec-f')">סעיף ו'</button>
+    <button class="tab-btn" onclick="switchSection('sec-g')">סעיף ז'</button>
+  </div>
+
+  <!-- MAIN CARD: ACTIVE SECTION CONTENT -->
+  <div class="card">
+
+    <!-- ========== SECTION A ========== -->
+    <div id="sec-a" class="section-container active">
+      <h2 class="section-header-title">סעיף א': קביעת תחומי התנועה (מאיץ, מהירות קבועה, מאט)</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">השאלה הנשאלת:</div>
+          <p>קבע עבור אילו ערכים של $x$ הגוף מאיץ, עבור אילו ערכים הוא מאט ועבור אילו ערכים הוא נע במהירות קבועה? הסבר.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">העיקרון הפיזיקלי:</div>
+          <ul>
+            <li>פרק הזמן בין כל שתי עקבות עוקבות הינו קבוע ($\Delta t = 0.2\text{ s}$).</li>
+            <li>המרחק בין שתי עקבות סמוכות מייצג את המהירות הממוצעת: $\Delta x = \bar{v} \Delta t$.</li>
+            <li>אם המרחק בין הנקודות גדל $\leftarrow$ המהירות עולה (הגוף <strong>בתאוצה</strong>).</li>
+            <li>אם המרחק בין הנקודות קבוע $\leftarrow$ המהירות אינה משתנה (<strong>מהירות קבועה</strong>).</li>
+            <li>אם המרחק בין הנקודות קטן $\leftarrow$ המהירות יורדת (הגוף <strong>בתאוטה</strong>).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="proof-section-title">נימוק והגדרה לפי תרשים העקבות:</div>
+      <div class="proof-card">
+        <div class="step-block">
+          <div class="step-title">1. תנועה בתאוצה (מאיץ):</div>
+          <p>
+            בקטע <strong>$0 - 5\text{ cm}$</strong>, המרחק בין כל שתי נקודות עוקבות הולך וגדל ככל שהגוף מתקדם ימינה ($0.2\text{ cm} \to 0.6\text{ cm} \to 1.0\text{ cm} \to 1.4\text{ cm} \to 1.8\text{ cm}$).<br>
+            מכיוון שהגוף עובר מרחקים הולכים וגדלים בפרקי זמן שווים, מהירותו גדלה – <strong>הגוף נע בתאוצה</strong>.
+          </p>
+        </div>
+
+        <div class="step-block">
+          <div class="step-title">2. תנועה במהירות קבועה:</div>
+          <p>
+            בקטע <strong>$5 - 11\text{ cm}$</strong>, המרחק בין כל שתי נקודות עוקבות שווה בדיוק ל-$2.0\text{ cm}$ ($5 \to 7 \to 9 \to 11$).<br>
+            מכיוון שבפרקי זמן שווים מועברים העתקים שווים, <strong>הגוף נע במהירות קבועה</strong>.
+          </p>
+        </div>
+
+        <div class="step-block">
+          <div class="step-title">3. תנועה בתאוטה (מאט):</div>
+          <p>
+            בתחום <strong>$11 - 21\text{ cm}$</strong>, המרחק בין הנקודות הולך ומצטמצם עד אשר בסמוך ל-$x = 21\text{ cm}$ הנקודות צמודות זו לזו.<br>
+            מכיוון שההעתקים קטנים בכל מרווח זמן, מהירותו קטנה עד לעצירה – <strong>הגוף נע בתאוטה</strong>.
+          </p>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            הגוף נע <strong>בתאוצה</strong> בקטע $0 - 5\text{ cm}$, ב<strong>מהירות קבועה</strong> בקטע $5 - 11\text{ cm}$, וב<strong>תאוטה</strong> בתחום $11 - 21\text{ cm}$.
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <div></div>
+        <button class="nav-step-btn" onclick="switchSection('sec-b')">הבא: סעיף ב' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION B ========== -->
+    <div id="sec-b" class="section-container">
+      <h2 class="section-header-title">סעיף ב': חישוב המהירות הממוצעת במהלך התנועה</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">נתוני התנועה הכוללת:</div>
+          <ul>
+            <li>נקודת התחלה: $x_0 = 0$.</li>
+            <li>נקודת סיום (עצירה): $x_{\text{final}} = 21\text{ cm}$.</li>
+            <li>העתק כולל של הגוף: $\Delta x = 21 - 0 = 21\text{ cm}$.</li>
+            <li>הערה מהשאלה: שתי הנקודות האחרונות צמודות ונראות כנקודה אחת.</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">משך הזמן שחלף מתחילת התנועה ועד סיומה:</div>
+          <p>
+            הזמן שחולף מתחילת התנועה ועד סיומה שווה ל- $\Delta t = 18 \times (0.2\text{ s}) = 3.6\text{ s}$, כאשר יש $18$ פרקי זמן עוקבים שכל אחד מהם $0.2\text{ s}$.
+          </p>
+          <div class="math-display-box">
+            $$\Delta t = 18 \times 0.2\text{ s} = 3.6\text{ s}$$
+          </div>
+        </div>
+      </div>
+
+      <div class="formula-helper-wrap">
+        <span class="formula-helper-label">נוסחאות דף עזר:</span>
+        <div class="formula-pill">$\bar{v} = \frac{\Delta x}{\Delta t}$</div>
+      </div>
+
+      <div class="proof-section-title">הצבה וחישוב:</div>
+      <div class="proof-card">
+        <div class="step-block">
+          <div class="step-title">חישוב המהירות הממוצעת:</div>
+          <p>נציב את ההעתק הכולל ואת משך הזמן הכולל בהגדרת המהירות הממוצעת:</p>
+          <div class="math-display-box">
+            $$\bar{v} = \frac{\Delta x}{\Delta t} = \frac{21\text{ cm}}{3.6\text{ s}} = 5\frac{5}{6}\text{ cm/s} \approx 5.833\text{ cm/s}$$
+          </div>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            המהירות הממוצעת של הגוף במהלך תנועתו היא <strong>$\bar{v} = 5\frac{5}{6}\text{ cm/s}$</strong> (או כ-$5.83\text{ cm/s}$).
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-a')">→ הקודם: סעיף א'</button>
+        <button class="nav-step-btn" onclick="switchSection('sec-c')">הבא: סעיף ג' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION C ========== -->
+    <div id="sec-c" class="section-container">
+      <h2 class="section-header-title">סעיף ג': חישוב תאוצות הגוף ומהירותו הקבועה</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">הדרישות בסעיף:</div>
+          <p><strong>(1)</strong> תאוצת הגוף בקטע\קטעים בהם מהירותו אינה קבועה.</p>
+          <p><strong>(2)</strong> מהירות הגוף בקטע שבו המהירות קבועה.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">נוסחאות קינמטיקה:</div>
+          <ul>
+            <li>העתק בתנועה שוות-תאוצה: $\Delta x = v_0 \Delta t + \frac{1}{2} a (\Delta t)^2$</li>
+            <li>מהירות בתנועה קצובה: $v = \frac{\Delta x}{\Delta t}$</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="proof-section-title">מהלך החישוב המפורט:</div>
+      <div class="proof-card">
+
+        <!-- (1) Stage 1 -->
+        <div class="step-block">
+          <div class="step-title">(1) תאוצת הגוף בקטע $0 - 5\text{ cm}$ :</div>
+          <p>על מנת לחשב את תאוצת הגוף, נשתמש בקשר:</p>
+          <div class="math-display-box">
+            $$\Delta x_1 = v_0 \Delta t_1 + \frac{1}{2} a_1 (\Delta t_1)^2$$
+          </div>
+          <p>כאשר נתוני הקטע הם:</p>
+          <ul>
+            <li>$\Delta x_1 = 5\text{ cm}$</li>
+            <li>$v_0 = 0$ (יציאה ממנוחה)</li>
+            <li>$\Delta t_1 = 5(0.2) = 1\text{ s}$ ($5$ פרקי זמן בני $0.2\text{ s}$)</li>
+          </ul>
+          <p style="margin-top: 8px;">נציב ונקבל:</p>
+          <div class="math-display-box">
+            $$5 = \frac{1}{2} a_1 (1)^2 \implies a_1 = 10\text{ cm/s}^2$$
+          </div>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+        <!-- (2) -->
+        <div class="step-block">
+          <div class="step-title">(2) בקטע $5 - 11\text{ cm}$ מהירות הגוף קבועה וגודלה:</div>
+          <p>בקטע זה הגוף עובר מ-$5\text{ cm}$ ל-$11\text{ cm}$ במשך $3$ פרקי זמן של $0.2\text{ s}$:</p>
+          <div class="math-display-box">
+            $$v = \frac{\Delta x}{\Delta t} = \frac{11 - 5}{3(0.2)} = 10\text{ cm/s}$$
+          </div>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+        <!-- (1) Stage 3 -->
+        <div class="step-block">
+          <div class="step-title">(1) המשך: בקטע $11 - 21\text{ cm}$ :</div>
+          <p>
+            בקטע זה של המסלול, הגוף נע בתאוטה, כאשר:
+          </p>
+          <ul>
+            <li>$\Delta x_2 = 21 - 11 = 10\text{ cm}$</li>
+            <li>מהירות כניסה: $v_0 = 10\text{ cm/s}$</li>
+            <li>משך הזמן: $\Delta t_2 = 10(0.2) = 2\text{ s}$ ($10$ פרקי זמן של $0.2\text{ s}$)</li>
+          </ul>
+          <p style="margin-top: 8px;">מכאן נקבל:</p>
+          <div class="math-display-box">
+            $$\Delta x_2 = v_0 (\Delta t_2) + \frac{1}{2} a_2 (\Delta t_2)^2$$
+            $$10 = 10(2) + \frac{1}{2} a_2 (2)^2 \implies a_2 = -5\text{ cm/s}^2$$
+          </div>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            <strong>(1)</strong> תאוצת הגוף: בהאצה $a_1 = 10\text{ cm/s}^2$, ובהאטה $a_2 = -5\text{ cm/s}^2$.<br>
+            <strong>(2)</strong> מהירות הגוף בקטע שבו היא קבועה: $v = 10\text{ cm/s}$.
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-b')">→ הקודם: סעיף ב'</button>
+        <button class="nav-step-btn" onclick="switchSection('sec-d')">הבא: סעיף ד' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION D ========== -->
+    <div id="sec-d" class="section-container">
+      <h2 class="section-header-title">סעיף ד': שרטוט גרף המהירות כפונקציה של הזמן $v(t)$</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">משוואות המהירות לפי פרקי הזמן:</div>
+          <ul>
+            <li><strong>(1) בפרק הזמן $(0 - 1\text{ s})$:</strong> $v = 10t$</li>
+            <li><strong>(2) בפרק הזמן $(1 - 1.6\text{ s})$:</strong> $v = 10\text{ cm/s}$</li>
+            <li><strong>(3) בפרק הזמן $(1.6 - 3.6\text{ s})$:</strong> $v = 10 - 5(t - 1.6)$</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">מאפייני הגרף:</div>
+          <p>
+            הגרף מתאר טרפז המורכב משלושה מקטעים רציפים:<br>
+            • עלייה מתונה מ-$(0,0)$ ועד $(1, 10)$.<br>
+            • קטע אופקי שווה מהירות בגובה $10\text{ cm/s}$ בין $t = 1\text{ s}$ ל-$t = 1.6\text{ s}$.<br>
+            • ירידה ליניארית מ-$(1.6, 10)$ ועד לעצירה מלאה $(3.6, 0)$.
+          </p>
+        </div>
+      </div>
+
+      <div class="plot-box">
+        <div class="graph-title">גרף מהירות כפונקציה של הזמן $v(t)$</div>
+        <svg viewBox="0 0 450 250" width="100%" height="240" xmlns="http://www.w3.org/2000/svg">
+          <!-- Grid -->
+          <defs>
+            <pattern id="grid_vd" width="28" height="25" patternUnits="userSpaceOnUse">
+              <path d="M 28 0 L 0 0 0 25" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+            </pattern>
+          </defs>
+          <rect x="55" y="20" width="365" height="175" fill="url(#grid_vd)" />
+
+          <!-- Axes -->
+          <line x1="55" y1="195" x2="430" y2="195" stroke="#334155" stroke-width="2" />
+          <line x1="55" y1="195" x2="55" y2="15" stroke="#334155" stroke-width="2" />
+
+          <!-- Axis Arrows -->
+          <polygon points="432,195 424,191 424,199" fill="#334155" />
+          <polygon points="55,13 51,21 59,21" fill="#334155" />
+
+          <!-- Labels -->
+          <text x="430" y="215" font-size="11.5" font-family="Rubik, sans-serif" fill="#334155" text-anchor="end">t(s)</text>
+          <text x="45" y="20" font-size="11.5" font-family="Rubik, sans-serif" fill="#334155" text-anchor="middle">v(cm/s)</text>
+
+          <!-- Ticks X -->
+          <text x="55" y="212" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="middle">0</text>
+          <line x1="140" y1="192" x2="140" y2="198" stroke="#64748b" stroke-width="1.2" />
+          <text x="140" y="212" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="middle">1</text>
+
+          <line x1="191" y1="192" x2="191" y2="198" stroke="#94a3b8" stroke-width="1" />
+          <text x="191" y="212" font-size="10" font-family="Rubik, sans-serif" fill="#2563eb" text-anchor="middle">1.6</text>
+
+          <line x1="225" y1="192" x2="225" y2="198" stroke="#64748b" stroke-width="1.2" />
+          <text x="225" y="212" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="middle">2</text>
+
+          <line x1="310" y1="192" x2="310" y2="198" stroke="#64748b" stroke-width="1.2" />
+          <text x="310" y="212" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="middle">3</text>
+
+          <line x1="361" y1="192" x2="361" y2="198" stroke="#94a3b8" stroke-width="1" />
+          <text x="361" y="212" font-size="10" font-family="Rubik, sans-serif" fill="#2563eb" text-anchor="middle">3.6</text>
+
+          <line x1="395" y1="192" x2="395" y2="198" stroke="#64748b" stroke-width="1.2" />
+          <text x="395" y="212" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="middle">4</text>
+
+          <!-- Ticks Y -->
+          <text x="45" y="198" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">0</text>
+          <text x="45" y="169" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">2</text>
+          <text x="45" y="141" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">4</text>
+          <text x="45" y="113" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">6</text>
+          <text x="45" y="85" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">8</text>
+          <text x="45" y="59" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">10</text>
+          <text x="45" y="31" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">12</text>
+
+          <!-- Guide lines -->
+          <line x1="55" y1="55" x2="191" y2="55" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1" />
+          <line x1="140" y1="55" x2="140" y2="195" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1" />
+          <line x1="191" y1="55" x2="191" y2="195" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1" />
+          <line x1="361" y1="55" x2="361" y2="195" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1" />
+
+          <!-- Trapezoid Area Fill -->
+          <polygon points="55,195 140,55 191,55 361,195" fill="rgba(37, 99, 235, 0.12)" />
+
+          <!-- Velocity Line -->
+          <polyline points="55,195 140,55 191,55 361,195" fill="none" stroke="#2563eb" stroke-width="2.8" />
+          <circle cx="55" cy="195" r="3.5" fill="#2563eb" />
+          <circle cx="140" cy="55" r="3.5" fill="#2563eb" />
+          <circle cx="191" cy="55" r="3.5" fill="#2563eb" />
+          <circle cx="361" cy="195" r="3.5" fill="#2563eb" />
+        </svg>
+      </div>
+
+      <div class="result-banner">
+        <div class="result-icon">✓</div>
+        <div class="result-text">
+          הגרף מציג טרפז: עליה ליניארית מ-$(0,0)$ עד $(1, 10)$, מהירות קבועה של $10\text{ cm/s}$ עד $t=1.6\text{ s}$, וירידה ליניארית לאפס עד לרגע העצירה ב-$t=3.6\text{ s}$.
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-c')">→ הקודם: סעיף ג'</button>
+        <button class="nav-step-btn" onclick="switchSection('sec-e')">הבא: סעיף ה' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION E ========== -->
+    <div id="sec-e" class="section-container">
+      <h2 class="section-header-title">סעיף ה': המשמעות הפיזיקלית וגודל השטח הכלוא</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">השאלה הנשאלת:</div>
+          <p>קבע, ללא חישוב, מהו גודל השטח הכלוא בין גרף המהירות ששרטטת בסעיף הקודם ובין ציר הזמן.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">המשמעות הפיזיקלית:</div>
+          <p>
+            בגרף מהירות כפונקציה של הזמן ($v-t$), השטח הכלוא בין עקומת הגרף לבין ציר הזמן מייצג את <strong>העתק הגוף ($\Delta x$)</strong>.
+          </p>
+        </div>
+      </div>
+
+      <div class="proof-section-title">קביעה ישירה ואימות:</div>
+      <div class="proof-card">
+        <div class="step-block">
+          <div class="step-title">1. קביעה ללא חישוב:</div>
+          <p>
+            שטח זה מבטא את העתק הגוף בפרק הזמן $0 - 3.6\text{ s}$.<br>
+            הגוף החל את תנועתו ב-$x = 0$ ונעצר ב-$x = 21\text{ cm}$ מבלי לשנות את כיוון תנועתו, ולכן:
+          </p>
+          <div class="math-display-box">
+            $$S = \Delta x = 21\text{ cm}$$
+          </div>
+        </div>
+
+        <div class="step-block">
+          <div class="step-title">2. אימות גיאומטרי (שטח טרפז):</div>
+          <div class="math-display-box">
+            $$S = \frac{\text{בסיס גדול} + \text{בסיס קטן}}{2} \times \text{גובה} = \frac{3.6 + (1.6 - 1)}{2} \times 10 = \frac{3.6 + 0.6}{2} \times 10 = 21\text{ cm}$$
+          </div>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            שטח זה מבטא את <strong>העתק הגוף</strong> בפרק הזמן $0 - 3.6\text{ s}$, שגודלו <strong>$21\text{ cm}$</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-d')">→ הקודם: סעיף ד'</button>
+        <button class="nav-step-btn" onclick="switchSection('sec-f')">הבא: סעיף ו' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION F ========== -->
+    <div id="sec-f" class="section-container">
+      <h2 class="section-header-title">סעיף ו': שרטוט גרף תאוצת הגוף כפונקציה של הזמן $a(t)$</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">ערכי התאוצה לפי פרקי הזמן:</div>
+          <ul>
+            <li><strong>בפרק הזמן $0 < t < 1\text{ s}$ :</strong> תאוצה קבועה $a = 10\text{ cm/s}^2$.</li>
+            <li><strong>בפרק הזמן $1 < t < 1.6\text{ s}$ :</strong> מהירות קבועה, תאוצה $a = 0$.</li>
+            <li><strong>בפרק הזמן $1.6 < t < 3.6\text{ s}$ :</strong> תאוטה קבועה $a = -5\text{ cm/s}^2$.</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">צורת הגרף:</div>
+          <p>
+            מכיוון שהתאוצה בכל קטע הינה קבועה, הגרף מורכב מקטעים אופקיים מקבילים לציר הזמן (פונקציית מדרגות).
+          </p>
+        </div>
+      </div>
+
+      <div class="plot-box">
+        <div class="graph-title">גרף תאוצה כפונקציה של הזמן $a(t)$</div>
+        <svg viewBox="0 0 450 250" width="100%" height="240" xmlns="http://www.w3.org/2000/svg">
+          <!-- Grid -->
+          <defs>
+            <pattern id="grid_a" width="28" height="23" patternUnits="userSpaceOnUse">
+              <path d="M 28 0 L 0 0 0 23" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+            </pattern>
+          </defs>
+          <rect x="55" y="20" width="365" height="190" fill="url(#grid_a)" />
+
+          <!-- Axes -->
+          <line x1="55" y1="135" x2="430" y2="135" stroke="#334155" stroke-width="2" />
+          <line x1="55" y1="220" x2="55" y2="15" stroke="#334155" stroke-width="2" />
+
+          <!-- Axis Arrows -->
+          <polygon points="432,135 424,131 424,139" fill="#334155" />
+          <polygon points="55,13 51,21 59,21" fill="#334155" />
+
+          <!-- Labels -->
+          <text x="430" y="155" font-size="11.5" font-family="Rubik, sans-serif" fill="#334155" text-anchor="end">t(s)</text>
+          <text x="45" y="20" font-size="11.5" font-family="Rubik, sans-serif" fill="#334155" text-anchor="middle">a(cm/s²)</text>
+
+          <!-- Ticks X -->
+          <text x="55" y="152" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="middle">0</text>
+          <line x1="140" y1="131" x2="140" y2="139" stroke="#64748b" stroke-width="1.2" />
+          <text x="140" y="152" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="middle">1</text>
+
+          <line x1="191" y1="131" x2="191" y2="139" stroke="#94a3b8" stroke-width="1" />
+          <text x="191" y="152" font-size="10" font-family="Rubik, sans-serif" fill="#2563eb" text-anchor="middle">1.6</text>
+
+          <line x1="225" y1="131" x2="225" y2="139" stroke="#64748b" stroke-width="1.2" />
+          <text x="225" y="152" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="middle">2</text>
+
+          <line x1="310" y1="131" x2="310" y2="139" stroke="#64748b" stroke-width="1.2" />
+          <text x="310" y="152" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="middle">3</text>
+
+          <line x1="361" y1="131" x2="361" y2="139" stroke="#94a3b8" stroke-width="1" />
+          <text x="361" y="152" font-size="10" font-family="Rubik, sans-serif" fill="#2563eb" text-anchor="middle">3.6</text>
+
+          <line x1="395" y1="131" x2="395" y2="139" stroke="#64748b" stroke-width="1.2" />
+          <text x="395" y="152" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="middle">4</text>
+
+          <!-- Ticks Y -->
+          <text x="45" y="139" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">0</text>
+          <text x="45" y="104" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">5</text>
+          <text x="45" y="69" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">10</text>
+          <text x="45" y="34" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">15</text>
+          <text x="45" y="174" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">-5</text>
+          <text x="45" y="209" font-size="11" font-family="Rubik, sans-serif" fill="#64748b" text-anchor="end">-10</text>
+
+          <!-- Segments -->
+          <!-- 0 to 1s: a = 10 -->
+          <line x1="55" y1="65" x2="140" y2="65" stroke="#2563eb" stroke-width="3" />
+          <!-- 1 to 1.6s: a = 0 -->
+          <line x1="140" y1="135" x2="191" y2="135" stroke="#059669" stroke-width="3.5" />
+          <!-- 1.6 to 3.6s: a = -5 -->
+          <line x1="191" y1="170" x2="361" y2="170" stroke="#dc2626" stroke-width="3" />
+
+          <!-- Vertical dashed guidelines -->
+          <line x1="140" y1="65" x2="140" y2="135" stroke="#94a3b8" stroke-dasharray="3,3" />
+          <line x1="191" y1="135" x2="191" y2="170" stroke="#94a3b8" stroke-dasharray="3,3" />
+          <line x1="361" y1="135" x2="361" y2="170" stroke="#94a3b8" stroke-dasharray="3,3" />
+        </svg>
+      </div>
+
+      <div class="result-banner">
+        <div class="result-icon">✓</div>
+        <div class="result-text">
+          גרף התאוצה מורכב משלוש מדרגות: קו אופקי ב-$+10\text{ cm/s}^2$ עד $t=1\text{ s}$, קו על ציר הזמן ($a=0$) עד $t=1.6\text{ s}$, וקו אופקי ב-$-5\text{ cm/s}^2$ עד $t=3.6\text{ s}$.
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-e')">→ הקודם: סעיף ה'</button>
+        <button class="nav-step-btn" onclick="switchSection('sec-g')">הבא: סעיף ז' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION G ========== -->
+    <div id="sec-g" class="section-container">
+      <h2 class="section-header-title">סעיף ז': בחירת גרף המיקום כפונקציה של הזמן $x(t)$</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">השאלה הנשאלת:</div>
+          <p>קבוצה של תלמידים התבקשו לשרטט באופן איכותי את המיקום כפונקציה של הזמן עבור הגוף. התקבלו ארבעה גרפים. קבע מי מבין הגרפים הוא הנכון ונמק.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">ביטויי המיקום כפונקציה של הזמן:</div>
+          <p>המיקום כפונקציה של הזמן מתואר על ידי הפונקציה הבאה:</p>
+          <div class="math-display-box" style="font-size:0.92rem;">
+            $$x(t) = \begin{cases}
+            5t^2 & 0 - 1\text{ s} \\
+            5 + 10(t - 1) & 1 - 1.6\text{ s} \\
+            11 + 10(t - 1.6) - 2.5(t - 1.6)^2 & 1.6 - 3.6\text{ s}
+            \end{cases}$$
+          </div>
+        </div>
+      </div>
+
+      <div class="proof-section-title">השוואת 4 הגרפים ונימוק:</div>
+      <div class="choice-grid">
+        <!-- Option 1 (CORRECT) -->
+        <div class="choice-card correct">
+          <div class="choice-header">
+            <strong style="color:var(--accent-green);">גרף (1)</strong>
+            <span class="choice-badge badge-correct">הגרף הנכון</span>
+          </div>
+          <p style="font-size:0.9rem; color:#334155;">
+            • מתחיל כפרבולה קעורה כלפי מעלה (מאיץ ממנוחה).<br>
+            • ממשיך כקו ישר משופע (מהירות קבועה).<br>
+            • מסתיים כפרבולה קעורה כלפי מטה עם שיפוע אפס (עצירה ב-$x=21\text{ cm}$).<br>
+            • המיקום עולה מונוטונית לאורך כל התנועה.
+          </p>
+        </div>
+
+        <!-- Option 2 -->
+        <div class="choice-card">
+          <div class="choice-header">
+            <strong>גרף (2)</strong>
+            <span class="choice-badge badge-wrong">שגוי</span>
+          </div>
+          <p style="font-size:0.9rem; color:#334155;">
+            מציג קו ישר, קטע אופקי (משמעותו מנוחה ממושכת), וירידה של המיקום חזרה ל-0 (חזרה לראשית). הגוף נע קדימה בלבד ולא חזר אחורה.
+          </p>
+        </div>
+
+        <!-- Option 3 -->
+        <div class="choice-card">
+          <div class="choice-header">
+            <strong>גרף (3)</strong>
+            <span class="choice-badge badge-wrong">שגוי</span>
+          </div>
+          <p style="font-size:0.9rem; color:#334155;">
+            מציג ירידה של המיקום חזרה לראשית הצירים בסיום התנועה, בסתירה לעובדה שהגוף נעצר ב-$x=21\text{ cm}$.
+          </p>
+        </div>
+
+        <!-- Option 4 -->
+        <div class="choice-card">
+          <div class="choice-header">
+            <strong>גרף (4)</strong>
+            <span class="choice-badge badge-wrong">שגוי</span>
+          </div>
+          <p style="font-size:0.9rem; color:#334155;">
+            מציג פונקציה בעלת נקודת חוד (אי-רציפות בנגזרת) וחזרה לאפס.
+          </p>
+        </div>
+      </div>
+
+      <div class="proof-card">
+        <div class="step-block">
+          <div class="step-title">נימוק פיזיקלי מסכם:</div>
+          <p>
+            1. <strong>כיוון התנועה ומונוטוניות:</strong> מהירות הגוף חיובית לאורך כל התנועה ($v \ge 0$), ולכן המיקום $x(t)$ חייב להיות <strong>פונקציה עולה בהתמדה</strong> מ-$x = 0$ ועד $x = 21\text{ cm}$. גרפים (2), (3) ו-(4) מציגים ירידה של המיקום חזרה ל-$x = 0$, ולכן הם נפסלים מיידית.<br><br>
+            2. <strong>שיפוע הגרף מייצג את המהירות ($\frac{dx}{dt} = v$):</strong><br>
+            • בפרק הזמן $0 - 1\text{ s}$: המהירות גדלה מאפס, לכן שיפוע המשיק מתחיל מאופקי והולך וגדל (פרבולה מחייכת, $a > 0$).<br>
+            • בפרק הזמן $1 - 1.6\text{ s}$: המהירות קבועה, לכן שיפוע הגרף קבוע (קטע של קו ישר).<br>
+            • בפרק הזמן $1.6 - 3.6\text{ s}$: המהירות קטנה עד לעצירה, לכן שיפוע המשיק הולך ומתמתן עד שהוא נעשה אופקי ($v=0$) ברגע העצירה בשיא הגרף (פרבולה בוכה, $a < 0$).
+          </p>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            הגרף המתאים לביטוי זה הוא <strong>גרף (1)</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-f')">→ הקודם: סעיף ו'</button>
+        <div></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  function switchSection(sectionId) {
+    // Hide all sections
+    const sections = document.querySelectorAll('.section-container');
+    sections.forEach(sec => sec.classList.remove('active'));
+
+    // Remove active class from buttons
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    // Show target section
+    const target = document.getElementById(sectionId);
+    if (target) {
+      target.classList.add('active');
+    }
+
+    // Update active button
+    const sectionIds = ['sec-a', 'sec-b', 'sec-c', 'sec-d', 'sec-e', 'sec-f', 'sec-g'];
+    const activeIndex = sectionIds.indexOf(sectionId);
+    if (activeIndex !== -1 && buttons[activeIndex]) {
+      buttons[activeIndex].classList.add('active');
+    }
+
+    // Smooth scroll to top of tabs area
+    window.scrollTo({
+      top: document.querySelector('.tabs-wrapper').offsetTop - 20,
+      behavior: 'smooth'
+    });
+  }
+</script>
+
+</body>
+</html>
