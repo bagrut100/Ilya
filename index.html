@@ -8,25 +8,33 @@
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
 
-  <header class="bg-[#0b0c10] text-white py-8 px-4 text-center border-b-4 border-cyan-500 shadow-xl">
+    <header class="bg-[#0b0c10] text-white py-8 px-4 text-center border-b-4 border-cyan-500 shadow-xl">
         <div class="container mx-auto max-w-4xl flex flex-col items-center">
-            
             <img src="LOGO.png" alt="איליה וינוקור - מורה לפיזיקה" class="w-56 h-56 object-cover rounded-full mb-4 shadow-2xl">
-            
             <p class="text-slate-400 mt-2 text-base max-w-md font-light">מאגר חומרי לימוד, תרגילים אינטראקטיביים והכנה לבגרות בפיזיקה 5 יח"ל</p>
         </div>
     </header>
 
     <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- דף נוסחאות וכללי -->
+            <div class="bg-purple-50 rounded-xl p-6 hover:bg-purple-100 transition shadow-sm">
+                <div class="text-2xl mb-2">📑</div>
+                <h3 class="text-xl font-bold text-purple-900 mb-2">כללי - דף נוסחאות</h3>
+                <p class="text-purple-700 text-sm mb-4">דפי נוסחאות, קבועים פיזיקליים, נספחים וחומרי עזר לבגרות.</p>
+                <a href="00_KLALI/klali.html" class="inline-block bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה לפרק</a>
+            </div>
             
+            <!-- מכניקה -->
             <div class="bg-blue-50 rounded-xl p-6 hover:bg-blue-100 transition shadow-sm">
                 <div class="text-2xl mb-2">🚗</div>
-                <h3 class="text-xl font-bold text-blue-900 mb-2">מכניקה </h3>
+                <h3 class="text-xl font-bold text-blue-900 mb-2">מכניקה</h3>
                 <p class="text-blue-700 text-sm mb-4">קינמטיקה, דינמיקה, חוקי ניוטון, עבודה ואנרגיה.</p>
                 <a href="01_mechanics/mechanics.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה לפרק</a>
             </div>
 
+            <!-- חשמל ומגנטיות -->
             <div class="bg-amber-50 rounded-xl p-6 hover:bg-amber-100 transition shadow-sm">
                 <div class="text-2xl mb-2">⚡</div>
                 <h3 class="text-xl font-bold text-amber-900 mb-2">חשמל ומגנטיות</h3>
@@ -34,6 +42,7 @@
                 <a href="02_electricity/electricity.html" class="inline-block bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה לפרק</a>
             </div>
 
+            <!-- קרינה וחומר -->
             <div class="bg-emerald-50 rounded-xl p-6 hover:bg-emerald-100 transition shadow-sm">
                 <div class="text-2xl mb-2">🔬</div>
                 <h3 class="text-xl font-bold text-emerald-900 mb-2">קרינה וחומר</h3>
@@ -41,6 +50,7 @@
                 <a href="03_optic/optics_waves.html" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה לפרק</a>
             </div>
 
+            <!-- מעבדות וסימולציות -->
             <div class="bg-slate-50 rounded-xl p-6 hover:bg-slate-100 transition shadow-sm">
                 <div class="text-2xl mb-2">📊</div>
                 <h3 class="text-xl font-bold text-slate-900 mb-2">מעבדות וסימולציות</h3>
@@ -48,19 +58,19 @@
                 <a href="04_lab/simulations.html" class="inline-block bg-slate-600 hover:bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה למעבדה</a>
             </div>
 
-
-            <div class="bg-slate-50 rounded-xl p-6 hover:bg-slate-100 transition shadow-sm">
-                <div class="text-2xl mb-2">📊</div>
-                <h3 class="text-xl font-bold text-slate-900 mb-2"> הטיבה</h3>
-                <p class="text-slate-700 text-sm mb-4"> ,  אנרגיה מכנית, תרמיט, חשמלית   .</p>
-                <a href="05_Hativa/hativa.html" class="inline-block bg-slate-600 hover:bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה למעבדה</a>
+            <!-- חטיבה -->
+            <div class="bg-teal-50 rounded-xl p-6 hover:bg-teal-100 transition shadow-sm">
+                <div class="text-2xl mb-2">📚</div>
+                <h3 class="text-xl font-bold text-teal-900 mb-2">חטיבת ביניים</h3>
+                <p class="text-teal-700 text-sm mb-4">אנרגיה מכנית, תרמית, חשמלית ומבוא לפיזיקה.</p>
+                <a href="05_Hativa/hativa.html" class="inline-block bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה לפרק</a>
             </div>
 
         </div>
     </main>
 
     <footer class="bg-white text-gray-500 text-center py-4 text-xs border-t border-gray-200">
-        <p>© 2026 מרכז הפיזיקה 5 יח"ל | אילייה וינוקור</p>
+        <p>© 2026 מרכז הפיזיקה 5 יח"ל | איליה וינוקור</p>
     </footer>
 
 </body>
