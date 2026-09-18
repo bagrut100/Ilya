@@ -3,65 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מכניקה ניוטונית - תרגילים</title>
+    <title>מכניקה ניוטונית - מאגר תרגילים ופתרונות</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans">
 
+    <!-- Top Navigation -->
     <nav class="bg-slate-900 text-white py-3 px-4 shadow-sm">
         <div class="container mx-auto max-w-5xl flex justify-between items-center">
-            <span class="font-bold text-cyan-400">מכניקה ניוטונית | מאגר חומרי לימוד</span>
+            <span class="font-bold text-cyan-400">מכניקה ניוטונית | מאגר חומרי לימוד ופתרונות</span>
             <a href="../index.html" class="text-sm bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded transition">חזרה לדף הבית 🏠</a>
         </div>
     </nav>
 
+    <!-- Main Content Area -->
     <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Dynamic Filter Card -->
         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
-            <span class="text-sm font-bold text-gray-500 block mb-2">סינון לפי נושאים (נוצר אוטומטית):</span>
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-bold text-gray-600">סינון לפי נושאים ותת-נושאים:</span>
+                <span id="active-filter-label" class="text-xs font-medium text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded-md hidden"></span>
+            </div>
             <div class="flex flex-wrap gap-2" id="tags-container">
-                <button onclick="filterTags('all')" class="bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer">הכל (#all)</button>
+                <button onclick="filterTags('all')" class="filter-tag-btn bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer" data-tag="all">הכל (#all)</button>
             </div>
         </div>
 
+        <!-- Exercises Cards List -->
         <div class="space-y-4" id="materials-list">
-            
-            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
-                 data-tags="קינמטיקה,זריקה_אנכית,">
+
+            <!-- Card 1: Bagrut 2024 Question 1 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition hover:shadow-md" 
+                 data-tags="קינמטיקה,גרף_מהירות_זמן,תנועה_שוות_תאוצה,תרשים_עקבות,בגרות_מכניקה">
                 <div>
-                    <h4 class="font-bold text-gray-900 text-lg">תרגיל אפקה 37 זריקה אנכית</h4>
-                    <p class="text-gray-500 text-xs mt-1 mb-3">זריקה אנכית פתרון</p>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xs bg-blue-100 text-blue-800 font-semibold px-2 py-0.5 rounded">בגרות 2024</span>
+                        <h4 class="font-bold text-gray-900 text-lg">שאלה 1: תנועת שתי מכוניות, גרף v(t) ותרשים עקבות</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs mb-3">חישוב תאוצות משיפוע, כיווני תנועה, העתקים לפי שטח הגרף, בלימה עד תחנת אוטובוס וזיהוי תרשים טיפות צבע.</p>
                     <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
                 </div>
-                <a href="https://youtu.be/NU9G6vAO6N8?si=CQ3LxDZq-g8j07i1" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center transition">פתח קובץ</a>
+                <a href="M2024_1.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center transition shrink-0">פתח פתרון מלא</a>
             </div>
 
-            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
-                 data-tags="דינמיקה,חוקי_ניוטון,חיכוך">
+            <!-- Card 2: Question 47 Foreman -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition hover:shadow-md" 
+                 data-tags="קינמטיקה,זריקה_אנכית,זריקה_אופקית,תנועה_בליסטית,רוח">
                 <div>
-                    <h4 class="font-bold text-gray-900 text-lg">גוף על מישור משופע עם חיכוך</h4>
-                    <p class="text-gray-500 text-xs mt-1 mb-3">חישוב מקדם החיכוך הסטטי והקינטי ומציאת תאוצת המערכת.</p>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xs bg-purple-100 text-purple-800 font-semibold px-2 py-0.5 rounded">פורמן - שאלה 47</span>
+                        <h4 class="font-bold text-gray-900 text-lg">זריקה ממגדל: זריקה זקופה, אופקית והשפעת רוח נגדית</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs mb-3">זריקה אנכית לשיא הגובה, זריקה אופקית ללא התנגדות וזריקה תחת תאוצת רוח קבועה כולל פגיעה ברגלי המגדל ומהירות פגיעה וקטורית.</p>
                     <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
                 </div>
-                <a href="#" class="bg-gray-400 text-white text-sm font-medium px-4 py-2 rounded-lg text-center cursor-not-allowed">בקרוב</a>
+                <a href="47 פורמן.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center transition shrink-0">פתח פתרון מלא</a>
+            </div>
+
+            <!-- Card 3: Bagrut 1990 Question 1 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition hover:shadow-md" 
+                 data-tags="קינמטיקה,דינמיקה,זריקה_אופקית,חוקי_ניוטון,שימור_אנרגיה,צורת_מסלול">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xs bg-indigo-100 text-indigo-800 font-semibold px-2 py-0.5 rounded">בגרות 1990</span>
+                        <h4 class="font-bold text-gray-900 text-lg">שאלה 1: זריקה אופקית וכוח אופקי קבוע</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs mb-3">חישוב מרחק פגיעה ומהירות בשתי שיטות (קינמטיקה ואנרגיה), השפעת כוח אופקי של 0.2N והוכחת צורת המסלול (קו ישר) בשחרור ממנוחה.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="M_1990_1.HTML" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center transition shrink-0">פתח פתרון מלא</a>
+            </div>
+
+            <!-- Card 4: Afeka Kinematics 013 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition hover:shadow-md" 
+                 data-tags="קינמטיקה,זמן_תגובה,מרחק_בלימה,המרת_יחידות,תנועה_בקו_ישר">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded">תרגול אפקה 013</span>
+                        <h4 class="font-bold text-gray-900 text-lg">בדיקת בלימה וזמן תגובה של נהג</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs mb-3">חישוב תאוצת האטה מכיול קודם, המרת קמ"ש למטר לשנייה, וחישוב זמן ומרחק עצירה כוללים בשילוב זמן תגובה ובלימה פעילה.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="אפקה קינמטיקה 013.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center transition shrink-0">פתח פתרון מלא</a>
+            </div>
+
+            <!-- Card 5: Afeka 37 (Existing) -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition hover:shadow-md" 
+                 data-tags="קינמטיקה,זריקה_אנכית">
+                <div>
+                    <h4 class="font-bold text-gray-900 text-lg">תרגיל אפקה 37: זריקה אנכית</h4>
+                    <p class="text-gray-600 text-xs mb-3">פתרון וידאו מפורט לשאלת זריקה אנכית ומציאת גובה וזמנים.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="https://youtu.be/NU9G6vAO6N8?si=CQ3LxDZq-g8j07i1" target="_blank" rel="noopener" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center transition shrink-0">צפה בפתרון 🎬</a>
+            </div>
+
+            <!-- Card 6: Dynamics (Coming soon) -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="דינמיקה,חוקי_ניוטון,חיכוך,מישור_משופע">
+                <div>
+                    <h4 class="font-bold text-gray-900 text-lg">גוף על מישור משופע עם חיכוך</h4>
+                    <p class="text-gray-500 text-xs mb-3">חישוב מקדם החיכוך הסטטי והקינטי ומציאת תאוצת המערכת.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <span class="bg-gray-200 text-gray-500 text-sm font-medium px-4 py-2 rounded-lg text-center cursor-not-allowed shrink-0">בקרוב</span>
             </div>
 
         </div>
     </main>
 
+    <footer class="text-center text-slate-400 text-xs py-6 mt-auto">
+        מאגר תרגילי פיזיקה | פתרונות מעוצבים 2026 ©
+    </footer>
+
+    <!-- Filter & Tags JavaScript -->
     <script>
         const cards = document.querySelectorAll('.item-card');
         const tagsContainer = document.getElementById('tags-container');
+        const activeFilterLabel = document.getElementById('active-filter-label');
         const allTags = new Set();
 
+        // Populate tags from data-tags attributes cleanly
         cards.forEach(card => {
             const rawTags = card.getAttribute('data-tags');
             if (rawTags) {
-                const tagsArray = rawTags.split(',');
+                const tagsArray = rawTags.split(',')
+                    .map(t => t.trim())
+                    .filter(t => t.length > 0);
+
                 const visibleContainer = card.querySelector('.card-tags-visible');
                 tagsArray.forEach(tag => {
                     allTags.add(tag);
                     const tagSpan = document.createElement('span');
-                    tagSpan.className = "text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded hover:bg-cyan-100 hover:text-cyan-700 cursor-pointer";
+                    tagSpan.className = "text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded hover:bg-cyan-100 hover:text-cyan-800 cursor-pointer transition";
                     tagSpan.innerText = `#${tag}`;
                     tagSpan.onclick = () => filterTags(tag);
                     visibleContainer.appendChild(tagSpan);
@@ -69,23 +144,49 @@
             }
         });
 
-        allTags.forEach(tag => {
+        // Generate filter buttons sorted alphabetically
+        Array.from(allTags).sort().forEach(tag => {
             const btn = document.createElement('button');
-            btn.className = "bg-cyan-50 hover:bg-cyan-100 text-cyan-700 text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer";
+            btn.className = "filter-tag-btn bg-cyan-50 hover:bg-cyan-100 text-cyan-700 text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer";
             btn.innerText = `#${tag}`;
+            btn.setAttribute('data-tag', tag);
             btn.onclick = () => filterTags(tag);
             tagsContainer.appendChild(btn);
         });
 
+        // Filter function
         function filterTags(selectedTag) {
+            // Update cards visibility
             cards.forEach(card => {
-                const cardTags = card.getAttribute('data-tags').split(',');
+                const cardTags = card.getAttribute('data-tags')
+                    .split(',')
+                    .map(t => t.trim())
+                    .filter(t => t.length > 0);
+
                 if (selectedTag === 'all' || cardTags.includes(selectedTag)) {
                     card.style.display = 'flex';
                 } else {
                     card.style.display = 'none';
                 }
             });
+
+            // Update active button styling
+            const buttons = tagsContainer.querySelectorAll('.filter-tag-btn');
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-tag') === selectedTag) {
+                    btn.className = "filter-tag-btn bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer";
+                } else {
+                    btn.className = "filter-tag-btn bg-cyan-50 hover:bg-cyan-100 text-cyan-700 text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer";
+                }
+            });
+
+            // Update filter status badge
+            if (selectedTag === 'all') {
+                activeFilterLabel.classList.add('hidden');
+            } else {
+                activeFilterLabel.textContent = `מסנן כעת: #${selectedTag}`;
+                activeFilterLabel.classList.remove('hidden');
+            }
         }
     </script>
 </body>

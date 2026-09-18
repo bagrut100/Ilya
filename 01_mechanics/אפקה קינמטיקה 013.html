@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פתרון מלא: קינמטיקה - בדיקת בלימה וזמן תגובה</title>
+  <!-- Google Fonts: Rubik -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+  <!-- MathJax for LaTeX formulas -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #1e3a8a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --border-color: #e2e8f0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 24px 16px 60px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* HEADER */
+    .header-banner {
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .header-pill {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .header-title {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    .header-badge {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      text-align: center;
+      z-index: 1;
+      min-width: 160px;
+    }
+
+    .header-badge .sub {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      margin-bottom: 2px;
+    }
+
+    .header-badge .main {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    /* OVERVIEW GRID */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 860px) {
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+      .header-banner {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      .header-badge {
+        width: 100%;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .accent-bar {
+      width: 6px;
+      height: 24px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .description-text {
+      color: #334155;
+      font-size: 1.02rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .assumptions-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+    }
+
+    .assumptions-title {
+      font-weight: 700;
+      color: var(--primary-deep);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .assumptions-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.92rem;
+      color: #1e3a8a;
+    }
+
+    .assumptions-list li {
+      position: relative;
+      padding-right: 18px;
+    }
+
+    .assumptions-list li::before {
+      content: "•";
+      color: var(--primary);
+      position: absolute;
+      right: 2px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .graph-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .graph-title {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    /* NAVIGATION TABS */
+    .tabs-wrapper {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      justify-content: center;
+    }
+
+    .tab-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--primary-deep);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 10px 24px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    /* SECTION STYLES */
+    .section-container {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .section-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header-title {
+      color: var(--primary-deep);
+      font-size: 1.55rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    .info-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 10px;
+    }
+
+    .info-card p, .info-card li {
+      font-size: 0.95rem;
+      color: #334155;
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding-right: 0;
+    }
+
+    .info-card li {
+      margin-bottom: 6px;
+      position: relative;
+      padding-right: 16px;
+    }
+
+    .info-card li::before {
+      content: "▪";
+      color: var(--primary);
+      position: absolute;
+      right: 0;
+      font-size: 0.9rem;
+    }
+
+    .formula-helper-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 16px 0 24px;
+      flex-wrap: wrap;
+    }
+
+    .formula-helper-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .formula-pill {
+      background: #eff6ff;
+      border: 1.5px solid #93c5fd;
+      border-radius: 9999px;
+      padding: 5px 18px;
+      color: var(--primary-dark);
+      font-size: 0.92rem;
+      font-weight: 600;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .proof-section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .proof-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .step-block {
+      margin-bottom: 22px;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .math-display-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 14px 20px;
+      margin: 12px 0;
+      overflow-x: auto;
+      direction: ltr;
+      text-align: center;
+    }
+
+    .result-banner {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .result-icon {
+      background: var(--accent-green);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .result-text {
+      color: #065f46;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .nav-buttons-wrap {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .nav-step-btn {
+      background: transparent;
+      border: 1.5px solid var(--border-color);
+      padding: 8px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .nav-step-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .header-banner { box-shadow: none; }
+      .tabs-wrapper, .nav-buttons-wrap { display: none !important; }
+      .section-container { display: block !important; margin-bottom: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header-banner">
+    <div class="header-content">
+      <div class="header-pill">פתרונות מעוצבים בפיזיקה</div>
+      <h1 class="header-title">קינמטיקה: בדיקת בלימה וזמן תגובה</h1>
+      <p class="header-subtitle">תרגול אפקה 013 | המרת יחידות, תנועה שוות-מהירות ותנועה שוות-תאוצה</p>
+    </div>
+    <div class="header-badge">
+      <div class="sub">נושא</div>
+      <div class="main">קינמטיקה בקו ישר</div>
+    </div>
+  </header>
+
+  <!-- OVERVIEW GRID -->
+  <div class="overview-grid">
+    <div class="card">
+      <div class="card-title-wrap">
+        <div class="accent-bar"></div>
+        <h2 class="card-title">תיאור השאלה והנתונים</h2>
+      </div>
+      <p class="description-text">
+        בבדיקת בלימה למכונית נמצא שהאטת המכונית ממהירות $36\text{ km/h}$ לעצירה מוחלטת מתבצעת על דרך של $5\text{ m}$.<br>
+        נהג שיכור שזמן תגובתו $0.75\text{ s}$ נוסע ברכב זה במהירות $90\text{ km/h}$ ומבחין בסכנה. בהנחה שתאוצת ההאטה של המכונית זהה לבדיקה הראשונית:
+      </p>
+
+      <div class="assumptions-box">
+        <div class="assumptions-title">המרת יחידות ונתוני פתיחה:</div>
+        <ul class="assumptions-list">
+          <li><strong>שלב הכיול (בדיקת הבלימה):</strong> $v_0 = 36\text{ km/h} = \frac{36}{3.6} = 10\text{ m/s}$, מרחק עצירה $\Delta x_{\text{test}} = 5\text{ m}$, מהירות סופית $v = 0$.</li>
+          <li><strong>הנסיעה בפועל:</strong> מהירות ראשונית $v_1 = 90\text{ km/h} = \frac{90}{3.6} = 25\text{ m/s}$.</li>
+          <li><strong>שלב 1 (זמן תגובה):</strong> תנועה שוות-מהירות במשך $\Delta t_{\text{react}} = 0.75\text{ s}$.</li>
+          <li><strong>שלב 2 (בלימה בפועל):</strong> תנועה שוות-תאוצה מהמהירות $25\text{ m/s}$ עד לעצירה מוחלטת ($v = 0$).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- DIAGRAM CARD -->
+    <div class="card">
+      <div class="graph-container">
+        <div class="graph-title">תרשים תנועת הרכב (תגובה ובלימה)</div>
+        <svg viewBox="0 0 340 220" width="100%" height="200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Baseline Road -->
+          <line x1="20" y1="170" x2="320" y2="170" stroke="#334155" stroke-width="2.5" />
+          
+          <!-- Stages division -->
+          <line x1="40" y1="40" x2="40" y2="175" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1.5" />
+          <line x1="140" y1="40" x2="140" y2="175" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1.5" />
+          <line x1="300" y1="40" x2="300" y2="175" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1.5" />
+
+          <!-- Stage 1: Reaction -->
+          <rect x="40" y="80" width="100" height="40" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5" />
+          <text x="90" y="100" font-size="12" font-family="Rubik, sans-serif" fill="#1e40af" text-anchor="middle" font-weight="bold">זמן תגובה</text>
+          <text x="90" y="114" font-size="11" font-family="Rubik, sans-serif" fill="#2563eb" text-anchor="middle">מהירות קבועה</text>
+          
+          <!-- Stage 2: Braking -->
+          <rect x="140" y="80" width="160" height="40" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5" />
+          <text x="220" y="100" font-size="12" font-family="Rubik, sans-serif" fill="#991b1b" text-anchor="middle" font-weight="bold">שלב הבלימה</text>
+          <text x="220" y="114" font-size="11" font-family="Rubik, sans-serif" fill="#dc2626" text-anchor="middle">$a = -10\text{ m/s}^2$</text>
+
+          <!-- Distance bracket labels -->
+          <text x="90" y="150" font-size="11" font-family="Rubik, sans-serif" fill="#2563eb" text-anchor="middle">$\Delta x_1 = 18.75\text{ m}$</text>
+          <text x="220" y="150" font-size="11" font-family="Rubik, sans-serif" fill="#dc2626" text-anchor="middle">$\Delta x_2 = 31.25\text{ m}$</text>
+
+          <!-- Markers -->
+          <circle cx="40" cy="170" r="4.5" fill="#3b82f6" />
+          <text x="40" y="195" font-size="11" font-family="Rubik, sans-serif" fill="#334155" text-anchor="middle">הבחנה בסכנה</text>
+
+          <circle cx="140" cy="170" r="4.5" fill="#f59e0b" />
+          <text x="140" y="195" font-size="11" font-family="Rubik, sans-serif" fill="#334155" text-anchor="middle">לחיצה על הבלם</text>
+
+          <circle cx="300" cy="170" r="4.5" fill="#10b981" />
+          <text x="300" y="195" font-size="11" font-family="Rubik, sans-serif" fill="#334155" text-anchor="middle">עצירה מוחלטת</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION TABS -->
+  <div class="tabs-wrapper">
+    <button class="tab-btn active" onclick="switchSection('sec-a')">סעיף א': הזמן הכולל עד לעצירה</button>
+    <button class="tab-btn" onclick="switchSection('sec-b')">סעיף ב': המרחק הכולל עד לעצירה</button>
+  </div>
+
+  <!-- MAIN CARD: ACTIVE SECTION CONTENT -->
+  <div class="card">
+
+    <!-- ========== SECTION A ========== -->
+    <div id="sec-a" class="section-container active">
+      <h2 class="section-header-title">סעיף א': מציאת הזמן שייקח לרכב להיעצר מרגע ההבחנה בסכנה</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">נתוני הסעיף:</div>
+          <ul>
+            <li>מהירות התחלתית: $v_0 = 90\text{ km/h} = 25\text{ m/s}$.</li>
+            <li>משך זמן תגובת הנהג: $t_{\text{react}} = 0.75\text{ s}$.</li>
+            <li>מהירות סופית בסיום התנועה: $v = 0$.</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">השאלה הנשאלת:</div>
+          <p>מצא את <strong>הזמן הכולל</strong> שייקח לרכב להיעצר מרגע ההבחנה בסכנה ועד לעצירתו המוחלטת ($t_{\text{total}}$).</p>
+        </div>
+      </div>
+
+      <div class="formula-helper-wrap">
+        <span class="formula-helper-label">נוסחאות דף עזר:</span>
+        <div class="formula-pill">$v^2 = v_0^2 + 2a\Delta x$</div>
+        <div class="formula-pill">$v = v_0 + at$</div>
+        <div class="formula-pill">$t_{\text{total}} = t_{\text{react}} + t_{\text{brake}}$</div>
+      </div>
+
+      <div class="proof-section-title">נימוק והוכחה מתמטית ופיזיקלית:</div>
+      <div class="proof-card">
+
+        <div class="step-block">
+          <div class="step-title">1. מציאת תאוצת ההאטה מתוך בדיקת הבלימה הראשונית:</div>
+          <p>
+            בבדיקת הבלימה הרכב האט ממהירות $36\text{ km/h}$ ($10\text{ m/s}$) לעצירה ($v = 0$) לאורך דרך של $\Delta x = 5\text{ m}$.
+            נשתמש במשוואת קינמטיקה עצמאית בזמן:
+          </p>
+          <div class="math-display-box">
+            $$v^2 = v_0^2 + 2a\Delta x$$
+            $$0^2 = 10^2 + 2 \cdot a \cdot 5$$
+            $$0 = 100 + 10a \implies 10a = -100 \implies a = -10\text{ m/s}^2$$
+          </div>
+          <p>גודל תאוצת ההאטה של הרכב הוא $|a| = 10\text{ m/s}^2$ בכיוון המנוגד לתנועה.</p>
+        </div>
+
+        <div class="step-block">
+          <div class="step-title">2. חישוב משך זמן הבלימה ($t_{\text{brake}}$):</div>
+          <p>
+            הנהג נוסע במהירות $25\text{ m/s}$. מרגע שלחץ על הבלמים, המכונית מאיטה בתאוצה של $a = -10\text{ m/s}^2$ עד לעצירה ($v=0$):
+          </p>
+          <div class="math-display-box">
+            $$v = v_0 + a \cdot t_{\text{brake}}$$
+            $$0 = 25 + (-10) \cdot t_{\text{brake}} \implies 10 \cdot t_{\text{brake}} = 25 \implies t_{\text{brake}} = \frac{25}{10} = 2.5\text{ s}$$
+          </div>
+        </div>
+
+        <div class="step-block">
+          <div class="step-title">3. חישוב הזמן הכולל מרגע ההבחנה בסכנה:</div>
+          <p>הזמן הכולל מורכב מזמן התגובה (שבו הנהג טרם לחץ על הבלם) וזמן הבלימה בפועל:</p>
+          <div class="math-display-box">
+            $$t_{\text{total}} = t_{\text{react}} + t_{\text{brake}} = 0.75 + 2.5 = 3.25\text{ s}$$
+          </div>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            הזמן הכולל שייקח לרכב להיעצר הוא <strong>$3.25\text{ שניות}$</strong> ($3.25\text{ sec}$).
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <div></div>
+        <button class="nav-step-btn" onclick="switchSection('sec-b')">הבא: סעיף ב' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION B ========== -->
+    <div id="sec-b" class="section-container">
+      <h2 class="section-header-title">סעיף ב': מציאת המרחק הכולל מרגע ההבחנה בסכנה ועד לעצירה</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">נתוני הסעיף:</div>
+          <ul>
+            <li>מהירות תנועה: $v_0 = 25\text{ m/s}$.</li>
+            <li>זמן תגובה: $t_{\text{react}} = 0.75\text{ s}$.</li>
+            <li>תאוצת בלימה: $a = -10\text{ m/s}^2$.</li>
+            <li>זמן בלימה: $t_{\text{brake}} = 2.5\text{ s}$.</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">השאלה הנשאלת:</div>
+          <p>מצא את <strong>המרחק הכולל</strong> (מרחק העצירה) שעבר הרכב מרגע ההבחנה בסכנה ועד לעצירתו המוחלטת ($x_{\text{total}}$).</p>
+        </div>
+      </div>
+
+      <div class="formula-helper-wrap">
+        <span class="formula-helper-label">נוסחאות דף עזר:</span>
+        <div class="formula-pill">$\Delta x_1 = v \cdot \Delta t$</div>
+        <div class="formula-pill">$\Delta x_2 = \frac{v^2 - v_0^2}{2a}$</div>
+        <div class="formula-pill">$\Delta x_{\text{total}} = \Delta x_1 + \Delta x_2$</div>
+      </div>
+
+      <div class="proof-section-title">נימוק והוכחה מתמטית ופיזיקלית:</div>
+      <div class="proof-card">
+
+        <div class="step-block">
+          <div class="step-title">1. חישוב מרחק התגובה ($\Delta x_1$):</div>
+          <p>במהלך זמן התגובה ($0.75\text{ s}$), הנהג עוד לא הספיק ללחוץ על דוושת הבלם, והרכב המשיך בתנועה קצובה במהירות של $25\text{ m/s}$:</p>
+          <div class="math-display-box">
+            $$\Delta x_1 = v \cdot t_{\text{react}} = 25 \cdot 0.75 = 18.75\text{ m}$$
+          </div>
+        </div>
+
+        <div class="step-block">
+          <div class="step-title">2. חישוב מרחק הבלימה בפועל ($\Delta x_2$):</div>
+          <p>מרגע לחיצת הבלמים, הרכב מאיט מ-$25\text{ m/s}$ לעצירה ($v=0$) בתאוצה $a = -10\text{ m/s}^2$:</p>
+          <div class="math-display-box">
+            $$v^2 = v_0^2 + 2a\Delta x_2$$
+            $$0^2 = 25^2 + 2 \cdot (-10) \cdot \Delta x_2$$
+            $$0 = 625 - 20 \Delta x_2 \implies 20 \Delta x_2 = 625 \implies \Delta x_2 = \frac{625}{20} = 31.25\text{ m}$$
+          </div>
+          <p><em>דרך חלופית:</em> בעזרת מהירות ממוצעת בבלימה: $\Delta x_2 = \frac{v_0 + v}{2} \cdot t_{\text{brake}} = \frac{25 + 0}{2} \cdot 2.5 = 12.5 \cdot 2.5 = 31.25\text{ m}$.</p>
+        </div>
+
+        <div class="step-block">
+          <div class="step-title">3. חישוב המרחק הכולל (מרחק העצירה הכולל):</div>
+          <p>חיבור מרחק התגובה עם מרחק הבלימה:</p>
+          <div class="math-display-box">
+            $$\Delta x_{\text{total}} = \Delta x_1 + \Delta x_2 = 18.75 + 31.25 = 50\text{ m}$$
+          </div>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            המרחק הכולל שעבר הרכב עד לעצירה הוא <strong>$50\text{ מטרים}$</strong> ($50\text{ m}$).
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-a')">→ הקודם: סעיף א'</button>
+        <div></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  function switchSection(sectionId) {
+    const sections = document.querySelectorAll('.section-container');
+    sections.forEach(sec => sec.classList.remove('active'));
+
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    const target = document.getElementById(sectionId);
+    if (target) {
+      target.classList.add('active');
+    }
+
+    const activeIndex = ['sec-a', 'sec-b'].indexOf(sectionId);
+    if (activeIndex !== -1 && buttons[activeIndex]) {
+      buttons[activeIndex].classList.add('active');
+    }
+
+    window.scrollTo({
+      top: document.querySelector('.tabs-wrapper').offsetTop - 20,
+      behavior: 'smooth'
+    });
+  }
+</script>
+
+</body>
+</html>
