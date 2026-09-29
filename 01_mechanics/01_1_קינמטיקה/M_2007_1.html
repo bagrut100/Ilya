@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פתרון מלא: בגרות 2007, שאלה 1 - קינמטיקה</title>
+
+  <!-- Google Fonts: Rubik -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+  <!-- MathJax for rendering LaTeX formulas -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #1e3a8a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --accent-red: #dc2626;
+      --border-color: #e2e8f0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 20px 12px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Top Layout & Canvas Controls Panel */
+    .controls-panel {
+      position: sticky;
+      top: 12px;
+      z-index: 1000;
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 10px 18px;
+      border-radius: 9999px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      margin-bottom: 20px;
+      border: 1px solid #334155;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .layout-toggle-btn {
+      background: #334155;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: inherit;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
+
+    .layout-toggle-btn.active {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    }
+
+    .canvas-tool-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #475569;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.82rem;
+      transition: all 0.2s ease;
+    }
+
+    .canvas-tool-btn.active {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #f87171;
+    }
+
+    /* Flexible Layout Containers */
+    .page-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .layout-19-6 {
+      width: 100%;
+      max-width: 1400px;
+      min-height: 800px;
+      transition: max-width 0.3s ease;
+    }
+
+    .layout-6-19 {
+      width: 100%;
+      max-width: 480px;
+      min-height: 800px;
+      transition: max-width 0.3s ease;
+    }
+
+    .main-content-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Header Banner */
+    .header-banner {
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .header-pill {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .header-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.92;
+    }
+
+    .header-badge {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      text-align: center;
+    }
+
+    .header-badge .sub {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      margin-bottom: 2px;
+    }
+
+    .header-badge .main {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    /* Overview Grid */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 24px;
+    }
+
+    .layout-6-19 .overview-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      background: #f8fafc;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .accent-bar {
+      width: 5px;
+      height: 22px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .description-text {
+      color: #334155;
+      font-size: 0.98rem;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .assumptions-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 14px;
+    }
+
+    .assumptions-title {
+      font-weight: 700;
+      color: var(--primary-deep);
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+
+    .assumptions-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: #1e3a8a;
+    }
+
+    .assumptions-list li {
+      position: relative;
+      padding-right: 18px;
+    }
+
+    .assumptions-list li::before {
+      content: "•";
+      color: var(--primary);
+      position: absolute;
+      right: 2px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    /* Table styling */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 10px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      background: #ffffff;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .data-table th, .data-table td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 8px;
+      text-align: center;
+    }
+
+    .data-table th {
+      background-color: #e2e8f0;
+      color: var(--text-main);
+      font-weight: 700;
+    }
+
+    .data-table tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    /* Graphics Container */
+    .graphics-container {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+      min-height: 310px;
+      justify-content: center;
+    }
+
+    .graph-title {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+      width: 100%;
+      text-align: right;
+    }
+
+    .interactive-canvas-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      z-index: 20;
+    }
+
+    /* Tabs Navigation */
+    .tabs-wrapper {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      justify-content: flex-start;
+      border-bottom: 2px solid #e2e8f0;
+      margin-top: 4px;
+    }
+
+    .tab-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--primary-deep);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    /* Section Content */
+    .section-container {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .section-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header-title {
+      color: var(--primary-deep);
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .layout-6-19 .details-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+    }
+
+    .info-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 8px;
+    }
+
+    .info-card p, .info-card li {
+      font-size: 0.92rem;
+      color: #334155;
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding-right: 0;
+    }
+
+    .info-card li {
+      margin-bottom: 6px;
+      position: relative;
+      padding-right: 16px;
+    }
+
+    .info-card li::before {
+      content: "▪";
+      color: var(--primary);
+      position: absolute;
+      right: 0;
+      font-size: 0.9rem;
+    }
+
+    .formula-helper-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 18px;
+      flex-wrap: wrap;
+    }
+
+    .formula-helper-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .formula-pill {
+      background: #eff6ff;
+      border: 1.5px solid #93c5fd;
+      border-radius: 9999px;
+      padding: 4px 14px;
+      color: var(--primary-dark);
+      font-size: 0.88rem;
+      font-weight: 600;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .proof-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .step-block {
+      margin-bottom: 18px;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .math-display-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      margin: 10px 0;
+      overflow-x: auto;
+      direction: ltr;
+      text-align: center;
+    }
+
+    .result-banner {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .result-icon {
+      background: var(--accent-green);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .result-text {
+      color: #065f46;
+      font-size: 0.98rem;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .nav-buttons-wrap {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .nav-step-btn {
+      background: transparent;
+      border: 1.5px solid var(--border-color);
+      padding: 8px 18px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .nav-step-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls Panel -->
+  <div class="controls-panel">
+    <button class="layout-toggle-btn active" id="btn-19-6" onclick="setLayout('19-6')">פריסה רחבה (19:6)</button>
+    <button class="layout-toggle-btn" id="btn-6-19" onclick="setLayout('6-19')">פריסה אנכית (6:19)</button>
+    <div style="width: 1px; height: 20px; background: #475569;"></div>
+    <button class="canvas-tool-btn" id="laser-btn" onclick="toggleLaser()">מצביע לייזר דועך (2s)</button>
+    <button class="canvas-tool-btn" id="snap-btn" onclick="toggleSnap()">יישור קווים אוטומטי: כבוי</button>
+    <button class="canvas-tool-btn" onclick="clearDrawings()">נקה שרטוט</button>
+  </div>
+
+  <!-- Page Wrapper -->
+  <div class="page-wrapper">
+    <div class="layout-19-6" id="main-wrapper">
+
+      <div class="main-content-card">
+
+        <!-- HEADER -->
+        <header class="header-banner">
+          <div class="header-content">
+            <div class="header-pill">פתרונות מעוצבים בפיזיקה | בגרות 5 יח"ל</div>
+            <h1 class="header-title">פתרון מלא: בגרות 2007, שאלה 1</h1>
+            <p class="header-subtitle">קינמטיקה | תנועה לאורך מסלול עקום, מהירות משיקית רגעית מטבלה, תאוצה משיקית ותאוצה רדיאלית</p>
+          </div>
+          <div class="header-badge">
+            <div class="sub">רמת קושי / נושא</div>
+            <div class="main">בגרות 5 יח"ל / מכניקה</div>
+          </div>
+        </header>
+
+        <!-- OVERVIEW GRID -->
+        <div class="overview-grid">
+          
+          <!-- Formulation & Assumptions -->
+          <div class="card">
+            <div class="card-title-wrap">
+              <div class="accent-bar"></div>
+              <h2 class="card-title">ניסוח השאלה המלא (סטנדרט בחינת בגרות)</h2>
+            </div>
+            <p class="description-text">
+              יעל ואורי חקרו את התנועה לאורך מגלשת מים בלונה פארק.<br>
+              למסלול המגלשה צורה עקומה לכל אורכו (אך צורתו אינה בהכרח קשת של מעגל).<br>
+              יעל גלשה ואורי צילם אותה במהלך גלישתה באמצעות מצלמת וידאו.<br>
+              לאחר מכן הם ניתחו את סרטון הווידאו: המקום של יעל על המגלשה באחת התמונות הוגדר כ"ראשית התנועה" ($s = 0$), כאשר בנקודה זו כבר הייתה יעל בתנועה, והרגע שבו צולמה תמונה זו הוגדר כ-$t = 0$.<br>
+              על סמך הסרטון, הם רשמו את הדרך $s$ שעברה יעל לאורך המגלשה מ"ראשית התנועה" במרווחי זמן קבועים של $0.40\text{ s}$. הממצאים רשומים בטבלה.
+            </p>
+
+            <div class="assumptions-box">
+              <div class="assumptions-title">נתוני המערכת והנחות עבודה:</div>
+              <ul class="assumptions-list">
+                <li>מרווח הזמן הקבוע בין מדידות עוקבות: $\Delta t = 0.40\text{ s}$.</li>
+                <li>ברגע $t = 0$: $s = 0$ (אך המהירות אינה אפס – יעל כבר הייתה בתנועה).</li>
+                <li>מסלול התנועה עקום במרחב לכל אורכו.</li>
+                <li>הגודל הנמדד בטבלה הוא <strong>אורך המסלול (הדרך $s$)</strong> לאורך עקומת המגלשה.</li>
+              </ul>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>הזמן $t\text{ (s)}$</th>
+                    <td>0</td>
+                    <td>0.4</td>
+                    <td>0.8</td>
+                    <td>1.2</td>
+                    <td>1.6</td>
+                    <td>2.0</td>
+                    <td>2.4</td>
+                    <td>2.8</td>
+                    <td>3.2</td>
+                    <td>3.6</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>הדרך $s\text{ (m)}$</th>
+                    <td>0</td>
+                    <td>0.90</td>
+                    <td>1.76</td>
+                    <td>3.62</td>
+                    <td>5.04</td>
+                    <td>7.22</td>
+                    <td>8.88</td>
+                    <td>11.26</td>
+                    <td>13.08</td>
+                    <td>15.54</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- SVG Diagram & Canvas -->
+          <div class="graphics-container">
+            <div class="graph-title">תרשים: גרף גודל המהירות של יעל כפונקציה של הזמן $v(t)$</div>
+            
+            <svg id="system-svg" viewBox="0 0 380 270" width="100%" height="240" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b"/>
+                </marker>
+                <pattern id="gridvt" width="28" height="28" patternUnits="userSpaceOnUse">
+                  <path d="M 28 0 L 0 0 0 28" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+                </pattern>
+              </defs>
+
+              <!-- Grid -->
+              <rect x="55" y="25" width="280" height="168" fill="url(#gridvt)"/>
+
+              <!-- Guidelines for v = 1, 2, 3, 4, 5, 6 -->
+              <line x1="55" y1="165" x2="335" y2="165" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="137" x2="335" y2="137" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="109" x2="335" y2="109" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="81" x2="335" y2="81" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="53" x2="335" y2="53" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="25" x2="335" y2="25" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+
+              <!-- Vertical guidelines for t = 0.4 to 3.6 -->
+              <line x1="86" y1="25" x2="86" y2="193" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="117" y1="25" x2="117" y2="193" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="148" y1="25" x2="148" y2="193" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="180" y1="25" x2="180" y2="193" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="211" y1="25" x2="211" y2="193" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="242" y1="25" x2="242" y2="193" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="273" y1="25" x2="273" y2="193" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="304" y1="25" x2="304" y2="193" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="335" y1="25" x2="335" y2="193" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+
+              <!-- Axes -->
+              <line x1="55" y1="193" x2="355" y2="193" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+              <line x1="55" y1="193" x2="55" y2="12" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+              <!-- Axis Labels -->
+              <text x="355" y="210" font-size="12" font-weight="700" fill="#1e293b">t (s)</text>
+              <text x="48" y="16" font-size="12" font-weight="700" fill="#1e293b" text-anchor="end">v (m/s)</text>
+
+              <!-- Y ticks -->
+              <text x="48" y="197" font-size="10" fill="#475569" text-anchor="end">0</text>
+              <text x="48" y="169" font-size="10" font-weight="600" fill="#475569" text-anchor="end">1</text>
+              <text x="48" y="141" font-size="10" font-weight="600" fill="#475569" text-anchor="end">2</text>
+              <text x="48" y="113" font-size="10" font-weight="600" fill="#475569" text-anchor="end">3</text>
+              <text x="48" y="85" font-size="10" font-weight="600" fill="#475569" text-anchor="end">4</text>
+              <text x="48" y="57" font-size="10" font-weight="600" fill="#475569" text-anchor="end">5</text>
+              <text x="48" y="29" font-size="10" font-weight="600" fill="#475569" text-anchor="end">6</text>
+
+              <!-- X ticks -->
+              <text x="55" y="210" font-size="10" fill="#475569" text-anchor="middle">0</text>
+              <text x="86" y="210" font-size="9" font-weight="600" fill="#475569" text-anchor="middle">0.4</text>
+              <text x="117" y="210" font-size="9" font-weight="600" fill="#475569" text-anchor="middle">0.8</text>
+              <text x="148" y="210" font-size="9" font-weight="600" fill="#475569" text-anchor="middle">1.2</text>
+              <text x="180" y="210" font-size="9" font-weight="600" fill="#475569" text-anchor="middle">1.6</text>
+              <text x="211" y="210" font-size="9" font-weight="600" fill="#475569" text-anchor="middle">2.0</text>
+              <text x="242" y="210" font-size="9" font-weight="600" fill="#475569" text-anchor="middle">2.4</text>
+              <text x="273" y="210" font-size="9" font-weight="600" fill="#475569" text-anchor="middle">2.8</text>
+              <text x="304" y="210" font-size="9" font-weight="600" fill="#475569" text-anchor="middle">3.2</text>
+              <text x="335" y="210" font-size="9" font-weight="600" fill="#475569" text-anchor="middle">3.6</text>
+
+              <!-- Curve through Points:
+                   (0.4, 2.20) -> (86.1, 131.4)
+                   (0.8, 3.40) -> (117.2, 97.8)
+                   (1.2, 4.10) -> (148.3, 78.2)
+                   (1.6, 4.50) -> (179.4, 67.0)
+                   (2.0, 4.80) -> (210.6, 58.6)
+                   (2.4, 5.05) -> (241.7, 51.6)
+                   (2.8, 5.25) -> (272.8, 46.0)
+                   (3.2, 5.35) -> (303.9, 43.2)
+              -->
+              <path d="M 86.1,131.4 Q 117.2,97.8 148.3,78.2 T 210.6,58.6 T 272.8,46.0 T 303.9,43.2" fill="none" stroke="#7e22ce" stroke-width="2.8"/>
+
+              <!-- Plotted Points -->
+              <circle cx="86.1" cy="131.4" r="3.5" fill="#7e22ce"/>
+              <circle cx="117.2" cy="97.8" r="3.5" fill="#7e22ce"/>
+              <circle cx="148.3" cy="78.2" r="3.5" fill="#7e22ce"/>
+              <circle cx="179.4" cy="67.0" r="4.5" fill="#dc2626"/>
+              <text x="180" y="55" font-size="10" font-weight="700" fill="#dc2626" text-anchor="middle">(1.6, 4.50)</text>
+              <circle cx="210.6" cy="58.6" r="3.5" fill="#7e22ce"/>
+              <circle cx="241.7" cy="51.6" r="3.5" fill="#7e22ce"/>
+              <circle cx="272.8" cy="46.0" r="3.5" fill="#7e22ce"/>
+              <circle cx="303.9" cy="43.2" r="3.5" fill="#7e22ce"/>
+            </svg>
+
+            <!-- Interactive Drawing and Laser Canvas Overlay -->
+            <canvas id="interactiveCanvas" class="interactive-canvas-layer"></canvas>
+          </div>
+
+        </div>
+
+        <!-- TABS NAVIGATION -->
+        <div class="tabs-wrapper" id="tabsWrapper">
+          <button class="tab-btn active" onclick="switchSection('sec-a')">סעיף א' (מהירות ב-t = 1.6s)</button>
+          <button class="tab-btn" onclick="switchSection('sec-b')">סעיף ב' (טבלת המהירויות המלאה)</button>
+          <button class="tab-btn" onclick="switchSection('sec-c')">סעיף ג' (סרטוט גרף v-t)</button>
+          <button class="tab-btn" onclick="switchSection('sec-d')">סעיף ד' (תאוצה משיקית)</button>
+          <button class="tab-btn" onclick="switchSection('sec-e')">סעיף ה' (תאוצה רדיאלית)</button>
+        </div>
+
+        <!-- SECTION CONTENT -->
+
+        <!-- SECTION A -->
+        <div id="sec-a" class="section-container active">
+          <h2 class="section-header-title">סעיף א': חישוב גודל המהירות של יעל ברגע $t = 1.60\text{ s}$</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">נתוני המדידות בסביבת $t = 1.60\text{ s}$:</div>
+              <ul>
+                <li>ברגע $t_1 = 1.20\text{ s}$: עברה דרך של $s_1 = 3.62\text{ m}$.</li>
+                <li>ברגע $t_2 = 1.60\text{ s}$: עברה דרך של $s_2 = 5.04\text{ m}$.</li>
+                <li>ברגע $t_3 = 2.00\text{ s}$: עברה דרך של $s_3 = 7.22\text{ m}$.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>חשב את גודל המהירות של יעל ברגע $t = 1.60\text{ s}$. פרט את חישוביך.</p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">נוסחאות דף עזר:</span>
+            <div class="formula-pill">$v(t) \approx \bar{v} = \frac{\Delta s}{\Delta t} = \frac{s(t+\Delta t) - s(t-\Delta t)}{2\Delta t}$</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">1. הסבר פיזיקלי ומתודולוגי:</div>
+              <p>
+                המהירות הרגעית לאורך מסלול עקום (גודל המהירות המשיקית) מוגדרת כנגזרת הדרך לפי הזמן ($v = \frac{ds}{dt} = \lim_{\Delta t \to 0} \frac{\Delta s}{\Delta t}$).<br>
+                כאשר נתונים ערכים בדידים מתוך ניסוי ללא תלות אנליטית מפורשת, הקירוב הטוב והתקני ביותר עבור המהירות הרגעית ברגע מסוים מתקבל מחישוב <strong>המהירות הממוצעת בקטע זמן קטן וסימטרי המקיף את הרגע המבוקש</strong> (נקודה אחת לפניו ב-$t = 1.20\text{ s}$ ונקודה אחת אחריו ב-$t = 2.00\text{ s}$):
+              </p>
+              <div class="math-display-box">
+                $$v(1.60) \approx \frac{\Delta s}{\Delta t} = \frac{s(2.00) - s(1.20)}{2.00 - 1.20}$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">2. הצבת ערכים וחישוב:</div>
+              <div class="math-display-box">
+                $$v(1.60) \approx \frac{7.22\text{ m} - 3.62\text{ m}}{2.00\text{ s} - 1.20\text{ s}} = \frac{3.60\text{ m}}{0.80\text{ s}} = 4.50\text{ m/s}$$
+              </div>
+              <p>
+                חישוב זה מתיישב במדויק עם דף הפתרון הרשמי של בחינת הבגרות.
+              </p>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                גודל מהירותה של יעל ברגע $t = 1.60\text{ s}$ הוא: <strong>$v(1.60) = 4.50\text{ m/s}$</strong>.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <div></div>
+            <button class="nav-step-btn" onclick="switchSection('sec-b')">הבא: סעיף ב' ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION B -->
+        <div id="sec-b" class="section-container">
+          <h2 class="section-header-title">סעיף ב': הכנת טבלת גודל המהירות של יעל כפונקציה של הזמן</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">הרגעים המבוקשים בטבלה:</div>
+              <ul>
+                <li>כל רגעי המדידה הפנימיים: מ-$t = 0.40\text{ s}$ ועד $t = 3.20\text{ s}$.</li>
+                <li>עבור כל רגע $t_i$, נחשב את המהירות הממוצעת במרווח הסימטרי $\Delta t_{\text{interval}} = 2 \times 0.40 = 0.80\text{ s}$ שבין $t_{i-1}$ ל-$t_{i+1}$.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>הכן טבלה ובה שתי עמודות: זמן $t\text{ (s)}$ וגודל המהירות $v\text{ (m/s)}$ עבור הרגעים $t = 0.4\text{ s}$ עד $t = 3.2\text{ s}$. חשב את המהירויות ורשום אותן בטבלה (אין חובה לפרט את החישובים).</p>
+            </div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">פירוט החישובים עבור כל הרגעים (לשם שלמות פדגוגית ובקרה):</div>
+              <div class="math-display-box">
+                $$v(0.40) \approx \frac{s(0.8) - s(0)}{0.8 - 0} = \frac{1.76 - 0}{0.80} = 2.20\text{ m/s}$$
+                $$v(0.80) \approx \frac{s(1.2) - s(0.4)}{1.2 - 0.4} = \frac{3.62 - 0.90}{0.80} = \frac{2.72}{0.80} = 3.40\text{ m/s}$$
+                $$v(1.20) \approx \frac{s(1.6) - s(0.8)}{1.6 - 0.8} = \frac{5.04 - 1.76}{0.80} = \frac{3.28}{0.80} = 4.10\text{ m/s}$$
+                $$v(1.60) \approx \frac{s(2.0) - s(1.2)}{2.0 - 1.2} = \frac{7.22 - 3.62}{0.80} = \frac{3.60}{0.80} = 4.50\text{ m/s}$$
+                $$v(2.00) \approx \frac{s(2.4) - s(1.6)}{2.4 - 1.6} = \frac{8.88 - 5.04}{0.80} = \frac{3.84}{0.80} = 4.80\text{ m/s}$$
+                $$v(2.40) \approx \frac{s(2.8) - s(2.0)}{2.8 - 2.0} = \frac{11.26 - 7.22}{0.80} = \frac{4.04}{0.80} = 5.05\text{ m/s}$$
+                $$v(2.80) \approx \frac{s(3.2) - s(2.4)}{3.2 - 2.4} = \frac{13.08 - 8.88}{0.80} = \frac{4.20}{0.80} = 5.25\text{ m/s}$$
+                $$v(3.20) \approx \frac{s(3.6) - s(2.8)}{3.6 - 2.8} = \frac{15.54 - 11.26}{0.80} = \frac{4.28}{0.80} = 5.35\text{ m/s}$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">הטבלה המסכמת המבוקשת:</div>
+              <div class="table-container" style="max-width: 440px; margin: 0 auto 10px;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>הזמן $t\text{ (s)}$</th>
+                      <th>גודל המהירות $v\text{ (m/s)}$</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>0.40</td>
+                      <td>2.20</td>
+                    </tr>
+                    <tr>
+                      <td>0.80</td>
+                      <td>3.40</td>
+                    </tr>
+                    <tr>
+                      <td>1.20</td>
+                      <td>4.10</td>
+                    </tr>
+                    <tr>
+                      <td>1.60</td>
+                      <td>4.50</td>
+                    </tr>
+                    <tr>
+                      <td>2.00</td>
+                      <td>4.80</td>
+                    </tr>
+                    <tr>
+                      <td>2.40</td>
+                      <td>5.05</td>
+                    </tr>
+                    <tr>
+                      <td>2.80</td>
+                      <td>5.25</td>
+                    </tr>
+                    <tr>
+                      <td>3.20</td>
+                      <td>5.35</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                הטבלה הושלמה במלואה. כל ערכי המהירות חושבו בשיטה סימטרית ומבוטאים בשברים עשרוניים תקניים ב-$\text{m/s}$.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-a')">→ הקודם: סעיף א'</button>
+            <button class="nav-step-btn" onclick="switchSection('sec-c')">הבא: סעיף ג' ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION C -->
+        <div id="sec-c" class="section-container">
+          <h2 class="section-header-title">סעיף ג': סרטוט גרף גודל המהירות כפונקציה של הזמן $v(t)$</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">מאפייני הנקודות בגרף:</div>
+              <ul>
+                <li>הנקודות שסומנו: $(0.4, 2.20)$, $(0.8, 3.40)$, $(1.2, 4.10)$, $(1.6, 4.50)$, $(2.0, 4.80)$, $(2.4, 5.05)$, $(2.8, 5.25)$, $(3.2, 5.35)$.</li>
+                <li>גודל המהירות עולה בהתמדה לאורך כל התנועה ($v$ עולה מ-$2.20\text{ m/s}$ ל-$5.35\text{ m/s}$).</li>
+                <li>קצב העלייה (שיפוע הגרף) הולך ומתמתן עם הזמן – העקומה קעורה כלפי מטה.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>סרטט גרף של גודל המהירות של יעל כפונקציה של הזמן בהתבסס על הנקודות שחישבת בסעיף ב'.</p>
+            </div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">תיאור ומאפייני העקומה:</div>
+              <p>
+                הגרף המתקבל מחיבור הנקודות בקו רציף וחלק איננו קו ישר, אלא <strong>עקומה עולה ששיפועה הולך וקטן</strong>.<br>
+                בתחילת התנועה ($t \le 1.20\text{ s}$) העלייה במהירות תלולה מאוד (הפרש של למעלה מ-$1\text{ m/s}$ בכל $0.4\text{ s}$), בעוד שבהמשך המסלול שינוי המהירות נעשה מתון ביותר (תוספת של $0.10\text{ m/s}$ בלבד בין $2.8\text{ s}$ ל-$3.2\text{ s}$).
+              </p>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                הגרף סורטט במדויק (ראו תרשים עליון): עקומה חלקה ועולה ששיפועה מתמתן בהדרגה ככל שחולף הזמן.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-b')">→ הקודם: סעיף ב'</button>
+            <button class="nav-step-btn" onclick="switchSection('sec-d')">הבא: סעיף ד' ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION D -->
+        <div id="sec-d" class="section-container">
+          <h2 class="section-header-title">סעיף ד': ניתוח קיומה של תאוצה משיקית במהלך התנועה</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">הגדרת תאוצה משיקית ($a_t$):</div>
+              <ul>
+                <li>התאוצה המשיקית מוגדרת כקצב השינוי של <strong>גודל המהירות</strong> בזמן:
+                  $$a_t = \frac{d|\vec{v}|}{dt} = \frac{dv}{dt}$$
+                </li>
+                <li>היא משיקה למסלול בכל נקודה ומבטאת שינוי במהירות הקווית של הגוף.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>האם במהלך תנועתה, הייתה ליעל תאוצה משיקית? נמק את תשובתך.</p>
+            </div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">קביעה חד-משמעית:</div>
+              <p><strong>כן, במהלך תנועתה הייתה ליעל תאוצה משיקית.</strong></p>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">נימוק פיזיקלי מפורט:</div>
+              <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
+                <li>התאוצה המשיקית מייצגת את קצב השינוי בגודלה של המהירות ($a_t = \frac{dv}{dt}$), והיא שווה לשיפוע המשיק לעקומת הגרף $v(t)$.</li>
+                <li>כפי שחושב בטבלה וכפי שנראה בגרף בסעיף ג', גודל המהירות של יעל <strong>אינו קבוע, אלא משתנה וגדל בהתמדה</strong> מ-$2.20\text{ m/s}$ ועד $5.35\text{ m/s}$.</li>
+                <li>בכל פרק זמן נתון $\Delta v \ne 0$, ולכן שיפוע הגרף שונה מאפס ($\frac{dv}{dt} \ne 0$).</li>
+                <li>מכיוון שגודל המהירות משתנה בזמן, בהכרח קיימת ליעל תאוצה משיקית (המכוונת עם כיוון התנועה המשיק למגלשה).</li>
+              </ul>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                <strong>כן</strong>. נימוק: תאוצה משיקית מבטאת שינוי בגודל המהירות ($a_t = \frac{dv}{dt}$). מכיוון שגודל מהירותה של יעל משתנה (הולך וגדל לפי הטבלה והגרף), הייתה לה תאוצה משיקית.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-c')">→ הקודם: סעיף ג'</button>
+            <button class="nav-step-btn" onclick="switchSection('sec-e')">הבא: סעיף ה' ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION E -->
+        <div id="sec-e" class="section-container">
+          <h2 class="section-header-title">סעיף ה': ניתוח קיומה של תאוצה רדיאלית במהלך התנועה</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">הגדרת תאוצה רדיאלית / צנטריפטלית ($a_R$):</div>
+              <ul>
+                <li>התאוצה הרדיאלית אחראית לשינוי <strong>בכיוון וקטור המהירות</strong> של גוף הנע במסלול עקמומי:
+                  $$a_R = \frac{v^2}{R}$$
+                  (כאשר $R$ הוא רדיוס העקמומיות המקומי של המסלול באותה נקודה).
+                </li>
+                <li>היא מכוונת תמיד בניצב למהירות, אל עבר מרכז העקמומיות המקומי.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>האם במהלך תנועתה, הייתה ליעל תאוצה רדיאלית? נמק את תשובתך.</p>
+            </div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">קביעה חד-משמעית:</div>
+              <p><strong>כן, במהלך תנועתה הייתה ליעל תאוצה רדיאלית.</strong></p>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">נימוק פיזיקלי מפורט:</div>
+              <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
+                <li>בניסוח השאלה מצוין מפורשות כי <strong>"למסלול המגלשה צורה עקומה לכל אורכו"</strong>.</li>
+                <li>כאשר גוף נע לאורך מסלול עקום, וקטור המהירות המשיק למסלול <strong>משנה את כיוונו ברציפות</strong> מנקודה לנקודה.</li>
+                <li>וקטור התאוצה הכולל מורכב מרכיב משיקי ומרכיב רדיאלי בניצב לו: $\vec{a} = \vec{a}_t + \vec{a}_R$.</li>
+                <li>תאוצה רדיאלית ($a_R = \frac{v^2}{R}$) קיימת בכל תנועה שבה יש שינוי בכיוון המהירות כאשר המהירות אינה אפס ורדיוס העקמומיות סופי ($R < \infty$).</li>
+                <li>מכיוון שיעל גלשה במהירות שונה מאפס ($v > 0$) לאורך מסלול עקום שבו כיוון התנועה משתנה בהתמדה, בהכרח פעלה עליה תאוצה רדיאלית המכוונת אל עבר מרכז העקמומיות של המגלשה.</li>
+              </ul>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                <strong>כן</strong>. נימוק: תאוצה רדיאלית נובעת משינוי בכיוון וקטור המהירות ($a_R = \frac{v^2}{R}$). מכיוון שיעל נעה במהירות שאינה אפס לאורך מסלול עקום לכל אורכו, כיוון מהירותה השתנה ברציפות ולכן הייתה לה תאוצה רדיאלית.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-d')">→ הקודם: סעיף ד'</button>
+            <div></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Tab Navigation Logic with smooth scroll
+    function switchSection(sectionId) {
+      document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const target = document.getElementById(sectionId);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      const tabs = ['sec-a', 'sec-b', 'sec-c', 'sec-d', 'sec-e'];
+      const idx = tabs.indexOf(sectionId);
+      const buttons = document.querySelectorAll('.tab-btn');
+      if (idx !== -1 && buttons[idx]) {
+        buttons[idx].classList.add('active');
+      }
+
+      const tabsWrapper = document.getElementById('tabsWrapper');
+      if (tabsWrapper) {
+        tabsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Layout Toggling Logic (19:6 vs 6:19)
+    function setLayout(mode) {
+      const wrapper = document.getElementById('main-wrapper');
+      const btn19 = document.getElementById('btn-19-6');
+      const btn6 = document.getElementById('btn-6-19');
+
+      if (mode === '19-6') {
+        wrapper.className = 'layout-19-6';
+        btn19.classList.add('active');
+        btn6.classList.remove('active');
+      } else {
+        wrapper.className = 'layout-6-19';
+        btn6.classList.add('active');
+        btn19.classList.remove('active');
+      }
+      setTimeout(resizeCanvas, 150);
+    }
+
+    // Canvas & Interactive Tools Logic (Disabled automatically by default)
+    const canvas = document.getElementById('interactiveCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    let currentX = 0, currentY = 0;
+
+    let laserMode = false;
+    let snapToStraightLine = false;
+
+    let laserTrail = [];
+    const LASER_LIFETIME = 2000; // Exactly 2 seconds (2000ms)
+
+    let persistentPaths = [];
+
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
+      redraw();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('load', resizeCanvas);
+
+    function toggleLaser() {
+      laserMode = !laserMode;
+      const btn = document.getElementById('laser-btn');
+      btn.classList.toggle('active', laserMode);
+      if (laserMode) {
+        laserTrail = [];
+      }
+    }
+
+    function toggleSnap() {
+      snapToStraightLine = !snapToStraightLine;
+      const btn = document.getElementById('snap-btn');
+      btn.innerText = snapToStraightLine ? "יישור קווים אוטומטי: פעיל" : "יישור קווים אוטומטי: כבוי";
+      btn.classList.toggle('active', snapToStraightLine);
+    }
+
+    function clearDrawings() {
+      persistentPaths = [];
+      laserTrail = [];
+      redraw();
+    }
+
+    function getCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: cx - rect.left,
+        y: cy - rect.top
+      };
+    }
+
+    // Mouse & Touch Handlers
+    canvas.addEventListener('mousedown', (e) => {
+      const p = getCoords(e);
+      isDrawing = true;
+      startX = p.x;
+      startY = p.y;
+      currentX = p.x;
+      currentY = p.y;
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      const p = getCoords(e);
+      currentX = p.x;
+      currentY = p.y;
+      if (laserMode) {
+        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (!isDrawing) return;
+      isDrawing = false;
+      if (!laserMode) {
+        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
+      }
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      const p = getCoords(e);
+      isDrawing = true;
+      startX = p.x;
+      startY = p.y;
+      currentX = p.x;
+      currentY = p.y;
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      const p = getCoords(e);
+      currentX = p.x;
+      currentY = p.y;
+      if (laserMode) {
+        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      if (isDrawing && !laserMode) {
+        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
+      }
+      isDrawing = false;
+    });
+
+    // Render loop for Live Drawings & Laser Trail Fade-Out
+    function render() {
+      const now = Date.now();
+      laserTrail = laserTrail.filter(pt => now - pt.time < LASER_LIFETIME);
+      redraw();
+      requestAnimationFrame(render);
+    }
+
+    function redraw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Persistent straight lines
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      persistentPaths.forEach(item => {
+        if (item.type === 'line') {
+          ctx.beginPath();
+          ctx.moveTo(item.x1, item.y1);
+          ctx.lineTo(item.x2, item.y2);
+          ctx.stroke();
+        }
+      });
+
+      // Preview line while dragging (if snap mode is on and not in laser mode)
+      if (isDrawing && !laserMode && snapToStraightLine) {
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(currentX, currentY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Render Laser Trail with gradual 2000ms decay
+      const now = Date.now();
+      if (laserTrail.length > 1) {
+        for (let i = 1; i < laserTrail.length; i++) {
+          const pt1 = laserTrail[i - 1];
+          const pt2 = laserTrail[i];
+          const age = now - pt2.time;
+          const alpha = Math.max(0, 1 - age / LASER_LIFETIME);
+
+          ctx.beginPath();
+          ctx.moveTo(pt1.x, pt1.y);
+          ctx.lineTo(pt2.x, pt2.y);
+          ctx.strokeStyle = `rgba(239, 68, 68, ${alpha})`;
+          ctx.lineWidth = 3.5 * alpha + 1;
+          ctx.lineCap = 'round';
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = 'rgba(239, 68, 68, 0.8)';
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      // Laser Pointer Tip
+      if (laserMode && laserTrail.length > 0) {
+        const last = laserTrail[laserTrail.length - 1];
+        if (now - last.time < 150) {
+          ctx.beginPath();
+          ctx.arc(last.x, last.y, 4, 0, 2 * Math.PI);
+          ctx.fillStyle = '#ef4444';
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = '#f87171';
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

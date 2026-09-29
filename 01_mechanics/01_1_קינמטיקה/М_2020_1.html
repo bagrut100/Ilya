@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פתרון מלא: בגרות 2020, שאלה 1 - קינמטיקה</title>
+
+  <!-- Google Fonts: Rubik -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+  <!-- MathJax for LaTeX Rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #1e3a8a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --accent-red: #dc2626;
+      --border-color: #e2e8f0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 24px 16px 60px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* HEADER */
+    .header-banner {
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .header-pill {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .header-title {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    .header-badge {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      text-align: center;
+      z-index: 1;
+      min-width: 160px;
+    }
+
+    .header-badge .sub {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      margin-bottom: 2px;
+    }
+
+    .header-badge .main {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    /* OVERVIEW GRID */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 860px) {
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+      .header-banner {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      .header-badge {
+        width: 100%;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .accent-bar {
+      width: 6px;
+      height: 24px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .description-text {
+      color: #334155;
+      font-size: 1.02rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .assumptions-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+    }
+
+    .assumptions-title {
+      font-weight: 700;
+      color: var(--primary-deep);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .assumptions-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.92rem;
+      color: #1e3a8a;
+    }
+
+    .assumptions-list li {
+      position: relative;
+      padding-right: 18px;
+    }
+
+    .assumptions-list li::before {
+      content: "•";
+      color: var(--primary);
+      position: absolute;
+      right: 2px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .graph-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .graph-title {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      font-weight: 500;
+      width: 100%;
+      text-align: right;
+    }
+
+    /* TABS */
+    .tabs-wrapper {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      justify-content: flex-start;
+      margin: 8px 0;
+    }
+
+    .tab-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--primary-deep);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 10px 24px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    /* SECTION CONTENT */
+    .section-container {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .section-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header-title {
+      color: var(--primary-deep);
+      font-size: 1.55rem;
+      font-weight: 800;
+      margin-bottom: 24px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    .info-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 10px;
+    }
+
+    .info-card p, .info-card li {
+      font-size: 0.95rem;
+      color: #334155;
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding-right: 0;
+    }
+
+    .info-card li {
+      margin-bottom: 6px;
+      position: relative;
+      padding-right: 16px;
+    }
+
+    .info-card li::before {
+      content: "▪";
+      color: var(--primary);
+      position: absolute;
+      right: 0;
+      font-size: 0.9rem;
+    }
+
+    .formula-helper-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 16px 0 24px;
+      flex-wrap: wrap;
+    }
+
+    .formula-helper-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .formula-pill {
+      background: #eff6ff;
+      border: 1.5px solid #93c5fd;
+      border-radius: 9999px;
+      padding: 5px 18px;
+      color: var(--primary-dark);
+      font-size: 0.92rem;
+      font-weight: 600;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .proof-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .step-block {
+      margin-bottom: 20px;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .math-display-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 14px 20px;
+      margin: 12px 0;
+      overflow-x: auto;
+      direction: ltr;
+      text-align: center;
+    }
+
+    .result-banner {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .result-icon {
+      background: var(--accent-green);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .result-text {
+      color: #065f46;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    /* Multiple Choice Options for Section F */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    @media (max-width: 768px) {
+      .options-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .option-card {
+      background: #ffffff;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      cursor: default;
+    }
+
+    .option-card.correct {
+      border-color: var(--accent-green);
+      background: #f0fdf4;
+    }
+
+    .option-label {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-main);
+    }
+
+    .badge-correct {
+      background: var(--accent-green);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+    }
+
+    /* Free Body Diagram Styles */
+    .fbd-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .fbd-svg {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    /* NAV BUTTONS */
+    .nav-buttons-wrap {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .nav-step-btn {
+      background: transparent;
+      border: 1.5px solid var(--border-color);
+      padding: 8px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .nav-step-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .header-banner { box-shadow: none; }
+      .tabs-wrapper, .nav-buttons-wrap { display: none !important; }
+      .section-container { display: block !important; margin-bottom: 40px; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header-banner">
+    <div class="header-content">
+      <div class="header-pill">פתרונות מעוצבים בפיזיקה</div>
+      <h1 class="header-title">פתרון מלא: בגרות 2020, שאלה 1</h1>
+      <p class="header-subtitle">קינמטיקה ודינמיקה | "בראשית", נחיתה רכה על הירח, משוואות תנועה וגרף מהירות-זמן</p>
+    </div>
+    <div class="header-badge">
+      <div class="sub">רמת קושי / נושא</div>
+      <div class="main">בגרות 5 יח"ל / מכניקה</div>
+    </div>
+  </header>
+
+  <!-- OVERVIEW GRID -->
+  <div class="overview-grid">
+    <!-- Question Description -->
+    <div class="card">
+      <div class="card-title-wrap">
+        <div class="accent-bar"></div>
+        <h2 class="card-title">תיאור השאלה והמערכת</h2>
+      </div>
+      <p class="description-text">
+        "בראשית" היא הגשושית (חללית) הראשונה מתוצרת ישראל שהייתה אמורה לנחות על הירח בנחיתה רכה. נחיתה רכה מוגדרת כהגעה לקרקע במהירות נמוכה מספיק כדי שלא ייגרם נזק.<br>
+        לשם כך, מנועי הגשושית אמוּרים לפעול במהלך הנחיתה באופן שיאט את מהירותה, וכך כשהיא תהיה בגובה של מטרים אחדים מעל פני הירח מהירותה תהיה אפס. מרגע זה, הגשושית אמוּרה לנוע בנפילה חופשית אל פני הירח.
+      </p>
+      <p class="description-text">
+        השאלה מבוססת על נתוני הדמיה של גשושית דמיונית, שנחתה נחיתה רכה אנכית על פני הירח. בגרף מוצגת מהירות הגשושית כפונקציה של הזמן.<br>
+        בזמן $t = 0$ הגשושית הייתה בגובה $H$ מעל פני הירח, ובזמן $t = 12.45\text{ s}$ היא נחתה על פני הירח. בשלב האחרון של תנועת הגשושית היא נעה בנפילה חופשית.
+      </p>
+
+      <div class="assumptions-box">
+        <div class="assumptions-title">נתונים מהותיים מהגרף ומהטקסט:</div>
+        <ul class="assumptions-list">
+          <li><strong>שלב המנועים ($0 \le t \le 10\text{ s}$):</strong> עלייה לינארית במהירות מ-$v(0) = -20\text{ m/s}$ ל-$v(10) = 0$.</li>
+          <li><strong>שלב הנפילה החופשית ($10\text{ s} < t \le 12.45\text{ s}$):</strong> ירידה לינארית במהירות (שיפוע שלילי).</li>
+          <li>מסת הגשושית קבועה: $m = 164\text{ kg}$.</li>
+          <li>תאוצת הנפילה החופשית בירח: $g_M = 1.67\text{ m/s}^2$ (כלומר בתנועה חופשית מטה התאוצה היא $1.67\text{ m/s}^2$).</li>
+          <li>בשאלה זו יש להתייחס אך ורק לכוחות המופעלים על ידי הירח. התנועה היא אנכית.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- System Diagram (Graph SVG) -->
+    <div class="card">
+      <div class="graph-container">
+        <div class="graph-title">תרשים פיזיקלי של המערכת: מהירות-זמן $v(t)$</div>
+        <svg viewBox="0 0 380 260" width="100%" height="220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b"/>
+            </marker>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+            </pattern>
+          </defs>
+
+          <!-- Grid Background -->
+          <rect x="55" y="30" width="310" height="200" fill="url(#grid)" />
+
+          <!-- Horizontal Guidelines (v axis) -->
+          <!-- y-scale: 0 is at 30, -25 is at 230 => 200px / 25 = 8px per 1 unit of v -->
+          <line x1="55" y1="30" x2="365" y2="30" stroke="#94a3b8" stroke-width="1.5" /> <!-- v = 0 -->
+          <line x1="55" y1="70" x2="365" y2="70" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- v = -5 -->
+          <line x1="55" y1="110" x2="365" y2="110" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- v = -10 -->
+          <line x1="55" y1="150" x2="365" y2="150" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- v = -15 -->
+          <line x1="55" y1="190" x2="365" y2="190" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- v = -20 -->
+          <line x1="55" y1="230" x2="365" y2="230" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- v = -25 -->
+
+          <!-- Vertical Guidelines (t axis) -->
+          <!-- x-scale: 0 is at 55, 14 is at 335 => 280px / 14 = 20px per 1 unit of t -->
+          <line x1="95" y1="30" x2="95" y2="230" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- t=2 -->
+          <line x1="135" y1="30" x2="135" y2="230" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- t=4 -->
+          <line x1="175" y1="30" x2="175" y2="230" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- t=6 -->
+          <line x1="215" y1="30" x2="215" y2="230" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- t=8 -->
+          <line x1="255" y1="30" x2="255" y2="230" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- t=10 -->
+          <line x1="295" y1="30" x2="295" y2="230" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- t=12 -->
+          <line x1="335" y1="30" x2="335" y2="230" stroke="#cbd5e1" stroke-dasharray="2,2"/> <!-- t=14 -->
+
+          <!-- Axes -->
+          <line x1="55" y1="30" x2="375" y2="30" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)" /> <!-- t axis -->
+          <line x1="55" y1="240" x2="55" y2="10" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)" /> <!-- v axis -->
+
+          <!-- Labels -->
+          <text x="375" y="45" font-size="12" font-family="Rubik, sans-serif" font-weight="700" fill="#1e293b">t(s)</text>
+          <text x="45" y="16" font-size="12" font-family="Rubik, sans-serif" font-weight="700" fill="#1e293b" text-anchor="end">v(m/s)</text>
+
+          <!-- Ticks & Numbers X-axis -->
+          <text x="50" y="24" font-size="11" font-family="Rubik, sans-serif" fill="#475569" text-anchor="end">0</text>
+          <text x="95" y="24" font-size="11" font-family="Rubik, sans-serif" fill="#475569" text-anchor="middle">2</text>
+          <text x="135" y="24" font-size="11" font-family="Rubik, sans-serif" fill="#475569" text-anchor="middle">4</text>
+          <text x="175" y="24" font-size="11" font-family="Rubik, sans-serif" fill="#475569" text-anchor="middle">6</text>
+          <text x="215" y="24" font-size="11" font-family="Rubik, sans-serif" fill="#475569" text-anchor="middle">8</text>
+          <text x="255" y="24" font-size="11" font-family="Rubik, sans-serif" font-weight="bold" fill="#1e3a8a" text-anchor="middle">10</text>
+          <text x="295" y="24" font-size="11" font-family="Rubik, sans-serif" fill="#475569" text-anchor="middle">12</text>
+          <text x="335" y="24" font-size="11" font-family="Rubik, sans-serif" fill="#475569" text-anchor="middle">14</text>
+
+          <!-- Ticks & Numbers Y-axis -->
+          <text x="48" y="74" font-size="11" font-family="Rubik, sans-serif" fill="#475569" text-anchor="end">-5</text>
+          <text x="48" y="114" font-size="11" font-family="Rubik, sans-serif" fill="#475569" text-anchor="end">-10</text>
+          <text x="48" y="154" font-size="11" font-family="Rubik, sans-serif" fill="#475569" text-anchor="end">-15</text>
+          <text x="48" y="194" font-size="11" font-family="Rubik, sans-serif" font-weight="bold" fill="#1e3a8a" text-anchor="end">-20</text>
+          <text x="48" y="234" font-size="11" font-family="Rubik, sans-serif" fill="#475569" text-anchor="end">-25</text>
+
+          <!-- Graph Data Points -->
+          <!-- Stage 1 (0 to 10s): from (0, -20) -> x=55, y=190 to (10, 0) -> x=255, y=30 -->
+          <line x1="55" y1="190" x2="255" y2="30" stroke="#2563eb" stroke-width="2.8" />
+          
+          <!-- Stage 2 (10 to 12.45s): from (10, 0) -> x=255, y=30 to (12.45, v2) -->
+          <!-- We calculate v2 later, but slope is -1.67. 2.45s * -1.67 m/s^2 ≈ -4.09 m/s. -->
+          <!-- x = 55 + 12.45*20 = 304, y = 30 + 4.09*8 ≈ 62.7 -->
+          <line x1="255" y1="30" x2="304" y2="62.7" stroke="#dc2626" stroke-width="2.8" />
+          
+          <!-- Highlight Points -->
+          <circle cx="55" cy="190" r="3.5" fill="#2563eb" />
+          <circle cx="255" cy="30" r="4.5" fill="#0f172a" />
+          <circle cx="304" cy="62.7" r="3.5" fill="#dc2626" />
+
+          <!-- Labels -->
+          <text x="130" y="100" font-size="11" font-weight="bold" fill="#2563eb" transform="rotate(-38.6, 130, 100)">בלימה ע"י מנועים</text>
+          <text x="310" y="55" font-size="10" font-weight="bold" fill="#dc2626">נפילה חופשית</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION TABS -->
+  <div class="tabs-wrapper" id="tabsWrapper">
+    <button class="tab-btn active" onclick="switchSection('sec-a')">סעיף א' (הגדרת המושג)</button>
+    <button class="tab-btn" onclick="switchSection('sec-b')">סעיף ב' (תרשים כוחות)</button>
+    <button class="tab-btn" onclick="switchSection('sec-c')">סעיף ג' (גודל כוח המנועים)</button>
+    <button class="tab-btn" onclick="switchSection('sec-d')">סעיף ד' (גובה ב-t=0)</button>
+    <button class="tab-btn" onclick="switchSection('sec-e')">סעיף ה' (גובה בעת איפוס המהירות)</button>
+    <button class="tab-btn" onclick="switchSection('sec-f')">סעיף ו' (בחירת גרף y(t))</button>
+  </div>
+
+  <!-- MAIN CARD: ACTIVE SECTION CONTENT -->
+  <div class="card">
+
+    <!-- ========== SECTION A ========== -->
+    <div id="sec-a" class="section-container active">
+      <h2 class="section-header-title">סעיף א': הגדרת המושג "נפילה חופשית" (4 נקודות)</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">השאלה הנשאלת:</div>
+          <p>הגדר את המושג "נפילה חופשית".</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">הערה פדגוגית חשובה:</div>
+          <p>המונח "נפילה" מטעה לעיתים. נפילה חופשית אינה מתייחסת רק לתנועה כלפי מטה, אלא מתארת כל תנועה (כגון זריקה אנכית מעלה או תנועה בליסטית) שבה הכוח היחיד שפועל הוא הכובד.</p>
+        </div>
+      </div>
+
+      <div class="proof-section-title">הגדרה:</div>
+      <div class="proof-card">
+        <div class="result-banner" style="margin-top: 0;">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            "נפילה חופשית" היא תנועה של גוף המתרחשת <strong>בהשפעת כוח הכובד בלבד</strong> (ללא התערבות כוחות נוספים כגון התנגדות אוויר, כוח מנוע או כוחות חיכוך).
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <div></div>
+        <button class="nav-step-btn" onclick="switchSection('sec-b')">הבא: סעיף ב' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION B ========== -->
+    <div id="sec-b" class="section-container">
+      <h2 class="section-header-title">סעיף ב': סרטוט תרשים הכוחות שפועלים על הגשושית (5 נקודות)</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">נתוני הסעיף:</div>
+          <ul>
+            <li>פרק הזמן הרלוונטי: מ-$t = 0$ ועד $t = 10\text{ s}$.</li>
+            <li>בפרק זמן זה המנועים פועלים כדי להאט את הגשושית בדרכה מטה לירח.</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">השאלה הנשאלת:</div>
+          <p>סרטט את תרשים הכוחות הפועלים על הגשושית הדמיונית מרגע $t=0$ עד $t=10\text{ s}$. ליד כל כוח רשום את שמו.</p>
+        </div>
+      </div>
+
+      <div class="proof-section-title">ניתוח פיזיקלי ותרשים (Free Body Diagram):</div>
+      <div class="proof-card">
+        <div class="step-block">
+          <p>
+            במהלך פרק הזמן $0 \le t \le 10\text{ s}$, הגשושית נמצאת בתנועה כלפי מטה אל הירח. על הגשושית פועלים שני כוחות בלבד:
+          </p>
+          <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
+            <li><strong>כוח הכובד ($F_g$ או $mg_M$):</strong> פועל אנכית כלפי מטה, לעבר פני הירח.</li>
+            <li><strong>כוח המנועים (דחף) ($F_{\text{engine}}$ או $F_D$):</strong> פועל אנכית כלפי מעלה. תפקידו להאט את הנפילה, ולכן עליו לגבור על כוח הכובד וליצור כוח שקול המכוון כלפי מעלה (תאוצה מנוגדת לכיוון התנועה).</li>
+          </ul>
+        </div>
+
+        <div class="fbd-container">
+          <svg class="fbd-svg" viewBox="0 0 200 240" width="200" height="240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="fbd-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b"/>
+              </marker>
+              <marker id="fbd-arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563eb"/>
+              </marker>
+            </defs>
+
+            <!-- Origin dot -->
+            <circle cx="100" cy="140" r="4" fill="#1e293b"/>
+            
+            <!-- Force from engines (upwards, longer) -->
+            <line x1="100" y1="140" x2="100" y2="40" stroke="#2563eb" stroke-width="2.5" marker-end="url(#fbd-arrow-blue)"/>
+            <text x="110" y="80" font-size="13" font-weight="bold" fill="#2563eb">F_engine</text>
+            <text x="110" y="100" font-size="11" fill="#475569">(כוח המנועים)</text>
+
+            <!-- Gravity (downwards, shorter) -->
+            <line x1="100" y1="140" x2="100" y2="200" stroke="#1e293b" stroke-width="2.5" marker-end="url(#fbd-arrow)"/>
+            <text x="110" y="180" font-size="13" font-weight="bold" fill="#1e293b">F_g</text>
+            <text x="110" y="200" font-size="11" fill="#475569">(כוח הכובד)</text>
+
+            <!-- Motion / Accel direction -->
+            <text x="20" y="145" font-size="11" font-weight="bold" fill="#059669" text-anchor="end">v ↓</text>
+            <text x="20" y="165" font-size="11" font-weight="bold" fill="#dc2626" text-anchor="end">a ↑</text>
+          </svg>
+        </div>
+
+        <div class="result-banner" style="margin-top: 0;">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            התרשים כולל את וקטור כוח המנועים ($F_{\text{engine}}$) המכוון מעלה, ואת וקטור כוח הכובד של הירח ($F_g$) המכוון מטה, כאשר $F_{\text{engine}} > F_g$.
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-a')">→ הקודם: סעיף א'</button>
+        <button class="nav-step-btn" onclick="switchSection('sec-c')">הבא: סעיף ג' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION C ========== -->
+    <div id="sec-c" class="section-container">
+      <h2 class="section-header-title">סעיף ג': חישוב גודל הכוח שמנועי הגשושית מפעילים (7 נקודות)</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">נתונים נדרשים:</div>
+          <ul>
+            <li>מסת הגשושית: $m = 164\text{ kg}$.</li>
+            <li>תאוצת הכובד של הירח: $g_M = 1.67\text{ m/s}^2$ (כלפי מטה).</li>
+            <li>נתונים מהגרף ($0 \le t \le 10\text{ s}$): $v(0) = -20\text{ m/s}$, $v(10) = 0$.</li>
+            <li>הכיוון החיובי מוגדר בגרף, ולפי הנתונים התנועה מטה היא שלילית, כלומר <strong>הכיוון החיובי של הציר הוא כלפי מעלה</strong>.</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">השאלה הנשאלת:</div>
+          <p>חשב את גודל הכוח שמנועי הגשושית מפעילים.</p>
+        </div>
+      </div>
+
+      <div class="formula-helper-wrap">
+        <span class="formula-helper-label">נוסחאות דף עזר:</span>
+        <div class="formula-pill">$a = \frac{\Delta v}{\Delta t}$</div>
+        <div class="formula-pill">$\Sigma F = m a \implies F_{\text{engine}} - F_g = m a$</div>
+      </div>
+
+      <div class="proof-section-title">נימוק וחישוב:</div>
+      <div class="proof-card">
+        <div class="step-block">
+          <div class="step-title">1. חישוב תאוצת הגשושית מתוך הגרף:</div>
+          <p>תאוצת הגשושית היא שיפוע הגרף בפרק הזמן שבו המנועים פועלים ($0$ עד $10\text{ s}$):</p>
+          <div class="math-display-box">
+            $$a = \frac{v(10) - v(0)}{10 - 0} = \frac{0 - (-20)}{10} = \frac{20}{10} = 2.0\text{ m/s}^2$$
+          </div>
+          <p>התאוצה חיובית, כלומר וקטור התאוצה מכוון מעלה, בניגוד לכיוון המהירות (ולכן יש האטה).</p>
+        </div>
+
+        <div class="step-block">
+          <div class="step-title">2. משוואת הכוחות (החוק השני של ניוטון):</div>
+          <p>נבחר את הכיוון החיובי כלפי מעלה. על פי תרשים הכוחות מסעיף ב':</p>
+          <div class="math-display-box">
+            $$\Sigma F = m a$$
+            $$F_{\text{engine}} - F_g = m a$$
+            $$F_{\text{engine}} - m g_M = m a$$
+          </div>
+        </div>
+
+        <div class="step-block">
+          <div class="step-title">3. הצבת נתונים ובידוד הכוח:</div>
+          <div class="math-display-box">
+            $$F_{\text{engine}} = m(g_M + a)$$
+            $$F_{\text{engine}} = 164 \cdot (1.67 + 2.0)$$
+            $$F_{\text{engine}} = 164 \cdot 3.67 = 601.88\text{ N}$$
+          </div>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            גודל הכוח שמנועי הגשושית מפעילים הוא <strong>$601.88\text{ N}$</strong> (כלפי מעלה).
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-b')">→ הקודם: סעיף ב'</button>
+        <button class="nav-step-btn" onclick="switchSection('sec-d')">הבא: סעיף ד' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION D ========== -->
+    <div id="sec-d" class="section-container">
+      <h2 class="section-header-title">סעיף ד': חישוב הגובה הראשוני מעל פני הירח ברגע $t=0$ (6 נקודות)</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">הקשר בין הגרף למיקום:</div>
+          <ul>
+            <li>הגשושית נחתה על פני הירח (גובה אפס) ברגע $t = 12.45\text{ s}$.</li>
+            <li>ההעתק הכולל של הגשושית שווה לגובה ההתחלתי $H$.</li>
+            <li>העתק הגשושית מיוצג על ידי השטח הכלוא מתחת לגרף המהירות-זמן לאורך כל התנועה מ-$t=0$ ועד $t=12.45\text{ s}$.</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">השאלה הנשאלת:</div>
+          <p>חשב את הגובה מעל פני הירח ברגע $t=0$ ($H$).</p>
+        </div>
+      </div>
+
+      <div class="formula-helper-wrap">
+        <span class="formula-helper-label">נוסחאות דף עזר:</span>
+        <div class="formula-pill">$\Delta y = \int v(t) dt \quad (\text{שטח מתחת לגרף})$</div>
+        <div class="formula-pill">$H = |\Delta y_1 + \Delta y_2|$</div>
+      </div>
+
+      <div class="proof-section-title">נימוק וחישוב – שיטת חלוקה לשטחים (או קינמטיקה):</div>
+      <div class="proof-card">
+        <div class="step-block">
+          <div class="step-title">1. השלב הראשון ($0 \le t \le 10\text{ s}$): האטה ע"י מנועים</div>
+          <p>
+            ההעתק בשלב זה מיוצג על ידי שטח המשולש בגרף (הגרף נמצא כולו מתחת לציר הזמן, ולכן השטח נחשב כשלילי – ירידה מטה):
+          </p>
+          <div class="math-display-box">
+            $$\Delta y_1 = S_{\text{triangle1}} = \frac{10\text{ s} \cdot (-20)\text{ m/s}}{2} = -100\text{ m}$$
+          </div>
+          <p>משמעות: הגשושית ירדה $100\text{ m}$ ב-10 השניות הראשונות.</p>
+        </div>
+
+        <div class="step-block">
+          <div class="step-title">2. השלב השני ($10\text{ s} < t \le 12.45\text{ s}$): נפילה חופשית</div>
+          <p>
+            בשלב זה הגשושית בנפילה חופשית תחת השפעת כוח כובד הירח בלבד, ולכן תאוצתה היא $a = -g_M = -1.67\text{ m/s}^2$ (כאשר הכיוון החיובי מוגדר מעלה).<br>
+            המהירות ההתחלתית בשלב זה היא $v(10) = 0$.<br>
+            נחשב את ההעתק בשלב זה בעזרת משוואת קינמטיקה:
+          </p>
+          <div class="math-display-box">
+            $$\Delta t_2 = 12.45 - 10 = 2.45\text{ s}$$
+            $$\Delta y_2 = v_0 \cdot \Delta t_2 + \frac{1}{2} a (\Delta t_2)^2$$
+            $$\Delta y_2 = 0 + \frac{1}{2} (-1.67) \cdot (2.45)^2 = -0.835 \cdot 6.0025 \approx -5.01\text{ m}$$
+          </div>
+        </div>
+
+        <div class="step-block">
+          <div class="step-title">3. חישוב הגובה הכולל $H$:</div>
+          <p>
+            סך כל ההעתק מתחילת התנועה ועד הפגיעה בקרקע מהווה את הגובה הכולל. כיוון שההעתק כולו מטה, הגובה הוא הערך המוחלט של ההעתק הכולל:
+          </p>
+          <div class="math-display-box">
+            $$\Delta y_{\text{total}} = \Delta y_1 + \Delta y_2 = -100 - 5.01 = -105.01\text{ m}$$
+            $$H = |\Delta y_{\text{total}}| = 105.01\text{ m}$$
+          </div>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            הגובה מעל פני הירח ברגע $t=0$ היה <strong>$H \approx 105.01\text{ m}$</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-c')">→ הקודם: סעיף ג'</button>
+        <button class="nav-step-btn" onclick="switchSection('sec-e')">הבא: סעיף ה' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION E ========== -->
+    <div id="sec-e" class="section-container">
+      <h2 class="section-header-title">סעיף ה': חישוב הגובה בו התאפסה מהירות הגשושית (6 נקודות)</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">ניתוח המידע:</div>
+          <ul>
+            <li>מהירות הגשושית התאפסה ברגע $t = 10\text{ s}$, כפי שרואים בגרף.</li>
+            <li>מרגע זה ($t=10$) ועד הנחיתה בקרקע הירח ($t=12.45$), הגשושית ירדה בנפילה חופשית.</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">השאלה הנשאלת:</div>
+          <p>חשב את הגובה מעל פני הירח שבו התאפסה מהירות הגשושית.</p>
+        </div>
+      </div>
+
+      <div class="formula-helper-wrap">
+        <span class="formula-helper-label">אסטרטגיית פתרון:</span>
+        <div class="formula-pill">הגובה ב-$t=10$ שווה למרחק שנותר לה עד לקרקע</div>
+      </div>
+
+      <div class="proof-section-title">נימוק וחישוב:</div>
+      <div class="proof-card">
+        <div class="step-block">
+          <p>
+            הגובה בו הייתה הגשושית ברגע התאפסות המהירות שווה בדיוק למרחק אותו עברה בנפילה חופשית מרגע זה ועד פגיעתה בקרקע.
+          </p>
+          <p>
+            בסעיף ד' (שלב 2) כבר חישבנו את ההעתק בשלב הנפילה החופשית:
+          </p>
+          <div class="math-display-box">
+            $$\Delta y_2 = -5.01\text{ m}$$
+          </div>
+          <p>
+            מכיוון שהגשושית נחתה ב-$y=0$ לאחר שירדה $5.01\text{ m}$ מהנקודה בה התאפסה מהירותה, הרי שנקודה זו הייתה בגובה של $5.01\text{ m}$ מעל פני הירח.
+          </p>
+          <p>
+            <em>דרך חלופית:</em> אפשר גם להחסיר את ההעתק עד ל-$t=10$ ($100\text{ m}$) מתוך הגובה ההתחלתי הכולל ($105.01\text{ m}$):
+            $$y(10) = 105.01 - 100 = 5.01\text{ m}$$
+          </p>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            הגובה מעל פני הירח בו התאפסה מהירות הגשושית הוא <strong>$5.01\text{ m}$</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-d')">→ הקודם: סעיף ד'</button>
+        <button class="nav-step-btn" onclick="switchSection('sec-f')">הבא: סעיף ו' ←</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION F ========== -->
+    <div id="sec-f" class="section-container">
+      <h2 class="section-header-title">סעיף ו': זיהוי גרף גובה הגשושית $y(t)$ כפונקציה של הזמן (5 נקודות)</h2>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <div class="info-card-title">קשרים מתמטיים וקינמטיים מרכזיים:</div>
+          <ul>
+            <li>הגרף הנתון מייצג את הגובה מעל הקרקע $y(t)$.</li>
+            <li>שיפוע המשיק לגרף המיקום-זמן הוא מהירות הגשושית: $v = \frac{dy}{dt}$.</li>
+            <li>ברגע $t = 10\text{ s}$ מהירות הגשושית שווה לאפס. לפיכך, <strong>שיפוע המשיק לגרף $y(t)$ ברגע $t=10\text{ s}$ חייב להיות אפס (משיק אופקי).</strong></li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">השאלה הנשאלת:</div>
+          <p>קבע איזה מן התרשימים 1–4 מתאר נכון את גובה הגשושית מעל פני הירח כפונקציה של הזמן. נמק את קביעתך.</p>
+        </div>
+      </div>
+
+      <div class="proof-section-title">השוואת התרשימים ונימוק הבחירה:</div>
+
+      <div class="traces-container">
+        <!-- Option 1 -->
+        <div class="trace-item">
+          <div class="trace-label">תרשים 1:</div>
+          <div class="trace-svg-wrap">
+            <svg viewBox="0 0 100 60" width="100%" height="60">
+              <line x1="15" y1="50" x2="90" y2="50" stroke="#1e293b" stroke-width="1.5"/>
+              <line x1="15" y1="55" x2="15" y2="5" stroke="#1e293b" stroke-width="1.5"/>
+              <!-- Steeper drop, tangent at t=10 is NOT horizontal -->
+              <path d="M 15 15 Q 50 20, 65 35 Q 75 50, 85 50" fill="none" stroke="#64748b" stroke-width="2"/>
+              <line x1="65" y1="50" x2="65" y2="35" stroke="#94a3b8" stroke-dasharray="1,1"/>
+            </svg>
+          </div>
+          <span style="font-size:0.85rem; color:#94a3b8;">שיפוע ב-t=10 שונה מאפס (שגוי)</span>
+        </div>
+
+        <!-- Option 2 (CORRECT) -->
+        <div class="trace-item correct">
+          <div class="trace-label">תרשים 2:</div>
+          <div class="trace-svg-wrap">
+            <svg viewBox="0 0 100 60" width="100%" height="60">
+              <line x1="15" y1="50" x2="90" y2="50" stroke="#1e293b" stroke-width="1.5"/>
+              <line x1="15" y1="55" x2="15" y2="5" stroke="#1e293b" stroke-width="1.5"/>
+              <!-- Curve that gets flatter at t=10 (inflection point / local min slope) then steepens -->
+              <path d="M 15 15 Q 50 18, 65 35 Q 75 50, 85 50" fill="none" stroke="#059669" stroke-width="2.5"/>
+              <line x1="65" y1="50" x2="65" y2="35" stroke="#059669" stroke-dasharray="1,1"/>
+              <!-- Tangent at t=10 -->
+              <line x1="58" y1="35" x2="72" y2="35" stroke="#ef4444" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <span class="trace-badge-correct">התשובה הנכונה</span>
+        </div>
+
+        <!-- Option 3 -->
+        <div class="trace-item">
+          <div class="trace-label">תרשים 3:</div>
+          <div class="trace-svg-wrap">
+            <svg viewBox="0 0 100 60" width="100%" height="60">
+              <line x1="15" y1="50" x2="90" y2="50" stroke="#1e293b" stroke-width="1.5"/>
+              <line x1="15" y1="55" x2="15" y2="5" stroke="#1e293b" stroke-width="1.5"/>
+              <!-- Straight line -->
+              <line x1="15" y1="15" x2="85" y2="50" stroke="#64748b" stroke-width="2"/>
+            </svg>
+          </div>
+          <span style="font-size:0.85rem; color:#94a3b8;">שיפוע (מהירות) קבוע (שגוי)</span>
+        </div>
+
+        <!-- Option 4 -->
+        <div class="trace-item">
+          <div class="trace-label">תרשים 4:</div>
+          <div class="trace-svg-wrap">
+            <svg viewBox="0 0 100 60" width="100%" height="60">
+              <line x1="15" y1="50" x2="90" y2="50" stroke="#1e293b" stroke-width="1.5"/>
+              <line x1="15" y1="55" x2="15" y2="5" stroke="#1e293b" stroke-width="1.5"/>
+              <!-- Parabola facing down entirely -->
+              <path d="M 15 15 Q 70 15, 85 50" fill="none" stroke="#64748b" stroke-width="2"/>
+            </svg>
+          </div>
+          <span style="font-size:0.85rem; color:#94a3b8;">שיפוע מתאפס ב-t=0 ולא ב-t=10 (שגוי)</span>
+        </div>
+      </div>
+
+      <div class="proof-card">
+        <div class="step-block">
+          <div class="step-title">נימוק בחירת הגרף (גרף מס' 2):</div>
+          <p>
+            גובה הגשושית $y(t)$ קשור למהירותה באופן הבא: מהירות הגשושית בכל רגע היא שיפוע המשיק לעקומת הגובה באותו רגע ($v = \frac{dy}{dt}$).
+          </p>
+          <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 8px;">
+            <li>בפרק הזמן $0 \le t \le 10\text{ s}$, גודל המהירות של הגשושית הולך וקטן. כלומר, שיפוע הגרף אמור להיות שלילי, אך ללכת ולהתמתן (העקומה הופכת להיות "שטוחה" יותר).</li>
+            <li><strong>ברגע $t = 10\text{ s}$ המהירות מתאפסת לחלוטין ($v = 0$).</strong> משמעות הדבר היא ששיפוע המשיק לגרף בנקודה זו חייב להיות אפס (קו אופקי לחלוטין). נקודה זו היא נקודת פיתול או מינימום מקומי לשיפוע.</li>
+            <li>החל מרגע $t = 10\text{ s}$ ואילך (בנפילה חופשית), המהירות חוזרת להיות שלילית וגודלה הולך וגדל. כלומר, שיפוע הגרף הופך שוב להיות תלול יותר ושלילי עד לפגיעה.</li>
+          </ul>
+          <p style="margin-top: 8px;">
+            <strong>תרשים מספר 2</strong> הוא הגרף היחיד המקיים תנאי זה – בנקודה המתאימה ל-$t=10\text{ s}$, העקומה מקבלת משיק אופקי בדיוק, לפני שהיא "נופלת" שוב לעבר הקרקע בשיפוע גדל.
+          </p>
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            התרשים הנכון הוא <strong>תרשים 2</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchSection('sec-e')">→ הקודם: סעיף ה'</button>
+        <div></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  function switchSection(sectionId) {
+    // Hide all sections
+    const sections = document.querySelectorAll('.section-container');
+    sections.forEach(sec => sec.classList.remove('active'));
+
+    // Remove active class from buttons
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    // Show target section
+    const target = document.getElementById(sectionId);
+    if (target) {
+      target.classList.add('active');
+    }
+
+    // Update active button
+    const activeIndex = ['sec-a', 'sec-b', 'sec-c', 'sec-d', 'sec-e', 'sec-f'].indexOf(sectionId);
+    if (activeIndex !== -1 && buttons[activeIndex]) {
+      buttons[activeIndex].classList.add('active');
+    }
+
+    // Scroll smoothly to tabs wrap
+    window.scrollTo({
+      top: document.getElementById('tabsWrapper').offsetTop - 20,
+      behavior: 'smooth'
+    });
+  }
+</script>
+
+</body>
+</html>

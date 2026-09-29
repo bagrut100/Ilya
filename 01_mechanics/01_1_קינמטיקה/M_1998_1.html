@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פתרון בגרות בפיזיקה 1998 - שאלה 1: קינמטיקה ודינמיקה</title>
+
+  <!-- Google Fonts: Rubik -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #1e3a8a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #0f172a;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --border-color: #cbd5e1;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rubik', system-ui, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Top Controls Bar */
+    .controls-panel {
+      position: sticky;
+      top: 12px;
+      z-index: 1000;
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 10px 18px;
+      border-radius: 9999px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      margin-bottom: 20px;
+      border: 1px solid #334155;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .layout-toggle-btn {
+      background: #334155;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: inherit;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
+
+    .layout-toggle-btn.active {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    }
+
+    .canvas-tool-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #475569;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.82rem;
+      transition: all 0.2s ease;
+    }
+
+    .canvas-tool-btn.active {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #f87171;
+    }
+
+    /* Layout Containers */
+    .page-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .layout-19-6 {
+      width: 100%;
+      max-width: 1440px;
+      aspect-ratio: 19 / 6;
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 28px 34px;
+      border: 2px solid #334155;
+    }
+
+    .layout-6-19 {
+      width: 100%;
+      max-width: 480px;
+      aspect-ratio: 6 / 19;
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 20px 16px;
+      border: 2px solid #334155;
+    }
+
+    /* Header Banner */
+    .header-box {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      margin-bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header-box h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+    }
+
+    .header-box .badge {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 5px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* Overview Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .layout-6-19 .main-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::before {
+      content: "";
+      width: 5px;
+      height: 18px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .question-text {
+      color: #334155;
+      font-size: 0.95rem;
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    /* Table */
+    .data-table-wrap {
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    table.data-table th {
+      background: #e2e8f0;
+      color: #1e293b;
+      padding: 8px 10px;
+      font-weight: 700;
+      border: 1px solid #cbd5e1;
+    }
+
+    table.data-table td {
+      padding: 7px 10px;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-family: monospace;
+      font-size: 0.92rem;
+    }
+
+    /* Graphics Container */
+    .graphics-container {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+    }
+
+    .interactive-canvas-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      z-index: 20;
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 6px 0 16px;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--border-color);
+      padding: 8px 18px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* Solution Sections */
+    .solution-section {
+      display: none;
+    }
+
+    .solution-section.active {
+      display: block;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-box {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px 22px;
+      margin-bottom: 16px;
+    }
+
+    .step-header {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 10px;
+    }
+
+    .math-formula {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px;
+      margin: 12px 0;
+      direction: ltr;
+      text-align: center;
+      font-size: 1.05rem;
+      overflow-x: auto;
+    }
+
+    .result-callout {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      color: #065f46;
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .result-callout::before {
+      content: "✓";
+      background: var(--accent-green);
+      color: #fff;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls Panel -->
+  <div class="controls-panel">
+    <button class="layout-toggle-btn active" id="btn-19-6" onclick="setLayout('19-6')">פריסה רחבה (19:6)</button>
+    <button class="layout-toggle-btn" id="btn-6-19" onclick="setLayout('6-19')">פריסה אנכית (6:19)</button>
+    <div style="width: 1px; height: 20px; background: #475569;"></div>
+    <button class="canvas-tool-btn active" id="laser-btn" onclick="toggleLaser()">מצביע לייזר דועך (2s)</button>
+    <button class="canvas-tool-btn" id="snap-btn" onclick="toggleSnap()">יישור קווים אוטומטי: פעיל</button>
+    <button class="canvas-tool-btn" onclick="clearDrawings()">נקה שרטוט</button>
+  </div>
+
+  <!-- Page Wrapper -->
+  <div class="page-wrapper">
+    <div class="layout-19-6" id="main-container">
+
+      <!-- Header Banner -->
+      <header class="header-box">
+        <div>
+          <h1>בגרות בפיזיקה 1998 – שאלה 1: מכניקה (קינמטיקה ודינמיקה)</h1>
+          <p style="font-size: 0.9rem; opacity: 0.9; margin-top: 4px;">תנועה בקו ישר, מהירות רגעית וממוצעת מטבלה וגרף, תאוצה והחוק השני של ניוטון</p>
+        </div>
+        <span class="badge">רמת בגרות 5 יח"ל</span>
+      </header>
+
+      <!-- Overview Grid -->
+      <div class="main-grid">
+
+        <!-- Question Text & Data Table -->
+        <div class="card">
+          <div class="card-title">ניסוח השאלה המלא (סטנדרט בחינת בגרות)</div>
+          <p class="question-text">
+            גוף החל לנוע ממנוחה ($v_0 = 0$), ונע בקו ישר לאורך כל מהלך תנועתו.<br>
+            תלמיד רשם את מקומו של הגוף במרווחי זמן קבועים של $0.02\text{ s}$. את הרגע שבו החל הגוף לנוע הוא הגדיר כ-$t = 0$.<br>
+            ציר המקום נבחר כך שראשיתו בנקודה שבה נמצא הגוף ברגע $t = 0$ ($x_0 = 0$) וכיוונו החיובי הוא בכיוון תנועת הגוף.<br>
+            תוצאות של חלק מן המדידות מוצגות בטבלה שלפניך:
+          </p>
+
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>זמן $t\text{ (s)}$</th>
+                  <td>0.04</td>
+                  <td>0.06</td>
+                  <td>0.08</td>
+                  <td>0.10</td>
+                  <td>0.12</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>מקום $x\text{ (m)}$</th>
+                  <td>0.0061</td>
+                  <td>0.0123</td>
+                  <td>0.0196</td>
+                  <td>0.0278</td>
+                  <td>0.0365</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="question-text" style="margin-top: 8px;">
+            התלמיד חישב את מהירות הגוף ברגעים שונים וסרטט גרף המתאר את מהירות הגוף כפונקציה של הזמן מ-$t = 0$ ועד $t = 0.20\text{ s}$.
+          </p>
+        </div>
+
+        <!-- SVG Graph & Canvas Container -->
+        <div class="graphics-container">
+          <div style="font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 6px; width: 100%; text-align: right;">
+            תרשים: גרף מהירות-זמן $v(t)$ של הגוף
+          </div>
+
+          <!-- Base SVG Graph -->
+          <svg id="system-svg" viewBox="0 0 460 280" width="100%" height="240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b"/>
+              </marker>
+              <pattern id="graphGrid" width="18" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 18 0 L 0 0 0 20" fill="none" stroke="#cbd5e1" stroke-width="0.8"/>
+              </pattern>
+            </defs>
+
+            <!-- Background Grid (20 sub-intervals along t, 10 along v) -->
+            <rect x="55" y="25" width="360" height="200" fill="url(#graphGrid)"/>
+
+            <!-- Axes -->
+            <line x1="55" y1="225" x2="435" y2="225" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="55" y1="225" x2="55" y2="10" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+            <!-- Axis Labels & Units (Clearly visible without obstruction) -->
+            <text x="440" y="240" font-size="12" font-weight="700" fill="#1e293b">t (s)</text>
+            <text x="50" y="14" font-size="12" font-weight="700" fill="#1e293b" text-anchor="end">v (m/s)</text>
+
+            <!-- Values on X Axis -->
+            <text x="55" y="240" font-size="11" fill="#475569" text-anchor="middle">0</text>
+            
+            <line x1="145" y1="225" x2="145" y2="230" stroke="#1e293b" stroke-width="1.5"/>
+            <text x="145" y="242" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">0.05</text>
+
+            <line x1="235" y1="225" x2="235" y2="230" stroke="#1e293b" stroke-width="1.5"/>
+            <text x="235" y="242" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">0.1</text>
+
+            <line x1="325" y1="225" x2="325" y2="230" stroke="#1e293b" stroke-width="1.5"/>
+            <text x="325" y="242" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">0.15</text>
+
+            <line x1="415" y1="225" x2="415" y2="230" stroke="#1e293b" stroke-width="1.5"/>
+            <text x="415" y="242" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">0.2 t(s)</text>
+
+            <!-- Values on Y Axis -->
+            <line x1="50" y1="185" x2="55" y2="185" stroke="#1e293b" stroke-width="1.5"/>
+            <text x="48" y="189" font-size="11" font-weight="600" fill="#475569" text-anchor="end">0.1</text>
+
+            <line x1="50" y1="145" x2="55" y2="145" stroke="#1e293b" stroke-width="1.5"/>
+            <text x="48" y="149" font-size="11" font-weight="600" fill="#475569" text-anchor="end">0.2</text>
+
+            <line x1="50" y1="105" x2="55" y2="105" stroke="#1e293b" stroke-width="1.5"/>
+            <text x="48" y="109" font-size="11" font-weight="600" fill="#475569" text-anchor="end">0.3</text>
+
+            <line x1="50" y1="65" x2="55" y2="65" stroke="#1e293b" stroke-width="1.5"/>
+            <text x="48" y="69" font-size="11" font-weight="600" fill="#475569" text-anchor="end">0.4</text>
+
+            <line x1="50" y1="25" x2="55" y2="25" stroke="#1e293b" stroke-width="1.5"/>
+            <text x="48" y="29" font-size="11" font-weight="600" fill="#475569" text-anchor="end">0.5</text>
+
+            <!-- Triangle Area under curve for [0, 0.02] -->
+            <polygon points="55,225 91,225 91,161" fill="rgba(37, 99, 235, 0.15)"/>
+
+            <!-- v(t) Curve Path -->
+            <path d="M 55 225 C 105 130, 180 50, 415 35" fill="none" stroke="#2563eb" stroke-width="2.8"/>
+
+            <!-- Experimental Data Points -->
+            <circle cx="55" cy="225" r="3.5" fill="#1e293b"/>
+            <circle cx="91" cy="161" r="3" fill="#1e293b"/> <!-- t=0.02, v=0.16 -->
+            <circle cx="132" cy="120" r="3" fill="#1e293b"/> <!-- t=0.043 -->
+            <circle cx="170" cy="90" r="3" fill="#1e293b"/>
+            <circle cx="204" cy="71" r="3" fill="#1e293b"/>
+            <circle cx="242" cy="58" r="3" fill="#1e293b"/>
+            <circle cx="278" cy="49" r="3" fill="#1e293b"/>
+            <circle cx="316" cy="43" r="3" fill="#1e293b"/>
+            <circle cx="352" cy="39" r="3" fill="#1e293b"/>
+            <circle cx="388" cy="37" r="3" fill="#1e293b"/>
+            <circle cx="415" cy="35" r="3.5" fill="#1e293b"/>
+
+            <text x="100" y="155" font-size="10" font-weight="700" fill="#2563eb">(0.02s, 0.16m/s)</text>
+          </svg>
+
+          <!-- Interactive Drawing and Laser Canvas Overlay -->
+          <canvas id="interactiveCanvas" class="interactive-canvas-layer"></canvas>
+        </div>
+
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" onclick="showTab('sec-a')">סעיף א' (מהירות רגעית)</button>
+        <button class="tab-btn" onclick="showTab('sec-b')">סעיף ב' (הערכת מרחק משטח)</button>
+        <button class="tab-btn" onclick="showTab('sec-c')">סעיף ג' (תאוצה ממוצעת)</button>
+        <button class="tab-btn" onclick="showTab('sec-d')">סעיף ד' (מגמת התאוצה בזמן)</button>
+        <button class="tab-btn" onclick="showTab('sec-e')">סעיף ה' (גודל הכוח השקול)</button>
+        <button class="tab-btn" onclick="showTab('sec-f')">סעיף ו' (כיוון הכוח השקול)</button>
+      </div>
+
+      <!-- SECTION A -->
+      <div id="sec-a" class="solution-section active">
+        <div class="step-box">
+          <div class="step-header">סעיף א': חישוב מהירות הגוף בקירוב הטוב ביותר ברגע $t = 0.08\text{ s}$</div>
+          <p class="question-text">
+            <strong>שאלה:</strong> חשב על-פי הטבלה, בקירוב הטוב ביותר, את מהירות הגוף ברגע $t = 0.08\text{ s}$. הסבר ופרט את חישוביך (אל תניח שהתאוצה קבועה).
+          </p>
+          <p>
+            כאשר התנועה אינה שוות-תאוצה, המהירות הרגעית ברגע $t$ מוגדרת כגבול של המהירות הממוצעת כאשר מרווח הזמן שואף לאפס ($v = \lim_{\Delta t \to 0} \frac{\Delta x}{\Delta t}$).<br>
+            הקירוב הטוב ביותר עבור מהירות רגעית מתוך טבלת נתונים בדידים מתקבל על ידי חישוב <strong>המהירות הממוצעת במרווח זמן סימטרי וקטן ככל האפשר סביב הרגע המבוקש</strong> (בין $t = 0.06\text{ s}$ לבין $t = 0.10\text{ s}$):
+          </p>
+
+          <div class="math-formula">
+            $$v(0.08) \approx \frac{\Delta x}{\Delta t} = \frac{x(0.10) - x(0.06)}{0.10 - 0.06} = \frac{0.0278\text{ m} - 0.0123\text{ m}}{0.04\text{ s}} = \frac{0.0155\text{ m}}{0.04\text{ s}} = 0.3875\text{ m/s}$$
+          </div>
+
+          <p><strong>הסבר פיזיקלי:</strong> על ידי בחירת סביבה סימטרית המקיפה את הרגע $t = 0.08\text{ s}$, שגיאות הקירוב הנובעות משינוי התאוצה מתקזזות באופן מיטבי ומספקות את הקירוב האנליטי המדויק ביותר מתוך הנתונים הנתונים.</p>
+          
+          <div class="result-callout">
+            המהירות בקירוב הטוב ביותר ברגע $t = 0.08\text{ s}$ היא: $v \approx 0.3875\text{ m/s}$.
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION B -->
+      <div id="sec-b" class="solution-section">
+        <div class="step-box">
+          <div class="step-header">סעיף ב': הערכת המרחק שעבר הגוף בין $t = 0$ ל-$t = 0.02\text{ s}$ על-פי הגרף</div>
+          <p class="question-text">
+            <strong>שאלה:</strong> הערך, על-פי הגרף, את המרחק שעבר הגוף מרגע $t = 0$ עד רגע $t = 0.02\text{ s}$.
+          </p>
+          <p>
+            בגרף מהירות כפונקציה של הזמן ($v-t$), ההעתק (והמרחק בתנועה חד-כיוונית) שווה לשטח הכלוא מתחת לעקומה וציר הזמן.<br>
+            קריאת נקודות מהגרף:
+          </p>
+          <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-bottom: 8px;">
+            <li>ברגע $t = 0$: המהירות היא $v(0) = 0$.</li>
+            <li>ברגע $t = 0.02\text{ s}$ (שנתה אחת בציר הזמן): המהירות נקראת מהגרף כ-$v(0.02) = 0.16\text{ m/s}$ (או בטווח $0.15 - 0.16\text{ m/s}$).</li>
+          </ul>
+          <p>במרווח זמן קצר זה ($0.02\text{ s}$), ניתן לקרב את צורת השטח מתחת לעקומה למשולש ישר-זווית שבו הבסיס הוא מרווח הזמן והגובה הוא המהירות:</p>
+
+          <div class="math-formula">
+            $$\Delta x = S_{\triangle} = \frac{\Delta t \cdot v(0.02)}{2} = \frac{0.02\text{ s} \cdot 0.16\text{ m/s}}{2} = 0.0016\text{ m} = 1.6 \times 10^{-3}\text{ m}$$
+          </div>
+          <p><em>הערה:</em> אם נקרא $v = 0.15\text{ m/s}$, השטח המתקבל הוא $\Delta x = \frac{0.02 \cdot 0.15}{2} = 0.0015\text{ m} = 1.5 \times 10^{-3}\text{ m}$. שני הערכים בטווח הקריאה התקני.</p>
+
+          <div class="result-callout">
+            המרחק שעבר הגוף מוערך ב: $\Delta x \approx 0.0016\text{ m}$ (או $1.6\text{ mm}$).
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION C -->
+      <div id="sec-c" class="solution-section">
+        <div class="step-box">
+          <div class="step-header">סעיף ג': חישוב התאוצה הממוצעת מרגע $t = 0$ עד $t = 0.02\text{ s}$</div>
+          <p class="question-text">
+            <strong>שאלה:</strong> חשב, במידת הדיוק שהגרף מאפשר, את התאוצה הממוצעת של הגוף מרגע $t = 0$ עד רגע $t = 0.02\text{ s}$.
+          </p>
+          <p>
+            התאוצה הממוצעת מוגדרת כשינוי במהירות מחולק במשך הזמן שבו התרחש השינוי (שיפוע המיתר המחבר את שתי הנקודות על הגרף):
+          </p>
+
+          <div class="math-formula">
+            $$\overline{a} = \frac{\Delta v}{\Delta t} = \frac{v(0.02) - v(0)}{0.02 - 0}$$
+          </div>
+
+          <p>הצבת ערכי המהירות מהגרף:</p>
+          <div class="math-formula">
+            $$\overline{a} = \frac{0.16\text{ m/s} - 0\text{ m/s}}{0.02\text{ s}} = 8.0\text{ m/s}^2$$
+          </div>
+          <p>עבור קריאה של $v = 0.15\text{ m/s}$ מתקבל: $\overline{a} = \frac{0.15}{0.02} = 7.5\text{ m/s}^2$. שני הערכים מקובלים ומדויקים בהתאם לרמת הקריאה מן הגרף.</p>
+
+          <div class="result-callout">
+            התאוצה הממוצעת של הגוף היא: $\overline{a} = 8.0\text{ m/s}^2$ (או $7.5\text{ m/s}^2$).
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION D -->
+      <div id="sec-d" class="solution-section">
+        <div class="step-box">
+          <div class="step-header">סעיף ד': קביעת מגמת תאוצת הגוף כפונקציה של הזמן</div>
+          <p class="question-text">
+            <strong>שאלה:</strong> קבע, על-פי הגרף, אם תאוצת הגוף גדלה כפונקציה של הזמן, קטנה או אינה משתנה. נמק.
+          </p>
+          <p><strong>קביעה:</strong> תאוצת הגוף <strong>הולכת וקטנה</strong> כפונקציה של הזמן.</p>
+          <p style="margin-top: 8px;"><strong>נימוק פיזיקלי ומתמטי:</strong></p>
+          <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
+            <li>בגרף מהירות-זמן ($v-t$), התאוצה הרגעית של הגוף בכל נקודת זמן מיוצגת על ידי <strong>שיפוע המשיק לעקומה</strong> באותו רגע ($a(t) = \frac{dv}{dt}$).</li>
+            <li>מהתבוננות בעקומת הגרף ניכר כי העקומה קעורה כלפי מטה: שיפוע המשיק תלול מאוד בסמוך ל-$t = 0$ (שיפוע של כ-$8\text{ m/s}^2$), והוא הולך ומתמתן בהדרגה ככל שהזמן חולף, עד שהוא נעשה כמעט אפקי לקראת $t = 0.20\text{ s}$.</li>
+            <li>מכיוון ששיפוע המשיק הולך וקטן עם הזמן, תאוצת הגוף הולכת וקטנה.</li>
+          </ul>
+
+          <div class="result-callout">
+            תאוצת הגוף הולכת וקטנה עם הזמן, כיוון ששיפוע המשיק לגרף $v(t)$ קטן בהתמדה.
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION E -->
+      <div id="sec-e" class="solution-section">
+        <div class="step-box">
+          <div class="step-header">סעיף ה': ניתוח גודלו של הכוח השקול הפועל על הגוף</div>
+          <p class="question-text">
+            <strong>שאלה:</strong> האם גודלו של הכוח השקול שפועל על הגוף הולך וגדל, הולך וקטן או אינו משתנה? נמק.
+          </p>
+          <p><strong>קביעה:</strong> גודלו של הכוח השקול <strong>הולך וקטן</strong>.</p>
+          <p style="margin-top: 8px;"><strong>נימוק:</strong></p>
+          <p>על פי החוק השני של ניוטון, הכוח השקול הפועל על גוף בעל מסה קבועה $m$ עומד ביחס ישר לתאוצתו:</p>
+          <div class="math-formula">
+            $$\Sigma \vec{F} = m \cdot \vec{a} \implies |\Sigma \vec{F}| = m \cdot |\vec{a}|$$
+          </div>
+          <p>בסעיף ד' הוכחנו כי גודל תאוצת הגוף ($\vert{}\vec{a}\vert{}$) הולך וקטן כפונקציה של הזמן. מכיוון שמסת הגוף $m$ קבועה וחיובית, נובע באופן ישיר מחוק ניוטון שגם גודלו של הכוח השקול הולך וקטן בהתאמה.</p>
+
+          <div class="result-callout">
+            גודל הכוח השקול הולך וקטן, ביחס ישר לתאוצת הגוף שקטנה עם הזמן ($\Sigma F = ma$).
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION F -->
+      <div id="sec-f" class="solution-section">
+        <div class="step-box">
+          <div class="step-header">סעיף ו': כיוון הכוח השקול הפועל על הגוף</div>
+          <p class="question-text">
+            <strong>שאלה:</strong> מהו כיוון הכוח השקול שפועל על הגוף – בכיוון תנועת הגוף, מנוגד לכיוון תנועת הגוף או מאונך לו? נמק.
+          </p>
+          <p><strong>קביעה:</strong> הכוח השקול פועל <strong>בכיוון תנועת הגוף</strong> (בכיוון החיובי של ציר המקום).</p>
+          <p style="margin-top: 8px;"><strong>נימוק פיזיקלי:</strong></p>
+          <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
+            <li>לפי החוק השני של ניוטון ($\Sigma \vec{F} = m \vec{a}$), כיוון וקטור הכוח השקול זהה תמיד לכיוון וקטור התאוצה.</li>
+            <li>הגרף מראה כי מהירות הגוף הולכת וגדלה לאורך כל התנועה ($v(t) > 0$ והערך עולה מ-0 ועד לכמעט $0.5\text{ m/s}$).</li>
+            <li>כאשר גוף נע בקו ישר ומהירותו גדלה (כלומר תנועה מואצת), וקטור התאוצה חייב להיות באותו כיוון של וקטור המהירות.</li>
+            <li>לכן, גם וקטור התאוצה וגם וקטור הכוח השקול מכוונים בכיוון התנועה (קדימה).</li>
+          </ul>
+
+          <div class="result-callout">
+            כיוון הכוח השקול הוא בכיוון תנועת הגוף (מהירותו גדלה לאורך כל הדרך).
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    function showTab(tabId) {
+      document.querySelectorAll('.solution-section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const targetSec = document.getElementById(tabId);
+      if (targetSec) targetSec.classList.add('active');
+
+      const tabs = ['sec-a', 'sec-b', 'sec-c', 'sec-d', 'sec-e', 'sec-f'];
+      const idx = tabs.indexOf(tabId);
+      const buttons = document.querySelectorAll('.tab-btn');
+      if (idx !== -1 && buttons[idx]) buttons[idx].classList.add('active');
+    }
+
+    // Layout toggling (19:6 vs 6:19)
+    function setLayout(mode) {
+      const container = document.getElementById('main-container');
+      const btn19 = document.getElementById('btn-19-6');
+      const btn6 = document.getElementById('btn-6-19');
+
+      if (mode === '19-6') {
+        container.className = 'layout-19-6';
+        btn19.classList.add('active');
+        btn6.classList.remove('active');
+      } else {
+        container.className = 'layout-6-19';
+        btn6.classList.add('active');
+        btn19.classList.remove('active');
+      }
+      setTimeout(resizeCanvas, 150);
+    }
+
+    // Canvas & Interactive Tools
+    const canvas = document.getElementById('interactiveCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    let currentX = 0, currentY = 0;
+
+    let laserMode = true;
+    let snapToStraightLine = true;
+
+    let laserTrail = [];
+    const LASER_LIFETIME = 2000; // Exactly 2 seconds
+
+    let persistentPaths = [];
+
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
+      redraw();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('load', resizeCanvas);
+
+    function toggleLaser() {
+      laserMode = !laserMode;
+      document.getElementById('laser-btn').classList.toggle('active', laserMode);
+    }
+
+    function toggleSnap() {
+      snapToStraightLine = !snapToStraightLine;
+      const btn = document.getElementById('snap-btn');
+      btn.innerText = snapToStraightLine ? "יישור קווים אוטומטי: פעיל" : "יישור קווים אוטומטי: כבוי";
+      btn.classList.toggle('active', snapToStraightLine);
+    }
+
+    function clearDrawings() {
+      persistentPaths = [];
+      laserTrail = [];
+      redraw();
+    }
+
+    function getCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: cx - rect.left,
+        y: cy - rect.top
+      };
+    }
+
+    // Mouse & Touch Handlers
+    canvas.addEventListener('mousedown', (e) => {
+      const p = getCoords(e);
+      isDrawing = true;
+      startX = p.x;
+      startY = p.y;
+      currentX = p.x;
+      currentY = p.y;
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      const p = getCoords(e);
+      currentX = p.x;
+      currentY = p.y;
+      if (laserMode) {
+        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (!isDrawing) return;
+      isDrawing = false;
+      if (!laserMode && snapToStraightLine) {
+        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
+      }
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      const p = getCoords(e);
+      isDrawing = true;
+      startX = p.x;
+      startY = p.y;
+      currentX = p.x;
+      currentY = p.y;
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      const p = getCoords(e);
+      currentX = p.x;
+      currentY = p.y;
+      if (laserMode) {
+        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      if (isDrawing && !laserMode && snapToStraightLine) {
+        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
+      }
+      isDrawing = false;
+    });
+
+    // Render loop
+    function render() {
+      const now = Date.now();
+      laserTrail = laserTrail.filter(pt => now - pt.time < LASER_LIFETIME);
+      redraw();
+      requestAnimationFrame(render);
+    }
+
+    function redraw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Persistent straight lines
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      persistentPaths.forEach(item => {
+        if (item.type === 'line') {
+          ctx.beginPath();
+          ctx.moveTo(item.x1, item.y1);
+          ctx.lineTo(item.x2, item.y2);
+          ctx.stroke();
+        }
+      });
+
+      // Drag preview line
+      if (isDrawing && !laserMode && snapToStraightLine) {
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(currentX, currentY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Laser Trail with 2-second decay
+      const now = Date.now();
+      if (laserTrail.length > 1) {
+        for (let i = 1; i < laserTrail.length; i++) {
+          const pt1 = laserTrail[i - 1];
+          const pt2 = laserTrail[i];
+          const age = now - pt2.time;
+          const alpha = Math.max(0, 1 - age / LASER_LIFETIME);
+
+          ctx.beginPath();
+          ctx.moveTo(pt1.x, pt1.y);
+          ctx.lineTo(pt2.x, pt2.y);
+          ctx.strokeStyle = `rgba(239, 68, 68, ${alpha})`;
+          ctx.lineWidth = 3.5 * alpha + 1;
+          ctx.lineCap = 'round';
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = 'rgba(239, 68, 68, 0.8)';
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      // Laser Tip
+      if (laserMode && laserTrail.length > 0) {
+        const last = laserTrail[laserTrail.length - 1];
+        if (now - last.time < 150) {
+          ctx.beginPath();
+          ctx.arc(last.x, last.y, 4, 0, 2 * Math.PI);
+          ctx.fillStyle = '#ef4444';
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = '#f87171';
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

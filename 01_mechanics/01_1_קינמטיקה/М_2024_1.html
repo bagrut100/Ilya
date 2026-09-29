@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פתרון מלא: בגרות 2024, שאלה 1 - קינמטיקה של שתי מכוניות</title>
+
+  <!-- Google Fonts: Rubik -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+  <!-- MathJax Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #1e3a8a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --border-color: #cbd5e1;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 20px 14px 60px;
+      transition: background-color 0.3s ease;
+    }
+
+    /* TOP VIEW CONTROLS */
+    .top-controls {
+      max-width: 1400px;
+      margin: 0 auto 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .layout-toggle-group {
+      display: inline-flex;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 9999px;
+      gap: 4px;
+    }
+
+    .layout-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .layout-btn.active {
+      background: var(--card-bg);
+      color: var(--primary-deep);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    /* CONTAINER LAYOUT MODES */
+    .container {
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: max-width 0.3s ease;
+    }
+
+    .container.mode-19x6 {
+      max-width: 1400px;
+    }
+
+    .container.mode-6x19 {
+      max-width: 480px;
+    }
+
+    /* HEADER BANNER */
+    .header-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.25);
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .header-pill {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(8px);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    .header-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.92;
+    }
+
+    .header-badge {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      text-align: center;
+      min-width: 150px;
+    }
+
+    .header-badge .sub {
+      font-size: 0.72rem;
+      opacity: 0.85;
+    }
+
+    .header-badge .main {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    /* TWO COLUMNS OVERVIEW */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1.15fr;
+      gap: 20px;
+    }
+
+    .container.mode-6x19 .overview-grid,
+    @media (max-width: 900px) {
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+      .header-banner {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .header-badge {
+        width: 100%;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .accent-bar {
+      width: 5px;
+      height: 22px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-size: 1.22rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .description-text {
+      color: #334155;
+      font-size: 0.98rem;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .assumptions-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+    }
+
+    .assumptions-title {
+      font-weight: 700;
+      color: var(--primary-deep);
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .assumptions-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 0.88rem;
+      color: #1e3a8a;
+    }
+
+    .assumptions-list li {
+      position: relative;
+      padding-right: 16px;
+    }
+
+    .assumptions-list li::before {
+      content: "•";
+      color: var(--primary);
+      position: absolute;
+      right: 2px;
+      font-weight: bold;
+    }
+
+    /* GRAPH & CANVAS WRAPPER */
+    .interactive-graph-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .graph-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-start;
+      background: #f1f5f9;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    .tool-btn {
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: var(--text-main);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+
+    .tool-btn:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .tool-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary-dark);
+    }
+
+    .graph-stage-relative {
+      position: relative;
+      width: 100%;
+      height: 310px;
+      background: #ffffff;
+      border-radius: var(--radius-sm);
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .graph-svg-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .drawing-canvas-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      cursor: default;
+    }
+
+    .drawing-canvas-layer.tool-draw {
+      cursor: crosshair;
+    }
+
+    .drawing-canvas-layer.tool-laser {
+      cursor: cell;
+    }
+
+    /* TABS NAVIGATION */
+    .tabs-wrapper {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 2px 10px;
+      -webkit-overflow-scrolling: touch;
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      background: rgba(248, 250, 252, 0.92);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius-md);
+    }
+
+    .tab-btn {
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      color: var(--primary-deep);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      background: #f1f5f9;
+      border-color: var(--primary);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    /* SECTION CONTAINERS */
+    .section-container {
+      display: none;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .section-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header-title {
+      color: var(--primary-deep);
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 8px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .container.mode-6x19 .details-grid,
+    @media (max-width: 768px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+    }
+
+    .info-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 8px;
+    }
+
+    .info-card ul {
+      list-style: none;
+    }
+
+    .info-card li {
+      margin-bottom: 5px;
+      position: relative;
+      padding-right: 16px;
+      font-size: 0.92rem;
+      color: #334155;
+    }
+
+    .info-card li::before {
+      content: "▪";
+      color: var(--primary);
+      position: absolute;
+      right: 0;
+    }
+
+    .formula-helper-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 20px;
+      flex-wrap: wrap;
+    }
+
+    .formula-helper-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .formula-pill {
+      background: #eff6ff;
+      border: 1.5px solid #93c5fd;
+      border-radius: 9999px;
+      padding: 4px 14px;
+      color: var(--primary-dark);
+      font-size: 0.9rem;
+      font-weight: 600;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .proof-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .step-block {
+      margin-bottom: 18px;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .math-display-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin: 10px 0;
+      overflow-x: auto;
+      direction: ltr;
+      text-align: center;
+    }
+
+    .result-banner {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .result-icon {
+      background: var(--accent-green);
+      color: white;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .result-text {
+      color: #065f46;
+      font-size: 0.98rem;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    /* TRACE ITEMS (SECTION E) */
+    .traces-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .trace-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      background: #ffffff;
+      border: 2px solid var(--border-color);
+      transition: all 0.2s ease;
+    }
+
+    .trace-card.correct {
+      border-color: var(--accent-green);
+      background: #f0fdf4;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.12);
+    }
+
+    .trace-label {
+      font-weight: 700;
+      min-width: 60px;
+      color: var(--text-main);
+    }
+
+    .trace-svg-wrap {
+      flex-grow: 1;
+    }
+
+    .trace-badge {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      white-space: nowrap;
+    }
+
+    .trace-badge.badge-correct {
+      background: var(--accent-green);
+      color: #ffffff;
+    }
+
+    .trace-badge.badge-wrong {
+      background: #e2e8f0;
+      color: #64748b;
+    }
+
+    /* NAV BUTTONS */
+    .nav-buttons-wrap {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .nav-step-btn {
+      background: transparent;
+      border: 1.5px solid var(--border-color);
+      padding: 8px 18px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .nav-step-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .top-controls, .graph-toolbar, .tabs-wrapper, .nav-buttons-wrap { display: none !important; }
+      .section-container { display: block !important; margin-bottom: 30px; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP VIEWPORT SWITCH CONTROLS -->
+  <div class="top-controls">
+    <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-muted);">מצב תצוגה / פריסה:</div>
+    <div class="layout-toggle-group">
+      <button id="btn-layout-wide" class="layout-btn active" onclick="setLayoutMode('19x6')">פריסה רחבה (19X6)</button>
+      <button id="btn-layout-mobile" class="layout-btn" onclick="setLayoutMode('6x19')">פריסה אנכית / מובייל (6X19)</button>
+    </div>
+  </div>
+
+  <div id="main-container" class="container mode-19x6">
+
+    <!-- HEADER BANNER -->
+    <header class="header-banner">
+      <div class="header-content">
+        <div class="header-pill">בגרות בפיזיקה 5 יח"ל | מכניקה קלאסית</div>
+        <h1 class="header-title">פתרון מלא: בגרות 2024, שאלה 1</h1>
+        <p class="header-subtitle">קינמטיקה חד-ממדית, גרף מהירות-זמן, תנועה שוות-תאוצה ותרשים עקבות</p>
+      </div>
+      <div class="header-badge">
+        <div class="sub">שאלון</div>
+        <div class="main">מכניקה 5 יח"ל</div>
+      </div>
+    </header>
+
+    <!-- OVERVIEW SECTION: QUESTION FORMULATION & INTERACTIVE DIAGRAM -->
+    <div class="overview-grid">
+      <!-- Problem Statement -->
+      <div class="card">
+        <div class="card-title-wrap">
+          <div class="accent-bar"></div>
+          <h2 class="card-title">ניסוח השאלה והנתונים</h2>
+        </div>
+        <p class="description-text">
+          שתי מכוניות, <strong>א'</strong> ו-<strong>ב'</strong>, נסעו על כביש ישר. ברגע $t = 0$ שתי המכוניות היו בנקודה $x = 0$.<br>
+          הגרפים בתרשים שלפניכם מתארים את המהירויות של המכוניות א' ו-ב' כפונקציה של הזמן, החל מרגע $t = 0$ ועד רגע $t = 10\text{ s}$. הכיוון <strong>ימינה מוגדר חיובי</strong>.
+        </p>
+
+        <div class="assumptions-box">
+          <div class="assumptions-title">דרישות הסעיפים לפי שאלוני הבגרות:</div>
+          <ul class="assumptions-list">
+            <li><strong>סעיף א':</strong> חשבו את התאוצה (גודל וכיוון) של כל אחת משתי המכוניות בפרק הזמן $0 < t < 10\text{ s}$.</li>
+            <li><strong>סעיף ב'(1):</strong> ענו עבור הרגע $t = 10\text{ s}$: קבעו אם שתי המכוניות נעו באותו כיוון או בכיוונים מנוגדים. נמקו.</li>
+            <li><strong>סעיף ב'(2):</strong> ענו עבור הרגע $t = 10\text{ s}$: קבעו אם המרחק של מכונית א' מן הנקודה $x = 0$ היה גדול מן המרחק של מכונית ב' מנקודה זו, קטן ממנו או שווה לו. נמקו.</li>
+            <li><strong>סעיף ג'(1):</strong> לאחר $t = 10\text{ s}$, מכונית א' המשיכה לנוע באותה התאוצה עד שהגיעה לתחנת אוטובוס ונעצרה. חשבו את מרחק תחנת האוטובוס מ-$x = 0$.</li>
+            <li><strong>סעיף ג'(2):</strong> חשבו את משך הזמן שעבר מרגע $t = 0$ ועד לרגע שמכונית א' הגיעה לתחנת האוטובוס.</li>
+            <li><strong>סעיף ד':</strong> ברגע $t = 10\text{ s}$ מכונית ב' התחילה להאט בתאוצה קבועה עד שנעצרה באותה תחנת אוטובוס שבה נעצרה מכונית א'. חשבו כמה זמן עבר מרגע שנעצרה מכונית א' בתחנה, ועד הרגע שנעצרה בה מכונית ב'.</li>
+            <li><strong>סעיף ה':</strong> בתחתית מכונית ב' הותקן מתקן המשחרר טיפת צבע לכביש בהפרשי זמן קבועים. קבעו איזה מבין האיורים 4-1 מתאר באופן הטוב ביותר את תרשים העקבות מ-$t = 0$ ועד לעצירתה בתחנה. נמקו.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Graph & Interactive Tools -->
+      <div class="card interactive-graph-card">
+        <div class="card-title-wrap">
+          <div class="accent-bar"></div>
+          <h2 class="card-title">גרף מהירות-זמן של שתי המכוניות $v(t)$</h2>
+        </div>
+
+        <!-- Graph Tools Bar -->
+        <div class="graph-toolbar">
+          <button id="btn-draw" class="tool-btn" onclick="setDrawingTool('draw')">✏️ שרטוט חופשי</button>
+          <button id="btn-snap" class="tool-btn" onclick="toggleSnap()">📏 יישור קו אוטומטי: <span id="snap-state">כבוי</span></button>
+          <button id="btn-laser" class="tool-btn" onclick="setDrawingTool('laser')">🔴 מצביע לייזר (2 שנ')</button>
+          <button class="tool-btn" onclick="clearCanvas()">🗑️ נקה שרטוטים</button>
+        </div>
+
+        <!-- Interactive Stage -->
+        <div id="graph-stage" class="graph-stage-relative">
+          <svg class="graph-svg-layer" viewBox="0 0 460 300" preserveAspectRatio="none">
+            <defs>
+              <pattern id="grid-pattern-cars" width="34" height="18" patternUnits="userSpaceOnUse">
+                <path d="M 34 0 L 0 0 0 18" fill="none" stroke="#e2e8f0" stroke-width="0.8" stroke-dasharray="2,2"/>
+              </pattern>
+            </defs>
+
+            <!-- Grid Background -->
+            <rect x="65" y="25" width="340" height="216" fill="url(#grid-pattern-cars)" />
+
+            <!-- Sub Axes -->
+            <line x1="65" y1="241" x2="425" y2="241" stroke="#0f172a" stroke-width="2" />
+            <line x1="65" y1="241" x2="65" y2="15" stroke="#0f172a" stroke-width="2" />
+
+            <!-- Axis Arrows -->
+            <polygon points="428,241 420,237 420,245" fill="#0f172a" />
+            <polygon points="65,12 61,20 69,20" fill="#0f172a" />
+
+            <!-- Axis Labels -->
+            <text x="435" y="245" font-size="12" font-weight="700" fill="#0f172a" font-family="Rubik">t(s)</text>
+            <text x="52" y="16" font-size="12" font-weight="700" fill="#0f172a" text-anchor="middle" font-family="Rubik">v(m/s)</text>
+
+            <!-- Ticks & Numbers X-axis (t: 0, 2, 4, 6, 8, 10) -->
+            <!-- 65 to 405 (width = 340px => 34px per 1s, 68px per 2s) -->
+            <text x="65" y="260" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">0</text>
+            <text x="133" y="260" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">2</text>
+            <text x="201" y="260" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">4</text>
+            <text x="269" y="260" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">6</text>
+            <text x="337" y="260" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">8</text>
+            <text x="405" y="260" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">10</text>
+
+            <!-- Ticks & Numbers Y-axis (v: 0, 2, 4, 6, 8, 10, 12) -->
+            <!-- 241 to 25 (height = 216px => 18px per 1 m/s, 36px per 2 m/s) -->
+            <text x="56" y="245" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">0</text>
+            <text x="56" y="209" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">2</text>
+            <text x="56" y="173" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">4</text>
+            <text x="56" y="137" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">6</text>
+            <text x="56" y="101" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">8</text>
+            <text x="56" y="65" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">10</text>
+            <text x="56" y="29" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">12</text>
+
+            <!-- Graph Line Car A (t=0, v=12 -> (65, 25); t=10, v=8 -> (405, 97)) -->
+            <line x1="65" y1="25" x2="405" y2="97" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="65" cy="25" r="4" fill="#dc2626" />
+            <circle cx="405" cy="97" r="4.5" fill="#dc2626" />
+            <text x="245" y="55" font-size="13" font-weight="700" fill="#dc2626" font-family="Rubik">מכונית א'</text>
+
+            <!-- Graph Line Car B (t=0, v=0 -> (65, 241); t=10, v=8 -> (405, 97)) -->
+            <line x1="65" y1="241" x2="405" y2="97" stroke="#059669" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="65" cy="241" r="4" fill="#059669" />
+            <circle cx="405" cy="97" r="4.5" fill="#059669" />
+            <text x="245" y="185" font-size="13" font-weight="700" fill="#059669" font-family="Rubik">מכונית ב'</text>
+
+            <!-- Intersection Point Label -->
+            <text x="415" y="93" font-size="11" font-weight="700" fill="#1e3a8a" font-family="Rubik">(10s, 8m/s)</text>
+          </svg>
+
+          <!-- Interactive User Layer -->
+          <canvas id="drawing-canvas" class="drawing-canvas-layer"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS NAVIGATION -->
+    <div class="tabs-wrapper" id="sections-tabs">
+      <button class="tab-btn active" onclick="switchSection('sec-a')">סעיף א': תאוצת המכוניות</button>
+      <button class="tab-btn" onclick="switchSection('sec-b')">סעיף ב': כיוון ומרחקים ברגע t=10s</button>
+      <button class="tab-btn" onclick="switchSection('sec-c')">סעיף ג': תנועת מכונית א' לתחנה</button>
+      <button class="tab-btn" onclick="switchSection('sec-d')">סעיף ד': הפרש זמני העצירה</button>
+      <button class="tab-btn" onclick="switchSection('sec-e')">סעיף ה': תרשים עקבות טיפות הצבע</button>
+    </div>
+
+    <!-- MAIN INTERACTIVE SECTION CONTENT CARD -->
+    <div class="card" id="active-content-card">
+
+      <!-- ========== SECTION A ========== -->
+      <div id="sec-a" class="section-container active">
+        <h2 class="section-header-title">סעיף א': חישוב התאוצה של שתי המכוניות בפרק הזמן $0 < t < 10\text{ s}$</h2>
+
+        <div class="details-grid">
+          <div class="info-card">
+            <div class="info-card-title">נתונים מתוך הגרף:</div>
+            <ul>
+              <li><strong>מכונית א':</strong> ב-$t = 0$: $v_{0A} = 12.00\text{ m/s}$; ב-$t = 10\text{ s}$: $v_A(10) = 8.00\text{ m/s}$.</li>
+              <li><strong>מכונית ב':</strong> ב-$t = 0$: $v_{0B} = 0.00\text{ m/s}$; ב-$t = 10\text{ s}$: $v_B(10) = 8.00\text{ m/s}$.</li>
+              <li>הכיוון החיובי מוגדר ימינה לאורך ציר $x$.</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <div class="info-card-title">העיקרון הפיזיקלי:</div>
+            <p>
+              בגרף מהירות-זמן ($v-t$), <strong>שיפוע הישר</strong> מייצג את תאוצת הגוף ($a = \frac{\Delta v}{\Delta t}$).<br>
+              גודל התאוצה הוא הערך המוחלט של השיפוע, וכיוון התאוצה נקבע על פי סימנו של השיפוע ביחס לכיוון החיובי של הציר.
+            </p>
+          </div>
+        </div>
+
+        <div class="formula-helper-wrap">
+          <span class="formula-helper-label">נוסחאות דף עזר:</span>
+          <div class="formula-pill">$a = \frac{\Delta v}{\Delta t} = \frac{v_2 - v_1}{t_2 - t_1}$</div>
+        </div>
+
+        <div class="proof-card">
+          <div class="step-block">
+            <div class="step-title">1. חישוב תאוצת מכונית א' ($a_A$):</div>
+            <p>מכונית א' מאטה לאורך קו ישר בעל שיפוע שלילי:</p>
+            <div class="math-display-box">
+              $$a_A = \frac{v_A(10) - v_A(0)}{10 - 0} = \frac{8.00 - 12.00}{10.00} = \frac{-4.00}{10.00} = -0.40\text{ m/s}^2$$
+            </div>
+            <p>
+              <strong>גודל התאוצה:</strong> $0.40\text{ m/s}^2$.<br>
+              <strong>כיוון התאוצה:</strong> שמאלה (מנוגד לכיוון התנועה החיובי, כיוון שלילי).
+            </p>
+          </div>
+
+          <div class="step-block">
+            <div class="step-title">2. חישוב תאוצת מכונית ב' ($a_B$):</div>
+            <p>מכונית ב' מאיצה ממנוחה לאורך קו ישר בעל שיפוע חיובי:</p>
+            <div class="math-display-box">
+              $$a_B = \frac{v_B(10) - v_B(0)}{10 - 0} = \frac{8.00 - 0.00}{10.00} = \frac{8.00}{10.00} = +0.80\text{ m/s}^2$$
+            </div>
+            <p>
+              <strong>גודל התאוצה:</strong> $0.80\text{ m/s}^2$.<br>
+              <strong>כיוון התאוצה:</strong> ימינה (עם כיוון הציר החיובי).
+            </p>
+          </div>
+
+          <div class="result-banner">
+            <div class="result-icon">✓</div>
+            <div class="result-text">
+              • <strong>מכונית א':</strong> גודל התאוצה $0.40\text{ m/s}^2$, כיוונה <strong>שמאלה</strong>.<br>
+              • <strong>מכונית ב':</strong> גודל התאוצה $0.80\text{ m/s}^2$, כיוונה <strong>ימינה</strong>.
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons-wrap">
+          <div></div>
+          <button class="nav-step-btn" onclick="switchSection('sec-b')">הבא: סעיף ב' (כיוון ומרחקים ב-t=10s) ←</button>
+        </div>
+      </div>
+
+      <!-- ========== SECTION B ========== -->
+      <div id="sec-b" class="section-container">
+        <h2 class="section-header-title">סעיף ב': כיוון התנועה והשוואת מרחקים עבור הרגע $t = 10\text{ s}$</h2>
+
+        <div class="details-grid">
+          <div class="info-card">
+            <div class="info-card-title">מצב המכוניות ברגע $t = 10\text{ s}$:</div>
+            <ul>
+              <li>מהירות מכונית א': $v_A(10) = +8.00\text{ m/s}$.</li>
+              <li>מהירות מכונית ב': $v_B(10) = +8.00\text{ m/s}$.</li>
+              <li>שתי המכוניות יצאו מאותה נקודה: $x_A(0) = 0$, $x_B(0) = 0$.</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <div class="info-card-title">עקרונות פיזיקליים:</div>
+            <ul>
+              <li><strong>כיוון תנועה רגעי:</strong> נקבע אך ורק על פי סימן המהירות הרגעית $v(t)$, ללא תלות בתאוצה.</li>
+              <li><strong>העתק ומרחק:</strong> ההעתק מ-$t = 0$ שווה לשטח הכלוא בין גרף המהירות לציר הזמן.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="formula-helper-wrap">
+          <span class="formula-helper-label">נוסחאות דף עזר:</span>
+          <div class="formula-pill">$\Delta x = S_{v-t}$</div>
+          <div class="formula-pill">$S_{\text{trapezoid}} = \frac{v_1 + v_2}{2} \cdot \Delta t$</div>
+          <div class="formula-pill">$S_{\text{triangle}} = \frac{b \cdot h}{2}$</div>
+        </div>
+
+        <div class="proof-card">
+          <div class="step-block">
+            <div class="step-title">תת-סעיף (1): קביעת כיוון התנועה ברגע $t = 10\text{ s}$</div>
+            <p>
+              ברגע $t = 10\text{ s}$, מהירותן של שתי המכוניות היא:
+            </p>
+            <div class="math-display-box">
+              $$v_A(10) = +8.00\text{ m/s} > 0, \quad v_B(10) = +8.00\text{ m/s} > 0$$
+            </div>
+            <p>
+              מכיוון שמהירות שתי המכוניות חיובית, שתיהן נעות <strong>באותו כיוון – ימינה</strong> (בכיוון החיובי של הציר).
+            </p>
+          </div>
+
+          <div class="step-block">
+            <div class="step-title">תת-סעיף (2): השוואת המרחקים מנקודת המוצא $x = 0$</div>
+            <p>
+              מכיוון ששתי המכוניות נעו ימינה לאורך כל 10 השניות מבלי לשנות כיוון, המרחק שעברו שווה להעתקן ($\Delta x$).<br>
+              נחשב את השטח הכלוא מתחת לגרף של כל מכונית מ-$t = 0$ עד $t = 10\text{ s}$:<br><br>
+              • <strong>מכונית א' (טרפז):</strong>
+            </p>
+            <div class="math-display-box">
+              $$\Delta x_A = \frac{v_A(0) + v_A(10)}{2} \cdot \Delta t = \frac{12.00 + 8.00}{2} \cdot 10.00 = 10.00 \cdot 10.00 = 100.00\text{ m}$$
+              $$x_A(10) = 100.00\text{ m}$$
+            </div>
+            <p>• <strong>מכונית ב' (משולש):</strong></p>
+            <div class="math-display-box">
+              $$\Delta x_B = \frac{v_B(10) \cdot \Delta t}{2} = \frac{8.00 \cdot 10.00}{2} = 40.00\text{ m}$$
+              $$x_B(10) = 40.00\text{ m}$$
+            </div>
+            <p>
+              מאחר ש-$100.00\text{ m} > 40.00\text{ m}$ (השטח מתחת לגרף א' גדול בבירור מהשטח מתחת לגרף ב'), המרחק של מכונית א' מ-$x = 0$ היה <strong>גדול יותר</strong> מהמרחק של מכונית ב'.
+            </p>
+          </div>
+
+          <div class="result-banner">
+            <div class="result-icon">✓</div>
+            <div class="result-text">
+              (1) שתי המכוניות נעו <strong>באותו כיוון</strong> (ימינה).<br>
+              (2) המרחק של מכונית א' מ-$x = 0$ היה <strong>גדול</strong> מן המרחק של מכונית ב' ($100.00\text{ m} > 40.00\text{ m}$).
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons-wrap">
+          <button class="nav-step-btn" onclick="switchSection('sec-a')">→ הקודם: סעיף א'</button>
+          <button class="nav-step-btn" onclick="switchSection('sec-c')">הבא: סעיף ג' (מרחק וזמן מכונית א') ←</button>
+        </div>
+      </div>
+
+      <!-- ========== SECTION C ========== -->
+      <div id="sec-c" class="section-container">
+        <h2 class="section-header-title">סעיף ג': תנועת מכונית א' עד לעצירה בתחנת האוטובוס</h2>
+
+        <div class="details-grid">
+          <div class="info-card">
+            <div class="info-card-title">נתוני תנועת מכונית א':</div>
+            <ul>
+              <li>תאוצה קבועה לאורך כל התנועה מ-$t = 0$: $a_A = -0.40\text{ m/s}^2$.</li>
+              <li>מהירות התחלתית ב-$t = 0$: $v_{0A} = 12.00\text{ m/s}$, במיקום $x_0 = 0$.</li>
+              <li>מצב סופי בתחנת האוטובוס: עצירה מוחלטת $v_{\text{stop}} = 0.00\text{ m/s}$.</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <div class="info-card-title">מטרות החישוב:</div>
+            <ul>
+              <li><strong>(1)</strong> מרחק תחנת האוטובוס מ-$x = 0$ ($x_{\text{bus}}$).</li>
+              <li><strong>(2)</strong> משך הזמן הכולל שעבר מרגע $t = 0$ ועד לעצירה בתחנה ($t_{\text{total}}$).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="formula-helper-wrap">
+          <span class="formula-helper-label">נוסחאות דף עזר:</span>
+          <div class="formula-pill">$v^2 = v_0^2 + 2a\Delta x$</div>
+          <div class="formula-pill">$v = v_0 + at$</div>
+          <div class="formula-pill">$\Delta x = \frac{v_0 + v}{2} \cdot t$</div>
+        </div>
+
+        <div class="proof-card">
+          <div class="step-block">
+            <div class="step-title">תת-סעיף (1): חישוב מרחק תחנת האוטובוס מ-$x = 0$</div>
+            <p>נשתמש במשוואת הקינמטיקה שאינה תלויה בזמן עבור מכונית א' מ-$t = 0$ ועד לעצירה:</p>
+            <div class="math-display-box">
+              $$v^2 = v_0^2 + 2 a_A (x_{\text{bus}} - x_0)$$
+              $$0^2 = (12.00)^2 + 2 \cdot (-0.40) \cdot (x_{\text{bus}} - 0)$$
+              $$0 = 144.00 - 0.80 \cdot x_{\text{bus}}$$
+              $$0.80 \cdot x_{\text{bus}} = 144.00 \implies x_{\text{bus}} = \frac{144.00}{0.80} = 180.00\text{ m}$$
+            </div>
+            <p><em>אימות בשני שלבים:</em> ב-10 השניות הראשונות עברה $100.00\text{ m}$. מ-$t = 10\text{ s}$ (מהירות $8.00\text{ m/s}$) ועד עצירה:<br>
+            $\Delta x_2 = \frac{0^2 - (8.00)^2}{2 \cdot (-0.40)} = \frac{-64.00}{-0.80} = 80.00\text{ m}$.<br>
+            סך הכל: $x_{\text{bus}} = 100.00 + 80.00 = 180.00\text{ m}$.</p>
+          </div>
+
+          <div class="step-block">
+            <div class="step-title">תת-סעיף (2): חישוב משך הזמן הכולל מרגע $t = 0$ ועד לעצירה</div>
+            <p>נשתמש במשוואת מהירות-זמן של מכונית א' מ-$t = 0$:</p>
+            <div class="math-display-box">
+              $$v(t) = v_0 + a_A \cdot t$$
+              $$0 = 12.00 + (-0.40) \cdot t_{\text{total}}$$
+              $$0.40 \cdot t_{\text{total}} = 12.00 \implies t_{\text{total}} = \frac{12.00}{0.40} = 30.00\text{ s}$$
+            </div>
+            <p><em>(או: הזמן משלב הבלימה מ-$t = 10\text{ s}$ הוא $\Delta t_2 = \frac{0 - 8.00}{-0.40} = 20.00\text{ s}$, ולכן $t_{\text{total}} = 10.00 + 20.00 = 30.00\text{ s}$).</em></p>
+          </div>
+
+          <div class="result-banner">
+            <div class="result-icon">✓</div>
+            <div class="result-text">
+              (1) מרחק תחנת האוטובוס מ-$x = 0$ הוא: <strong>$180.00\text{ m}$</strong>.<br>
+              (2) משך הזמן הכולל שעבר מרגע $t = 0$ עד להגעת מכונית א' לתחנה הוא: <strong>$30.00\text{ s}$</strong>.
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons-wrap">
+          <button class="nav-step-btn" onclick="switchSection('sec-b')">→ הקודם: סעיף ב'</button>
+          <button class="nav-step-btn" onclick="switchSection('sec-d')">הבא: סעיף ד' (הפרש זמני עצירה) ←</button>
+        </div>
+      </div>
+
+      <!-- ========== SECTION D ========== -->
+      <div id="sec-d" class="section-container">
+        <h2 class="section-header-title">סעיף ד': חישוב הפרש הזמנים בין עצירת מכונית א' לעצירת מכונית ב' בתחנה</h2>
+
+        <div class="details-grid">
+          <div class="info-card">
+            <div class="info-card-title">נתוני שלב הבלימה של מכונית ב':</div>
+            <ul>
+              <li>תחילת הבלימה ברגע: $t = 10.00\text{ s}$.</li>
+              <li>מיקום בתחילת הבלימה: $x_B(10) = 40.00\text{ m}$.</li>
+              <li>מהירות בתחילת הבלימה: $v_B(10) = 8.00\text{ m/s}$.</li>
+              <li>עצירה מלאה באותה תחנה: $x_{\text{bus}} = 180.00\text{ m}$, $v_{\text{stop}} = 0.00\text{ m/s}$.</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <div class="info-card-title">נתוני מכונית א':</div>
+            <p>
+              מכונית א' נעצרה בתחנת האוטובוס ברגע $t_A = 30.00\text{ s}$ (כפי שחושב בסעיף ג'(2)).<br>
+              עלינו למצוא את רגע העצירה של מכונית ב' $t_B$, ואת ההפרש $\Delta t = t_B - t_A$.
+            </p>
+          </div>
+        </div>
+
+        <div class="formula-helper-wrap">
+          <span class="formula-helper-label">נוסחאות דף עזר:</span>
+          <div class="formula-pill">$\Delta x = \frac{v_1 + v_2}{2} \cdot \Delta t$</div>
+          <div class="formula-pill">$t_B = 10 + \Delta t_B$</div>
+        </div>
+
+        <div class="proof-card">
+          <div class="step-block">
+            <div class="step-title">שלב 1: חישוב המרחק שמכונית ב' עוברת בזמן בלימתה</div>
+            <p>ההעתק של מכונית ב' מרגע $t = 10\text{ s}$ ועד לעצירתה בתחנה:</p>
+            <div class="math-display-box">
+              $$\Delta x_{\text{brake}, B} = x_{\text{bus}} - x_B(10) = 180.00 - 40.00 = 140.00\text{ m}$$
+            </div>
+          </div>
+
+          <div class="step-block">
+            <div class="step-title">שלב 2: מציאת משך זמן הבלימה של מכונית ב' ($\Delta t_{\text{brake}, B}$)</div>
+            <p>
+              נתון כי מכונית ב' מאטה ב<strong>תאוצה קבועה</strong>. לכן ניתן להשתמש בקשר המהירות הממוצעת:
+            </p>
+            <div class="math-display-box">
+              $$\Delta x_{\text{brake}, B} = \frac{v_{\text{initial}} + v_{\text{final}}}{2} \cdot \Delta t_{\text{brake}, B}$$
+              $$140.00 = \frac{8.00 + 0.00}{2} \cdot \Delta t_{\text{brake}, B}$$
+              $$140.00 = 4.00 \cdot \Delta t_{\text{brake}, B} \implies \Delta t_{\text{brake}, B} = \frac{140.00}{4.00} = 35.00\text{ s}$$
+            </div>
+            <p><em>(דרך חלופית: תאוצת הבלימה היא $a = \frac{0^2 - 8^2}{2 \cdot 140} = -\frac{64}{280} \approx -0.2286\text{ m/s}^2$, וזמן הבלימה הוא $\Delta t = \frac{0 - 8}{-0.2286} = 35.00\text{ s}$).</em></p>
+          </div>
+
+          <div class="step-block">
+            <div class="step-title">שלב 3: חישוב רגע העצירה של מכונית ב' והפרש הזמנים</div>
+            <p>רגע העצירה של מכונית ב' נמדד ביחס לתחילת התנועה ($t = 0$):</p>
+            <div class="math-display-box">
+              $$t_{B,\text{stop}} = 10.00 + \Delta t_{\text{brake}, B} = 10.00 + 35.00 = 45.00\text{ s}$$
+            </div>
+            <p>הפרש הזמנים מרגע שעצרה מכונית א' ועד שעצרה מכונית ב':</p>
+            <div class="math-display-box">
+              $$\Delta t = t_{B,\text{stop}} - t_{A,\text{stop}} = 45.00 - 30.00 = 15.00\text{ s}$$
+            </div>
+          </div>
+
+          <div class="result-banner">
+            <div class="result-icon">✓</div>
+            <div class="result-text">
+              הזמן שעבר מרגע שעצרה מכונית א' ועד הרגע שעצרה מכונית ב' הוא: <strong>$15.00\text{ s}$</strong>.
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons-wrap">
+          <button class="nav-step-btn" onclick="switchSection('sec-c')">→ הקודם: סעיף ג'</button>
+          <button class="nav-step-btn" onclick="switchSection('sec-e')">הבא: סעיף ה' (תרשים עקבות) ←</button>
+        </div>
+      </div>
+
+      <!-- ========== SECTION E ========== -->
+      <div id="sec-e" class="section-container">
+        <h2 class="section-header-title">סעיף ה': ניתוח תרשים עקבות טיפות הצבע של מכונית ב'</h2>
+
+        <div class="details-grid">
+          <div class="info-card">
+            <div class="info-card-title">עקרון פעולת מתקן הטיפות:</div>
+            <ul>
+              <li>טיפות הצבע משתחררות בהפרשי זמן קבועים לחלוטין ($\Delta t = \text{const}$).</li>
+              <li>המרחק בין שתי טיפות סמוכות פרופורציונלי למהירות הממוצעת של המכונית באותו מרווח זמן: $\Delta x \approx v \cdot \Delta t$.</li>
+              <li>מהירות גבוהה $\implies$ מרווח גדול בין הטיפות (צפיפות נמוכה).</li>
+              <li>מהירות נמוכה / עצירה $\implies$ מרווח קטן בין הטיפות (צפיפות גבוהה).</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <div class="info-card-title">מהלך התנועה השלם של מכונית ב':</div>
+            <ol style="padding-right: 18px; font-size: 0.92rem; color: #334155;">
+              <li><strong>יציאה ממנוחה ($t = 0$, $x = 0$):</strong> מהירות $v = 0$, האצה עד ל-$8.00\text{ m/s}$.</li>
+              <li><strong>אמצע המסלול ($t = 10\text{ s}$, $x = 40\text{ m}$):</strong> שיא המהירות ($8.00\text{ m/s}$).</li>
+              <li><strong>סיום המסלול (תחנת האוטובוס, $x = 180\text{ m}$):</strong> האטה עד לעצירה מוחלטת ($v = 0$).</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="proof-card">
+          <div class="step-title">ניתוח ארבעת התרשימים הנתונים:</div>
+
+          <div class="traces-container">
+            <!-- Trace 1 -->
+            <div class="trace-card">
+              <div class="trace-label">איור 1:</div>
+              <div class="trace-svg-wrap">
+                <svg viewBox="0 0 500 24" width="100%" height="24">
+                  <rect x="0" y="2" width="500" height="20" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+                  <!-- dense in the middle -->
+                  <circle cx="20" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="100" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="180" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="230" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="248" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="262" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="290" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="360" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="430" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="485" cy="12" r="3" fill="#64748b"/>
+                </svg>
+              </div>
+              <span class="trace-badge badge-wrong">שגוי: צפוף באמצע ומרווח בקצוות</span>
+            </div>
+
+            <!-- Trace 2 -->
+            <div class="trace-card">
+              <div class="trace-label">איור 2:</div>
+              <div class="trace-svg-wrap">
+                <svg viewBox="0 0 500 24" width="100%" height="24">
+                  <rect x="0" y="2" width="500" height="20" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+                  <!-- equally spaced -->
+                  <circle cx="20" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="72" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="124" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="176" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="228" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="280" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="332" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="384" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="436" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="485" cy="12" r="3" fill="#64748b"/>
+                </svg>
+              </div>
+              <span class="trace-badge badge-wrong">שגוי: מרווחים שווים (מהירות קבועה)</span>
+            </div>
+
+            <!-- Trace 3 -->
+            <div class="trace-card">
+              <div class="trace-label">איור 3:</div>
+              <div class="trace-svg-wrap">
+                <svg viewBox="0 0 500 24" width="100%" height="24">
+                  <rect x="0" y="2" width="500" height="20" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+                  <!-- widely spaced at start, getting denser towards end -->
+                  <circle cx="20" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="140" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="250" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="340" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="410" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="460" cy="12" r="3" fill="#64748b"/>
+                  <circle cx="485" cy="12" r="3" fill="#64748b"/>
+                </svg>
+              </div>
+              <span class="trace-badge badge-wrong">שגוי: האטה בלבד לכל אורך התנועה</span>
+            </div>
+
+            <!-- Trace 4 (CORRECT) -->
+            <div class="trace-card correct">
+              <div class="trace-label" style="color: #065f46;">איור 4:</div>
+              <div class="trace-svg-wrap">
+                <svg viewBox="0 0 500 24" width="100%" height="24">
+                  <rect x="0" y="2" width="500" height="20" fill="#f0fdf4" stroke="#86efac" rx="4"/>
+                  <!-- dense at x=0, wider in middle, dense at bus stop -->
+                  <circle cx="20" cy="12" r="3.2" fill="#059669"/>
+                  <circle cx="35" cy="12" r="3.2" fill="#059669"/>
+                  <circle cx="65" cy="12" r="3.2" fill="#059669"/>
+                  <circle cx="135" cy="12" r="3.2" fill="#059669"/>
+                  <circle cx="225" cy="12" r="3.2" fill="#059669"/>
+                  <circle cx="315" cy="12" r="3.2" fill="#059669"/>
+                  <circle cx="395" cy="12" r="3.2" fill="#059669"/>
+                  <circle cx="445" cy="12" r="3.2" fill="#059669"/>
+                  <circle cx="470" cy="12" r="3.2" fill="#059669"/>
+                  <circle cx="485" cy="12" r="3.2" fill="#059669"/>
+                </svg>
+              </div>
+              <span class="trace-badge badge-correct">התשובה הנכונה</span>
+            </div>
+          </div>
+
+          <div class="step-block">
+            <div class="step-title">נימוק פיזיקלי מנוסח לבגרות:</div>
+            <p>
+              1. <strong>שלב ראשון (האצה):</strong> מכונית ב' מתחילה ממנוחה ($v = 0$ ב-$x = 0$), ומהירותה עולה בהדרגה. לכן, בסמוך ל-$x = 0$ מהירות המכונית קטנה מאוד, והמרחק שהיא עוברת בכל מרווח זמן $\Delta t$ קטן – כלומר <strong>הטיפות צפופות מאוד זו לזו בתחילת התנועה</strong>. ככל שהמכונית מאיצה, המרווחים בין הטיפות גדלים.
+            </p>
+            <p style="margin-top: 8px;">
+              2. <strong>שלב שני (בלימה):</strong> החל מ-$t = 10\text{ s}$ ועד להגעתה לתחנת האוטובוס, מכונית ב' מאטה ממהירותה המרבית ($8.00\text{ m/s}$) עד לעצירה מוחלטת ($v = 0$). לכן, המרחקים בין הטיפות העוקבות הולכים וקטנים, ו<strong>בסמוך לתחנת האוטובוס הטיפות שוב הופכות לצפופות מאוד</strong>.
+            </p>
+            <p style="margin-top: 8px;">
+              <strong>איור 4</strong> הוא התרשים היחיד שבו הטיפות צפופות בראשית התנועה ($x = 0$), מרווחות בחלק המרכזי שבו המהירות מרבית, וצפופות שוב בעת העצירה בתחנת האוטובוס.
+            </p>
+          </div>
+
+          <div class="result-banner">
+            <div class="result-icon">✓</div>
+            <div class="result-text">
+              האיור המתאים ביותר הוא <strong>איור 4</strong>.
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons-wrap">
+          <button class="nav-step-btn" onclick="switchSection('sec-d')">→ הקודם: סעיף ד'</button>
+          <div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       1. TABS NAVIGATION & SMOOTH SCROLL
+       ========================================================= */
+    function switchSection(sectionId) {
+      const sections = document.querySelectorAll('.section-container');
+      sections.forEach(sec => sec.classList.remove('active'));
+
+      const buttons = document.querySelectorAll('#sections-tabs .tab-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      const targetSec = document.getElementById(sectionId);
+      if (targetSec) {
+        targetSec.classList.add('active');
+      }
+
+      const secIds = ['sec-a', 'sec-b', 'sec-c', 'sec-d', 'sec-e'];
+      const index = secIds.indexOf(sectionId);
+      if (index !== -1 && buttons[index]) {
+        buttons[index].classList.add('active');
+      }
+
+      const card = document.getElementById('active-content-card');
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise();
+      }
+    }
+
+    /* =========================================================
+       2. DUAL LAYOUT SWITCHER (19X6 Wide vs 6X19 Vertical)
+       ========================================================= */
+    function setLayoutMode(mode) {
+      const container = document.getElementById('main-container');
+      const btnWide = document.getElementById('btn-layout-wide');
+      const btnMobile = document.getElementById('btn-layout-mobile');
+
+      if (mode === '19x6') {
+        container.classList.remove('mode-6x19');
+        container.classList.add('mode-19x6');
+        btnWide.classList.add('active');
+        btnMobile.classList.remove('active');
+      } else {
+        container.classList.remove('mode-19x6');
+        container.classList.add('mode-6x19');
+        btnMobile.classList.add('active');
+        btnWide.classList.remove('active');
+      }
+
+      setTimeout(resizeCanvas, 50);
+    }
+
+    /* =========================================================
+       3. INTERACTIVE CANVAS: DRAWING, LASER POINTER & SNAP
+       ========================================================= */
+    const stage = document.getElementById('graph-stage');
+    const canvas = document.getElementById('drawing-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let currentTool = 'none'; // 'none', 'draw', 'laser'
+    let isDrawing = false;
+    let snapEnabled = false;
+    let startX = 0;
+    let startY = 0;
+
+    const drawnPaths = [];
+    let currentPath = null;
+
+    let laserPoints = [];
+    let laserAnimationId = null;
+
+    function resizeCanvas() {
+      const rect = stage.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+
+      ctx.scale(dpr, dpr);
+      redrawStaticDrawings();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('DOMContentLoaded', () => {
+      resizeCanvas();
+    });
+
+    function setDrawingTool(tool) {
+      const btnDraw = document.getElementById('btn-draw');
+      const btnLaser = document.getElementById('btn-laser');
+
+      if (currentTool === tool) {
+        currentTool = 'none';
+        btnDraw.classList.remove('active');
+        btnLaser.classList.remove('active');
+        canvas.className = 'drawing-canvas-layer';
+      } else {
+        currentTool = tool;
+        btnDraw.classList.toggle('active', tool === 'draw');
+        btnLaser.classList.toggle('active', tool === 'laser');
+        canvas.className = 'drawing-canvas-layer tool-' + tool;
+
+        if (tool === 'laser' && !laserAnimationId) {
+          laserLoop();
+        }
+      }
+    }
+
+    function toggleSnap() {
+      snapEnabled = !snapEnabled;
+      const stateSpan = document.getElementById('snap-state');
+      const btnSnap = document.getElementById('btn-snap');
+      stateSpan.textContent = snapEnabled ? 'פעיל' : 'כבוי';
+      btnSnap.classList.toggle('active', snapEnabled);
+    }
+
+    function clearCanvas() {
+      drawnPaths.length = 0;
+      laserPoints.length = 0;
+      redrawStaticDrawings();
+    }
+
+    function getCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      if (currentTool === 'none') return;
+      isDrawing = true;
+      const pos = getCoords(e);
+      startX = pos.x;
+      startY = pos.y;
+
+      if (currentTool === 'draw') {
+        currentPath = {
+          snap: snapEnabled,
+          color: '#2563eb',
+          width: 2.5,
+          points: [{ x: pos.x, y: pos.y }]
+        };
+      } else if (currentTool === 'laser') {
+        addLaserPoint(pos.x, pos.y);
+      }
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!isDrawing || currentTool === 'none') {
+        if (currentTool === 'laser' && !isDrawing) {
+          const rect = canvas.getBoundingClientRect();
+          if (e.clientX >= rect.left && e.clientX <= rect.right &&
+              e.clientY >= rect.top && e.clientY <= rect.bottom) {
+            addLaserPoint(e.clientX - rect.left, e.clientY - rect.top);
+          }
+        }
+        return;
+      }
+
+      const pos = getCoords(e);
+
+      if (currentTool === 'draw') {
+        if (snapEnabled) {
+          redrawStaticDrawings();
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(pos.x, pos.y);
+          ctx.strokeStyle = '#2563eb';
+          ctx.lineWidth = 2.5;
+          ctx.lineCap = 'round';
+          ctx.setLineDash([4, 4]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        } else {
+          currentPath.points.push(pos);
+          redrawStaticDrawings();
+          renderPath(currentPath);
+        }
+      } else if (currentTool === 'laser') {
+        addLaserPoint(pos.x, pos.y);
+      }
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      if (!isDrawing) return;
+      isDrawing = false;
+
+      if (currentTool === 'draw' && currentPath) {
+        if (snapEnabled) {
+          const pos = getCoords(e);
+          currentPath.points = [{ x: startX, y: startY }, { x: pos.x, y: pos.y }];
+        }
+        if (currentPath.points.length > 1) {
+          drawnPaths.push(currentPath);
+        }
+        currentPath = null;
+        redrawStaticDrawings();
+      }
+    });
+
+    function addLaserPoint(x, y) {
+      laserPoints.push({ x, y, time: performance.now() });
+      if (!laserAnimationId) {
+        laserLoop();
+      }
+    }
+
+    function renderPath(path) {
+      if (!path.points || path.points.length < 2) return;
+      ctx.beginPath();
+      ctx.moveTo(path.points[0].x, path.points[0].y);
+      for (let i = 1; i < path.points.length; i++) {
+        ctx.lineTo(path.points[i].x, path.points[i].y);
+      }
+      ctx.strokeStyle = path.color || '#2563eb';
+      ctx.lineWidth = path.width || 2.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+    }
+
+    function redrawStaticDrawings() {
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      for (const p of drawnPaths) {
+        renderPath(p);
+      }
+    }
+
+    function laserLoop() {
+      const now = performance.now();
+      const DURATION = 2000;
+
+      laserPoints = laserPoints.filter(pt => now - pt.time < DURATION);
+
+      redrawStaticDrawings();
+
+      if (laserPoints.length > 0) {
+        for (let i = 0; i < laserPoints.length; i++) {
+          const pt = laserPoints[i];
+          const age = now - pt.time;
+          const alpha = Math.max(0, 1 - age / DURATION);
+          const radius = 5 * (1 - age / (DURATION * 1.5)) + 2;
+
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, Math.max(1, radius), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(239, 68, 68, ${alpha})`;
+          ctx.shadowColor = 'rgba(239, 68, 68, 0.8)';
+          ctx.shadowBlur = 8;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+        laserAnimationId = requestAnimationFrame(laserLoop);
+      } else {
+        laserAnimationId = null;
+      }
+    }
+  </script>
+</body>
+</html>

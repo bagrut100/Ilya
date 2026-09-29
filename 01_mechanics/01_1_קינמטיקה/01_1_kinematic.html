@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מכניקה ניוטונית - מאגר תרגילים ופתרונות מלאים</title>
+    <!-- Google Fonts: Rubik -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        .filter-btn.active-filter {
+            background-color: #0f172a !important;
+            color: #38bdf8 !important;
+            border-color: #0284c7 !important;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-slate-900 text-white py-3 px-4 shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto max-w-5xl flex justify-between items-center">
+            <span class="font-bold text-cyan-400 text-base sm:text-lg flex items-center gap-2">
+                <span>⚛️</span> מכניקה ניוטונית | מאגר בחינות בגרות וחומרי לימוד
+            </span>
+            <a href="../index.html" class="text-sm bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 transition">חזרה לדף הבית 🏠</a>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
+        
+        <!-- Filter Controls Card -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-bold text-gray-700 block">סינון לפי נושאים ותת-נושאים:</span>
+                <span id="items-counter" class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">מציג הכל</span>
+            </div>
+            <div class="flex flex-wrap gap-2" id="tags-container">
+                <button onclick="filterTags('all')" id="btn-all" class="filter-btn active-filter bg-slate-900 text-white text-xs font-semibold px-3.5 py-1.5 rounded-full border border-transparent transition cursor-pointer">הכל (#all)</button>
+            </div>
+        </div>
+
+        <!-- Exercises List Container -->
+        <div class="space-y-4" id="materials-list">
+
+            <!-- 2024 Question 1 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="בגרות_2024,קינמטיקה,גרף_מהירות_זמן,תנועה_קצובה,תרשים_עקבות">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded">שאלון 5 יח"ל</span>
+                        <h4 class="font-bold text-gray-900 text-lg">בגרות 2024, שאלה 1 - קינמטיקה של שתי מכוניות</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 mb-3">ניתוח גרף מהירות-זמן של שתי מכוניות, השוואת העתקים ומרחקים, חישוב זמני עצירה בתחנת אוטובוס ותרשים עקבות טיפות צבע.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="М_2024_1.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap transition shadow-sm">פתח פתרון מלא ↗</a>
+            </div>
+
+            <!-- 2023 Question 3 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="בגרות_2023,קינמטיקה,זריקה_אופקית,תנועה_בליסטית,מהירות_יחסית,אנרגיה">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded">שאלון 5 יח"ל</span>
+                        <h4 class="font-bold text-gray-900 text-lg">בגרות 2023, שאלה 3 - רחפן וכדורים</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 mb-3">תנועה בליסטית, שחרור כדורים עוקבים מרחפן אופקי, מרחקי פגיעה, מיקום יחסי אנכי ושיקולי שימור אנרגיה בזריקה משופעת.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="М_2023_3.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap transition shadow-sm">פתח פתרון מלא ↗</a>
+            </div>
+
+            <!-- 2023 Question 1 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="בגרות_2023,קינמטיקה,דינמיקה,מישור_משופע,גרף_מהירות_זמן,חיכוך">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded">שאלון 5 יח"ל</span>
+                        <h4 class="font-bold text-gray-900 text-lg">בגרות 2023, שאלה 1 - תנועה במישור משופע</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 mb-3">שני ניסויים במישור משופע חלק, חישוב מרחקים משיא גובה, העתק כולל, והשפעת כוח חיכוך קינטי על שיפועי גרף מהירות-זמן.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="М_2023_1.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap transition shadow-sm">פתח פתרון מלא ↗</a>
+            </div>
+
+            <!-- 2022 Question 1 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="בגרות_2022,קינמטיקה,גרף_מהירות_זמן,זמן_תגובה,מרחק_בלימה,בטיחות_בדרכים">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded">שאלון 5 יח"ל</span>
+                        <h4 class="font-bold text-gray-900 text-lg">בגרות 2022, שאלה 1 - תנועת מכונית ובלימת חירום</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 mb-3">תאוצה משתנה מול שוות-תאוצה, מהירות ממוצעת באמצעות שטח, חישוב מרחק עצירה (תגובה + בלימה), והערכת טענת כרזת בטיחות.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="М_20222_1.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap transition shadow-sm">פתח פתרון מלא ↗</a>
+            </div>
+
+            <!-- 2021 Question 3 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="בגרות_2021,קינמטיקה,זריקה_אופקית,לינאריזציה,עיבוד_נתונים">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded">שאלון 5 יח"ל</span>
+                        <h4 class="font-bold text-gray-900 text-lg">בגרות 2021, שאלה 3 - זריקה אופקית ולינאריזציה</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 mb-3">אי-תלות תנועות, פיתוח קשר אלגברי ל-d² כפונקציה של h, סרטוט קו מגמה, חישוב מהירות התחלתית משיפוע הישר ומהירות פגיעה.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="М_2021_3.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap transition shadow-sm">פתח פתרון מלא ↗</a>
+            </div>
+
+            <!-- 2021 Question 1 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="בגרות_2021,קינמטיקה,שתי_מכוניות,גרף_מהירות_זמן,תנועה_בכיוונים_מנוגדים">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded">שאלון 5 יח"ל</span>
+                        <h4 class="font-bold text-gray-900 text-lg">בגרות 2021, שאלה 1 - שתי מכוניות נעות זו לקראת זו</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 mb-3">קביעת סימני תאוצה ביחס לציר, זמני עצירה והעתקים, חישוב מרחק התחלתי בין המכוניות וסרטוט גרף v(t) משותף עם שיפועים מנוגדים.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="М_2021_1.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap transition shadow-sm">פתח פתרון מלא ↗</a>
+            </div>
+
+            <!-- 2020 Question 1 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="בגרות_2020,קינמטיקה,דינמיקה,נפילה_חופשית,חוקי_ניוטון,גרף_מיקום_זמן">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded">שאלון 5 יח"ל</span>
+                        <h4 class="font-bold text-gray-900 text-lg">בגרות 2020, שאלה 1 - גשושית "בראשית" בנחיתה על הירח</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 mb-3">בלימה אנכית באמצעות מנועים, כוח דחף מול כובד הירח, העתקים דרך שטח הגרף, גובה התאפסות מהירות ובחירת גרף y(t).</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="М_2020_1.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap transition shadow-sm">פתח פתרון מלא ↗</a>
+            </div>
+
+            <!-- 2019 Question 2 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="בגרות_2019,דינמיקה,חוקי_ניוטון,מישור_משופע,גלגלת,קריעת_חוט,גרף_מהירות_זמן">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded">שאלון 5 יח"ל</span>
+                        <h4 class="font-bold text-gray-900 text-lg">בגרות 2019, שאלה 2 - מערכת גופים, מישור משופע וגלגלת</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 mb-3">ניתוח נתוני חיישן תנועה, תרשימי כוחות FBD, חישוב מתיחות החוט, יחס תאוצות לאחר קריעת החוט וניתוח שינוי מגמת המהירות.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="M_2019_2.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap transition shadow-sm">פתח פתרון מלא ↗</a>
+            </div>
+
+            <!-- 2019 Question 1 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="בגרות_2019,קינמטיקה,זריקה_אנכית,גרף_מיקום_זמן,מהירות_ממוצעת,אי_תלות_תנועות">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded">שאלון 5 יח"ל</span>
+                        <h4 class="font-bold text-gray-900 text-lg">בגרות 2019, שאלה 1 - זריקה אנכית מעלה מגג בניין</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 mb-3">גרף מיקום-זמן פרבולי, מציאת מהירות התחלתית, השוואת מהירויות ותאוצות במסלול, מהירות ממוצעת והשפעת כוח אופקי רגעי.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="M_2019_1.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap transition shadow-sm">פתח פתרון מלא ↗</a>
+            </div>
+
+            <!-- 2016 Question 2 -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="בגרות_2016,דינמיקה,חוקי_ניוטון,מכונת_אטווד,עיבוד_נתונים,לינאריזציה">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded">שאלון 5 יח"ל</span>
+                        <h4 class="font-bold text-gray-900 text-lg">בגרות 2016, שאלה 2 - מכונת אטווד וניתוח מעבדה</h4>
+                    </div>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1 mb-3">יישום החוק השני של ניוטון, אימות השערת תנועה שוות-תאוצה, פיתוח משוואת התאוצה וחישוב המסה הכוללת משיפוע גרף a כתלות ב-Δm.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="M_2016_2.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap transition shadow-sm">פתח פתרון מלא ↗</a>
+            </div>
+
+            <!-- Original exercise 1 (Afeka) -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="קינמטיקה,זריקה_אנכית">
+                <div>
+                    <h4 class="font-bold text-gray-900 text-lg">תרגיל אפקה 37 זריקה אנכית</h4>
+                    <p class="text-gray-500 text-xs mt-1 mb-3">פתרון וידאו מודרך לתרגיל זריקה אנכית.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="https://youtu.be/NU9G6vAO6N8?si=CQ3LxDZq-g8j07i1" target="_blank" rel="noopener noreferrer" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap transition shadow-sm">צפה בווידאו ↗</a>
+            </div>
+
+            <!-- Original exercise 2 (Placeholder) -->
+            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
+                 data-tags="דינמיקה,חוקי_ניוטון,חיכוך,מישור_משופע">
+                <div>
+                    <h4 class="font-bold text-gray-900 text-lg">גוף על מישור משופע עם חיכוך</h4>
+                    <p class="text-gray-500 text-xs mt-1 mb-3">חישוב מקדם החיכוך הסטטי והקינטי ומציאת תאוצת המערכת.</p>
+                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
+                </div>
+                <a href="#" class="bg-gray-400 text-white text-sm font-medium px-4 py-2 rounded-lg text-center whitespace-nowrap cursor-not-allowed">בקרוב</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-6 text-center text-xs text-gray-500 mt-12">
+        מאגר פתרונות בפיזיקה 5 יח"ל | מכניקה קלאסית
+    </footer>
+
+    <!-- Filter & Tags Generation Script -->
+    <script>
+        const cards = document.querySelectorAll('.item-card');
+        const tagsContainer = document.getElementById('tags-container');
+        const itemsCounter = document.getElementById('items-counter');
+        const allTags = new Set();
+
+        // Populate tags on cards and gather unique tags
+        cards.forEach(card => {
+            const rawTags = card.getAttribute('data-tags');
+            if (rawTags) {
+                const tagsArray = rawTags.split(',').map(t => t.trim()).filter(Boolean);
+                const visibleContainer = card.querySelector('.card-tags-visible');
+                tagsArray.forEach(tag => {
+                    allTags.add(tag);
+                    const tagSpan = document.createElement('span');
+                    tagSpan.className = "text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded hover:bg-cyan-100 hover:text-cyan-700 cursor-pointer transition";
+                    tagSpan.innerText = `#${tag}`;
+                    tagSpan.onclick = (e) => {
+                        e.stopPropagation();
+                        filterTags(tag);
+                    };
+                    visibleContainer.appendChild(tagSpan);
+                });
+            }
+        });
+
+        // Create filter buttons dynamically sorted alphabetically
+        Array.from(allTags).sort().forEach(tag => {
+            const btn = document.createElement('button');
+            btn.className = "filter-btn bg-cyan-50 hover:bg-cyan-100 text-cyan-800 text-xs font-semibold px-3 py-1.5 rounded-full border border-cyan-200 transition cursor-pointer";
+            btn.innerText = `#${tag}`;
+            btn.setAttribute('data-filter', tag);
+            btn.onclick = () => filterTags(tag);
+            tagsContainer.appendChild(btn);
+        });
+
+        // Filtering logic
+        function filterTags(selectedTag) {
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const cardTags = card.getAttribute('data-tags').split(',').map(t => t.trim()).filter(Boolean);
+                if (selectedTag === 'all' || cardTags.includes(selectedTag)) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Update active state on buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const filterVal = btn.getAttribute('data-filter') || 'all';
+                if (filterVal === selectedTag) {
+                    btn.classList.add('active-filter');
+                } else {
+                    btn.classList.remove('active-filter');
+                }
+            });
+
+            // Update item counter
+            if (selectedTag === 'all') {
+                itemsCounter.innerText = `מציג הכל (${visibleCount})`;
+            } else {
+                itemsCounter.innerText = `נמצאו ${visibleCount} תרגילים בנושא #${selectedTag}`;
+            }
+        }
+    </script>
+</body>
+</html>

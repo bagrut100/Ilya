@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פתרון מלא: בגרות 1999, שאלה 2 - מכניקה (כוחות וקינמטיקה)</title>
+
+  <!-- Google Fonts: Rubik -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+  <!-- MathJax for LaTeX Rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #1e3a8a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --accent-red: #dc2626;
+      --border-color: #e2e8f0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 20px 12px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Top Layout & Canvas Controls Panel */
+    .controls-panel {
+      position: sticky;
+      top: 12px;
+      z-index: 1000;
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 10px 18px;
+      border-radius: 9999px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      margin-bottom: 20px;
+      border: 1px solid #334155;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .layout-toggle-btn {
+      background: #334155;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: inherit;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
+
+    .layout-toggle-btn.active {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    }
+
+    .canvas-tool-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #475569;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.82rem;
+      transition: all 0.2s ease;
+    }
+
+    .canvas-tool-btn.active {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #f87171;
+    }
+
+    /* Flexible Layout Containers */
+    .page-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .layout-19-6 {
+      width: 100%;
+      max-width: 1400px;
+      min-height: 800px;
+      transition: max-width 0.3s ease;
+    }
+
+    .layout-6-19 {
+      width: 100%;
+      max-width: 480px;
+      min-height: 800px;
+      transition: max-width 0.3s ease;
+    }
+
+    .main-content-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Header Banner */
+    .header-banner {
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .header-pill {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .header-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.92;
+    }
+
+    .header-badge {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      text-align: center;
+    }
+
+    .header-badge .sub {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      margin-bottom: 2px;
+    }
+
+    .header-badge .main {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    /* Overview Grid */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 24px;
+    }
+
+    .layout-6-19 .overview-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      background: #f8fafc;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .accent-bar {
+      width: 5px;
+      height: 22px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .description-text {
+      color: #334155;
+      font-size: 0.98rem;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .assumptions-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 14px;
+    }
+
+    .assumptions-title {
+      font-weight: 700;
+      color: var(--primary-deep);
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+
+    .assumptions-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: #1e3a8a;
+    }
+
+    .assumptions-list li {
+      position: relative;
+      padding-right: 18px;
+    }
+
+    .assumptions-list li::before {
+      content: "•";
+      color: var(--primary);
+      position: absolute;
+      right: 2px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    /* Graphics Container */
+    .graphics-container {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+      min-height: 310px;
+      justify-content: center;
+    }
+
+    .graph-title {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+      width: 100%;
+      text-align: right;
+    }
+
+    .interactive-canvas-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      z-index: 20;
+    }
+
+    /* Tabs Navigation */
+    .tabs-wrapper {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      justify-content: flex-start;
+      border-bottom: 2px solid #e2e8f0;
+      margin-top: 4px;
+    }
+
+    .tab-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--primary-deep);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    /* Section Content */
+    .section-container {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .section-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header-title {
+      color: var(--primary-deep);
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .layout-6-19 .details-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+    }
+
+    .info-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 8px;
+    }
+
+    .info-card p, .info-card li {
+      font-size: 0.92rem;
+      color: #334155;
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding-right: 0;
+    }
+
+    .info-card li {
+      margin-bottom: 6px;
+      position: relative;
+      padding-right: 16px;
+    }
+
+    .info-card li::before {
+      content: "▪";
+      color: var(--primary);
+      position: absolute;
+      right: 0;
+      font-size: 0.9rem;
+    }
+
+    .formula-helper-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 18px;
+      flex-wrap: wrap;
+    }
+
+    .formula-helper-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .formula-pill {
+      background: #eff6ff;
+      border: 1.5px solid #93c5fd;
+      border-radius: 9999px;
+      padding: 4px 14px;
+      color: var(--primary-dark);
+      font-size: 0.88rem;
+      font-weight: 600;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .proof-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .step-block {
+      margin-bottom: 18px;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .math-display-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      margin: 10px 0;
+      overflow-x: auto;
+      direction: ltr;
+      text-align: center;
+    }
+
+    .result-banner {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .result-icon {
+      background: var(--accent-green);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .result-text {
+      color: #065f46;
+      font-size: 0.98rem;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .nav-buttons-wrap {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .nav-step-btn {
+      background: transparent;
+      border: 1.5px solid var(--border-color);
+      padding: 8px 18px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .nav-step-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls Panel -->
+  <div class="controls-panel">
+    <button class="layout-toggle-btn active" id="btn-19-6" onclick="setLayout('19-6')">פריסה רחבה (19:6)</button>
+    <button class="layout-toggle-btn" id="btn-6-19" onclick="setLayout('6-19')">פריסה אנכית (6:19)</button>
+    <div style="width: 1px; height: 20px; background: #475569;"></div>
+    <button class="canvas-tool-btn" id="laser-btn" onclick="toggleLaser()">מצביע לייזר דועך (2s)</button>
+    <button class="canvas-tool-btn" id="snap-btn" onclick="toggleSnap()">יישור קווים אוטומטי: כבוי</button>
+    <button class="canvas-tool-btn" onclick="clearDrawings()">נקה שרטוט</button>
+  </div>
+
+  <!-- Page Wrapper -->
+  <div class="page-wrapper">
+    <div class="layout-19-6" id="main-wrapper">
+
+      <div class="main-content-card">
+
+        <!-- HEADER -->
+        <header class="header-banner">
+          <div class="header-content">
+            <div class="header-pill">פתרונות מעוצבים בפיזיקה | בגרות 5 יח"ל</div>
+            <h1 class="header-title">פתרון מלא: בגרות 1999, שאלה 2</h1>
+            <p class="header-subtitle">מכניקה | חוקי ניוטון, מכונת אטווד, מתיחות בחוט וקינמטיקה שוות-תאוצה</p>
+          </div>
+          <div class="header-badge">
+            <div class="sub">רמת קושי / נושא</div>
+            <div class="main">בגרות 5 יח"ל / מכניקה</div>
+          </div>
+        </header>
+
+        <!-- OVERVIEW GRID -->
+        <div class="overview-grid">
+          
+          <!-- Formulation & Assumptions -->
+          <div class="card">
+            <div class="card-title-wrap">
+              <div class="accent-bar"></div>
+              <h2 class="card-title">ניסוח השאלה המלא (סטנדרט בחינת בגרות)</h2>
+            </div>
+            <p class="description-text">
+              שני גופים, $A$ ו-$B$, שמסותיהם $m_A = 3.00\text{ kg}$ ו-$m_B = 2.00\text{ kg}$ בהתאמה, קשורים זה לזה באמצעות חוט אידאלי ובלתי נמתח הכרוך סביב גלגלת קבועה.<br>
+              ניתן להזניח את מסת החוט, את מסת הגלגלת ואת כל כוחות החיכוך ($g = 10.00\text{ m/s}^2$).
+            </p>
+
+            <div class="assumptions-box">
+              <div class="assumptions-title">מהלך הניסוי ושלבי התנועה:</div>
+              <ul class="assumptions-list">
+                <li><strong>שלב 1 ($0 \le t \le 2.00\text{ s}$):</strong> אדם מחזיק בגוף $B$ במנוחה. שני הגופים נמצאים בגובה $h_0 = 3.50\text{ m}$ מעל הרצפה ($v_0 = 0$).</li>
+                <li><strong>שלב 2 ($2.00\text{ s} \le t \le 4.00\text{ s}$):</strong> האדם מפעיל על גוף $B$ כוח קבוע שגודלו $F = 15.00\text{ N}$ כלפי מטה למשך $\Delta t_1 = 2.00\text{ s}$. גוף $B$ יורד ומאיץ.</li>
+                <li><strong>שלב 3 ($t > 4.00\text{ s}$):</strong> האדם מרפה לחלוטין מגוף $B$ ($F = 0$). שני הגופים ממשיכים לנוע בהשפעת כוח הכובד והמתיחות בלבד עד לעצירה רגעית.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- SVG Diagram & Canvas -->
+          <div class="graphics-container">
+            <div class="graph-title">תרשים פיזיקלי של המערכת: גלגלת ושני גופים תלויים</div>
+            
+            <svg id="system-svg" viewBox="0 0 360 300" width="100%" height="270" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b"/>
+                </marker>
+                <marker id="arrow-red" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#dc2626"/>
+                </marker>
+                <pattern id="hatch-ceiling" width="8" height="8" patternUnits="userSpaceOnUse">
+                  <path d="M 0 8 L 8 0" stroke="#94a3b8" stroke-width="1.2"/>
+                </pattern>
+                <pattern id="hatch-floor" width="8" height="8" patternUnits="userSpaceOnUse">
+                  <path d="M 0 8 L 8 0" stroke="#cbd5e1" stroke-width="1.2"/>
+                </pattern>
+              </defs>
+
+              <!-- Ceiling -->
+              <rect x="70" y="10" width="220" height="12" fill="url(#hatch-ceiling)"/>
+              <line x1="70" y1="22" x2="290" y2="22" stroke="#334155" stroke-width="2"/>
+
+              <!-- Pulley Support -->
+              <line x1="180" y1="22" x2="180" y2="55" stroke="#475569" stroke-width="2.5"/>
+
+              <!-- Pulley Wheel -->
+              <circle cx="180" cy="75" r="28" fill="#f8fafc" stroke="#334155" stroke-width="2.5"/>
+              <circle cx="180" cy="75" r="4.5" fill="#1e293b"/>
+
+              <!-- String -->
+              <!-- Left side (B) at x = 152, Right side (A) at x = 208 -->
+              <path d="M 152,150 L 152,75 A 28,28 0 0,1 208,75 L 208,150" fill="none" stroke="#1e293b" stroke-width="2"/>
+
+              <!-- Body B (Left, 2kg) -->
+              <rect x="135" y="150" width="34" height="28" fill="#f1f5f9" stroke="#1e293b" stroke-width="2" rx="3"/>
+              <text x="152" y="168" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">B</text>
+              <text x="152" y="190" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">2.00 kg</text>
+
+              <!-- Body A (Right, 3kg) -->
+              <rect x="190" y="150" width="36" height="28" fill="#f1f5f9" stroke="#1e293b" stroke-width="2" rx="3"/>
+              <text x="208" y="168" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">A</text>
+              <text x="208" y="190" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">3.00 kg</text>
+
+              <!-- Hand icon applying F=15N on B -->
+              <!-- Hand stylized pushing down on B -->
+              <path d="M 85,165 Q 115,160 135,153 L 138,150 Q 120,146 95,152 Z" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+              <!-- Force arrow downwards on B -->
+              <line x1="152" y1="130" x2="152" y2="148" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arrow-red)"/>
+              <text x="122" y="138" font-size="10" font-weight="700" fill="#dc2626">F = 15.00 N</text>
+
+              <!-- Initial height dotted line -->
+              <line x1="40" y1="178" x2="135" y2="178" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1.2"/>
+              <line x1="169" y1="178" x2="190" y2="178" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1.2"/>
+
+              <!-- Floor -->
+              <rect x="20" y="270" width="320" height="15" fill="url(#hatch-floor)"/>
+              <line x1="20" y1="270" x2="340" y2="270" stroke="#334155" stroke-width="2"/>
+              <text x="330" y="264" font-size="10" font-weight="600" fill="#64748b" text-anchor="end">רצפה</text>
+
+              <!-- Height dimension arrow: from floor y=270 to bottom of bodies y=178 -> height = 3.5 m -->
+              <line x1="65" y1="270" x2="65" y2="178" stroke="#334155" stroke-width="1.5"/>
+              <line x1="60" y1="270" x2="70" y2="270" stroke="#334155" stroke-width="1.5"/>
+              <line x1="60" y1="178" x2="70" y2="178" stroke="#334155" stroke-width="1.5"/>
+              <text x="60" y="228" font-size="11" font-weight="700" fill="#334155" text-anchor="end">3.50 m</text>
+            </svg>
+
+            <!-- Interactive Drawing and Laser Canvas Overlay -->
+            <canvas id="interactiveCanvas" class="interactive-canvas-layer"></canvas>
+          </div>
+
+        </div>
+
+        <!-- TABS NAVIGATION -->
+        <div class="tabs-wrapper" id="tabsWrapper">
+          <button class="tab-btn active" onclick="switchSection('sec-a')">סעיף א' (מתיחות במנוחה)</button>
+          <button class="tab-btn" onclick="switchSection('sec-b1')">סעיף ב'(1) (תאוצה עם כוח חיצוני)</button>
+          <button class="tab-btn" onclick="switchSection('sec-b2')">סעיף ב'(2) (מתיחות עם כוח חיצוני)</button>
+          <button class="tab-btn" onclick="switchSection('sec-c')">סעיף ג' (תאוצה לאחר ההרפיה)</button>
+          <button class="tab-btn" onclick="switchSection('sec-d')">סעיף ד' (מרחק מינימלי מהרצפה)</button>
+        </div>
+
+        <!-- SECTION CONTENT -->
+
+        <!-- SECTION A -->
+        <div id="sec-a" class="section-container active">
+          <h2 class="section-header-title">סעיף א': חישוב מתיחות החוט במצב שבו הגופים מוחזקים במנוחה</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">נתוני המצב במנוחה ($0 \le t \le 2.00\text{ s}$):</div>
+              <ul>
+                <li>מסת גוף $A$: $m_A = 3.00\text{ kg}$.</li>
+                <li>מסת גוף $B$: $m_B = 2.00\text{ kg}$.</li>
+                <li>שני הגופים במנוחה מוחלטת: $a_A = 0$, $a_B = 0$.</li>
+                <li>האדם מחזיק בגוף $B$ בלבד. גוף $A$ תלוי חופשי על החוט.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>חשב את מתיחות החוט במצב שבו הגופים מוחזקים במנוחה ($0 \le t \le 2.00\text{ s}$).</p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">נוסחאות דף עזר:</span>
+            <div class="formula-pill">$\Sigma \vec{F} = 0 \quad (\text{שיווי משקל סטטי})$</div>
+            <div class="formula-pill">$W_A = m_A g$</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">תרשים כוחות ומשוואת שיווי משקל עבור גוף $A$:</div>
+              <p>
+                על גוף $A$ פועלים שני כוחות אנכיים בלבד:
+              </p>
+              <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 4px;">
+                <li>כוח הכובד $W_A = m_A g$ המושך אנכית כלפי מטה.</li>
+                <li>כוח המתיחות של החוט $T$ המושך אנכית כלפי מעלה.</li>
+              </ul>
+              <p style="margin-top: 8px;">
+                מכיוון שגוף $A$ נמצא במנוחה ($\Sigma F_y = 0$), מתקבל ישירות:
+              </p>
+              <div class="math-display-box">
+                $$\Sigma F_y = T - m_A g = 0 \implies T = m_A g$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">הצבת נתונים וחישוב:</div>
+              <div class="math-display-box">
+                $$T = 3.00\text{ kg} \cdot 10.00\text{ m/s}^2 = 30.00\text{ N}$$
+              </div>
+              <p>
+                <em>הערה פיזיקלית לגבי גוף $B$:</em> על גוף $B$ פועלים כוח הכובד ($m_B g = 20.00\text{ N}$ מטה), כוח המתיחות ($T = 30.00\text{ N}$ מעלה) וכוח התמיכה/האחיזה של יד האדם ($F_{\text{hand}}$ מטה). משיווי משקל של $B$: $T - m_B g - F_{\text{hand}} = 0 \implies F_{\text{hand}} = 10.00\text{ N}$ כלפי מטה. כוח זה מבטיח את מנוחת המערכת.
+              </p>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                מתיחות החוט במצב מנוחה היא <strong>$T = 30.00\text{ N}$</strong>.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <div></div>
+            <button class="nav-step-btn" onclick="switchSection('sec-b1')">הבא: סעיף ב'(1) ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION B(1) -->
+        <div id="sec-b1" class="section-container">
+          <h2 class="section-header-title">סעיף ב'(1): חישוב תאוצת הגופים בהשפעת הכוח החיצוני</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">נתוני השלב ($2.00\text{ s} \le t \le 4.00\text{ s}$):</div>
+              <ul>
+                <li>כוח חיצוני כלפי מטה על גוף $B$: $F = 15.00\text{ N}$.</li>
+                <li>מסת הגופים: $m_A = 3.00\text{ kg}$, $m_B = 2.00\text{ kg}$.</li>
+                <li>חוט אידאלי: לשני הגופים אותו גודל תאוצה $a$. גוף $B$ מאיץ כלפי מטה וגוף $A$ מאיץ כלפי מעלה.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>חשב את גודל תאוצת הגופים מרגע $t = 2.00\text{ s}$ עד רגע $t = 4.00\text{ s}$.</p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">נוסחאות דף עזר:</span>
+            <div class="formula-pill">$\Sigma \vec{F} = m \vec{a}$ (החוק השני של ניוטון)</div>
+            <div class="formula-pill">$a = \frac{\Sigma F_{\text{ext}}}{m_{\text{total}}}$</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">1. כתיבת משוואות החוק השני של ניוטון עבור כל גוף בנפרד:</div>
+              <p>
+                <strong>עבור גוף $B$ (נבחר ציר חיובי כלפי מטה בכיוון תנועתו):</strong>
+              </p>
+              <div class="math-display-box">
+                $$F + m_B g - T = m_B a \implies 15.00 + 2.00 \cdot 10.00 - T = 2.00 a \implies 35.00 - T = 2.00 a \quad \text{(משוואה 1)}$$
+              </div>
+              <p>
+                <strong>עבור גוף $A$ (נבחר ציר חיובי כלפי מעלה בכיוון תנועתו):</strong>
+              </p>
+              <div class="math-display-box">
+                $$T - m_A g = m_A a \implies T - 3.00 \cdot 10.00 = 3.00 a \implies T - 30.00 = 3.00 a \quad \text{(משוואה 2)}$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">2. פתרון מערכת המשוואות:</div>
+              <p>נחבר את משוואה (1) ומשוואה (2) לביטול המתיחות $T$:</p>
+              <div class="math-display-box">
+                $$(35.00 - T) + (T - 30.00) = 2.00 a + 3.00 a$$
+                $$5.00 = 5.00 a \implies a = \frac{5.00}{5.00} = 1.00\text{ m/s}^2$$
+              </div>
+              <p>
+                <em>דרך חלופית (מערכת משולבת לאורך החוט):</em> הכוח המאיץ נטו הוא $F + m_B g - m_A g = 15.00 + 20.00 - 30.00 = 5.00\text{ N}$.<br>
+                המסה הכוללת הנעה היא $m_A + m_B = 5.00\text{ kg}$. לכן:
+                $$a = \frac{F_{\text{net}}}{m_{\text{total}}} = \frac{5.00\text{ N}}{5.00\text{ kg}} = 1.00\text{ m/s}^2$$
+              </p>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                גודל תאוצת הגופים בפרק הזמן $2.00\text{ s} \le t \le 4.00\text{ s}$ הוא <strong>$a = 1.00\text{ m/s}^2$</strong>.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-a')">→ הקודם: סעיף א'</button>
+            <button class="nav-step-btn" onclick="switchSection('sec-b2')">הבא: סעיף ב'(2) ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION B(2) -->
+        <div id="sec-b2" class="section-container">
+          <h2 class="section-header-title">סעיף ב'(2): חישוב מתיחות החוט בהשפעת הכוח החיצוני</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">נתונים להצבה:</div>
+              <ul>
+                <li>תאוצת המערכת: $a = 1.00\text{ m/s}^2$.</li>
+                <li>מסת גוף $A$: $m_A = 3.00\text{ kg}$.</li>
+                <li>מסת גוף $B$: $m_B = 2.00\text{ kg}$, $F = 15.00\text{ N}$.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>חשב את מתיחות החוט מרגע $t = 2.00\text{ s}$ עד רגע $t = 4.00\text{ s}$.</p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">נוסחאות דף עזר:</span>
+            <div class="formula-pill">$T = m_A(g + a)$</div>
+            <div class="formula-pill">$T = F + m_B(g - a)$</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">חישוב המתיחות ממשוואת התנועה של גוף $A$:</div>
+              <p>נציב את ערך התאוצה $a = 1.00\text{ m/s}^2$ במשוואה (2):</p>
+              <div class="math-display-box">
+                $$T - 30.00 = 3.00 \cdot 1.00 \implies T = 30.00 + 3.00 = 33.00\text{ N}$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">אימות באמצעות משוואת התנועה של גוף $B$:</div>
+              <p>נציב במשוואה (1):</p>
+              <div class="math-display-box">
+                $$35.00 - T = 2.00 \cdot 1.00 \implies T = 35.00 - 2.00 = 33.00\text{ N}$$
+              </div>
+              <p>התוצאה זהה לחלוטין ומאמתת את נכונות החישוב משני הכיוונים.</p>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                מתיחות החוט בפרק הזמן שבו פועל הכוח היא <strong>$T = 33.00\text{ N}$</strong>.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-b1')">→ הקודם: סעיף ב'(1)</button>
+            <button class="nav-step-btn" onclick="switchSection('sec-c')">הבא: סעיף ג' ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION C -->
+        <div id="sec-c" class="section-container">
+          <h2 class="section-header-title">סעיף ג': חישוב תאוצת הגופים לאחר הרפיית היד</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">נתוני השלב לאחר ההרפיה ($t > 4.00\text{ s}$):</div>
+              <ul>
+                <li>הכוח החיצוני התאפס: $F = 0$.</li>
+                <li>המערכת נעה חופשית: כוח הכובד של $A$ ($30.00\text{ N}$) גדול מכוח הכובד של $B$ ($20.00\text{ N}$).</li>
+                <li>כיוון התנועה נותר עדיין מטה עבור $B$ ומעלה עבור $A$ בשל התמדה, אך התאוצה פועלת כעת לבלום תנועה זו.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>ברגע $t = 4.00\text{ s}$ האדם מרפה מגוף $B$. חשב את גודל תאוצת הגופים לאחר הרגע $t = 4.00\text{ s}$.</p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">נוסחאות דף עזר:</span>
+            <div class="formula-pill">$\Sigma F_{\text{ext}} = m_A g - m_B g = (m_A + m_B) a'$</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">1. כתיבת משוואות הכוחות ללא הכוח החיצוני:</div>
+              <p>
+                נגדיר את תאוצת המערכת החדשה כ-$a'$.<br>
+                כיוון ש-$m_A > m_B$, שקול הכוחות נוטה לטובת גוף $A$ (משיכה כלפי מטה של $A$ וכלפי מעלה של $B$):
+              </p>
+              <div class="math-display-box">
+                $$\text{עבור גוף } A: \quad m_A g - T' = m_A a' \implies 30.00 - T' = 3.00 a' \quad \text{(משוואה 3)}$$
+                $$\text{עבור גוף } B: \quad T' - m_B g = m_B a' \implies T' - 20.00 = 2.00 a' \quad \text{(משוואה 4)}$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">2. חישוב גודל התאוצה $a'$:</div>
+              <p>נחבר את משוואה (3) ומשוואה (4):</p>
+              <div class="math-display-box">
+                $$(30.00 - T') + (T' - 20.00) = 3.00 a' + 2.00 a'$$
+                $$10.00 = 5.00 a' \implies a' = \frac{10.00}{5.00} = 2.00\text{ m/s}^2$$
+              </div>
+              <p>
+                <strong>משמעות פיזיקלית של כיוון התאוצה:</strong> וקטור התאוצה של גוף $B$ מכוון <strong>כלפי מעלה</strong> (מנוגד לכיוון מהירותו שמוסיפה להיות כלפי מטה). לכן, החל מרגע זה גוף $B$ מבצע <strong>תנועה מואטת (בלימה)</strong> בתאוצה שגודלה $2.00\text{ m/s}^2$.
+              </p>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                גודל תאוצת הגופים לאחר הרגע $t = 4.00\text{ s}$ הוא <strong>$a' = 2.00\text{ m/s}^2$</strong>.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-b2')">→ הקודם: סעיף ב'(2)</button>
+            <button class="nav-step-btn" onclick="switchSection('sec-d')">הבא: סעיף ד' ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION D -->
+        <div id="sec-d" class="section-container">
+          <h2 class="section-header-title">סעיף ד': חישוב המרחק המינימלי בין גוף B לרצפה</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">שלבי תנועת הירידה של גוף $B$:</div>
+              <ul>
+                <li>גובה התחלתי: $h_0 = 3.50\text{ m}$ מעל הרצפה.</li>
+                <li><strong>שלב האצה ($2\text{ s} \le t \le 4\text{ s}$):</strong> ירידה ממנוחה במשך $\Delta t_1 = 2.00\text{ s}$ בתאוצה $a = 1.00\text{ m/s}^2$.</li>
+                <li><strong>שלב בלימה ($t > 4\text{ s}$):</strong> המשך ירידה במהירות התחלתית $v_1$ בתאוטה $a' = 2.00\text{ m/s}^2$ עד לעצירה רגעית ($v_2 = 0$).</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>חשב את המרחק המינימלי בין גוף $B$ לרצפה (הנקודה הנמוכה ביותר שאליה מגיע הגוף במסלולו).</p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">נוסחאות דף עזר:</span>
+            <div class="formula-pill">$\Delta y_1 = \frac{1}{2} a \Delta t^2$</div>
+            <div class="formula-pill">$v_1 = a \Delta t$</div>
+            <div class="formula-pill">$v_2^2 - v_1^2 = 2 a_{\text{vector}} \Delta y_2$</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">שלב 1: העתק ומהירות בסיום שלב ההאצה ($t = 4.00\text{ s}$):</div>
+              <p>המרחק שגוף $B$ ירד בפרק הזמן שבו פעל הכוח החיצוני ($\Delta t_1 = 2.00\text{ s}$):</p>
+              <div class="math-display-box">
+                $$\Delta y_1 = v_0 \Delta t_1 + \frac{1}{2} a (\Delta t_1)^2 = 0 + \frac{1}{2} \cdot 1.00 \cdot (2.00)^2 = \frac{4.00}{2} = 2.00\text{ m}$$
+              </div>
+              <p>המהירות של גוף $B$ ברגע $t = 4.00\text{ s}$ (מכוונת כלפי מטה):</p>
+              <div class="math-display-box">
+                $$v_1 = v_0 + a \Delta t_1 = 0 + 1.00 \cdot 2.00 = 2.00\text{ m/s}$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">שלב 2: העתק שלב הבלימה עד לעצירה רגעית:</div>
+              <p>
+                החל מרגע $t = 4.00\text{ s}$, גוף $B$ ממשיך לרדת מטה, אך תאוצתו מכוונת מעלה ($a_{\text{down}} = -a' = -2.00\text{ m/s}^2$).<br>
+                הגוף מגיע למרחק המינימלי מהרצפה בנקודה שבה מהירותו מתאפסת רגעית ($v_2 = 0$):
+              </p>
+              <div class="math-display-box">
+                $$v_2^2 = v_1^2 + 2 (-a') \Delta y_2 \implies 0^2 = (2.00)^2 - 2 \cdot 2.00 \cdot \Delta y_2$$
+                $$0 = 4.00 - 4.00 \cdot \Delta y_2 \implies 4.00 \Delta y_2 = 4.00 \implies \Delta y_2 = 1.00\text{ m}$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">שלב 3: חישוב סך כל הירידה והמרחק המינימלי מהרצפה:</div>
+              <p>שיעור הירידה הכולל של גוף $B$ מגובהו המקורי:</p>
+              <div class="math-display-box">
+                $$\Delta y_{\text{total}} = \Delta y_1 + \Delta y_2 = 2.00\text{ m} + 1.00\text{ m} = 3.00\text{ m}$$
+              </div>
+              <p>מכיוון שהגובה ההתחלתי היה $h_0 = 3.50\text{ m}$, המרחק המינימלי בין גוף $B$ לרצפה הוא:</p>
+              <div class="math-display-box">
+                $$h_{\min} = h_0 - \Delta y_{\text{total}} = 3.50\text{ m} - 3.00\text{ m} = 0.50\text{ m}$$
+              </div>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                המרחק המינימלי בין גוף $B$ לרצפה הוא <strong>$h_{\min} = 0.50\text{ m}$</strong> (חצי מטר).
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-c')">→ הקודם: סעיף ג'</button>
+            <div></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Tab Navigation Logic
+    function switchSection(sectionId) {
+      document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const target = document.getElementById(sectionId);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      const tabs = ['sec-a', 'sec-b1', 'sec-b2', 'sec-c', 'sec-d'];
+      const idx = tabs.indexOf(sectionId);
+      const buttons = document.querySelectorAll('.tab-btn');
+      if (idx !== -1 && buttons[idx]) {
+        buttons[idx].classList.add('active');
+      }
+
+      // Smooth scroll to top of tabs
+      const tabsWrapper = document.getElementById('tabsWrapper');
+      if (tabsWrapper) {
+        tabsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Layout Toggling Logic (19:6 vs 6:19)
+    function setLayout(mode) {
+      const wrapper = document.getElementById('main-wrapper');
+      const btn19 = document.getElementById('btn-19-6');
+      const btn6 = document.getElementById('btn-6-19');
+
+      if (mode === '19-6') {
+        wrapper.className = 'layout-19-6';
+        btn19.classList.add('active');
+        btn6.classList.remove('active');
+      } else {
+        wrapper.className = 'layout-6-19';
+        btn6.classList.add('active');
+        btn19.classList.remove('active');
+      }
+      setTimeout(resizeCanvas, 150);
+    }
+
+    // Canvas & Interactive Tools Logic (Disabled automatically by default)
+    const canvas = document.getElementById('interactiveCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    let currentX = 0, currentY = 0;
+
+    let laserMode = false;
+    let snapToStraightLine = false;
+
+    let laserTrail = [];
+    const LASER_LIFETIME = 2000; // Exactly 2 seconds (2000ms)
+
+    let persistentPaths = [];
+
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
+      redraw();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('load', resizeCanvas);
+
+    function toggleLaser() {
+      laserMode = !laserMode;
+      const btn = document.getElementById('laser-btn');
+      btn.classList.toggle('active', laserMode);
+      if (laserMode) {
+        laserTrail = [];
+      }
+    }
+
+    function toggleSnap() {
+      snapToStraightLine = !snapToStraightLine;
+      const btn = document.getElementById('snap-btn');
+      btn.innerText = snapToStraightLine ? "יישור קווים אוטומטי: פעיל" : "יישור קווים אוטומטי: כבוי";
+      btn.classList.toggle('active', snapToStraightLine);
+    }
+
+    function clearDrawings() {
+      persistentPaths = [];
+      laserTrail = [];
+      redraw();
+    }
+
+    function getCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: cx - rect.left,
+        y: cy - rect.top
+      };
+    }
+
+    // Mouse & Touch Handlers
+    canvas.addEventListener('mousedown', (e) => {
+      const p = getCoords(e);
+      isDrawing = true;
+      startX = p.x;
+      startY = p.y;
+      currentX = p.x;
+      currentY = p.y;
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      const p = getCoords(e);
+      currentX = p.x;
+      currentY = p.y;
+      if (laserMode) {
+        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (!isDrawing) return;
+      isDrawing = false;
+      if (!laserMode) {
+        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
+      }
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      const p = getCoords(e);
+      isDrawing = true;
+      startX = p.x;
+      startY = p.y;
+      currentX = p.x;
+      currentY = p.y;
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      const p = getCoords(e);
+      currentX = p.x;
+      currentY = p.y;
+      if (laserMode) {
+        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      if (isDrawing && !laserMode) {
+        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
+      }
+      isDrawing = false;
+    });
+
+    // Render loop for Live Drawings & Laser Trail Fade-Out
+    function render() {
+      const now = Date.now();
+      laserTrail = laserTrail.filter(pt => now - pt.time < LASER_LIFETIME);
+      redraw();
+      requestAnimationFrame(render);
+    }
+
+    function redraw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Persistent straight lines
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      persistentPaths.forEach(item => {
+        if (item.type === 'line') {
+          ctx.beginPath();
+          ctx.moveTo(item.x1, item.y1);
+          ctx.lineTo(item.x2, item.y2);
+          ctx.stroke();
+        }
+      });
+
+      // Preview line while dragging (if snap mode is on and not in laser mode)
+      if (isDrawing && !laserMode && snapToStraightLine) {
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(currentX, currentY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Render Laser Trail with gradual 2000ms decay
+      const now = Date.now();
+      if (laserTrail.length > 1) {
+        for (let i = 1; i < laserTrail.length; i++) {
+          const pt1 = laserTrail[i - 1];
+          const pt2 = laserTrail[i];
+          const age = now - pt2.time;
+          const alpha = Math.max(0, 1 - age / LASER_LIFETIME);
+
+          ctx.beginPath();
+          ctx.moveTo(pt1.x, pt1.y);
+          ctx.lineTo(pt2.x, pt2.y);
+          ctx.strokeStyle = `rgba(239, 68, 68, ${alpha})`;
+          ctx.lineWidth = 3.5 * alpha + 1;
+          ctx.lineCap = 'round';
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = 'rgba(239, 68, 68, 0.8)';
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      // Laser Pointer Tip
+      if (laserMode && laserTrail.length > 0) {
+        const last = laserTrail[laserTrail.length - 1];
+        if (now - last.time < 150) {
+          ctx.beginPath();
+          ctx.arc(last.x, last.y, 4, 0, 2 * Math.PI);
+          ctx.fillStyle = '#ef4444';
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = '#f87171';
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

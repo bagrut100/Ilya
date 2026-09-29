@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פתרון מלא: בגרות 2001, שאלה 1 - קינמטיקה</title>
+
+  <!-- Google Fonts: Rubik -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+  <!-- MathJax for rendering LaTeX formulas -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #1e3a8a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --border-color: #e2e8f0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 20px 12px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Top Layout & Canvas Controls Panel */
+    .controls-panel {
+      position: sticky;
+      top: 12px;
+      z-index: 1000;
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 10px 18px;
+      border-radius: 9999px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      margin-bottom: 20px;
+      border: 1px solid #334155;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .layout-toggle-btn {
+      background: #334155;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: inherit;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
+
+    .layout-toggle-btn.active {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    }
+
+    .canvas-tool-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #475569;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.82rem;
+      transition: all 0.2s ease;
+    }
+
+    .canvas-tool-btn.active {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #f87171;
+    }
+
+    /* Flexible Containers */
+    .page-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .layout-19-6 {
+      width: 100%;
+      max-width: 1400px;
+      min-height: 800px;
+      transition: max-width 0.3s ease;
+    }
+
+    .layout-6-19 {
+      width: 100%;
+      max-width: 480px;
+      min-height: 800px;
+      transition: max-width 0.3s ease;
+    }
+
+    .main-content-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Header Banner */
+    .header-banner {
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .header-pill {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .header-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.92;
+    }
+
+    .header-badge {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      text-align: center;
+    }
+
+    .header-badge .sub {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      margin-bottom: 2px;
+    }
+
+    .header-badge .main {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    /* Overview Grid */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 24px;
+    }
+
+    .layout-6-19 .overview-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      background: #f8fafc;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .accent-bar {
+      width: 5px;
+      height: 22px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .description-text {
+      color: #334155;
+      font-size: 0.98rem;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .assumptions-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+    }
+
+    .assumptions-title {
+      font-weight: 700;
+      color: var(--primary-deep);
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+
+    .assumptions-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: #1e3a8a;
+    }
+
+    .assumptions-list li {
+      position: relative;
+      padding-right: 18px;
+    }
+
+    .assumptions-list li::before {
+      content: "•";
+      color: var(--primary);
+      position: absolute;
+      right: 2px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    /* Graphics Container */
+    .graphics-container {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+      min-height: 290px;
+      justify-content: center;
+    }
+
+    .graph-title {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+      width: 100%;
+      text-align: right;
+    }
+
+    .interactive-canvas-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      z-index: 20;
+    }
+
+    /* Tabs Navigation */
+    .tabs-wrapper {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      justify-content: flex-start;
+      border-bottom: 2px solid #e2e8f0;
+      margin-top: 4px;
+    }
+
+    .tab-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--primary-deep);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    /* Section Content */
+    .section-container {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .section-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header-title {
+      color: var(--primary-deep);
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .layout-6-19 .details-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+    }
+
+    .info-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 8px;
+    }
+
+    .info-card p, .info-card li {
+      font-size: 0.92rem;
+      color: #334155;
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding-right: 0;
+    }
+
+    .info-card li {
+      margin-bottom: 6px;
+      position: relative;
+      padding-right: 16px;
+    }
+
+    .info-card li::before {
+      content: "▪";
+      color: var(--primary);
+      position: absolute;
+      right: 0;
+      font-size: 0.9rem;
+    }
+
+    .formula-helper-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 18px;
+      flex-wrap: wrap;
+    }
+
+    .formula-helper-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .formula-pill {
+      background: #eff6ff;
+      border: 1.5px solid #93c5fd;
+      border-radius: 9999px;
+      padding: 4px 14px;
+      color: var(--primary-dark);
+      font-size: 0.88rem;
+      font-weight: 600;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .proof-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .step-block {
+      margin-bottom: 18px;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .math-display-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      margin: 10px 0;
+      overflow-x: auto;
+      direction: ltr;
+      text-align: center;
+    }
+
+    .result-banner {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .result-icon {
+      background: var(--accent-green);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .result-text {
+      color: #065f46;
+      font-size: 0.98rem;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .nav-buttons-wrap {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .nav-step-btn {
+      background: transparent;
+      border: 1.5px solid var(--border-color);
+      padding: 8px 18px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .nav-step-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls Panel -->
+  <div class="controls-panel">
+    <button class="layout-toggle-btn active" id="btn-19-6" onclick="setLayout('19-6')">פריסה רחבה (19:6)</button>
+    <button class="layout-toggle-btn" id="btn-6-19" onclick="setLayout('6-19')">פריסה אנכית (6:19)</button>
+    <div style="width: 1px; height: 20px; background: #475569;"></div>
+    <button class="canvas-tool-btn" id="laser-btn" onclick="toggleLaser()">מצביע לייזר דועך (2s)</button>
+    <button class="canvas-tool-btn" id="snap-btn" onclick="toggleSnap()">יישור קווים אוטומטי: כבוי</button>
+    <button class="canvas-tool-btn" onclick="clearDrawings()">נקה שרטוט</button>
+  </div>
+
+  <!-- Page Wrapper -->
+  <div class="page-wrapper">
+    <div class="layout-19-6" id="main-wrapper">
+
+      <div class="main-content-card">
+
+        <!-- HEADER -->
+        <header class="header-banner">
+          <div class="header-content">
+            <div class="header-pill">פתרונות מעוצבים בפיזיקה | בגרות 5 יח"ל</div>
+            <h1 class="header-title">פתרון מלא: בגרות 2001, שאלה 1</h1>
+            <p class="header-subtitle">קינמטיקה | נפילה חופשית וזריקה אנכית כלפי מטה, תנועה יחסית ומפגש גופים</p>
+          </div>
+          <div class="header-badge">
+            <div class="sub">רמת קושי / נושא</div>
+            <div class="main">בגרות 5 יח"ל / מכניקה</div>
+          </div>
+        </header>
+
+        <!-- OVERVIEW GRID -->
+        <div class="overview-grid">
+          
+          <!-- Formulation & Assumptions -->
+          <div class="card">
+            <div class="card-title-wrap">
+              <div class="accent-bar"></div>
+              <h2 class="card-title">ניסוח השאלה המלא (סטנדרט בחינת בגרות)</h2>
+            </div>
+            <p class="description-text">
+              תלמיד עומד על גג בניין ומחזיק בידיו שני כדורים, <strong>כדור א'</strong> ו-<strong>כדור ב'</strong>.<br>
+              ברגע $t = 0$ התלמיד משחרר את כדור א' ממנוחה מגובה גג הבניין, והכדור נופל למטה בהשפעת הכובד.<br>
+              ברגע $t = 1.0\text{ s}$ התלמיד זורק את כדור ב' מאותו גובה גג בדיוק במהירות שגודלה $14.0\text{ m/s}$ כלפי מטה.<br>
+              הזנח את השפעת התנגדות האוויר על תנועת הכדורים. תאוצת הנפילה החופשית היא $g = 10.0\text{ m/s}^2$ כלפי מטה.
+            </p>
+
+            <div class="assumptions-box">
+              <div class="assumptions-title">נתוני המערכת והנחות עבודה:</div>
+              <ul class="assumptions-list">
+                <li>תאוצת הנפילה החופשית: $g = 10.0\text{ m/s}^2$ כלפי מטה עבור שני הכדורים.</li>
+                <li><strong>כדור א':</strong> משוחרר ממנוחה ברגע $t = 0$ מגובה הגג ($v_{0A} = 0$).</li>
+                <li><strong>כדור ב':</strong> נזרק ברגע $t = 1.0\text{ s}$ מגובה הגג במהירות $14.0\text{ m/s}$ כלפי מטה.</li>
+                <li>התנועה מתרחשת בקו אנכי ישר בהזנחת התנגדות האוויר.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- System SVG Diagram & Canvas Layer -->
+          <div class="graphics-container">
+            <div class="graph-title">תרשים פיזיקלי של המערכת: שחרור וזריקת הכדורים מראש הבניין</div>
+            
+            <svg id="system-svg" viewBox="0 0 360 270" width="100%" height="240" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arrow-down" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b"/>
+                </marker>
+                <marker id="arrow-red" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#dc2626"/>
+                </marker>
+                <marker id="arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563eb"/>
+                </marker>
+              </defs>
+
+              <!-- Building Outline -->
+              <rect x="30" y="45" width="90" height="210" fill="#e2e8f0" stroke="#475569" stroke-width="2"/>
+              <!-- Roof surface line -->
+              <line x1="20" y1="45" x2="130" y2="45" stroke="#334155" stroke-width="3"/>
+              <text x="75" y="145" font-size="13" font-weight="700" fill="#64748b" text-anchor="middle">בניין</text>
+
+              <!-- Axis y (downwards from roof) -->
+              <line x1="165" y1="45" x2="165" y2="245" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-down)"/>
+              <text x="175" y="248" font-size="12" font-weight="700" fill="#1e293b">y (m)</text>
+              <line x1="160" y1="45" x2="170" y2="45" stroke="#1e293b" stroke-width="2"/>
+              <text x="155" y="49" font-size="11" font-weight="700" fill="#1e293b" text-anchor="end">y=0 (גג)</text>
+
+              <!-- Ball B at roof level -->
+              <circle cx="230" cy="45" r="7" fill="#dc2626"/>
+              <text x="245" y="42" font-size="12" font-weight="700" fill="#dc2626">כדור ב' (t=1.0s)</text>
+              <!-- Velocity vector Ball B -->
+              <line x1="230" y1="52" x2="230" y2="92" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arrow-red)"/>
+              <text x="240" y="80" font-size="11" font-weight="700" fill="#dc2626">14.0 m/s</text>
+
+              <!-- Ball A falling below roof level at t=1.0s -->
+              <circle cx="295" cy="115" r="7" fill="#2563eb"/>
+              <text x="270" y="135" font-size="12" font-weight="700" fill="#2563eb">כדור א' (ב-t=1.0s)</text>
+              <!-- Velocity vector Ball A at t=1s -->
+              <line x1="295" y1="122" x2="295" y2="157" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+              <text x="305" y="145" font-size="11" font-weight="700" fill="#2563eb">10.0 m/s</text>
+
+              <!-- Guideline showing Ball A distance at t=1s (5.0 m) -->
+              <line x1="230" y1="45" x2="310" y2="45" stroke="#94a3b8" stroke-dasharray="2,2"/>
+              <line x1="295" y1="45" x2="295" y2="115" stroke="#94a3b8" stroke-dasharray="2,2"/>
+              <text x="325" y="85" font-size="10" font-weight="600" fill="#64748b">5.0 m</text>
+            </svg>
+
+            <!-- Interactive Drawing and Laser Canvas Overlay -->
+            <canvas id="interactiveCanvas" class="interactive-canvas-layer"></canvas>
+          </div>
+
+        </div>
+
+        <!-- TABS NAVIGATION -->
+        <div class="tabs-wrapper" id="tabsWrapper">
+          <button class="tab-btn active" onclick="switchSection('sec-a1-a2')">סעיף א'(1)-(2) (משוואות תנועה)</button>
+          <button class="tab-btn" onclick="switchSection('sec-a3')">סעיף א'(3) (זמן הפגישה)</button>
+          <button class="tab-btn" onclick="switchSection('sec-b1')">סעיף ב'(1) (מהירות כדור א' ב-t=1s)</button>
+          <button class="tab-btn" onclick="switchSection('sec-b2')">סעיף ב'(2) (זריקה ב-10 m/s ושיקולים פיזיקליים)</button>
+        </div>
+
+        <!-- SECTION CONTENT -->
+
+        <!-- SECTION A(1) & A(2) -->
+        <div id="sec-a1-a2" class="section-container active">
+          <h2 class="section-header-title">סעיף א'(1)-(2): ביטוי מקום הכדורים כפונקציה של הזמן</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">בחירת מערכת צירים (ציר מומלץ):</div>
+              <ul>
+                <li><strong>ראשית הציר ($y = 0$):</strong> גובה גג הבניין.</li>
+                <li><strong>כיוון חיובי:</strong> אנכית כלפי מטה (בכיוון התנועה).</li>
+                <li><strong>תאוצת הנפילה החופשית:</strong> $a = +g = +10.0\text{ m/s}^2$.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">הדרישה בסעיף:</div>
+              <p>
+                <strong>(1)</strong> בטא את מקומו של כדור א' כפונקציה של הזמן $y_A(t)$.<br>
+                <strong>(2)</strong> בטא את מקומו של כדור ב' כפונקציה של הזמן $y_B(t)$.
+              </p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">נוסחאות דף עזר:</span>
+            <div class="formula-pill">$y(t) = y_0 + v_0(t - t_0) + \frac{1}{2} a (t - t_0)^2$</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">1. ביטוי מקום כדור א' ($y_A(t)$):</div>
+              <p>
+                כדור א' משוחרר ממנוחה ברגע $t = 0$ מראשית הצירים שבגג ($y_{0A} = 0$, $v_{0A} = 0$):
+              </p>
+              <div class="math-display-box">
+                $$y_A(t) = 0 + 0 \cdot t + \frac{1}{2} \cdot 10.0 \cdot t^2 = 5.0 t^2 \quad [t \ge 0]$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">2. ביטוי מקום כדור ב' ($y_B(t)$):</div>
+              <p>
+                כדור ב' נזרק מגובה הגג ($y_{0B} = 0$) ברגע $t_0 = 1.0\text{ s}$ במהירות התחלתית $v_{0B} = 14.0\text{ m/s}$ כלפי מטה (בכיוון החיובי).<br>
+                לכן עבור כל $t \ge 1.0\text{ s}$ מתקיים:
+              </p>
+              <div class="math-display-box">
+                $$y_B(t) = y_{0B} + v_{0B}(t - 1.0) + \frac{1}{2} g (t - 1.0)^2$$
+                $$y_B(t) = 14.0(t - 1.0) + 5.0(t - 1.0)^2 \quad [t \ge 1.0\text{ s}]$$
+              </div>
+              <p>פיתוח אלגברי לפי חזקות $t$:</p>
+              <div class="math-display-box">
+                $$y_B(t) = 14.0 t - 14.0 + 5.0(t^2 - 2.0 t + 1.0) = 5.0 t^2 + 4.0 t - 9.0 \quad [t \ge 1.0\text{ s}]$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">הערה: בחירה חלופית בציר אנכי המכוון כלפי מעלה (שתי הבחירות תקניות ומלאות):</div>
+              <p>אם ראשית הציר בגג וכיוונו החיובי כלפי מעלה ($a = -10.0\text{ m/s}^2$):</p>
+              <div class="math-display-box">
+                $$y_A(t) = -5.0 t^2, \quad y_B(t) = -14.0(t - 1.0) - 5.0(t - 1.0)^2 = -5.0 t^2 - 4.0 t + 9.0$$
+              </div>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                ביחס לציר שכיוונו כלפי מטה וראשיתו בגג הבניין:<br>
+                <strong>כדור א':</strong> $y_A(t) = 5.0 t^2$<br>
+                <strong>כדור ב':</strong> $y_B(t) = 14.0(t - 1.0) + 5.0(t - 1.0)^2 = 5.0 t^2 + 4.0 t - 9.0$ (עבור $t \ge 1.0\text{ s}$).
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <div></div>
+            <button class="nav-step-btn" onclick="switchSection('sec-a3')">הבא: סעיף א'(3) ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION A(3) -->
+        <div id="sec-a3" class="section-container">
+          <h2 class="section-header-title">סעיף א'(3): חישוב משך הזמן עד לפגישת הכדורים</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">תנאי המפגש במרחב:</div>
+              <p>
+                שני הכדורים חולפים זה לצד זה כאשר הם מגיעים לאותו מיקום אנכי בדיוק לאורך ציר התנועה:
+              </p>
+              <div class="math-display-box" style="margin: 6px 0; padding: 6px;">
+                $$y_A(t) = y_B(t)$$
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>כעבור כמה זמן, <strong>מרגע שחרור כדור א' ($t = 0$)</strong>, נפגשים שני הכדורים?</p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">נוסחאות דף עזר:</span>
+            <div class="formula-pill">$y_A(t) = y_B(t)$</div>
+            <div class="formula-pill">$5.0 t^2 = 14.0(t - 1.0) + 5.0(t - 1.0)^2$</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">השוואת פונקציות המיקום ופתרון המשוואה:</div>
+              <div class="math-display-box">
+                $$5.0 t^2 = 14.0(t - 1.0) + 5.0(t - 1.0)^2$$
+              </div>
+              <p>נפתח את הסוגריים באגף ימין:</p>
+              <div class="math-display-box">
+                $$5.0 t^2 = 14.0 t - 14.0 + 5.0(t^2 - 2.0 t + 1.0)$$
+                $$5.0 t^2 = 14.0 t - 14.0 + 5.0 t^2 - 10.0 t + 5.0$$
+              </div>
+              <p>
+                האיבר הריבועי $5.0 t^2$ מופיע בשני האגפים ומצטמצם לחלוטין (משקף תאוצה יחסית אפס):
+              </p>
+              <div class="math-display-box">
+                $$0 = 14.0 t - 10.0 t - 14.0 + 5.0$$
+                $$0 = 4.0 t - 9.0$$
+                $$4.0 t = 9.0 \implies t = \frac{9.0}{4.0} = 2.25\text{ s}$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">בדיקת המיקום ברגע המפגש ואימות פיזיקלי:</div>
+              <p>נציב את הזמן $t = 2.25\text{ s}$ במשוואות המקום של שני הכדורים:</p>
+              <div class="math-display-box">
+                $$y_A(2.25) = 5.0 \cdot (2.25)^2 = 5.0 \cdot 5.0625 = 25.3125\text{ m}$$
+                $$y_B(2.25) = 14.0(1.25) + 5.0(1.25)^2 = 17.5 + 5.0 \cdot 1.5625 = 17.5 + 7.8125 = 25.3125\text{ m}$$
+              </div>
+              <p>
+                שני הכדורים נפגשים במרחק של $25.3125\text{ m}$ מתחת לגג הבניין.
+              </p>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                הכדורים נפגשים כעבור <strong>$t = 2.25\text{ s}$</strong> מרגע שחרור כדור א' (במרחק $25.3125\text{ m}$ מתחת לגג).
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-a1-a2')">→ הקודם: סעיף א'(1)-(2)</button>
+            <button class="nav-step-btn" onclick="switchSection('sec-b1')">הבא: סעיף ב'(1) ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION B(1) -->
+        <div id="sec-b1" class="section-container">
+          <h2 class="section-header-title">סעיף ב'(1): מהירות כדור א' ברגע $t = 1.0\text{ s}$</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">נתוני כדור א':</div>
+              <ul>
+                <li>מהירות התחלתית: $v_{0A} = 0$.</li>
+                <li>תאוצה: $g = 10.0\text{ m/s}^2$ כלפי מטה.</li>
+                <li>הרגע המבוקש: $t = 1.0\text{ s}$ (רגע זריקת כדור ב').</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>מהי המהירות של כדור א' ברגע $t = 1.0\text{ s}$? (הקפד להשתמש ב-$g = 10.0\text{ m/s}^2$).</p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">נוסחאות דף עזר:</span>
+            <div class="formula-pill">$v(t) = v_0 + at$</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">חישוב המהירות (גודל וכיוון):</div>
+              <p>
+                על פי משוואת מהירות-זמן של נפילה חופשית ממנוחה:
+              </p>
+              <div class="math-display-box">
+                $$v_A(t) = v_{0A} + g \cdot t$$
+                $$v_A(1.0) = 0 + 10.0 \cdot 1.0 = 10.0\text{ m/s} \quad (\text{כלפי מטה})$$
+              </div>
+              <p>
+                ביחס לציר המכוון מעלה: $v_A(1.0) = -10.0\text{ m/s}$.<br>
+                גודל המהירות של כדור א' ברגע זה הוא $10.0\text{ m/s}$ וכיוונה אנכית כלפי מטה.
+              </p>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                מהירות כדור א' ברגע $t = 1.0\text{ s}$ היא <strong>$10.0\text{ m/s}$ כלפי מטה</strong> (ערך אלגברי בציר מעלה: $-10.0\text{ m/s}$).
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-a3')">→ הקודם: סעיף א'(3)</button>
+            <button class="nav-step-btn" onclick="switchSection('sec-b2')">הבא: סעיף ב'(2) ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION B(2) -->
+        <div id="sec-b2" class="section-container">
+          <h2 class="section-header-title">סעיף ב'(2): ניתוח אפשרות מפגש אילו נזרק כדור ב' ב-$10.0\text{ m/s}$</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">התרחיש החדש ($t = 1.0\text{ s}$):</div>
+              <ul>
+                <li>כדור א' כבר הספיק ליפול מרחק של $y_A(1.0) = 5.0\text{ m}$ מתחת לגג הבניין.</li>
+                <li>מהירות כדור א' ברגע זה היא $v_A(1.0) = 10.0\text{ m/s}$ כלפי מטה.</li>
+                <li>כדור ב' נזרק מגובה הגג במהירות התחלתית של $v_{0B} = 10.0\text{ m/s}$ כלפי מטה.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>
+                אילו זרק התלמיד את כדור ב' במהירות של $10.0\text{ m/s}$ כלפי מטה (ולא $14.0\text{ m/s}$), האם היו הכדורים "נפגשים" (לפני הגיעם לקרקע)?<br>
+                <strong>הסבר במילים את תשובתך על-פי שיקולים פיזיקליים.</strong>
+              </p>
+            </div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">קביעה חד-משמעית:</div>
+              <p>
+                <strong>הכדורים לא היו נפגשים לעולם</strong> (עד לפגיעתם בקרקע).
+              </p>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">נימוק והסבר פיזיקלי (מוצג בשתי גישות שוות ערך ומלאות):</div>
+              
+              <p style="margin-top: 8px;"><strong>גישה א' – שיקול של תנועה יחסית ופער מרחקים קבוע:</strong></p>
+              <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
+                <li>ברגע הזריקה של כדור ב' ($t = 1.0\text{ s}$), לשני הכדורים יש בדיוק את אותה המהירות: $10.0\text{ m/s}$ כלפי מטה.</li>
+                <li>ברגע זה כדור א' כבר מקדים את כדור ב' ונמצא $5.0\text{ m}$ מתחתיו ($y_A(1) = 5.0\text{ m}$, בעוד כדור ב' בגג $y_B(1) = 0$).</li>
+                <li>כיוון שעל שני הכדורים פועל אך ורק כוח הכובד, לשניהם יש בדיוק את אותה התאוצה ($g = 10.0\text{ m/s}^2$ כלפי מטה).</li>
+                <li>לכן <strong>התאוצה היחסית ביניהם מתאפסת</strong> ($a_{\text{rel}} = a_B - a_A = 0$), והמהירות היחסית ביניהם מתאפסת אף היא בכל רגע נתון ($v_{\text{rel}} = v_B(t) - v_A(t) = 0$).</li>
+                <li>מכיוון שהמהירות היחסית היא אפס, <strong>המרחק בין שני הכדורים נשאר קבוע לחלוטין ($5.0\text{ m}$)</strong> לאורך כל זמן התנועה באוויר, וכדור ב' אינו מצמצם את הפער לעולם.</li>
+              </ul>
+
+              <p style="margin-top: 14px;"><strong>גישה ב' – ניתוח גרף מהירות-זמן והעתקים (השטח הכלוא):</strong></p>
+              <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
+                <li>אם נסרטט את גרפי המהירות $v(t)$ של שני הכדורים, נקבל שני קווים ישרים מקבילים (אותו שיפוע $g$).</li>
+                <li>הגרף של כדור ב' מוזח ימינה בדיוק בשנייה אחת ביחס לגרף של כדור א'.</li>
+                <li>ההפרש בין ההעתקים של שני הכדורים מיוצג על ידי השטח שנוצר בין $t = 0$ ל-$t = 1.0\text{ s}$ (שטח משולש שערכו $5.0\text{ m}$).</li>
+                <li>בכל פרק זמן שלאחר $t = 1.0\text{ s}$, שני הכדורים עוברים בדיוק את אותו ההעתק באותו משך זמן, ולכן הפער המרחבי אינו נסגר לעולם.</li>
+              </ul>
+            </div>
+
+            <!-- SVG Graph v(t) showing parallel lines -->
+            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; align-items: center; margin: 16px 0;">
+              <div style="font-weight: 700; color: #1e3a8a; margin-bottom: 8px;">גרף מהירות-זמן השוואתי עבור מקרה ב'(2): קווים ישרים מקבילים</div>
+              <svg viewBox="0 0 440 220" width="100%" height="200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <marker id="arrow-v" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b"/>
+                  </marker>
+                </defs>
+
+                <!-- Grid lines -->
+                <line x1="50" y1="180" x2="410" y2="180" stroke="#e2e8f0" stroke-width="1"/>
+                <line x1="50" y1="130" x2="410" y2="130" stroke="#e2e8f0" stroke-width="1"/>
+                <line x1="50" y1="80" x2="410" y2="80" stroke="#e2e8f0" stroke-width="1"/>
+
+                <!-- Axes -->
+                <line x1="50" y1="180" x2="420" y2="180" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-v)"/>
+                <line x1="50" y1="180" x2="50" y2="20" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-v)"/>
+
+                <text x="420" y="198" font-size="12" font-weight="700" fill="#1e293b">t (s)</text>
+                <text x="42" y="24" font-size="12" font-weight="700" fill="#1e293b" text-anchor="end">v (m/s)</text>
+
+                <!-- Ticks on T axis -->
+                <text x="50" y="198" font-size="11" fill="#64748b" text-anchor="middle">0</text>
+                <line x1="130" y1="177" x2="130" y2="183" stroke="#1e293b" stroke-width="1.5"/>
+                <text x="130" y="198" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle">1</text>
+
+                <line x1="210" y1="177" x2="210" y2="183" stroke="#1e293b" stroke-width="1.5"/>
+                <text x="210" y="198" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle">2</text>
+
+                <line x1="290" y1="177" x2="290" y2="183" stroke="#1e293b" stroke-width="1.5"/>
+                <text x="290" y="198" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle">3</text>
+
+                <!-- Ticks on V axis -->
+                <line x1="47" y1="130" x2="53" y2="130" stroke="#1e293b" stroke-width="1.5"/>
+                <text x="42" y="134" font-size="11" font-weight="600" fill="#64748b" text-anchor="end">10</text>
+
+                <line x1="47" y1="80" x2="53" y2="80" stroke="#1e293b" stroke-width="1.5"/>
+                <text x="42" y="84" font-size="11" font-weight="600" fill="#64748b" text-anchor="end">20</text>
+
+                <!-- Graph Ball A: (0,0) -> (1, 10) -> (2, 20) -> (3, 30) -->
+                <!-- Coordinates: (50, 180) -> (130, 130) -> (210, 80) -> (290, 30) -->
+                <line x1="50" y1="180" x2="290" y2="30" stroke="#2563eb" stroke-width="3"/>
+                <circle cx="50" cy="180" r="4" fill="#2563eb"/>
+                <circle cx="130" cy="130" r="4" fill="#2563eb"/>
+                <text x="220" y="60" font-size="12" font-weight="700" fill="#2563eb">כדור א': v_A(t) = 10t</text>
+
+                <!-- Graph Ball B: starts at t=1 with v=10 -> (130, 130) -> (210, 80) -> (290, 30) shifted -->
+                <!-- Line for Ball B: from (130, 130) to (370, -20) parallel to line A -->
+                <line x1="130" y1="130" x2="370" y2="-20" stroke="#dc2626" stroke-width="3"/>
+                <circle cx="130" cy="130" r="5" fill="#dc2626"/>
+                <text x="300" y="105" font-size="12" font-weight="700" fill="#dc2626">כדור ב': v_B(t) = 10(t-1)+10</text>
+              </svg>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                הכדורים לא היו נפגשים. ברגע $t = 1.0\text{ s}$ לשני הכדורים אותה מהירות ($10.0\text{ m/s}$), אך כדור א' מקדים ונמצא $5.0\text{ m}$ מתחת לכדור ב'. מכיוון שלשניהם אותה תאוצה ($g$), התאוצה היחסית והמהירות היחסית מתאפסות, והמרחק ביניהם נשאר קבוע ($5.0\text{ m}$).
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-b1')">→ הקודם: סעיף ב'(1)</button>
+            <div></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Tab Navigation Logic
+    function switchSection(sectionId) {
+      document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const target = document.getElementById(sectionId);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      const tabs = ['sec-a1-a2', 'sec-a3', 'sec-b1', 'sec-b2'];
+      const idx = tabs.indexOf(sectionId);
+      const buttons = document.querySelectorAll('.tab-btn');
+      if (idx !== -1 && buttons[idx]) {
+        buttons[idx].classList.add('active');
+      }
+
+      // Smooth scroll to the top of tabs
+      const tabsWrapper = document.getElementById('tabsWrapper');
+      if (tabsWrapper) {
+        tabsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Layout Toggling Logic (19:6 vs 6:19)
+    function setLayout(mode) {
+      const wrapper = document.getElementById('main-wrapper');
+      const btn19 = document.getElementById('btn-19-6');
+      const btn6 = document.getElementById('btn-6-19');
+
+      if (mode === '19-6') {
+        wrapper.className = 'layout-19-6';
+        btn19.classList.add('active');
+        btn6.classList.remove('active');
+      } else {
+        wrapper.className = 'layout-6-19';
+        btn6.classList.add('active');
+        btn19.classList.remove('active');
+      }
+      setTimeout(resizeCanvas, 150);
+    }
+
+    // Canvas & Interactive Tools Logic (Disabled automatically by default)
+    const canvas = document.getElementById('interactiveCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    let currentX = 0, currentY = 0;
+
+    let laserMode = false;
+    let snapToStraightLine = false;
+
+    let laserTrail = [];
+    const LASER_LIFETIME = 2000; // Exactly 2 seconds (2000ms)
+
+    let persistentPaths = [];
+
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
+      redraw();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('load', resizeCanvas);
+
+    function toggleLaser() {
+      laserMode = !laserMode;
+      const btn = document.getElementById('laser-btn');
+      btn.classList.toggle('active', laserMode);
+      if (laserMode) {
+        laserTrail = [];
+      }
+    }
+
+    function toggleSnap() {
+      snapToStraightLine = !snapToStraightLine;
+      const btn = document.getElementById('snap-btn');
+      btn.innerText = snapToStraightLine ? "יישור קווים אוטומטי: פעיל" : "יישור קווים אוטומטי: כבוי";
+      btn.classList.toggle('active', snapToStraightLine);
+    }
+
+    function clearDrawings() {
+      persistentPaths = [];
+      laserTrail = [];
+      redraw();
+    }
+
+    function getCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: cx - rect.left,
+        y: cy - rect.top
+      };
+    }
+
+    // Mouse & Touch Handlers
+    canvas.addEventListener('mousedown', (e) => {
+      const p = getCoords(e);
+      isDrawing = true;
+      startX = p.x;
+      startY = p.y;
+      currentX = p.x;
+      currentY = p.y;
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      const p = getCoords(e);
+      currentX = p.x;
+      currentY = p.y;
+      if (laserMode) {
+        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (!isDrawing) return;
+      isDrawing = false;
+      if (!laserMode) {
+        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
+      }
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      const p = getCoords(e);
+      isDrawing = true;
+      startX = p.x;
+      startY = p.y;
+      currentX = p.x;
+      currentY = p.y;
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      const p = getCoords(e);
+      currentX = p.x;
+      currentY = p.y;
+      if (laserMode) {
+        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      if (isDrawing && !laserMode) {
+        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
+      }
+      isDrawing = false;
+    });
+
+    // Render loop for Live Drawings & Laser Trail Fade-Out
+    function render() {
+      const now = Date.now();
+      laserTrail = laserTrail.filter(pt => now - pt.time < LASER_LIFETIME);
+      redraw();
+      requestAnimationFrame(render);
+    }
+
+    function redraw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Persistent straight lines
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      persistentPaths.forEach(item => {
+        if (item.type === 'line') {
+          ctx.beginPath();
+          ctx.moveTo(item.x1, item.y1);
+          ctx.lineTo(item.x2, item.y2);
+          ctx.stroke();
+        }
+      });
+
+      // Preview line while dragging (if snap mode is on and not in laser mode)
+      if (isDrawing && !laserMode && snapToStraightLine) {
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(currentX, currentY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Render Laser Trail with gradual 2000ms decay
+      const now = Date.now();
+      if (laserTrail.length > 1) {
+        for (let i = 1; i < laserTrail.length; i++) {
+          const pt1 = laserTrail[i - 1];
+          const pt2 = laserTrail[i];
+          const age = now - pt2.time;
+          const alpha = Math.max(0, 1 - age / LASER_LIFETIME);
+
+          ctx.beginPath();
+          ctx.moveTo(pt1.x, pt1.y);
+          ctx.lineTo(pt2.x, pt2.y);
+          ctx.strokeStyle = `rgba(239, 68, 68, ${alpha})`;
+          ctx.lineWidth = 3.5 * alpha + 1;
+          ctx.lineCap = 'round';
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = 'rgba(239, 68, 68, 0.8)';
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      // Laser Pointer Tip
+      if (laserMode && laserTrail.length > 0) {
+        const last = laserTrail[laserTrail.length - 1];
+        if (now - last.time < 150) {
+          ctx.beginPath();
+          ctx.arc(last.x, last.y, 4, 0, 2 * Math.PI);
+          ctx.fillStyle = '#ef4444';
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = '#f87171';
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פתרון מלא: בגרות 2019, שאלה 1 - קינמטיקה (זריקה אנכית)</title>
+
+  <!-- Google Fonts: Rubik -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+  <!-- MathJax for rendering LaTeX formulas -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #1e3a8a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --accent-red: #dc2626;
+      --border-color: #e2e8f0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 20px 12px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Top Layout & Canvas Controls Panel */
+    .controls-panel {
+      position: sticky;
+      top: 12px;
+      z-index: 1000;
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 10px 18px;
+      border-radius: 9999px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      margin-bottom: 20px;
+      border: 1px solid #334155;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .layout-toggle-btn {
+      background: #334155;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: inherit;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
+
+    .layout-toggle-btn.active {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    }
+
+    .canvas-tool-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #475569;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.82rem;
+      transition: all 0.2s ease;
+    }
+
+    .canvas-tool-btn.active {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #f87171;
+    }
+
+    /* Flexible Containers */
+    .page-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .layout-19-6 {
+      width: 100%;
+      max-width: 1400px;
+      min-height: 800px;
+      transition: max-width 0.3s ease;
+    }
+
+    .layout-6-19 {
+      width: 100%;
+      max-width: 480px;
+      min-height: 800px;
+      transition: max-width 0.3s ease;
+    }
+
+    .main-content-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Header Banner */
+    .header-banner {
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .header-pill {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .header-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.92;
+    }
+
+    .header-badge {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      text-align: center;
+    }
+
+    .header-badge .sub {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      margin-bottom: 2px;
+    }
+
+    .header-badge .main {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    /* Overview Grid */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 24px;
+    }
+
+    .layout-6-19 .overview-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      background: #f8fafc;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .accent-bar {
+      width: 5px;
+      height: 22px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .description-text {
+      color: #334155;
+      font-size: 0.98rem;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .assumptions-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 14px;
+    }
+
+    .assumptions-title {
+      font-weight: 700;
+      color: var(--primary-deep);
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+
+    .assumptions-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: #1e3a8a;
+    }
+
+    .assumptions-list li {
+      position: relative;
+      padding-right: 18px;
+    }
+
+    .assumptions-list li::before {
+      content: "•";
+      color: var(--primary);
+      position: absolute;
+      right: 2px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    /* Graphics Container */
+    .graphics-container {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+      min-height: 310px;
+      justify-content: center;
+    }
+
+    .graph-title {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+      width: 100%;
+      text-align: right;
+    }
+
+    .interactive-canvas-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      z-index: 20;
+    }
+
+    /* Tabs Navigation */
+    .tabs-wrapper {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      justify-content: flex-start;
+      border-bottom: 2px solid #e2e8f0;
+      margin-top: 4px;
+    }
+
+    .tab-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--primary-deep);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    /* Section Content */
+    .section-container {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .section-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header-title {
+      color: var(--primary-deep);
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .layout-6-19 .details-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+    }
+
+    .info-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 8px;
+    }
+
+    .info-card p, .info-card li {
+      font-size: 0.92rem;
+      color: #334155;
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding-right: 0;
+    }
+
+    .info-card li {
+      margin-bottom: 6px;
+      position: relative;
+      padding-right: 16px;
+    }
+
+    .info-card li::before {
+      content: "▪";
+      color: var(--primary);
+      position: absolute;
+      right: 0;
+      font-size: 0.9rem;
+    }
+
+    .formula-helper-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 18px;
+      flex-wrap: wrap;
+    }
+
+    .formula-helper-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .formula-pill {
+      background: #eff6ff;
+      border: 1.5px solid #93c5fd;
+      border-radius: 9999px;
+      padding: 4px 14px;
+      color: var(--primary-dark);
+      font-size: 0.88rem;
+      font-weight: 600;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .proof-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .step-block {
+      margin-bottom: 18px;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .math-display-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      margin: 10px 0;
+      overflow-x: auto;
+      direction: ltr;
+      text-align: center;
+    }
+
+    .result-banner {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .result-icon {
+      background: var(--accent-green);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .result-text {
+      color: #065f46;
+      font-size: 0.98rem;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .nav-buttons-wrap {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .nav-step-btn {
+      background: transparent;
+      border: 1.5px solid var(--border-color);
+      padding: 8px 18px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .nav-step-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls Panel -->
+  <div class="controls-panel">
+    <button class="layout-toggle-btn active" id="btn-19-6" onclick="setLayout('19-6')">פריסה רחבה (19:6)</button>
+    <button class="layout-toggle-btn" id="btn-6-19" onclick="setLayout('6-19')">פריסה אנכית (6:19)</button>
+    <div style="width: 1px; height: 20px; background: #475569;"></div>
+    <button class="canvas-tool-btn" id="laser-btn" onclick="toggleLaser()">מצביע לייזר דועך (2s)</button>
+    <button class="canvas-tool-btn" id="snap-btn" onclick="toggleSnap()">יישור קווים אוטומטי: כבוי</button>
+    <button class="canvas-tool-btn" onclick="clearDrawings()">נקה שרטוט</button>
+  </div>
+
+  <!-- Page Wrapper -->
+  <div class="page-wrapper">
+    <div class="layout-19-6" id="main-wrapper">
+
+      <div class="main-content-card">
+
+        <!-- HEADER -->
+        <header class="header-banner">
+          <div class="header-content">
+            <div class="header-pill">פתרונות מעוצבים בפיזיקה | בגרות 5 יח"ל</div>
+            <h1 class="header-title">פתרון מלא: בגרות 2019, שאלה 1</h1>
+            <p class="header-subtitle">קינמטיקה | זריקה אנכית מעלה מגג בניין, גרף מיקום-זמן פרבולי, מהירות ממוצעת ואי-תלות תנועות</p>
+          </div>
+          <div class="header-badge">
+            <div class="sub">רמת קושי / נושא</div>
+            <div class="main">בגרות 5 יח"ל / מכניקה</div>
+          </div>
+        </header>
+
+        <!-- OVERVIEW GRID -->
+        <div class="overview-grid">
+          
+          <!-- Formulation & Assumptions -->
+          <div class="card">
+            <div class="card-title-wrap">
+              <div class="accent-bar"></div>
+              <h2 class="card-title">ניסוח השאלה המלא (סטנדרט בחינת בגרות)</h2>
+            </div>
+            <p class="description-text">
+              אדם עמד על גגו של בניין וזרק כדור בכיוון אנכי כלפי מעלה.<br>
+              הגרף הנתון מתאר את המיקום האנכי $y$ של הכדור כפונקציה של הזמן $t$ מרגע הזריקה ($t = 0$) ועד לסף פגיעתו בקרקע ($t = 4.00\text{ s}$).<br>
+              בגרף מסומנות הנקודות $A$, $B$, $C$ ו-$D$.<br>
+              הציר האנכי מכוון כלפי מעלה, וראשיתו בקרקע ($y = 0$). התנגדות האוויר ניתנת להזנחה. תאוצת הנפילה החופשית היא $g = 10.00\text{ m/s}^2$ כלפי מטה.
+            </p>
+
+            <div class="assumptions-box">
+              <div class="assumptions-title">נתוני הנקודות המסומנות על הגרף:</div>
+              <ul class="assumptions-list">
+                <li><strong>נקודה A (רגע הזריקה מגג הבניין):</strong> $t_A = 0$, $y_A = 40.00\text{ m}$.</li>
+                <li><strong>נקודה B (שיא הגובה):</strong> $t_B = 1.00\text{ s}$, $y_B = 45.00\text{ m}$, מהירות רגעית $v_B = 0$.</li>
+                <li><strong>נקודה C (במהלך הירידה חזרה):</strong> $t_C = 3.00\text{ s}$, $y_C = 25.00\text{ m}$.</li>
+                <li><strong>נקודה D (סף הפגיעה בקרקע):</strong> $t_D = 4.00\text{ s}$, $y_D = 0$.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- SVG Diagram & Interactive Canvas -->
+          <div class="graphics-container">
+            <div class="graph-title">תרשים: גרף מיקום-זמן $y(t)$ של הכדור</div>
+            
+            <svg id="system-svg" viewBox="0 0 380 280" width="100%" height="250" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b"/>
+                </marker>
+                <pattern id="graphGrid" width="17" height="19" patternUnits="userSpaceOnUse">
+                  <path d="M 17 0 L 0 0 0 19" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+                </pattern>
+              </defs>
+
+              <!-- Background Grid -->
+              <rect x="55" y="20" width="280" height="209" fill="url(#graphGrid)"/>
+
+              <!-- Guidelines for y = 5, 10, 15, 20, 25, 30, 35, 40, 45 m -->
+              <!-- y scale: 0m at 229, 45m at 20 => dy = 209/45 = 4.644 px/m -->
+              <line x1="55" y1="206" x2="335" y2="206" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="183" x2="335" y2="183" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="159" x2="335" y2="159" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="136" x2="335" y2="136" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="113" x2="335" y2="113" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="90" x2="335" y2="90" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="66" x2="335" y2="66" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="43" x2="335" y2="43" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="55" y1="20" x2="335" y2="20" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+
+              <!-- Guidelines for t = 1, 2, 3, 4 s -->
+              <!-- t scale: 0s at 55, 4s at 325 => dt = 270/4 = 67.5 px/s -->
+              <line x1="122.5" y1="20" x2="122.5" y2="229" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="190" y1="20" x2="190" y2="229" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="257.5" y1="20" x2="257.5" y2="229" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <line x1="325" y1="20" x2="325" y2="229" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+
+              <!-- Axes -->
+              <line x1="55" y1="229" x2="345" y2="229" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+              <line x1="55" y1="229" x2="55" y2="10" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+              <!-- Axis Labels -->
+              <text x="345" y="246" font-size="12" font-weight="700" fill="#1e293b">t (s)</text>
+              <text x="48" y="16" font-size="12" font-weight="700" fill="#1e293b" text-anchor="end">y (m)</text>
+
+              <!-- Y ticks -->
+              <text x="48" y="233" font-size="10" fill="#475569" text-anchor="end">0</text>
+              <text x="48" y="210" font-size="9" font-weight="600" fill="#475569" text-anchor="end">5</text>
+              <text x="48" y="187" font-size="9" font-weight="600" fill="#475569" text-anchor="end">10</text>
+              <text x="48" y="163" font-size="9" font-weight="600" fill="#475569" text-anchor="end">15</text>
+              <text x="48" y="140" font-size="9" font-weight="600" fill="#475569" text-anchor="end">20</text>
+              <text x="48" y="117" font-size="9" font-weight="600" fill="#475569" text-anchor="end">25</text>
+              <text x="48" y="94" font-size="9" font-weight="600" fill="#475569" text-anchor="end">30</text>
+              <text x="48" y="70" font-size="9" font-weight="600" fill="#475569" text-anchor="end">35</text>
+              <text x="48" y="47" font-size="9" font-weight="600" fill="#475569" text-anchor="end">40</text>
+              <text x="48" y="24" font-size="9" font-weight="600" fill="#475569" text-anchor="end">45</text>
+
+              <!-- X ticks -->
+              <text x="55" y="246" font-size="10" fill="#475569" text-anchor="middle">0</text>
+              <text x="122.5" y="246" font-size="10" font-weight="600" fill="#475569" text-anchor="middle">1</text>
+              <text x="190" y="246" font-size="10" font-weight="600" fill="#475569" text-anchor="middle">2</text>
+              <text x="257.5" y="246" font-size="10" font-weight="600" fill="#475569" text-anchor="middle">3</text>
+              <text x="325" y="246" font-size="10" font-weight="600" fill="#475569" text-anchor="middle">4</text>
+
+              <!-- Parabolic path: y(t) = 40 + 10t - 5t^2 -->
+              <!-- (0, 40) -> (55, 43.2) -->
+              <!-- (1, 45) -> (122.5, 20) -->
+              <!-- (2, 40) -> (190, 43.2) -->
+              <!-- (3, 25) -> (257.5, 112.9) -->
+              <!-- (4, 0)  -> (325, 229) -->
+              <path d="M 55,43.2 Q 122.5,-3.2 190,43.2 T 325,229" fill="none" stroke="#2563eb" stroke-width="2.8"/>
+
+              <!-- Markers and Labels for A, B, C, D -->
+              <!-- Point A -->
+              <circle cx="55" cy="43.2" r="4.5" fill="#dc2626"/>
+              <text x="45" y="38" font-size="13" font-weight="800" fill="#dc2626">A</text>
+
+              <!-- Point B -->
+              <circle cx="122.5" cy="20" r="4.5" fill="#dc2626"/>
+              <text x="122.5" y="12" font-size="13" font-weight="800" fill="#dc2626" text-anchor="middle">B</text>
+
+              <!-- Point C -->
+              <circle cx="257.5" cy="112.9" r="4.5" fill="#dc2626"/>
+              <text x="270" y="112" font-size="13" font-weight="800" fill="#dc2626">C</text>
+
+              <!-- Point D -->
+              <circle cx="325" cy="229" r="4.5" fill="#dc2626"/>
+              <text x="335" y="224" font-size="13" font-weight="800" fill="#dc2626">D</text>
+            </svg>
+
+            <!-- Interactive Drawing and Laser Canvas Overlay -->
+            <canvas id="interactiveCanvas" class="interactive-canvas-layer"></canvas>
+          </div>
+
+        </div>
+
+        <!-- TABS NAVIGATION -->
+        <div class="tabs-wrapper" id="tabsWrapper">
+          <button class="tab-btn active" onclick="switchSection('sec-a')">סעיף א' (מהירות התחלתית)</button>
+          <button class="tab-btn" onclick="switchSection('sec-b')">סעיף ב' (השוואת מהירות ותאוצה)</button>
+          <button class="tab-btn" onclick="switchSection('sec-c')">סעיף ג' (מהירות ממוצעת)</button>
+          <button class="tab-btn" onclick="switchSection('sec-d')">סעיף ד' (סרטוט גרף v-t)</button>
+          <button class="tab-btn" onclick="switchSection('sec-e')">סעיף ה' (כוח אופקי בנקודה C)</button>
+        </div>
+
+        <!-- SECTION CONTENT -->
+
+        <!-- SECTION A -->
+        <div id="sec-a" class="section-container active">
+          <h2 class="section-header-title">סעיף א': חישוב גודל המהירות ההתחלתית שבה נזרק הכדור (6 נקודות)</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">נתוני נקודת שיא הגובה (B):</div>
+              <ul>
+                <li>ברגע $t_B = 1.00\text{ s}$: הכדור מגיע לשיא גובהו ($y_B = 45.00\text{ m}$).</li>
+                <li>בשיא הגובה המהירות הרגעית מתאפסת: $v_y(t_B) = 0$.</li>
+                <li>תאוצת הנפילה החופשית: $a_y = -g = -10.00\text{ m/s}^2$ (ציר אנכי מוגדר מעלה).</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>חשב את גודל המהירות ההתחלתית שבה נזרק הכדור מגג הבניין ברגע $t = 0$.</p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">נוסחאות דף עזר:</span>
+            <div class="formula-pill">$v_y(t) = v_0 - g t$</div>
+            <div class="formula-pill">$v_B^2 = v_0^2 - 2g(y_B - y_A)$</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">דרך א' – שימוש במשוואת מהירות-זמן בשיא הגובה:</div>
+              <p>
+                על פי משוואת מהירות-זמן של נפילה חופשית בתאוצת כובד קבועה:
+              </p>
+              <div class="math-display-box">
+                $$v_y(t) = v_0 - g \cdot t$$
+              </div>
+              <p>
+                ברגע $t_B = 1.00\text{ s}$ המהירות מתאפסת ($v_B = 0$):
+              </p>
+              <div class="math-display-box">
+                $$0 = v_0 - 10.00 \cdot 1.00 \implies v_0 = 10.00\text{ m/s}$$
+              </div>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">דרך ב' – אימות מתוך משוואת מהירות-מקום ועקרון שימור אנרגיה:</div>
+              <p>
+                הכדור עלה מגג הבניין ($y_A = 40.00\text{ m}$) עד לשיא הגובה ($y_B = 45.00\text{ m}$), כלומר עלייה של $\Delta y = 45.00 - 40.00 = 5.00\text{ m}$:
+              </p>
+              <div class="math-display-box">
+                $$v_B^2 = v_0^2 - 2g \Delta y \implies 0^2 = v_0^2 - 2 \cdot 10.00 \cdot 5.00$$
+                $$0 = v_0^2 - 100.00 \implies v_0^2 = 100.00 \implies v_0 = 10.00\text{ m/s}$$
+              </div>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                גודל המהירות ההתחלתית שבה נזרק הכדור הוא <strong>$v_0 = 10.00\text{ m/s}$</strong>.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <div></div>
+            <button class="nav-step-btn" onclick="switchSection('sec-b')">הבא: סעיף ב' ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION B -->
+        <div id="sec-b" class="section-container">
+          <h2 class="section-header-title">סעיף ב': השוואת מהירות ותאוצה בין נקודות המסלול (8 נקודות)</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">השוואת נקודות המסלול:</div>
+              <ul>
+                <li><strong>נקודה A:</strong> $y_A = 40.00\text{ m}$, $v_A = +10.00\text{ m/s}$ (עלייה).</li>
+                <li><strong>נקודה B:</strong> $y_B = 45.00\text{ m}$, $v_B = 0$ (שיא הגובה).</li>
+                <li><strong>נקודה C:</strong> $y_C = 25.00\text{ m}$, $t_C = 3.00\text{ s}$ (ירידה).</li>
+                <li>תאוצת הנפילה החופשית בכל הנקודות מוכתבת ע"י כוח הכובד בלבד.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלות הנשאלות:</div>
+              <p><strong>(1)</strong> קבע אם גודל המהירות הרגעית של הכדור בנקודה C קטן מגודל המהירות הרגעית בנקודה A, גדול ממנו או שווה לו. נמק.</p>
+              <p><strong>(2)</strong> קבע אם התאוצה של הכדור בנקודה B זהה לתאוצתו בנקודה A. נמק (התייחס לגודל ולכיוון).</p>
+            </div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">תת-סעיף (1) – השוואת גודל המהירות הרגעית בנקודה C לעומת נקודה A:</div>
+              <p>
+                <strong>קביעה:</strong> גודל המהירות הרגעית של הכדור בנקודה C <strong>גדול</strong> מגודל המהירות הרגעית בנקודה A.
+              </p>
+              <p><strong>נימוק (באמצעות שתי גישות שוות ערך):</strong></p>
+              <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
+                <li>
+                  <strong>גישה א' – שיקולי שימור אנרגיה מכנית וגובה:</strong><br>
+                  בהיעדר התנגדות אוויר, סכום האנרגיה הקינטית והאנרגיה הפוטנציאלית הכובדית נשמר לאורך כל התנועה ($E_{\text{total}} = E_k + E_p = \text{const}$). גובה הנקודה C ($y_C = 25.00\text{ m}$) נמוך מגובה הנקודה A ($y_A = 40.00\text{ m}$). מכיוון שהאנרגיה הפוטנציאלית ב-C קטנה מזו שב-A ($E_{p,C} < E_{p,A}$), האנרגיה הקינטית ב-C בהכרח גדולה מזו שב-A ($E_{k,C} > E_{k,A}$), ומכאן שגודל המהירות ב-C גדול מזה שב-A:
+                  <div class="math-display-box">
+                    $$|v_C| = \sqrt{v_0^2 + 2g(y_A - y_C)} = \sqrt{10.00^2 + 2 \cdot 10.00 \cdot (40.00 - 25.00)} = \sqrt{100.00 + 300.00} = 20.00\text{ m/s} > 10.00\text{ m/s}$$
+                  </div>
+                </li>
+                <li>
+                  <strong>גישה ב' – שיפוע המשיק לגרף $y(t)$:</strong><br>
+                  המהירות הרגעית מיוצגת על ידי שיפוע המשיק לעקומת המיקום-זמן ($v = \frac{dy}{dt}$). מהגרף ניתן לראות בבירור כי ערכו המוחלט של שיפוע המשיק בנקודה C תלול בהרבה משיפוע המשיק בנקודה A.
+                </li>
+              </ul>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">תת-סעיף (2) – השוואת התאוצה בנקודה B לתאוצה בנקודה A:</div>
+              <p>
+                <strong>קביעה:</strong> התאוצה של הכדור בנקודה B <strong>זהה לחלוטין</strong> לתאוצתו בנקודה A (הן בגודלה והן בכיוונה).
+              </p>
+              <p><strong>נימוק פיזיקלי מפורט:</strong></p>
+              <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
+                <li>התנגדות האוויר ניתנת להזנחה, ולכן לכל אורך מעופו של הכדור באוויר – כולל בשיא הגובה (נקודה B) וברגע הזריקה (נקודה A) – הכוח היחיד הפועל עליו הוא כוח הכובד ($W = mg$).</li>
+                <li>לפי החוק השני של ניוטון:
+                  <div class="math-display-box">
+                    $$\Sigma\vec{F} = m\vec{a} \implies m\vec{g} = m\vec{a} \implies \vec{a} = \vec{g}$$
+                  </div>
+                </li>
+                <li>תאוצת הכובד $g$ היא גודל קבוע: גודלה שווה תמיד ל-<strong>$10.00\text{ m/s}^2$</strong>, וכיוונה מכוון תמיד <strong>אנכית כלפי מטה</strong> לעבר מרכז כדור הארץ.</li>
+                <li>לפיכך, אף על פי שמהירות הכדור בשיא הגובה (B) מתאפסת רגעית, תאוצתו אינה מתאפסת, והיא זהה בגודלה ובכיוונה לתאוצה ברגע הזריקה (A).</li>
+              </ul>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                (1) גודל המהירות ב-C <strong>גדול</strong> מגודל המהירות ב-A ($20.00\text{ m/s} > 10.00\text{ m/s}$).<br>
+                (2) התאוצה ב-B <strong>זהה</strong> לתאוצה ב-A: גודלה $10.00\text{ m/s}^2$ וכיוונה אנכית כלפי מטה.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-a')">→ הקודם: סעיף א'</button>
+            <button class="nav-step-btn" onclick="switchSection('sec-c')">הבא: סעיף ג' ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION C -->
+        <div id="sec-c" class="section-container">
+          <h2 class="section-header-title">סעיף ג': חישוב המהירות הממוצעת במהלך התנועה כולה (6 נקודות)</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">נתוני נקודות הקצה של התנועה:</div>
+              <ul>
+                <li>רגע הזריקה (נקודה A): $t_1 = 0$, $y_1 = 40.00\text{ m}$.</li>
+                <li>סף הפגיעה בקרקע (נקודה D): $t_2 = 4.00\text{ s}$, $y_2 = 0$.</li>
+                <li>משך הזמן הכולל שחלף: $\Delta t = 4.00 - 0 = 4.00\text{ s}$.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>חשב את המהירות הממוצעת (<span class="highlight-bold">גודל וכיוון</span>) של הכדור במהלך תנועתו, מרגע הזריקה ($t = 0$) ועד לסף פגיעתו בקרקע ($t = 4.00\text{ s}$).</p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">נוסחאות דף עזר:</span>
+            <div class="formula-pill">$\bar{v} = \frac{\Delta y}{\Delta t} = \frac{y_{\text{final}} - y_{\text{initial}}}{t_{\text{final}} - t_{\text{initial}}}$</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">פיתוח וחישוב וקטור המהירות הממוצעת:</div>
+              <p>
+                וקטור המהירות הממוצעת מוגדר כהעתק הכולל של הגוף מחולק במשך הזמן הכולל שבו התרחש ההעתק (הערך תלוי בנקודות הקצה בלבד ואינו תלוי בדרך שעבר הכדור):
+              </p>
+              <div class="math-display-box">
+                $$\bar{v} = \frac{\Delta y}{\Delta t} = \frac{y_D - y_A}{t_D - t_A}$$
+              </div>
+              <p>הצבת ערכי המיקום והזמן מתוך הגרף:</p>
+              <div class="math-display-box">
+                $$\bar{v} = \frac{0 - 40.00\text{ m}}{4.00\text{ s} - 0\text{ s}} = \frac{-40.00\text{ m}}{4.00\text{ s}} = -10.00\text{ m/s}$$
+              </div>
+              <p>
+                <strong>משמעות פיזיקלית (גודל וכיוון):</strong><br>
+                - <strong>גודל המהירות הממוצעת:</strong> $|\bar{v}| = 10.00\text{ m/s}$.<br>
+                - <strong>כיוון המהירות הממוצעת:</strong> הסימן השלילי מציין כי הווקטור מכוון <strong>אנכית כלפי מטה</strong> (בכיוון השלילי של ציר ה-$y$).
+              </p>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                המהירות הממוצעת: גודלה <strong>$10.00\text{ m/s}$</strong>, וכיוונה <strong>אנכית כלפי מטה</strong> (ערך בציר מעלה: $-10.00\text{ m/s}$).
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-b')">→ הקודם: סעיף ב'</button>
+            <button class="nav-step-btn" onclick="switchSection('sec-d')">הבא: סעיף ד' ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION D -->
+        <div id="sec-d" class="section-container">
+          <h2 class="section-header-title">סעיף ד': סרטוט גרף מהירות-זמן $v(t)$ וסימון הנקודות a, b, c, d (8 נקודות)</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">חישוב ערכי המהירות בכל נקודה:</div>
+              <ul>
+                <li>משוואת המהירות: $v(t) = v_0 - gt = 10.00 - 10.00 t$.</li>
+                <li><strong>נקודה a ($t = 0$):</strong> $v_a = +10.00\text{ m/s}$.</li>
+                <li><strong>נקודה b ($t = 1.00\text{ s}$):</strong> $v_b = 0$.</li>
+                <li><strong>נקודה c ($t = 3.00\text{ s}$):</strong> $v_c = 10.00 - 10.00 \cdot 3.00 = -20.00\text{ m/s}$.</li>
+                <li><strong>נקודה d ($t = 4.00\text{ s}$):</strong> $v_d = 10.00 - 10.00 \cdot 4.00 = -30.00\text{ m/s}$.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>סרטט במחברתך גרף של מהירות הכדור כפונקציה של הזמן במהלך תנועתו מ-$t = 0$ עד $t = 4.00\text{ s}$. בגרף שסרטטת סמן באותיות a, b, c, d את הנקודות המייצגות את מהירות הכדור בנקודות A, B, C, D בהתאמה.</p>
+            </div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">תרשים גרפי וקטורי מדויק: גרף מהירות-זמן $v(t)$</div>
+              <p>
+                הגרף הוא קו ישר רציף בעל שיפוע קבוע $a = -g = -10.00\text{ m/s}^2$:
+              </p>
+              
+              <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; align-items: center; margin: 16px 0;">
+                <svg viewBox="0 0 440 260" width="100%" height="230" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <marker id="arrow-v" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b"/>
+                    </marker>
+                  </defs>
+
+                  <!-- Guidelines for v = 10, 0, -10, -20, -30 m/s -->
+                  <!-- v=10 at y=35, v=0 at y=80, v=-10 at y=125, v=-20 at y=170, v=-30 at y=215 -->
+                  <line x1="50" y1="35" x2="400" y2="35" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+                  <line x1="50" y1="80" x2="400" y2="80" stroke="#94a3b8" stroke-width="1.2"/> <!-- axis line v=0 -->
+                  <line x1="50" y1="125" x2="400" y2="125" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+                  <line x1="50" y1="170" x2="400" y2="170" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+                  <line x1="50" y1="215" x2="400" y2="215" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+
+                  <!-- Guidelines for t = 1, 2, 3, 4 s -->
+                  <!-- t=0 at x=65, t=1 at x=145, t=2 at x=225, t=3 at x=305, t=4 at x=385 -->
+                  <line x1="145" y1="25" x2="145" y2="225" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+                  <line x1="225" y1="25" x2="225" y2="225" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+                  <line x1="305" y1="25" x2="305" y2="225" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+                  <line x1="385" y1="25" x2="385" y2="225" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+
+                  <!-- Axes (t axis at v=0 -> y=80) -->
+                  <line x1="65" y1="80" x2="415" y2="80" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-v)"/>
+                  <line x1="65" y1="230" x2="65" y2="15" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-v)"/>
+
+                  <!-- Axis Labels -->
+                  <text x="415" y="98" font-size="12" font-weight="700" fill="#1e293b">t (s)</text>
+                  <text x="56" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="end">v (m/s)</text>
+
+                  <!-- Y ticks -->
+                  <text x="58" y="39" font-size="11" font-weight="600" fill="#475569" text-anchor="end">10</text>
+                  <text x="58" y="84" font-size="11" font-weight="600" fill="#475569" text-anchor="end">0</text>
+                  <text x="58" y="129" font-size="11" font-weight="600" fill="#475569" text-anchor="end">-10</text>
+                  <text x="58" y="174" font-size="11" font-weight="600" fill="#475569" text-anchor="end">-20</text>
+                  <text x="58" y="219" font-size="11" font-weight="600" fill="#475569" text-anchor="end">-30</text>
+
+                  <!-- X ticks -->
+                  <text x="65" y="98" font-size="11" fill="#475569" text-anchor="middle">0</text>
+                  <text x="145" y="98" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">1</text>
+                  <text x="225" y="98" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">2</text>
+                  <text x="305" y="98" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">3</text>
+                  <text x="385" y="98" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">4</text>
+
+                  <!-- Line v(t) = 10 - 10t from (0, 10) to (4, -30) -->
+                  <line x1="65" y1="35" x2="385" y2="215" stroke="#2563eb" stroke-width="3"/>
+
+                  <!-- Point a (0, 10) -->
+                  <circle cx="65" cy="35" r="4.5" fill="#dc2626"/>
+                  <text x="80" y="32" font-size="12" font-weight="800" fill="#dc2626">a (0, 10)</text>
+
+                  <!-- Point b (1, 0) -->
+                  <circle cx="145" cy="80" r="4.5" fill="#dc2626"/>
+                  <text x="145" y="70" font-size="12" font-weight="800" fill="#dc2626" text-anchor="middle">b (1, 0)</text>
+
+                  <!-- Point c (3, -20) -->
+                  <circle cx="305" cy="170" r="4.5" fill="#dc2626"/>
+                  <text x="325" y="172" font-size="12" font-weight="800" fill="#dc2626">c (3, -20)</text>
+
+                  <!-- Point d (4, -30) -->
+                  <circle cx="385" cy="215" r="4.5" fill="#dc2626"/>
+                  <text x="360" y="235" font-size="12" font-weight="800" fill="#dc2626">d (4, -30)</text>
+                </svg>
+              </div>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                הגרף הוא קו ישר יורד בעל שיפוע קבוע $a = -10.00\text{ m/s}^2$, המתחיל ב-$a(0, 10.00\text{ m/s})$, חותך את ציר הזמן ב-$b(1.00\text{ s}, 0)$, ומסתיים ב-$d(4.00\text{ s}, -30.00\text{ m/s})$.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-c')">→ הקודם: סעיף ג'</button>
+            <button class="nav-step-btn" onclick="switchSection('sec-e')">הבא: סעיף ה' ←</button>
+          </div>
+        </div>
+
+        <!-- SECTION E -->
+        <div id="sec-e" class="section-container">
+          <h2 class="section-header-title">סעיף ה': השפעת כוח אופקי רגעי בנקודה C על הגרף $y(t)$ (5 נקודות)</h2>
+
+          <div class="details-grid">
+            <div class="info-card">
+              <div class="info-card-title">התנאים החדשים:</div>
+              <ul>
+                <li>הכדור נזרק באותם תנאים התחלתיים בדיוק ($y_0 = 40.00\text{ m}$, $v_0 = 10.00\text{ m/s}$ מעלה).</li>
+                <li>ברגע המעבר בנקודה C ($t = 3.00\text{ s}$) מופעל כוח <strong>אופקי רגעי בלבד</strong>.</li>
+                <li>הגרף המדובר הוא גרף <strong>המיקום האנכי כפונקציה של הזמן</strong> ($y(t)$).</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">השאלה הנשאלת:</div>
+              <p>קבע אם הגרף $y(t)$ הנתון בשאלה ישתנה בגלל הפעלת הכוח. נמק את קביעתך.</p>
+            </div>
+          </div>
+
+          <div class="formula-helper-wrap">
+            <span class="formula-helper-label">עקרונות פיזיקליים:</span>
+            <div class="formula-pill">$\vec{F} = F_x \hat{i} \implies F_y = 0$</div>
+            <div class="formula-pill">עקרון אי-תלות התנועות במרחב</div>
+          </div>
+
+          <div class="proof-card">
+            <div class="step-block">
+              <div class="step-title">קביעה חד-משמעית:</div>
+              <p>
+                <strong>הגרף $y(t)$ לא ישתנה כלל.</strong>
+              </p>
+            </div>
+
+            <div class="step-block">
+              <div class="step-title">נימוק פיזיקלי מפורט (עקרון אי-תלות התנועות):</div>
+              <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
+                <li>הכוח שהופעל על הכדור הוא <strong>כוח אופקי</strong> (פועל לאורך ציר ה-$x$).</li>
+                <li>על פי חוקי ניוטון ועקרון הסופרפוזיציה, כוח אופקי מעניק תאוצה בכיוון האופקי בלבד ומשנה אך ורק את רכיב המהירות האופקי $v_x$ ואת המיקום האופקי $x(t)$.</li>
+                <li>לכוח אופקי <strong>אין כל רכיב או היטל לאורך הציר האנכי</strong> ($F_y = 0$).</li>
+                <li>לאורך הציר האנכי ($y$) ממשיך לפעול אך ורק כוח הכובד ($F_{g,y} = -mg$), ולכן התאוצה האנכית נשארת ללא כל שינוי: $a_y = -g = -10.00\text{ m/s}^2$.</li>
+                <li>כמו כן, הפעלת הכוח האופקי אינה משנה את המיקום האנכי $y_C = 25.00\text{ m}$ או את המהירות האנכית $v_{y,C} = -20.00\text{ m/s}$ ברגע הפעלת הכוח.</li>
+                <li>על פי <strong>עקרון אי-תלות התנועות</strong> של גלילאו, התנועה לאורך ציר ה-$y$ מתנהלת באופן בלתי תלוי לחלוטין בתנועה לאורך ציר ה-$x$.</li>
+              </ul>
+              <p style="margin-top: 8px;">
+                לפיכך, פונקציית המיקום האנכי $y(t) = 40.00 + 10.00 t - 5.00 t^2$ נותרת בעינה לכל אורך התנועה, והגרף $y(t)$ אינו משתנה כלל.
+              </p>
+            </div>
+
+            <div class="result-banner">
+              <div class="result-icon">✓</div>
+              <div class="result-text">
+                הגרף $y(t)$ <strong>לא ישתנה כלל</strong>. נימוק: הכוח שהופעל הוא אופקי ואין לו רכיב בכיוון האנכי ($F_y = 0$). על פי עקרון אי-תלות התנועות, התנועה האנכית נקבעת אך ורק על ידי כוח הכובד ותנאי ההתחלה האנכיים שנותרו ללא שינוי.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-buttons-wrap">
+            <button class="nav-step-btn" onclick="switchSection('sec-d')">→ הקודם: סעיף ד'</button>
+            <div></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Tab Navigation Logic with smooth scroll
+    function switchSection(sectionId) {
+      document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const target = document.getElementById(sectionId);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      const tabs = ['sec-a', 'sec-b', 'sec-c', 'sec-d', 'sec-e'];
+      const idx = tabs.indexOf(sectionId);
+      const buttons = document.querySelectorAll('.tab-btn');
+      if (idx !== -1 && buttons[idx]) {
+        buttons[idx].classList.add('active');
+      }
+
+      const tabsWrapper = document.getElementById('tabsWrapper');
+      if (tabsWrapper) {
+        tabsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Layout Toggling Logic (19:6 vs 6:19)
+    function setLayout(mode) {
+      const wrapper = document.getElementById('main-wrapper');
+      const btn19 = document.getElementById('btn-19-6');
+      const btn6 = document.getElementById('btn-6-19');
+
+      if (mode === '19-6') {
+        wrapper.className = 'layout-19-6';
+        btn19.classList.add('active');
+        btn6.classList.remove('active');
+      } else {
+        wrapper.className = 'layout-6-19';
+        btn6.classList.add('active');
+        btn19.classList.remove('active');
+      }
+      setTimeout(resizeCanvas, 150);
+    }
+
+    // Canvas & Interactive Tools Logic (Disabled automatically by default)
+    const canvas = document.getElementById('interactiveCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    let currentX = 0, currentY = 0;
+
+    let laserMode = false;
+    let snapToStraightLine = false;
+
+    let laserTrail = [];
+    const LASER_LIFETIME = 2000; // Exactly 2 seconds (2000ms)
+
+    let persistentPaths = [];
+
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
+      redraw();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('load', resizeCanvas);
+
+    function toggleLaser() {
+      laserMode = !laserMode;
+      const btn = document.getElementById('laser-btn');
+      btn.classList.toggle('active', laserMode);
+      if (laserMode) {
+        laserTrail = [];
+      }
+    }
+
+    function toggleSnap() {
+      snapToStraightLine = !snapToStraightLine;
+      const btn = document.getElementById('snap-btn');
+      btn.innerText = snapToStraightLine ? "יישור קווים אוטומטי: פעיל" : "יישור קווים אוטומטי: כבוי";
+      btn.classList.toggle('active', snapToStraightLine);
+    }
+
+    function clearDrawings() {
+      persistentPaths = [];
+      laserTrail = [];
+      redraw();
+    }
+
+    function getCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: cx - rect.left,
+        y: cy - rect.top
+      };
+    }
+
+    // Mouse & Touch Handlers
+    canvas.addEventListener('mousedown', (e) => {
+      const p = getCoords(e);
+      isDrawing = true;
+      startX = p.x;
+      startY = p.y;
+      currentX = p.x;
+      currentY = p.y;
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      const p = getCoords(e);
+      currentX = p.x;
+      currentY = p.y;
+      if (laserMode) {
+        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (!isDrawing) return;
+      isDrawing = false;
+      if (!laserMode) {
+        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
+      }
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      const p = getCoords(e);
+      isDrawing = true;
+      startX = p.x;
+      startY = p.y;
+      currentX = p.x;
+      currentY = p.y;
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      const p = getCoords(e);
+      currentX = p.x;
+      currentY = p.y;
+      if (laserMode) {
+        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      if (isDrawing && !laserMode) {
+        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
+      }
+      isDrawing = false;
+    });
+
+    // Render loop for Live Drawings & Laser Trail Fade-Out
+    function render() {
+      const now = Date.now();
+      laserTrail = laserTrail.filter(pt => now - pt.time < LASER_LIFETIME);
+      redraw();
+      requestAnimationFrame(render);
+    }
+
+    function redraw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Persistent straight lines
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      persistentPaths.forEach(item => {
+        if (item.type === 'line') {
+          ctx.beginPath();
+          ctx.moveTo(item.x1, item.y1);
+          ctx.lineTo(item.x2, item.y2);
+          ctx.stroke();
+        }
+      });
+
+      // Preview line while dragging
+      if (isDrawing && !laserMode && snapToStraightLine) {
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(currentX, currentY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Render Laser Trail with gradual 2000ms decay
+      const now = Date.now();
+      if (laserTrail.length > 1) {
+        for (let i = 1; i < laserTrail.length; i++) {
+          const pt1 = laserTrail[i - 1];
+          const pt2 = laserTrail[i];
+          const age = now - pt2.time;
+          const alpha = Math.max(0, 1 - age / LASER_LIFETIME);
+
+          ctx.beginPath();
+          ctx.moveTo(pt1.x, pt1.y);
+          ctx.lineTo(pt2.x, pt2.y);
+          ctx.strokeStyle = `rgba(239, 68, 68, ${alpha})`;
+          ctx.lineWidth = 3.5 * alpha + 1;
+          ctx.lineCap = 'round';
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = 'rgba(239, 68, 68, 0.8)';
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      // Laser Pointer Tip
+      if (laserMode && laserTrail.length > 0) {
+        const last = laserTrail[laserTrail.length - 1];
+        if (now - last.time < 150) {
+          ctx.beginPath();
+          ctx.arc(last.x, last.y, 4, 0, 2 * Math.PI);
+          ctx.fillStyle = '#ef4444';
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = '#f87171';
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

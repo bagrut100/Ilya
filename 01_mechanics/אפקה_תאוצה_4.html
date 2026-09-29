@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>פתרון: שאלה 4 - קינמטיקה (פורמט 6X19)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #1e3a8a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #0f172a;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --accent-red: #ef4444;
+      --border-color: #e2e8f0;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Rubik', system-ui, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.55;
+      padding: 8px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .mobile-frame {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      background: #f8fafc;
+      border-radius: var(--radius-lg);
+      padding: 12px 10px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* HEADER */
+    .mobile-header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .header-pill {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.22);
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .mobile-title { font-size: 1.35rem; font-weight: 800; }
+    .mobile-subtitle { font-size: 0.82rem; opacity: 0.9; }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .accent-bar {
+      width: 4px;
+      height: 18px;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+    .card-title { font-size: 1.05rem; font-weight: 700; color: var(--text-main); }
+    .description-text {
+      font-size: 0.88rem;
+      color: #334155;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .assumptions-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 0.84rem;
+      color: #1e3a8a;
+    }
+    .assumptions-box ul { list-style: none; }
+    .assumptions-box li { position: relative; padding-right: 14px; margin-bottom: 4px; }
+    .assumptions-box li::before { content: "•"; color: var(--primary); position: absolute; right: 0; font-weight: bold; }
+
+    /* TOOLBAR */
+    .toolbar-container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+      background: #f1f5f9;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      border: 1px solid var(--border-color);
+    }
+    .tool-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.active { background: var(--primary); color: #ffffff; border-color: var(--primary); }
+    .tool-btn.laser-active { background: var(--accent-red); color: #ffffff; border-color: #dc2626; }
+    .color-dot-btn {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 0 0 1px #cbd5e1;
+      cursor: pointer;
+    }
+    .color-dot-btn.selected { box-shadow: 0 0 0 2px var(--primary); }
+
+    /* CANVAS */
+    .graph-viewport {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      touch-action: none;
+    }
+    .svg-underlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .drawing-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+    }
+
+    /* TABS */
+    .tabs-wrapper {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--primary-deep);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 9999px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .tab-btn.active { background: var(--primary); color: #ffffff; border-color: var(--primary); }
+
+    .section-container { display: none; }
+    .section-container.active { display: block; animation: fadeIn 0.2s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-header-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .formula-pill {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 9999px;
+      padding: 3px 10px;
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      font-weight: 600;
+      direction: ltr;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .step-block { margin-bottom: 12px; }
+    .step-title { font-weight: 700; font-size: 0.88rem; margin-bottom: 4px; }
+    .math-display-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      margin: 6px 0;
+      direction: ltr;
+      text-align: center;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+    .result-banner {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .result-icon {
+      background: var(--accent-green);
+      color: white;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    .result-text { color: #065f46; font-size: 0.84rem; font-weight: 600; }
+
+    .nav-buttons-wrap {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
+    }
+    .nav-step-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      padding: 5px 14px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="mobile-frame">
+
+  <!-- MOBILE HEADER -->
+  <header class="mobile-header">
+    <div class="header-pill">בגרות בפיזיקה | קינמטיקה</div>
+    <h1 class="mobile-title">שאלה 4: זמן תגובה ועצירה</h1>
+    <p class="mobile-subtitle">פורמט מותאם לסמארטפון (6X19)</p>
+  </header>
+
+  <!-- QUESTION CARD -->
+  <div class="card">
+    <div class="card-title-wrap">
+      <div class="accent-bar"></div>
+      <h2 class="card-title">ניסוח השאלה והנתונים</h2>
+    </div>
+    <p class="description-text">
+      נהג "חצי רדום" נוסע במהירות $90\text{ km/h}$ ומבחין ברמזור. זמן תגובתו $0.9\text{ s}$ ותאוטת רכבו $1.5\text{ m/s}^2$ עד לעצירה.
+    </p>
+    <div class="assumptions-box">
+      <ul>
+        <li>מהירות: $v_0 = 90\text{ km/h} = 25.00\text{ m/s}$</li>
+        <li>תגובה: $\Delta t_1 = 0.9\text{ s}$ ($a_1 = 0$)</li>
+        <li>בלימה: $a_2 = -1.5\text{ m/s}^2$ עד $v=0$</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- GRAPH & CANVAS -->
+  <div class="card">
+    <div class="card-title-wrap">
+      <div class="accent-bar" style="background:#059669;"></div>
+      <h2 class="card-title">גרף $v(t)$ ושכבת איור</h2>
+    </div>
+
+    <div class="toolbar-container">
+      <button id="btn-m-pen" class="tool-btn active" onclick="setMTool('pen')">✏️ עט</button>
+      <button id="btn-m-line" class="tool-btn" onclick="setMTool('line')">📏 קו ישר</button>
+      <button id="btn-m-laser" class="tool-btn" onclick="setMTool('laser')">🔴 לייזר</button>
+      <button id="btn-m-eraser" class="tool-btn" onclick="setMTool('eraser')">🧹 מחק</button>
+      <div style="display:flex; gap:3px; margin-right:2px;">
+        <button class="color-dot-btn selected" style="background:#dc2626;" onclick="setMColor('#dc2626', this)"></button>
+        <button class="color-dot-btn" style="background:#2563eb;" onclick="setMColor('#2563eb', this)"></button>
+      </div>
+      <button class="tool-btn" style="margin-right:auto;" onclick="clearMCanvas()">🗑️</button>
+    </div>
+
+    <div class="graph-viewport" id="m-viewport">
+      <svg class="svg-underlay" viewBox="0 0 320 180" preserveAspectRatio="none">
+        <line x1="40" y1="150" x2="300" y2="150" stroke="#334155" stroke-width="1.8" />
+        <line x1="40" y1="150" x2="40" y2="15" stroke="#334155" stroke-width="1.8" />
+        <polygon points="40,45 60,45 60,150 40,150" fill="rgba(37, 99, 235, 0.15)" />
+        <polygon points="60,45 270,150 60,150" fill="rgba(5, 150, 105, 0.15)" />
+        <line x1="40" y1="45" x2="60" y2="45" stroke="#2563eb" stroke-width="2.5" />
+        <line x1="60" y1="45" x2="270" y2="150" stroke="#dc2626" stroke-width="2.5" />
+        <circle cx="40" cy="45" r="3" fill="#2563eb" />
+        <circle cx="60" cy="45" r="3" fill="#2563eb" />
+        <circle cx="270" cy="150" r="3.5" fill="#dc2626" />
+        <text x="34" y="49" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">25</text>
+        <text x="60" y="166" font-size="9" font-weight="bold" fill="#1e293b" text-anchor="middle">0.9s</text>
+        <text x="270" y="166" font-size="9" font-weight="bold" fill="#1e293b" text-anchor="middle">17.57s</text>
+        <text x="295" y="142" font-size="9" fill="#64748b">t</text>
+        <text x="26" y="24" font-size="9" fill="#64748b">v</text>
+      </svg>
+      <canvas id="m-canvas" class="drawing-canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-wrapper">
+    <button class="tab-btn active" onclick="switchMSec('m-tab-a')">סעיף א' (זמן)</button>
+    <button class="tab-btn" onclick="switchMSec('m-tab-b')">סעיף ב' (דרך)</button>
+  </div>
+
+  <!-- ACTIVE CONTENT -->
+  <div class="card">
+    <!-- SECTION A -->
+    <div id="m-tab-a" class="section-container active">
+      <h2 class="section-header-title">סעיף א': זמן עצירה כולל</h2>
+      <div class="formula-pill">$v = v_0 + at \implies \Delta t = \frac{v - v_0}{a}$</div>
+
+      <div class="step-block">
+        <div class="step-title">1. זמן הבלימה ($\Delta t_2$):</div>
+        <div class="math-display-box">
+          $$0 = 25 - 1.5 \Delta t_2 \implies \Delta t_2 = \frac{50}{3}\text{ s} \approx 16.67\text{ s}$$
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-title">2. זמן כולל מרגע ההבחנה:</div>
+        <div class="math-display-box">
+          $$t_{\text{tot}} = 0.9 + \frac{50}{3} = 17\frac{17}{30}\text{ s} \approx 17.57\text{ s}$$
+        </div>
+      </div>
+
+      <div class="result-banner">
+        <div class="result-icon">✓</div>
+        <div class="result-text">זמן עצירה כולל: <strong>17.57 שניות</strong> ($17.57\text{ s}$).</div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <div></div>
+        <button class="nav-step-btn" onclick="switchMSec('m-tab-b')">סעיף ב' ←</button>
+      </div>
+    </div>
+
+    <!-- SECTION B -->
+    <div id="m-tab-b" class="section-container">
+      <h2 class="section-header-title">סעיף ב': מרחק העצירה הכולל</h2>
+      <div class="formula-pill">$v^2 = v_0^2 + 2a\Delta x$</div>
+
+      <div class="step-block">
+        <div class="step-title">1. דרך התגובה ($\Delta x_1$):</div>
+        <div class="math-display-box">
+          $$\Delta x_1 = 25 \cdot 0.9 = 22.50\text{ m}$$
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-title">2. דרך הבלימה ($\Delta x_2$):</div>
+        <div class="math-display-box">
+          $$\Delta x_2 = \frac{0^2 - 25^2}{2(-1.5)} = \frac{625}{3}\text{ m} \approx 208.33\text{ m}$$
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-title">3. מרחק העצירה הכולל:</div>
+        <div class="math-display-box">
+          $$x_{\text{tot}} = 22.50 + 208.33 = 230\frac{5}{6}\text{ m} \approx 230.83\text{ m}$$
+        </div>
+      </div>
+
+      <div class="result-banner">
+        <div class="result-icon">✓</div>
+        <div class="result-text">מרחק עצירה כולל: <strong>230.83 מטרים</strong> ($230.83\text{ m}$).</div>
+      </div>
+
+      <div class="nav-buttons-wrap">
+        <button class="nav-step-btn" onclick="switchMSec('m-tab-a')">→ סעיף א'</button>
+        <div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchMSec(id) {
+    document.querySelectorAll('.mobile-frame .section-container').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.mobile-frame .tab-btn').forEach(btn => btn.classList.remove('active'));
+    const t = document.getElementById(id);
+    if (t) t.classList.add('active');
+    const idx = id === 'm-tab-a' ? 0 : 1;
+    document.querySelectorAll('.mobile-frame .tab-btn')[idx].classList.add('active');
+  }
+
+  /* MOBILE CANVAS ENGINE: FREE DRAW, AUTO-LINE SNAP & 2-SECOND LASER TRAIL */
+  const mCanvas = document.getElementById('m-canvas');
+  const mCtx = mCanvas.getContext('2d');
+  const mViewport = document.getElementById('m-viewport');
+
+  let mTool = 'pen';
+  let mColor = '#dc2626';
+  let mIsDown = false;
+  let mStroke = null;
+  let mHistory = [];
+
+  let mLaserTrail = [];
+  let mIsLaserActive = false;
+  let mLastLaserPos = null;
+
+  function initMCanvas() {
+    const r = mViewport.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    mCanvas.width = r.width * dpr;
+    mCanvas.height = r.height * dpr;
+    mCtx.scale(dpr, dpr);
+    drawMFrame();
+  }
+  window.addEventListener('resize', initMCanvas);
+  window.addEventListener('load', initMCanvas);
+
+  function setMTool(tool) {
+    mTool = tool;
+    document.querySelectorAll('.toolbar-container .tool-btn').forEach(b => b.classList.remove('active', 'laser-active'));
+    const btn = document.getElementById('btn-m-' + tool);
+    if (btn) {
+      if (tool === 'laser') btn.classList.add('laser-active');
+      else btn.classList.add('active');
+    }
+  }
+
+  function setMColor(c, el) {
+    mColor = c;
+    document.querySelectorAll('.color-dot-btn').forEach(b => b.classList.remove('selected'));
+    if (el) el.classList.add('selected');
+    if (mTool === 'eraser' || mTool === 'laser') setMTool('pen');
+  }
+
+  function clearMCanvas() {
+    mHistory = [];
+    mStroke = null;
+    mLaserTrail = [];
+    drawMFrame();
+  }
+
+  function getMPos(e) {
+    const r = mCanvas.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+
+  mViewport.addEventListener('pointerdown', e => {
+    const p = getMPos(e);
+    if (mTool === 'laser') {
+      mIsLaserActive = true;
+      mLastLaserPos = p;
+      mLaserTrail.push({ x: p.x, y: p.y, t: performance.now() });
+      return;
+    }
+    mIsDown = true;
+    if (mTool === 'pen') mStroke = { type: 'free', points: [p], color: mColor };
+    else if (mTool === 'line') mStroke = { type: 'line', x1: p.x, y1: p.y, x2: p.x, y2: p.y, color: mColor };
+    else if (mTool === 'eraser') eraseAtM(p.x, p.y);
+  });
+
+  mViewport.addEventListener('pointermove', e => {
+    const p = getMPos(e);
+    if (mTool === 'laser') {
+      if (mIsLaserActive) {
+        mLastLaserPos = p;
+        mLaserTrail.push({ x: p.x, y: p.y, t: performance.now() });
+      }
+      return;
+    }
+    if (!mIsDown) return;
+    if (mTool === 'pen') mStroke.points.push(p);
+    else if (mTool === 'line') { mStroke.x2 = p.x; mStroke.y2 = p.y; }
+    else if (mTool === 'eraser') eraseAtM(p.x, p.y);
+  });
+
+  function stopMDraw() {
+    if (mTool === 'laser') {
+      mIsLaserActive = false;
+      return;
+    }
+    if (mIsDown && mStroke) {
+      mHistory.push(mStroke);
+      mStroke = null;
+    }
+    mIsDown = false;
+  }
+  mViewport.addEventListener('pointerup', stopMDraw);
+  mViewport.addEventListener('pointerleave', stopMDraw);
+
+  function eraseAtM(x, y) {
+    mHistory = mHistory.filter(s => {
+      if (s.type === 'line') return Math.hypot((s.x1+s.x2)/2 - x, (s.y1+s.y2)/2 - y) > 20;
+      return !s.points.some(pt => Math.hypot(pt.x - x, pt.y - y) < 18);
+    });
+  }
+
+  function drawMFrame() {
+    const r = mViewport.getBoundingClientRect();
+    mCtx.clearRect(0, 0, r.width, r.height);
+
+    mHistory.forEach(s => renderMStroke(s));
+    if (mStroke) renderMStroke(mStroke);
+
+    const now = performance.now();
+    mLaserTrail = mLaserTrail.filter(pt => now - pt.t <= 2000);
+
+    if (mLaserTrail.length > 1) {
+      for (let i = 1; i < mLaserTrail.length; i++) {
+        const p1 = mLaserTrail[i - 1];
+        const p2 = mLaserTrail[i];
+        const alpha = Math.max(0, 1 - (now - p2.t) / 2000);
+
+        mCtx.save();
+        mCtx.beginPath();
+        mCtx.moveTo(p1.x, p1.y);
+        mCtx.lineTo(p2.x, p2.y);
+        mCtx.strokeStyle = `rgba(239, 68, 68, ${alpha})`;
+        mCtx.lineWidth = 3 * alpha + 1;
+        mCtx.lineCap = 'round';
+        mCtx.shadowColor = '#ef4444';
+        mCtx.shadowBlur = 8 * alpha;
+        mCtx.stroke();
+        mCtx.restore();
+      }
+    }
+
+    if (mTool === 'laser' && mIsLaserActive && mLastLaserPos) {
+      mCtx.save();
+      mCtx.beginPath();
+      mCtx.arc(mLastLaserPos.x, mLastLaserPos.y, 5, 0, Math.PI * 2);
+      mCtx.fillStyle = '#ef4444';
+      mCtx.shadowColor = '#ff0000';
+      mCtx.shadowBlur = 12;
+      mCtx.fill();
+      mCtx.restore();
+    }
+  }
+
+  function renderMStroke(s) {
+    mCtx.save();
+    mCtx.strokeStyle = s.color;
+    mCtx.lineWidth = 2.4;
+    mCtx.lineCap = 'round';
+    mCtx.beginPath();
+    if (s.type === 'line') {
+      mCtx.moveTo(s.x1, s.y1);
+      mCtx.lineTo(s.x2, s.y2);
+    } else if (s.type === 'free') {
+      s.points.forEach((pt, i) => {
+        if (i === 0) mCtx.moveTo(pt.x, pt.y);
+        else mCtx.lineTo(pt.x, pt.y);
+      });
+    }
+    mCtx.stroke();
+    mCtx.restore();
+  }
+
+  function mAnimation() {
+    drawMFrame();
+    requestAnimationFrame(mAnimation);
+  }
+  requestAnimationFrame(mAnimation);
+</script>
+
+</body>
+</html>

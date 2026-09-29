@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פתרון מלא: בגרות בפיזיקה 1992, שאלה 1 - קינמטיקה ודינמיקה</title>
+
+  <!-- Google Fonts: Rubik -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #1e3a8a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --accent-red: #dc2626;
+      --border-color: #e2e8f0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 24px 16px 60px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* HEADER */
+    .header-banner {
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 30px 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .header-pill {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    .header-title {
+      font-size: 1.95rem;
+      font-weight: 800;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.92;
+    }
+
+    .header-badge {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: var(--radius-md);
+      padding: 12px 22px;
+      text-align: center;
+      min-width: 160px;
+    }
+
+    .header-badge .sub {
+      font-size: 0.75rem;
+      color: #bfdbfe;
+    }
+
+    .header-badge .main {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    /* CONTROLS BAR */
+    .control-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .control-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-layout {
+      border: 1.5px solid var(--border-color);
+      background: #f8fafc;
+      color: var(--text-main);
+      padding: 8px 18px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-layout.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    /* APPLIED LAYOUTS */
+    .app-layout {
+      display: grid;
+      gap: 22px;
+      transition: all 0.3s ease;
+    }
+
+    /* 19X6 Layout */
+    .layout-19x6 {
+      grid-template-columns: 19fr 6fr;
+    }
+
+    /* 6X19 Layout */
+    .layout-6x19 {
+      grid-template-columns: 6fr 19fr;
+    }
+
+    @media (max-width: 980px) {
+      .layout-19x6, .layout-6x19 {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .accent-bar {
+      width: 5px;
+      height: 24px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* QUESTION BANNER */
+    .exam-question-box {
+      background: var(--primary-light);
+      border: 1.5px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+
+    .exam-question-title {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: var(--primary-deep);
+      margin-bottom: 10px;
+    }
+
+    .exam-question-box p {
+      font-size: 0.98rem;
+      color: #334155;
+      margin-bottom: 12px;
+    }
+
+    .question-list {
+      padding-right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: #1e293b;
+    }
+
+    /* TABS */
+    .tabs-wrapper {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--primary-deep);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .section-container {
+      display: none;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .section-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CONTENT DISPLAY */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.92rem;
+    }
+
+    .data-table th, .data-table td {
+      border: 1px solid var(--border-color);
+      padding: 10px 12px;
+      text-align: center;
+    }
+
+    .data-table th {
+      background: #f1f5f9;
+      color: var(--primary-deep);
+      font-weight: 700;
+    }
+
+    .math-display-box {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      margin: 12px 0;
+      direction: ltr;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    .result-banner {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .result-icon {
+      background: var(--accent-green);
+      color: white;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .result-text {
+      color: #065f46;
+      font-size: 0.98rem;
+      font-weight: 600;
+    }
+
+    /* INTERACTIVE CANVAS & TOOLBAR */
+    .interactive-board {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .canvas-toolbar {
+      background: #f1f5f9;
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tool-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tool-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .canvas-viewport {
+      position: relative;
+      width: 100%;
+      height: 440px;
+      background: #ffffff;
+    }
+
+    .canvas-viewport svg,
+    .canvas-viewport canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #drawCanvas {
+      z-index: 10;
+      cursor: crosshair;
+    }
+
+    #laserCanvas {
+      z-index: 20;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header-banner">
+    <div class="header-content">
+      <div class="header-pill">מאגר פתרונות רשמי בפיזיקה לבגרות</div>
+      <h1 class="header-title">פתרון מלא: בחינת בגרות בפיזיקה 1992, שאלה 1</h1>
+      <p class="header-subtitle">מכניקה | קינמטיקה בקו ישר (גרף מהירות-זמן) וחוקי ניוטון (משקל נראה במעלית)</p>
+    </div>
+    <div class="header-badge">
+      <div class="sub">שנת בחינה</div>
+      <div class="main">בגרות 1992, שאלה 1</div>
+    </div>
+  </header>
+
+  <!-- LAYOUT CONTROL BAR -->
+  <div class="control-bar">
+    <div class="control-title">בחר פריסת תצוגה:</div>
+    <div class="btn-group">
+      <button class="btn-layout active" id="btnLayout19x6" onclick="applyLayout('19x6')">פריסה 19X6 (תוכן מורחב / לוח גרפיקה)</button>
+      <button class="btn-layout" id="btnLayout6x19" onclick="applyLayout('6x19')">פריסה 6X19 (לוח גרפיקה / תוכן מורחב)</button>
+    </div>
+  </div>
+
+  <!-- APPLICATION GRID -->
+  <main id="appLayout" class="app-layout layout-19x6">
+
+    <!-- PRIMARY COLUMN: QUESTION & SOLUTION -->
+    <div class="card" id="colMain">
+
+      <!-- EXAM QUESTION STATEMENT -->
+      <section class="exam-question-box">
+        <div class="exam-question-title">ניסוח השאלה (נוסח בגרות מלא ומפורט)</div>
+        <p>
+          הגרף שלפניך מתאר תנועת מעלית במבנה הנמצא בבנייה. מסומנים בו שבעה קטעים מ-A עד G.
+          המעלית מתחילה את תנועתה ברגע $t = 0\text{ s}$ ממצב מנוחה על פני הקרקע, והכיוון <strong>כלפי מעלה נבחר כחיובי</strong>.
+        </p>
+        <ol class="question-list">
+          <li><strong>סעיף א':</strong> קבע בכל אחד מן הקטעים אם המעלית עולה, יורדת או נחה, ואם גודל מהירותה קבוע, גדל או קטן. נמק.</li>
+          <li><strong>סעיף ב':</strong> מהו הגובה המרבי אליו מגיעה המעלית?</li>
+          <li><strong>סעיף ג':</strong> באיזה גובה מעל הקרקע נמצאת המעלית בגמר תנועתה?</li>
+          <li><strong>סעיף ד':</strong> שק מלט מונח על מאזני קפיץ (מאזני אמבטיה) שעל רצפת המעלית. המאזניים מכוילים בקילוגרמים. בקטע A של התנועה מופיע המספר $55\text{ kg}$ על צג המאזניים. מצא איזה מספר יופיע על הצג בכל אחד מהקטעים האחרים של התנועה (הנח $g = 10\text{ m/s}^2$).</li>
+        </ol>
+      </section>
+
+      <!-- NAVIGATION TABS -->
+      <div class="tabs-wrapper">
+        <button class="tab-btn active" onclick="showTab('tab-a')">סעיף א'</button>
+        <button class="tab-btn" onclick="showTab('tab-b')">סעיף ב'</button>
+        <button class="tab-btn" onclick="showTab('tab-c')">סעיף ג'</button>
+        <button class="tab-btn" onclick="showTab('tab-d')">סעיף ד'</button>
+      </div>
+
+      <!-- TAB CONTENT: SECTION A -->
+      <div id="tab-a" class="section-container active">
+        <div class="card-title-wrap">
+          <div class="accent-bar"></div>
+          <h3 class="card-title">סעיף א': כיוון תנועת המעלית ושינוי גודל המהירות בכל קטע</h3>
+        </div>
+        <p>
+          <strong>עיקרון פיזיקלי מנחה:</strong>
+          כיוון התנועה נקבע על פי סימן המהירות הרגעית $v(t)$ (חיובי – עולה, שלילי – יורדת, אפס – במנוחה).
+          שינוי גודל המהירות ($\vert{}v\vert{}$) נקבע לפי התרחקות או התקרבות לציר הזמן ($v = 0$).
+        </p>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>קטע</th>
+              <th>פרק זמן $\Delta t$ [s]</th>
+              <th>ערך המהירות $v(t)$ [m/s]</th>
+              <th>כיוון תנועת המעלית</th>
+              <th>שינוי גודל המהירות $|v|$</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>A</strong></td>
+              <td>$0 \le t \le 3$</td>
+              <td>$v > 0$ (מ-0 ל-$+3$)</td>
+              <td>עולה כלפי מעלה</td>
+              <td>גדל (תנועה מואצת)</td>
+            </tr>
+            <tr>
+              <td><strong>B</strong></td>
+              <td>$3 \le t \le 6$</td>
+              <td>$v = +3$ (קבוע)</td>
+              <td>עולה כלפי מעלה</td>
+              <td>קבוע (תנועה קצובה)</td>
+            </tr>
+            <tr>
+              <td><strong>C</strong></td>
+              <td>$6 \le t \le 7$</td>
+              <td>$v > 0$ (מ-$+3$ ל-0)</td>
+              <td>עולה כלפי מעלה</td>
+              <td>קטן (תנועה מואטת)</td>
+            </tr>
+            <tr>
+              <td><strong>D</strong></td>
+              <td>$7 \le t \le 10$</td>
+              <td>$v = 0$</td>
+              <td>נחה (עצירה מוחלטת)</td>
+              <td>קבוע ושווה ל-$0\text{ m/s}$</td>
+            </tr>
+            <tr>
+              <td><strong>E</strong></td>
+              <td>$10 \le t \le 11$</td>
+              <td>$v < 0$ (מ-0 ל-$-2$)</td>
+              <td>יורדת כלפי מטה</td>
+              <td>גדל (תנועה מואצת כלפי מטה)</td>
+            </tr>
+            <tr>
+              <td><strong>F</strong></td>
+              <td>$11 \le t \le 14$</td>
+              <td>$v = -2$ (קבוע)</td>
+              <td>יורדת כלפי מטה</td>
+              <td>קבוע (תנועה קצובה)</td>
+            </tr>
+            <tr>
+              <td><strong>G</strong></td>
+              <td>$14 \le t \le 17$</td>
+              <td>$v < 0$ (מ-$-2$ ל-0)</td>
+              <td>יורדת כלפי מטה</td>
+              <td>קטן (תנועה מואטת עד עצירה)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TAB CONTENT: SECTION B -->
+      <div id="tab-b" class="section-container">
+        <div class="card-title-wrap">
+          <div class="accent-bar"></div>
+          <h3 class="card-title">סעיף ב': הגובה המרבי אליו מגיעה המעלית</h3>
+        </div>
+        <p>
+          ההעתק שווה לשטח הכלוא בין גרף המהירות לציר הזמן.
+          כל עוד המהירות חיובית ($0 \le t \le 7\text{ s}$), המעלית עולה. היא מגיעה לגובהה המרבי ברגע $t = 7\text{ s}$, 
+          השווה לשטח הטרפז מעל ציר הזמן (הקטעים A, B, C):
+        </p>
+
+        <div class="math-display-box">
+          $$h_{\max} = S_{\text{ABC}} = \frac{(B + b) \cdot h}{2} = \frac{(7 + 3) \cdot 3}{2} = \frac{10 \cdot 3}{2} = 15.0\text{ m}$$
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            הגובה המרבי אליו מגיעה המעלית הוא: <strong>15.0 m</strong>.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT: SECTION C -->
+      <div id="tab-c" class="section-container">
+        <div class="card-title-wrap">
+          <div class="accent-bar"></div>
+          <h3 class="card-title">סעיף ג': גובה המעלית מעל הקרקע בסיום תנועתה</h3>
+        </div>
+        <p>
+          המעלית נחה בקטע D ($7 \le t \le 10\text{ s}$). החל מרגע $t = 10\text{ s}$ ועד סיום התנועה ב-$t = 17\text{ s}$ המעלית יורדת.
+          ההעתק כלפי מטה שווה לשטח הטרפז שנמצא מתחת לציר הזמן (הקטעים E, F, G):
+        </p>
+        <ul style="padding-right: 20px; margin: 8px 0;">
+          <li>בסיס גדול: מ-$t = 10\text{ s}$ עד $t = 17\text{ s}$, כלומר אורך הבסיס הוא $B_{\text{down}} = 17 - 10 = 7\text{ s}$.</li>
+          <li>בסיס קטן (קטע F): מ-$t = 11\text{ s}$ עד $t = 14\text{ s}$, כלומר אורך הבסיס הוא $b_{\text{down}} = 14 - 11 = 3\text{ s}$.</li>
+          <li>גובה הטרפז (גודל המהירות): $h = 2\text{ m/s}$.</li>
+        </ul>
+
+        <div class="math-display-box">
+          $$S_{\text{down}} = \frac{(B_{\text{down}} + b_{\text{down}}) \cdot h}{2} = \frac{(7 + 3) \cdot 2}{2} = \frac{10 \cdot 2}{2} = 10.0\text{ m}$$
+          $$h_{\text{final}} = h_{\max} - S_{\text{down}} = 15.0 - 10.0 = 5.0\text{ m}$$
+        </div>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            בגמר תנועתה נמצאת המעלית בגובה של: <strong>5.0 m</strong> מעל פני הקרקע.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT: SECTION D -->
+      <div id="tab-d" class="section-container">
+        <div class="card-title-wrap">
+          <div class="accent-bar"></div>
+          <h3 class="card-title">סעיף ד': הוריית מאזני הקפיץ בכל קטעי התנועה</h3>
+        </div>
+        <p>
+          <strong>המודל הדינמי:</strong> על שק המלט פועלים שני כוחות: כוח הכובד $mg$ כלפי מטה, והכוח הנורמלי $N$ כלפי מעלה.
+          המאזניים מודדים את הכוח הנורמלי $N$, וקריאתם בק"ג היא:
+          $$M_{\text{read}} = \frac{N}{g} = \frac{N}{10}$$
+          לפי החוק השני של ניוטון עבור ציר אנכי כלפי מעלה:
+          $$\Sigma F = N - mg = ma \implies N = m(g + a)$$
+        </p>
+
+        <p><strong>1. מציאת מסת שק המלט ($m$) מתוך נתוני קטע A:</strong></p>
+        <div class="math-display-box">
+          $$a_A = \frac{\Delta v}{\Delta t} = \frac{3 - 0}{3} = 1.0\text{ m/s}^2$$
+          $$N_A = 55\text{ kg} \cdot 10\text{ m/s}^2 = 550.0\text{ N}$$
+          $$N_A - mg = m \cdot a_A \implies 550.0 - 10m = 1m \implies 11m = 550 \implies m = 50.0\text{ kg}$$
+        </div>
+
+        <p><strong>2. חישוב תאוצה והוריית הצג בכל שאר הקטעים:</strong></p>
+        <ul style="padding-right: 20px; margin: 8px 0; display: flex; flex-direction: column; gap: 8px;">
+          <li>
+            <strong>קטע B ($a = 0$):</strong> אין תאוצה (מהירות קבועה).
+            $$N = mg = 50 \cdot 10 = 500.0\text{ N} \implies \text{הצג יראה: } 50.0\text{ kg}$$
+          </li>
+          <li>
+            <strong>קטע C ($6 \le t \le 7$):</strong> $a = \frac{0 - 3}{1} = -3.0\text{ m/s}^2$.
+            $$N - mg = ma \implies N = 50 \cdot (10 - 3) = 350.0\text{ N} \implies \text{הצג יראה: } 35.0\text{ kg}$$
+          </li>
+          <li>
+            <strong>קטע D ($7 \le t \le 10$):</strong> המעלית במנוחה ($a = 0$).
+            $$N = mg = 50 \cdot 10 = 500.0\text{ N} \implies \text{הצג יראה: } 50.0\text{ kg}$$
+          </li>
+          <li>
+            <strong>קטע E ($10 \le t \le 11$):</strong> $a = \frac{-2 - 0}{1} = -2.0\text{ m/s}^2$.
+            $$N = 50 \cdot (10 - 2) = 400.0\text{ N} \implies \text{הצג יראה: } 40.0\text{ kg}$$
+          </li>
+          <li>
+            <strong>קטע F ($11 \le t \le 14$):</strong> מהירות קבועה ($a = 0$).
+            $$N = mg = 50 \cdot 10 = 500.0\text{ N} \implies \text{הצג יראה: } 50.0\text{ kg}$$
+          </li>
+          <li>
+            <strong>קטע G ($14 \le t \le 17$):</strong> $a = \frac{0 - (-2)}{17 - 14} = \frac{2}{3} \approx 0.67\text{ m/s}^2$.
+            $$N = 50 \cdot \left(10 + \frac{2}{3}\right) = \frac{1600}{3} \approx 533.3\text{ N} \implies \text{הצג יראה: } 53.3\text{ kg}$$
+          </li>
+        </ul>
+
+        <div class="result-banner">
+          <div class="result-icon">✓</div>
+          <div class="result-text">
+            המספר שיופיע על הצג: קטע B: 50.0 kg | קטע C: 35.0 kg | קטע D: 50.0 kg | קטע E: 40.0 kg | קטע F: 50.0 kg | קטע G: 53.3 kg
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECONDARY COLUMN: GRAPHICS & INTERACTIVE TOOL -->
+    <div class="card" id="colSide">
+      <div class="card-title-wrap">
+        <div class="accent-bar"></div>
+        <h3 class="card-title">תרשים תנועה ושרטוט אינטראקטיבי</h3>
+      </div>
+
+      <div class="interactive-board">
+        <!-- TOOLBAR -->
+        <div class="canvas-toolbar">
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="tool-btn active" id="btnPen" onclick="selectDrawMode('pen')">ציור חופשי</button>
+            <button class="tool-btn" id="btnLine" onclick="selectDrawMode('line')">יישור קווים אוטומטי</button>
+            <button class="tool-btn" id="btnLaser" onclick="toggleLaserMode()">מצביע לייזר דועך</button>
+          </div>
+          <button class="tool-btn" onclick="resetDrawings()" style="color:var(--accent-red); border-color:#fca5a5;">נקה שרטוט</button>
+        </div>
+
+        <!-- CANVAS STACK -->
+        <div class="canvas-viewport" id="viewportStage">
+          <!-- BASE PHYSICS SVG -->
+          <svg viewBox="0 0 680 440" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="gridPattern" width="28" height="28" patternUnits="userSpaceOnUse">
+                <path d="M 28 0 L 0 0 0 28" fill="none" stroke="#f1f5f9" stroke-width="1.2"/>
+              </pattern>
+            </defs>
+
+            <rect width="680" height="440" fill="#ffffff"/>
+            <rect x="70" y="30" width="580" height="360" fill="url(#gridPattern)"/>
+
+            <!-- Shaded areas -->
+            <polygon points="100,240 190,84 280,84 310,240" fill="rgba(37, 99, 235, 0.08)"/>
+            <polygon points="400,240 430,344 520,344 610,240" fill="rgba(220, 38, 38, 0.08)"/>
+
+            <!-- Axes -->
+            <line x1="60" y1="240" x2="660" y2="240" stroke="#0f172a" stroke-width="2.2"/>
+            <polygon points="665,240 653,234 653,246" fill="#0f172a"/>
+            <text x="650" y="222" font-size="14" font-weight="700" fill="#0f172a" text-anchor="end">t(s)</text>
+
+            <line x1="100" y1="400" x2="100" y2="25" stroke="#0f172a" stroke-width="2.2"/>
+            <polygon points="100,20 94,32 106,32" fill="#0f172a"/>
+            <text x="88" y="24" font-size="14" font-weight="700" fill="#0f172a" text-anchor="end">v(m/s)</text>
+
+            <!-- Dashed projection lines -->
+            <line x1="100" y1="84" x2="310" y2="84" stroke="#94a3b8" stroke-dasharray="4,4"/>
+            <line x1="190" y1="84" x2="190" y2="240" stroke="#94a3b8" stroke-dasharray="4,4"/>
+            <line x1="280" y1="84" x2="280" y2="240" stroke="#94a3b8" stroke-dasharray="4,4"/>
+            <line x1="310" y1="84" x2="310" y2="240" stroke="#94a3b8" stroke-dasharray="4,4"/>
+
+            <line x1="100" y1="344" x2="520" y2="344" stroke="#94a3b8" stroke-dasharray="4,4"/>
+            <line x1="430" y1="240" x2="430" y2="344" stroke="#94a3b8" stroke-dasharray="4,4"/>
+            <line x1="520" y1="240" x2="520" y2="344" stroke="#94a3b8" stroke-dasharray="4,4"/>
+
+            <!-- Y Numbers -->
+            <text x="82" y="88" font-size="13" font-weight="700" fill="#0f172a" text-anchor="end">+3.0</text>
+            <circle cx="100" cy="84" r="3" fill="#0f172a"/>
+
+            <text x="82" y="136" font-size="13" font-weight="600" fill="#64748b" text-anchor="end">+2.0</text>
+            <circle cx="100" cy="136" r="2.5" fill="#64748b"/>
+
+            <text x="82" y="188" font-size="13" font-weight="600" fill="#64748b" text-anchor="end">+1.0</text>
+            <circle cx="100" cy="188" r="2.5" fill="#64748b"/>
+
+            <text x="82" y="244" font-size="13" font-weight="700" fill="#0f172a" text-anchor="end">0.0</text>
+
+            <text x="82" y="292" font-size="13" font-weight="600" fill="#64748b" text-anchor="end">-1.0</text>
+            <circle cx="100" cy="292" r="2.5" fill="#64748b"/>
+
+            <text x="82" y="348" font-size="13" font-weight="700" fill="#0f172a" text-anchor="end">-2.0</text>
+            <circle cx="100" cy="344" r="3" fill="#0f172a"/>
+
+            <!-- X Numbers -->
+            <text x="190" y="262" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">3</text>
+            <text x="250" y="262" font-size="13" font-weight="600" fill="#64748b" text-anchor="middle">5</text>
+            <text x="280" y="262" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">6</text>
+            <text x="310" y="262" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">7</text>
+            <text x="400" y="262" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">10</text>
+            <text x="430" y="262" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">11</text>
+            <text x="520" y="262" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">14</text>
+            <text x="550" y="262" font-size="13" font-weight="600" fill="#64748b" text-anchor="middle">15</text>
+            <text x="610" y="262" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">17</text>
+
+            <!-- Traces -->
+            <line x1="100" y1="240" x2="190" y2="84" stroke="#2563eb" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="190" y1="84" x2="280" y2="84" stroke="#2563eb" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="280" y1="84" x2="310" y2="240" stroke="#2563eb" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="310" y1="240" x2="400" y2="240" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
+            <line x1="400" y1="240" x2="430" y2="344" stroke="#dc2626" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="430" y1="344" x2="520" y2="344" stroke="#dc2626" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="520" y1="344" x2="610" y2="240" stroke="#dc2626" stroke-width="3.5" stroke-linecap="round"/>
+
+            <!-- Section Letters -->
+            <text x="135" y="150" font-size="17" font-weight="800" fill="#1d4ed8">A</text>
+            <text x="235" y="74" font-size="17" font-weight="800" fill="#1d4ed8">B</text>
+            <text x="305" y="150" font-size="17" font-weight="800" fill="#1d4ed8">C</text>
+            <text x="355" y="230" font-size="17" font-weight="800" fill="#1e3a8a">D</text>
+            <text x="405" y="305" font-size="17" font-weight="800" fill="#b91c1c">E</text>
+            <text x="475" y="370" font-size="17" font-weight="800" fill="#b91c1c">F</text>
+            <text x="575" y="285" font-size="17" font-weight="800" fill="#b91c1c">G</text>
+          </svg>
+
+          <!-- Freehand and Line Canvas -->
+          <canvas id="drawCanvas" width="680" height="440"></canvas>
+
+          <!-- 2-Second Laser Trail Canvas -->
+          <canvas id="laserCanvas" width="680" height="440"></canvas>
+        </div>
+      </div>
+
+      <p style="margin-top: 12px; font-size: 0.88rem; color: var(--text-muted);">
+        <strong>כלי עזר להוראה:</strong>
+        <br>• <strong>יישור קווים אוטומטי:</strong> מאפשר מתיחת קווי עזר הנדסיים המתיישרים מעצמם.
+        <br>• <strong>מצביע לייזר דועך:</strong> מציג עקבות אור דועכות הנעלמות לחלוטין כעבור 2 שניות.
+      </p>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  /* 1. LAYOUT SWITCHER */
+  function applyLayout(mode) {
+    const layout = document.getElementById('appLayout');
+    const colMain = document.getElementById('colMain');
+    const colSide = document.getElementById('colSide');
+    const btn19x6 = document.getElementById('btnLayout19x6');
+    const btn6x19 = document.getElementById('btnLayout6x19');
+
+    if (mode === '19x6') {
+      layout.className = 'app-layout layout-19x6';
+      layout.insertBefore(colMain, colSide);
+      btn19x6.classList.add('active');
+      btn6x19.classList.remove('active');
+    } else {
+      layout.className = 'app-layout layout-6x19';
+      layout.insertBefore(colSide, colMain);
+      btn6x19.classList.add('active');
+      btn19x6.classList.remove('active');
+    }
+  }
+
+  /* 2. TAB SWITCHER */
+  function showTab(tabId) {
+    document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+    const targetSec = document.getElementById(tabId);
+    if (targetSec) targetSec.classList.add('active');
+
+    const tabMap = { 'tab-a': 0, 'tab-b': 1, 'tab-c': 2, 'tab-d': 3 };
+    const btns = document.querySelectorAll('.tab-btn');
+    if (btns[tabMap[tabId]]) btns[tabMap[tabId]].classList.add('active');
+  }
+
+  /* 3. CANVAS & LASER ENGINE */
+  const dCanvas = document.getElementById('drawCanvas');
+  const dCtx = dCanvas.getContext('2d');
+  const lCanvas = document.getElementById('laserCanvas');
+  const lCtx = lCanvas.getContext('2d');
+
+  let activeMode = 'pen';
+  let isPointerDown = false;
+  let startX = 0, startY = 0;
+  let canvasHistory = [];
+
+  let laserPoints = [];
+  const LASER_DURATION = 2000; // 2 seconds
+
+  function selectDrawMode(mode) {
+    activeMode = mode;
+    document.getElementById('btnPen').classList.toggle('active', mode === 'pen');
+    document.getElementById('btnLine').classList.toggle('active', mode === 'line');
+    document.getElementById('btnLaser').classList.toggle('active', mode === 'laser');
+  }
+
+  function toggleLaserMode() {
+    selectDrawMode(activeMode === 'laser' ? 'pen' : 'laser');
+  }
+
+  function resetDrawings() {
+    dCtx.clearRect(0, 0, dCanvas.width, dCanvas.height);
+    canvasHistory = [];
+  }
+
+  function getCoords(e) {
+    const rect = dCanvas.getBoundingClientRect();
+    const sx = dCanvas.width / rect.width;
+    const sy = dCanvas.height / rect.height;
+    return {
+      x: (e.clientX - rect.left) * sx,
+      y: (e.clientY - rect.top) * sy
+    };
+  }
+
+  dCanvas.addEventListener('pointerdown', (e) => {
+    const pos = getCoords(e);
+    isPointerDown = true;
+    startX = pos.x;
+    startY = pos.y;
+
+    if (activeMode === 'pen') {
+      dCtx.beginPath();
+      dCtx.moveTo(pos.x, pos.y);
+      dCtx.strokeStyle = '#2563eb';
+      dCtx.lineWidth = 2.5;
+      dCtx.lineCap = 'round';
+      dCtx.lineJoin = 'round';
+    } else if (activeMode === 'laser') {
+      laserPoints.push({ x: pos.x, y: pos.y, time: performance.now() });
+    }
+  });
+
+  dCanvas.addEventListener('pointermove', (e) => {
+    const pos = getCoords(e);
+
+    if (activeMode === 'laser') {
+      laserPoints.push({ x: pos.x, y: pos.y, time: performance.now() });
+      return;
+    }
+
+    if (!isPointerDown) return;
+
+    if (activeMode === 'pen') {
+      dCtx.lineTo(pos.x, pos.y);
+      dCtx.stroke();
+    } else if (activeMode === 'line') {
+      restoreCanvasHistory();
+      dCtx.beginPath();
+      dCtx.moveTo(startX, startY);
+      dCtx.lineTo(pos.x, pos.y);
+      dCtx.strokeStyle = '#059669';
+      dCtx.lineWidth = 2.5;
+      dCtx.setLineDash([4, 4]);
+      dCtx.stroke();
+      dCtx.setLineDash([]);
+    }
+  });
+
+  window.addEventListener('pointerup', (e) => {
+    if (!isPointerDown) return;
+    isPointerDown = false;
+
+    if (activeMode === 'line') {
+      const pos = getCoords(e);
+      let endX = pos.x;
+      let endY = pos.y;
+
+      if (Math.abs(endY - startY) < 14) endY = startY;
+      if (Math.abs(endX - startX) < 14) endX = startX;
+
+      restoreCanvasHistory();
+      dCtx.beginPath();
+      dCtx.moveTo(startX, startY);
+      dCtx.lineTo(endX, endY);
+      dCtx.strokeStyle = '#059669';
+      dCtx.lineWidth = 2.5;
+      dCtx.stroke();
+
+      canvasHistory.push(dCtx.getImageData(0, 0, dCanvas.width, dCanvas.height));
+    } else if (activeMode === 'pen') {
+      canvasHistory.push(dCtx.getImageData(0, 0, dCanvas.width, dCanvas.height));
+    }
+  });
+
+  function restoreCanvasHistory() {
+    dCtx.clearRect(0, 0, dCanvas.width, dCanvas.height);
+    if (canvasHistory.length > 0) {
+      dCtx.putImageData(canvasHistory[canvasHistory.length - 1], 0, 0);
+    }
+  }
+
+  function laserRenderLoop(now) {
+    lCtx.clearRect(0, 0, lCanvas.width, lCanvas.height);
+    laserPoints = laserPoints.filter(pt => (now - pt.time) < LASER_DURATION);
+
+    if (laserPoints.length > 1) {
+      for (let i = 1; i < laserPoints.length; i++) {
+        const p1 = laserPoints[i - 1];
+        const p2 = laserPoints[i];
+        const age = now - p2.time;
+        const alpha = Math.max(0, 1 - (age / LASER_DURATION));
+
+        lCtx.beginPath();
+        lCtx.moveTo(p1.x, p1.y);
+        lCtx.lineTo(p2.x, p2.y);
+        lCtx.strokeStyle = `rgba(239, 68, 68, ${alpha})`;
+        lCtx.lineWidth = 3.5;
+        lCtx.lineCap = 'round';
+        lCtx.stroke();
+
+        lCtx.beginPath();
+        lCtx.moveTo(p1.x, p1.y);
+        lCtx.lineTo(p2.x, p2.y);
+        lCtx.strokeStyle = `rgba(255, 0, 0, ${alpha * 0.35})`;
+        lCtx.lineWidth = 8;
+        lCtx.lineCap = 'round';
+        lCtx.stroke();
+      }
+
+      const tip = laserPoints[laserPoints.length - 1];
+      lCtx.beginPath();
+      lCtx.arc(tip.x, tip.y, 4, 0, 2 * Math.PI);
+      lCtx.fillStyle = '#ffffff';
+      lCtx.fill();
+      lCtx.beginPath();
+      lCtx.arc(tip.x, tip.y, 7, 0, 2 * Math.PI);
+      lCtx.fillStyle = 'rgba(239, 68, 68, 0.6)';
+      lCtx.fill();
+    }
+
+    requestAnimationFrame(laserRenderLoop);
+  }
+  requestAnimationFrame(laserRenderLoop);
+</script>
+
+</body>
+</html>

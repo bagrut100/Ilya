@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>בגרות בפיזיקה 2024 - מכניקה שאלה 2 | פתרון מלא ומודרך</title>
+  
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-deep: #0f172a;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --bg-page: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-green-border: #a7f3d0;
+      --border-color: #e2e8f0;
+      --laser-color: #ef4444;
+      --radius-lg: 20px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rubik', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 20px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* TOP CONTROLS FOR ASPECT RATIO */
+    .view-control-bar {
+      width: 100%;
+      max-width: 1200px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid var(--border-color);
+    }
+
+    .aspect-selector {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .aspect-btn {
+      padding: 6px 16px;
+      border-radius: 9999px;
+      border: 1px solid var(--border-color);
+      background: #f1f5f9;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .aspect-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* CONTAINER LAYOUT MODES */
+    .app-viewport {
+      transition: all 0.3s ease;
+      margin: 0 auto;
+    }
+
+    /* 19x6: Wide Landscape */
+    .app-viewport.mode-19-6 {
+      width: 1330px;
+      max-width: 98vw;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 6x19: Narrow Vertical */
+    .app-viewport.mode-6-19 {
+      width: 480px;
+      max-width: 96vw;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* HEADER */
+    .header-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 24px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+
+    .header-banner h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .header-banner p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    /* CARD STYLES */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::before {
+      content: "";
+      width: 5px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    /* QUESTION SECTION */
+    .question-full-box {
+      background: #f8fafc;
+      border-right: 4px solid var(--primary);
+      padding: 16px;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      margin-bottom: 18px;
+      font-size: 0.98rem;
+    }
+
+    .data-table-container {
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    table.data-table th, table.data-table td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+    }
+
+    table.data-table th {
+      background-color: #f1f5f9;
+      color: var(--text-main);
+      font-weight: 700;
+    }
+
+    /* INTERACTIVE GRAPH & DRAWING CANVAS CONTAINER */
+    .interactive-stage {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .canvas-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #f1f5f9;
+      border-bottom: 1px solid var(--border-color);
+      align-items: center;
+    }
+
+    .tool-btn {
+      background: white;
+      border: 1px solid #cbd5e1;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tool-btn.active {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+
+    .canvas-viewport-wrap {
+      position: relative;
+      width: 100%;
+      height: 380px;
+    }
+
+    canvas.layer-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+    }
+
+    /* STEP TABS */
+    .tabs-wrapper {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0 10px;
+    }
+
+    .tab-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 9999px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .solution-content {
+      display: none;
+    }
+
+    .solution-content.active {
+      display: block;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .math-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      margin: 12px 0;
+      direction: ltr;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    .final-ans-box {
+      background: var(--accent-green-bg);
+      border: 1.5px solid var(--accent-green-border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      color: #065f46;
+      font-weight: 600;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .final-ans-badge {
+      background: var(--accent-green);
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- VIEWPORT RATIO CONTROLLER -->
+  <div class="view-control-bar">
+    <div style="font-weight: 700; font-size: 0.95rem;">בחר יחס תצוגה / פריסה:</div>
+    <div class="aspect-selector">
+      <button class="aspect-btn active" onclick="setMode('19-6')">פריסה רחבה (19X6)</button>
+      <button class="aspect-btn" onclick="setMode('6-19')">פריסה צרה (6X19)</button>
+    </div>
+  </div>
+
+  <div id="mainViewport" class="app-viewport mode-19-6">
+    
+    <!-- HEADER -->
+    <header class="header-banner">
+      <div>
+        <p style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">פתרון רשמי ומפורט | בגרות בפיזיקה 2024</p>
+        <h1>שאלה 2: ניסוי חוק שני של ניוטון וכוח חיכוך</h1>
+      </div>
+      <div style="text-align: left; opacity: 0.85; font-size: 0.85rem;">
+        <div>מכניקה קלאסית</div>
+        <div>שאלת ניסוי וגרפים</div>
+      </div>
+    </header>
+
+    <!-- QUESTION DEFINITION CARD -->
+    <div class="card">
+      <div class="card-title">ניסוח השאלה המלא (סטנדרט בגרות)</div>
+      <div class="question-full-box">
+        תלמידת פיזיקה ערכה ניסוי ובו תיבה שמסתה $m$ מונחת על משטח אופקי מחוספס. התיבה קשורה בחוט אידיאלי העובר דרך גלגלת אידיאלית. מסת החוט ומסת הגלגלת ניתנות להזנחה, וכך גם כל חיכוך בציר הגלגלת. מקדם החיכוך (הסטטי והקינטי) בין התיבה למשטח הוא $\mu$.
+        במהלך הניסוי משכה התלמידה את קצהו החופשי של החוט בכוח $F$ כלפי מטה, ומדדה את גודל תאוצת התיבה $a$ במהלך תנועתה. התלמידה חזרה על הניסוי מספר פעמים, ובכל פעם שינתה את גודל הכוח $F$ ומדדה את גודל התאוצה $a$.
+      </div>
+
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>$F\text{ [N]}$</th>
+              <td>3.5</td>
+              <td>4.0</td>
+              <td>4.5</td>
+              <td>5.0</td>
+              <td>5.5</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>$a\text{ [m/s}^2\text{]}$</th>
+              <td>1.9</td>
+              <td>2.7</td>
+              <td>3.4</td>
+              <td>4.2</td>
+              <td>5.0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="font-size: 0.92rem; color: #475569; margin-top: 8px;">
+        <strong>דרישות השאלה:</strong>
+        סרטוט תרשים כוחות מלא; פיתוח תיאורטי של $a(F)$; בניית דיאגרמת פיזור והוספת קו מגמה לינארי; חישוב המסה $m$ ומקדם החיכוך $\mu$; ניתוח התנהגות המערכת כאשר מופעל כוח $F = 1.5\text{ N}$.
+      </div>
+    </div>
+
+    <!-- INTERACTIVE LAB CANVAS -->
+    <div class="card">
+      <div class="card-title">סביבת עבודה אינטראקטיבית (דיאגרמת פיזור, יישור קווים ולייזר)</div>
+      <div class="interactive-stage">
+        <div class="canvas-toolbar">
+          <button id="btnLaser" class="tool-btn active" onclick="setTool('laser')">🔴 מצביע לייזר (שובל 2 שניות)</button>
+          <button id="btnDraw" class="tool-btn" onclick="setTool('draw')">✏️ ציור חופשי</button>
+          <button id="btnSnap" class="tool-btn" onclick="toggleSnap()">📏 יישור קו אוטומטי (Snap): <span id="snapStatus">כבוי</span></button>
+          <button class="tool-btn" onclick="clearDrawings()">🗑️ נקה ציורים</button>
+          <span style="font-size: 0.8rem; color: var(--text-muted); margin-right: auto;">הגרף מציג חיצים, יחידות מדידה וערכים מלאים ללא הסתרות</span>
+        </div>
+        <div class="canvas-viewport-wrap">
+          <!-- Background Chart Canvas -->
+          <canvas id="baseGraphCanvas" class="layer-canvas"></canvas>
+          <!-- User Drawing Canvas -->
+          <canvas id="userDrawCanvas" class="layer-canvas"></canvas>
+          <!-- Laser Trail Canvas -->
+          <canvas id="laserCanvas" class="layer-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP-BY-STEP DETAILED SOLUTION -->
+    <div class="card">
+      <div class="card-title">מהלך הפתרון המלא לפי סעיפים</div>
+      
+      <div class="tabs-wrapper">
+        <button class="tab-btn active" onclick="switchTab('tab-a')">סעיף א': תרשים כוחות</button>
+        <button class="tab-btn" onclick="switchTab('tab-b')">סעיף ב': פיתוח $a$ כפונקציה של $F$</button>
+        <button class="tab-btn" onclick="switchTab('tab-c')">סעיף ג': גרף וקו מגמה</button>
+        <button class="tab-btn" onclick="switchTab('tab-d')">סעיף ד': חישוב $m$ ו-$\mu$</button>
+        <button class="tab-btn" onclick="switchTab('tab-e')">סעיף ה': כוח $F = 1.5\text{ N}$</button>
+      </div>
+
+      <!-- TAB A -->
+      <div id="tab-a" class="solution-content active">
+        <h3 style="color: var(--primary-dark); margin-bottom: 10px;">סעיף א': תרשים הכוחות הפועלים על התיבה</h3>
+        <p>על התיבה בעת תנועתה ימינה פועלים 4 כוחות:</p>
+        <ul style="margin: 10px 24px; font-size: 0.95rem;">
+          <li><strong>$T$ (מתיחות החוט):</strong> פועל אופקית <strong>ימינה</strong>. מופעל על ידי החוט המקשר (מכיוון שהחוט וגלגלת חסרי מסה וחיכוך, $T = F$).</li>
+          <li><strong>$f_k$ (כוח חיכוך קינטי):</strong> פועל אופקית <strong>שמאלה</strong>, בניגוד לכיוון התנועה. מופעל על ידי המשטח האופקי המחוספס.</li>
+          <li><strong>$W = mg$ (כוח הכובד):</strong> פועל אנכית <strong>כלפי מטה</strong>. מופעל על ידי כדור הארץ.</li>
+          <li><strong>$N$ (כוח נורמלי):</strong> פועל אנכית <strong>כלפי מעלה</strong> במאונך למשטח. מופעל על ידי המשטח האופקי.</li>
+        </ul>
+        <div class="final-ans-box">
+          <span class="final-ans-badge">✓</span>
+          <span>בציר האנכי מתקיים שיווי משקל ($N = mg$). בציר האופקי שקול הכוחות מקנה תאוצה ימינה: $\Sigma F_x = T - f_k = ma$.</span>
+        </div>
+      </div>
+
+      <!-- TAB B -->
+      <div id="tab-b" class="solution-content">
+        <h3 style="color: var(--primary-dark); margin-bottom: 10px;">סעיף ב': פיתוח ביטוי תיאורטי לתאוצה $a(F)$</h3>
+        <p>1. מכיוון שהחוט והגלגלת חסרי מסה: המתיחות בחוט שווה לגודל כוח המשיכה החיצוני, כלומר $T = F$.</p>
+        <p>2. בציר האנכי ($y$) אין תנועה, ולכן לפי החוק הראשון של ניוטון:</p>
+        <div class="math-card">$$\Sigma F_y = 0 \implies N - mg = 0 \implies N = mg$$</div>
+        <p>3. כוח החיכוך הקינטי שווה למכפלת מקדם החיכוך בכוח הנורמלי:</p>
+        <div class="math-card">$$f_k = \mu N = \mu mg$$</div>
+        <p>4. נרשום את משוואת החוק השני של ניוטון עבור ציר התנועה האופקי ($x$ ימינה):</p>
+        <div class="math-card">$$\Sigma F_x = ma \implies F - f_k = ma \implies F - \mu mg = ma$$</div>
+        <p>5. נבודד את התאוצה $a$ כפונקציה מפורשת של הכוח $F$:</p>
+        <div class="math-card">$$a = \frac{1}{m} F - \mu g$$</div>
+        <div class="final-ans-box">
+          <span class="final-ans-badge">✓</span>
+          <span>הביטוי המבוקש הוא פונקציה לינארית מהצורה $y = Bx + A$ כאשר השיפוע הוא $B = \frac{1}{m}$ ונקודת החיתוך עם ציר התאוצה היא $A = -\mu g$.</span>
+        </div>
+      </div>
+
+      <!-- TAB C -->
+      <div id="tab-c" class="solution-content">
+        <h3 style="color: var(--primary-dark); margin-bottom: 10px;">סעיף ג': דיאגרמת פיזור וקו מגמה</h3>
+        <p>הנקודות מהניסוי משורטטות במדויק בלוח הגרפי שלמעלה. נבחר שתי נקודות נוחות על גבי קו המגמה הלינארי המייצג ביותר כדי לקבוע את משוואתו:</p>
+        <ul style="margin: 10px 24px; font-size: 0.95rem;">
+          <li>נקודה ראשונה על הישר: $(F_1, a_1) = (3.5\text{ N}, 1.90\text{ m/s}^2)$</li>
+          <li>נקודה שנייה על הישר: $(F_2, a_2) = (5.5\text{ N}, 5.00\text{ m/s}^2)$</li>
+        </ul>
+        <div class="math-card">$$\text{Slope } B = \frac{\Delta a}{\Delta F} = \frac{5.00 - 1.90}{5.50 - 3.50} = \frac{3.10}{2.00} = 1.55\text{ kg}^{-1}$$</div>
+        <p>משוואת קו המגמה המתקבלת היא:</p>
+        <div class="math-card">$$a = 1.55 \cdot F - 3.525$$</div>
+        <div class="final-ans-box">
+          <span class="final-ans-badge">✓</span>
+          <span>קו המגמה עובר היטב דרך פיזור כל נקודות המדידה וחותך את ציר ה-$F$ בערך של כ-$2.27\text{ N}$.</span>
+        </div>
+      </div>
+
+      <!-- TAB D -->
+      <div id="tab-d" class="solution-content">
+        <h3 style="color: var(--primary-dark); margin-bottom: 10px;">סעיף ד': חישוב מסת התיבה $m$ ומקדם החיכוך $\mu$</h3>
+        <p><strong>ד(1) חישוב מסת התיבה $m$:</strong></p>
+        <p>מהשוואת הביטוי התיאורטי $a = \left(\frac{1}{m}\right)F - \mu g$ למשוואת קו המגמה, שיפוע הגרף שווה ל-$\frac{1}{m}$:</p>
+        <div class="math-card">$$\text{Slope} = \frac{1}{m} \implies m = \frac{1}{\text{Slope}} = \frac{1}{1.55} \approx 0.645\text{ kg}$$</div>
+        
+        <p><strong>ד(2) חישוב מקדם החיכוך $\mu$:</strong></p>
+        <p>האיבר החופשי (חיתוך עם ציר $a$) מייצג את $-\mu g$. נציב $g = 9.8\text{ m/s}^2$ (או $g = 10\text{ m/s}^2$ לפי התקן):</p>
+        <div class="math-card">$$\text{Intercept } |A| = \mu g \implies 3.525 = \mu \cdot 9.8 \implies \mu = \frac{3.525}{9.8} \approx 0.360$$</div>
+        <p style="font-size:0.9rem; color: var(--text-muted); text-align: center;">(בחישוב עם $g = 10\text{ m/s}^2$ מתקבל: $\mu = \frac{3.525}{10} \approx 0.353$)</p>
+
+        <div class="final-ans-box">
+          <span class="final-ans-badge">✓</span>
+          <span>מסת התיבה: $m = 0.65\text{ kg}$. מקדם החיכוך: $\mu = 0.36$ (חסר יחידות).</span>
+        </div>
+      </div>
+
+      <!-- TAB E -->
+      <div id="tab-e" class="solution-content">
+        <h3 style="color: var(--primary-dark); margin-bottom: 10px;">סעיף ה': ניתוח המקרה $F = 1.5\text{ N}$</h3>
+        <p>נחשב את כוח החיכוך הסטטי המקסימלי האפשרי הפועל בין התיבה למשטח:</p>
+        <div class="math-card">$$f_{s,\max} = \mu N = \mu mg = 0.36 \cdot 0.645 \cdot 9.8 \approx 2.28\text{ N}$$</div>
+        <p>
+          הכוח המופעל על החוט הוא $F = 1.50\text{ N}$, ולכן המתיחות היא $T = 1.50\text{ N}$.
+          ניתן לראות בבירור כי:
+        </p>
+        <div class="math-card">$$F < f_{s,\max} \quad (1.50\text{ N} < 2.28\text{ N})$$</div>
+        <p>
+          מכיוון שהכוח המושך קטן מכוח החיכוך הסטטי המקסימלי הדרוש להתחלת תנועה, התיבה לא תנוע ותישאר במנוחה.
+          במצב זה פועל חיכוך סטטי בלבד שגודלו שווה בדיוק לכוח המופעל: $f_s = F = 1.50\text{ N}$, ושקול הכוחות הוא אפס.
+        </p>
+        <div class="final-ans-box">
+          <span class="final-ans-badge">✓</span>
+          <span>תאוצת התיבה היא: $a = 0.00\text{ m/s}^2$.</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // VIEWPORT SWITCHER
+    function setMode(mode) {
+      const vp = document.getElementById('mainViewport');
+      const btns = document.querySelectorAll('.aspect-btn');
+      btns.forEach(b => b.classList.remove('active'));
+
+      if (mode === '19-6') {
+        vp.className = 'app-viewport mode-19-6';
+        btns[0].classList.add('active');
+      } else {
+        vp.className = 'app-viewport mode-6-19';
+        btns[1].classList.add('active');
+      }
+      setTimeout(resizeAllCanvases, 50);
+    }
+
+    // TABS LOGIC
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.solution-content').forEach(c => c.classList.remove('active'));
+      
+      const target = document.getElementById(tabId);
+      if (target) target.classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // INTERACTIVE MULTI-LAYER CANVAS
+    const baseCanvas = document.getElementById('baseGraphCanvas');
+    const drawCanvas = document.getElementById('userDrawCanvas');
+    const laserCanvas = document.getElementById('laserCanvas');
+
+    const baseCtx = baseCanvas.getContext('2d');
+    const drawCtx = drawCanvas.getContext('2d');
+    const laserCtx = laserCanvas.getContext('2d');
+
+    let currentTool = 'laser'; // 'laser' or 'draw'
+    let snapEnabled = false;
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+
+    // Laser trail storage: points with timestamps
+    let laserTrail = [];
+    const TRAIL_DURATION = 2000; // 2 seconds
+
+    function resizeAllCanvases() {
+      const rect = baseCanvas.parentElement.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      [baseCanvas, drawCanvas, laserCanvas].forEach(c => {
+        c.width = w;
+        c.height = h;
+      });
+
+      renderBaseGraph();
+    }
+
+    // RENDER BASE GRAPH: AXES, ARROWS, LABELS, POINTS, LINE
+    function renderBaseGraph() {
+      const w = baseCanvas.width;
+      const h = baseCanvas.height;
+      baseCtx.clearRect(0, 0, w, h);
+
+      // Coordinate transformation boundaries
+      const padLeft = 65;
+      const padBottom = 55;
+      const padRight = 35;
+      const padTop = 30;
+
+      const plotW = w - padLeft - padRight;
+      const plotH = h - padTop - padBottom;
+
+      const fMin = 2.0, fMax = 6.0;
+      const aMin = 0.0, aMax = 6.0;
+
+      function toX(f) { return padLeft + ((f - fMin) / (fMax - fMin)) * plotW; }
+      function toY(a) { return h - padBottom - ((a - aMin) / (aMax - aMin)) * plotH; }
+
+      // Background Grid
+      baseCtx.strokeStyle = '#f1f5f9';
+      baseCtx.lineWidth = 1;
+      for (let f = 2.0; f <= 6.0; f += 0.5) {
+        baseCtx.beginPath();
+        baseCtx.moveTo(toX(f), toY(aMin));
+        baseCtx.lineTo(toX(f), toY(aMax));
+        baseCtx.stroke();
+      }
+      for (let a = 0.0; a <= 6.0; a += 1.0) {
+        baseCtx.beginPath();
+        baseCtx.moveTo(toX(fMin), toY(a));
+        baseCtx.lineTo(toX(fMax), toY(a));
+        baseCtx.stroke();
+      }
+
+      // Main Axes
+      baseCtx.strokeStyle = '#334155';
+      baseCtx.lineWidth = 2;
+
+      // X Axis
+      baseCtx.beginPath();
+      baseCtx.moveTo(padLeft - 10, toY(0));
+      baseCtx.lineTo(w - 15, toY(0));
+      baseCtx.stroke();
+
+      // Arrow on X
+      baseCtx.fillStyle = '#334155';
+      baseCtx.beginPath();
+      baseCtx.moveTo(w - 10, toY(0));
+      baseCtx.lineTo(w - 20, toY(0) - 5);
+      baseCtx.lineTo(w - 20, toY(0) + 5);
+      baseCtx.fill();
+
+      // Y Axis
+      baseCtx.beginPath();
+      baseCtx.moveTo(toX(2.0), h - padBottom + 10);
+      baseCtx.lineTo(toX(2.0), padTop - 10);
+      baseCtx.stroke();
+
+      // Arrow on Y
+      baseCtx.beginPath();
+      baseCtx.moveTo(toX(2.0), padTop - 15);
+      baseCtx.lineTo(toX(2.0) - 5, padTop - 5);
+      baseCtx.lineTo(toX(2.0) + 5, padTop - 5);
+      baseCtx.fill();
+
+      // Axis Ticks and Labels (Clear and Unobstructed)
+      baseCtx.font = '12px Rubik, sans-serif';
+      baseCtx.fillStyle = '#475569';
+      baseCtx.textAlign = 'center';
+
+      // X Ticks
+      for (let f = 2.0; f <= 5.5; f += 0.5) {
+        const x = toX(f);
+        baseCtx.beginPath();
+        baseCtx.moveTo(x, toY(0));
+        baseCtx.lineTo(x, toY(0) + 5);
+        baseCtx.stroke();
+        baseCtx.fillText(f.toFixed(1), x, toY(0) + 20);
+      }
+
+      // Y Ticks
+      baseCtx.textAlign = 'right';
+      for (let a = 0.0; a <= 5.0; a += 1.0) {
+        const y = toY(a);
+        baseCtx.beginPath();
+        baseCtx.moveTo(toX(2.0), y);
+        baseCtx.lineTo(toX(2.0) - 5, y);
+        baseCtx.stroke();
+        baseCtx.fillText(a.toFixed(1), toX(2.0) - 10, y + 4);
+      }
+
+      // Axis Titles with Units
+      baseCtx.fillStyle = '#0f172a';
+      baseCtx.font = 'bold 13px Rubik, sans-serif';
+      baseCtx.textAlign = 'left';
+      baseCtx.fillText('F [N]  (כוח המשיכה)', w - 120, toY(0) + 38);
+
+      baseCtx.textAlign = 'center';
+      baseCtx.fillText('a [m/s²]  (תאוצת התיבה)', toX(2.0) + 50, padTop - 12);
+
+      // Best-Fit Trend Line
+      baseCtx.strokeStyle = '#2563eb';
+      baseCtx.lineWidth = 2.5;
+      baseCtx.beginPath();
+      // Line from F = 2.27 (a=0) to F = 5.8
+      const xStart = toX(2.274);
+      const yStart = toY(0);
+      const xEnd = toX(5.8);
+      const yEnd = toY(1.55 * 5.8 - 3.525);
+      baseCtx.moveTo(xStart, yStart);
+      baseCtx.lineTo(xEnd, yEnd);
+      baseCtx.stroke();
+
+      // Experimental Data Points
+      const dataPoints = [
+        { f: 3.5, a: 1.9 },
+        { f: 4.0, a: 2.7 },
+        { f: 4.5, a: 3.4 },
+        { f: 5.0, a: 4.2 },
+        { f: 5.5, a: 5.0 }
+      ];
+
+      dataPoints.forEach(pt => {
+        const cx = toX(pt.f);
+        const cy = toY(pt.a);
+
+        // Marker Point
+        baseCtx.fillStyle = '#ef4444';
+        baseCtx.beginPath();
+        baseCtx.arc(cx, cy, 5, 0, Math.PI * 2);
+        baseCtx.fill();
+        baseCtx.strokeStyle = '#991b1b';
+        baseCtx.lineWidth = 1.5;
+        baseCtx.stroke();
+
+        // Point Coordinate Label
+        baseCtx.fillStyle = '#1e293b';
+        baseCtx.font = '11px Rubik, sans-serif';
+        baseCtx.textAlign = 'left';
+        baseCtx.fillText(`(${pt.f.toFixed(1)}, ${pt.a.toFixed(1)})`, cx + 8, cy - 6);
+      });
+    }
+
+    // LASER POINTER SYSTEM (2-SECOND FADING TRAIL)
+    function addLaserPoint(x, y) {
+      laserTrail.push({ x, y, time: performance.now() });
+    }
+
+    function renderLaserLoop(timestamp) {
+      laserCtx.clearRect(0, 0, laserCanvas.width, laserCanvas.height);
+      const cutoff = timestamp - TRAIL_DURATION;
+
+      // Filter out points older than 2 seconds
+      laserTrail = laserTrail.filter(pt => pt.time > cutoff);
+
+      if (laserTrail.length > 1) {
+        for (let i = 1; i < laserTrail.length; i++) {
+          const ptPrev = laserTrail[i - 1];
+          const ptCurr = laserTrail[i];
+          const age = timestamp - ptCurr.time;
+          const life = Math.max(0, 1 - (age / TRAIL_DURATION));
+
+          laserCtx.beginPath();
+          laserCtx.moveTo(ptPrev.x, ptPrev.y);
+          laserCtx.lineTo(ptCurr.x, ptCurr.y);
+          laserCtx.strokeStyle = `rgba(239, 68, 68, ${life * 0.9})`;
+          laserCtx.lineWidth = 4 * life + 1;
+          laserCtx.lineCap = 'round';
+          laserCtx.stroke();
+        }
+
+        // Draw glowing head
+        const head = laserTrail[laserTrail.length - 1];
+        laserCtx.beginPath();
+        laserCtx.arc(head.x, head.y, 6, 0, Math.PI * 2);
+        laserCtx.fillStyle = '#ef4444';
+        laserCtx.shadowColor = '#ef4444';
+        laserCtx.shadowBlur = 10;
+        laserCtx.fill();
+        laserCtx.shadowBlur = 0;
+      }
+
+      requestAnimationFrame(renderLaserLoop);
+    }
+    requestAnimationFrame(renderLaserLoop);
+
+    // DRAWING & SNAPPING LOGIC
+    function setTool(tool) {
+      currentTool = tool;
+      document.getElementById('btnLaser').classList.toggle('active', tool === 'laser');
+      document.getElementById('btnDraw').classList.toggle('active', tool === 'draw');
+    }
+
+    function toggleSnap() {
+      snapEnabled = !snapEnabled;
+      const statusSpan = document.getElementById('snapStatus');
+      statusSpan.textContent = snapEnabled ? 'פעיל' : 'כבוי';
+      document.getElementById('btnSnap').classList.toggle('active', snapEnabled);
+    }
+
+    function clearDrawings() {
+      drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+    }
+
+    // Pointer events
+    laserCanvas.addEventListener('pointerdown', (e) => {
+      const rect = laserCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (currentTool === 'laser') {
+        addLaserPoint(x, y);
+      } else if (currentTool === 'draw') {
+        isDrawing = true;
+        startX = x;
+        startY = y;
+        drawCtx.beginPath();
+        drawCtx.moveTo(x, y);
+      }
+    });
+
+    laserCanvas.addEventListener('pointermove', (e) => {
+      const rect = laserCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (currentTool === 'laser') {
+        addLaserPoint(x, y);
+      } else if (currentTool === 'draw' && isDrawing) {
+        if (!snapEnabled) {
+          drawCtx.strokeStyle = '#2563eb';
+          drawCtx.lineWidth = 2.5;
+          drawCtx.lineCap = 'round';
+          drawCtx.lineTo(x, y);
+          drawCtx.stroke();
+        }
+      }
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      if (isDrawing && currentTool === 'draw') {
+        const rect = laserCanvas.getBoundingClientRect();
+        const endX = e.clientX - rect.left;
+        const endY = e.clientY - rect.top;
+
+        if (snapEnabled) {
+          // Automatic Straight Line Snap
+          drawCtx.strokeStyle = '#2563eb';
+          drawCtx.lineWidth = 2.5;
+          drawCtx.lineCap = 'round';
+          drawCtx.beginPath();
+          drawCtx.moveTo(startX, startY);
+          drawCtx.lineTo(endX, endY);
+          drawCtx.stroke();
+        }
+      }
+      isDrawing = false;
+    });
+
+    // Window Resize Handling
+    window.addEventListener('resize', resizeAllCanvases);
+    window.addEventListener('load', resizeAllCanvases);
+  </script>
+</body>
+</html>
