@@ -3,75 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>איליה וינוקור | מורה לפיזיקה</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>איליה וינוקור | מורה לפיזיקה - מאגר חומרים</title>
+    <style>
+        :root {
+            --bg-color: #0f1115;
+            --card-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-secondary: #555555;
+            --accent-purple: #7928ca;
+            --accent-blue: #0070f3;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 50px;
+        }
+
+        /* Шапка профиля */
+        .header-profile {
+            text-align: center;
+            padding: 40px 20px 30px;
+            max-width: 700px;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255,255,255,0.2);
+            margin-bottom: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        }
+
+        .header-profile h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .header-profile p {
+            font-size: 1rem;
+            color: #a0aec0;
+        }
+
+        .divider {
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #0070f3, #7928ca, #f59e0b);
+            margin-bottom: 30px;
+        }
+
+        /* Сетка карточек */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1100px;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .card-btn {
+            display: inline-block;
+            text-align: center;
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: bold;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .card-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Цвета кнопок по категориям */
+        .btn-mechanics { background-color: var(--accent-blue); }
+        .btn-klali { background-color: var(--accent-purple); }
+        .btn-optic { background-color: var(--accent-green); }
+        .btn-electricity { background-color: var(--accent-orange); }
+        .btn-hativa { background-color: #06b6d4; }
+        .btn-lab { background-color: #4b5563; }
+
+        /* Адаптивность для телефонов */
+        @media (max-width: 600px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            .header-profile h1 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+<body>
 
-    <header class="bg-[#0b0c10] text-white py-8 px-4 text-center border-b-4 border-cyan-500 shadow-xl">
-        <div class="container mx-auto max-w-4xl flex flex-col items-center">
-            <img src="LOGO.png" alt="איליה וינוקור - מורה לפיזיקה" class="w-56 h-56 object-cover rounded-full mb-4 shadow-2xl">
-            <p class="text-slate-400 mt-2 text-base max-w-md font-light">מאגר חומרי לימוד, תרגילים אינטראקטיביים והכנה לבגרות בפיזיקה 5 יח"ל</p>
+    <div class="header-profile">
+        <img src="LOGO.png" alt="Илья Винокур" class="avatar">
+        <p>מאגר חומרי לימוד, תרגילים אינטראקטיביים והכנה לבגרות בפיזיקה 5 יח"ל</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="cards-container">
+        <!-- Механика -->
+        <div class="card">
+            <div class="card-icon">🚗</div>
+            <div>
+                <h2>מכניקה</h2>
+                <p>קינמטיקה, דינמיקה, חוקי ניוטון, עבודה ואנרגיה.</p>
+            </div>
+            <a href="01_mechanics/index.html" class="card-btn btn-mechanics">כנסו לפרק</a>
         </div>
-    </header>
 
-    <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-            <!-- דף נוסחאות וכללי -->
-            <div class="bg-purple-50 rounded-xl p-6 hover:bg-purple-100 transition shadow-sm">
-                <div class="text-2xl mb-2">📑</div>
-                <h3 class="text-xl font-bold text-purple-900 mb-2">כללי - דף נוסחאות</h3>
-                <p class="text-purple-700 text-sm mb-4">דפי נוסחאות, קבועים פיזיקליים, נספחים וחומרי עזר לבגרות.</p>
-                <a href="00_KLALI/klali.html" class="inline-block bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה לפרק</a>
+        <!-- Общее -->
+        <div class="card">
+            <div class="card-icon">📄</div>
+            <div>
+                <h2>כללי - דף נוסחאות</h2>
+                <p>דפי נוסחאות, קבועים פיזיקליים, נספחים וחומרי עזר לבגרות.</p>
             </div>
-            
-            <!-- מכניקה -->
-            <div class="bg-blue-50 rounded-xl p-6 hover:bg-blue-100 transition shadow-sm">
-                <div class="text-2xl mb-2">🚗</div>
-                <h3 class="text-xl font-bold text-blue-900 mb-2">מכניקה</h3>
-                <p class="text-blue-700 text-sm mb-4">קינמטיקה, דינמיקה, חוקי ניוטון, עבודה ואנרגיה.</p>
-                <a href="01_mechanics/mechanics.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה לפרק</a>
-            </div>
-
-            <!-- חשמל ומגנטיות -->
-            <div class="bg-amber-50 rounded-xl p-6 hover:bg-amber-100 transition shadow-sm">
-                <div class="text-2xl mb-2">⚡</div>
-                <h3 class="text-xl font-bold text-amber-900 mb-2">חשמל ומגנטיות</h3>
-                <p class="text-amber-700 text-sm mb-4">שדה חשמלי, מעגלי זרם, שדה מגנטי והשראה אלקטרומגנטית.</p>
-                <a href="02_electricity/electricity.html" class="inline-block bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה לפרק</a>
-            </div>
-
-            <!-- קרינה וחומר -->
-            <div class="bg-emerald-50 rounded-xl p-6 hover:bg-emerald-100 transition shadow-sm">
-                <div class="text-2xl mb-2">🔬</div>
-                <h3 class="text-xl font-bold text-emerald-900 mb-2">קרינה וחומר</h3>
-                <p class="text-emerald-700 text-sm mb-4">אופטיקה גיאומטרית, המודל החלקיקי ומבנה האטום.</p>
-                <a href="03_optic/optics_waves.html" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה לפרק</a>
-            </div>
-
-            <!-- מעבדות וסימולציות -->
-            <div class="bg-slate-50 rounded-xl p-6 hover:bg-slate-100 transition shadow-sm">
-                <div class="text-2xl mb-2">📊</div>
-                <h3 class="text-xl font-bold text-slate-900 mb-2">מעבדות וסימולציות</h3>
-                <p class="text-slate-700 text-sm mb-4">הדמיות אינטראקטיביות, סימולציות 3D והנחיות לכתיבת דוחות.</p>
-                <a href="04_lab/simulations.html" class="inline-block bg-slate-600 hover:bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה למעבדה</a>
-            </div>
-
-            <!-- חטיבה -->
-            <div class="bg-teal-50 rounded-xl p-6 hover:bg-teal-100 transition shadow-sm">
-                <div class="text-2xl mb-2">📚</div>
-                <h3 class="text-xl font-bold text-teal-900 mb-2">חטיבת ביניים</h3>
-                <p class="text-teal-700 text-sm mb-4">אנרגיה מכנית, תרמית, חשמלית ומבוא לפיזיקה.</p>
-                <a href="05_Hativa/hativa.html" class="inline-block bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">כניסה לפרק</a>
-            </div>
-
+            <a href="00_KLALI/index.html" class="card-btn btn-klali">כנסו לפרק</a>
         </div>
-    </main>
 
-    <footer class="bg-white text-gray-500 text-center py-4 text-xs border-t border-gray-200">
-        <p>© 2026 מרכז הפיזיקה 5 יח"ל | איליה וינוקור</p>
-    </footer>
+        <!-- Излучение и вещество -->
+        <div class="card">
+            <div class="card-icon">🔬</div>
+            <div>
+                <h2>קרינה וחומר</h2>
+                <p>אופטיקה גיאומטרית, המודל החלקיקי ומבנה האטום.</p>
+            </div>
+            <a href="03_optic/index.html" class="card-btn btn-optic">כנסו לפרק</a>
+        </div>
+
+        <!-- Электричество и магнетизм -->
+        <div class="card">
+            <div class="card-icon">⚡</div>
+            <div>
+                <h2>חשמל ומגנטיות</h2>
+                <p>שדה חשמלי, מעגלי זרם, שדה מגנטי והשרה אלקטרומגנטית.</p>
+            </div>
+            <a href="02_electricity/index.html" class="card-btn btn-electricity">כנסו לפרק</a>
+        </div>
+
+        <!-- Средняя школа -->
+        <div class="card">
+            <div class="card-icon">📚</div>
+            <div>
+                <h2>חטיבת ביניים</h2>
+                <p>אנרגיה מכנית, תרמית, חשמלית ומבוא לפיזיקה.</p>
+            </div>
+            <a href="05_Hativa/index.html" class="card-btn btn-hativa">כנסו לפרק</a>
+        </div>
+
+        <!-- Лаборатории -->
+        <div class="card">
+            <div class="card-icon">📊</div>
+            <div>
+                <h2>מעבדות וסימולציות</h2>
+                <p>הדמיות אינטראקטיביות, סימולציות 3D והנחיות לכתיבת דוחות.</p>
+            </div>
+            <a href="04_lab/index.html" class="card-btn btn-lab">כנסו למעבדה</a>
+        </div>
+    </div>
 
 </body>
 </html>
