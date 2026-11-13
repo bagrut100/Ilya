@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>בונה הפתרון — תנועה מעגלית אנכית ועבודת כוחות לא-משמרים (בגרות 5 יח"ל)</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --primary: #1d4ed8;
+      --primary-hover: #1e40af;
+      --primary-light: #eff6ff;
+      --accent: #0f766e;
+      --success: #15803d;
+      --success-bg: #f0fdf4;
+      --success-border: #86efac;
+      --error: #b91c1c;
+      --error-bg: #fef2f2;
+      --error-border: #fca5a5;
+      --warning: #b45309;
+      --warning-bg: #fffbeb;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --border: #cbd5e1;
+      --radius: 14px;
+      --shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .math {
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-style: italic;
+      direction: ltr;
+      display: inline-block;
+      unicode-bidi: isolate;
+      font-weight: 500;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+      color: #fff;
+      padding: 18px 16px;
+      box-shadow: 0 2px 10px rgba(30, 58, 138, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-inner {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .header-sub {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin: 2px 0 0;
+    }
+
+    .btn-reset {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+      transition: background 0.15s;
+    }
+
+    .btn-reset:hover, .btn-reset:active {
+      background: rgba(255, 255, 255, 0.28);
+    }
+
+    main {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 16px 14px 60px;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid #e2e8f0;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #bfdbfe;
+    }
+
+    .badge-done {
+      background: var(--success-bg);
+      color: var(--success);
+      border-color: var(--success-border);
+    }
+
+    h2 {
+      font-size: 1.08rem;
+      margin: 0;
+      color: #0f172a;
+    }
+
+    .problem-text {
+      font-size: 1rem;
+      color: #1e293b;
+      margin: 0 0 14px;
+    }
+
+    .formula-ref-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-right: 4px solid #1d4ed8;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 0.92rem;
+    }
+
+    .formula-ref-title {
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 6px;
+    }
+
+    .formula-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      direction: ltr;
+      justify-content: flex-end;
+    }
+
+    .formula-pill {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-size: 0.98rem;
+      color: #0f172a;
+    }
+
+    .diagram-box {
+      background: var(--surface-alt);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    .diagram-box svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* Progress Bar */
+    .progress-wrap {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .prog-step {
+      flex: 1;
+      height: 8px;
+      border-radius: 999px;
+      background: #cbd5e1;
+      transition: background 0.3s;
+    }
+
+    .prog-step.active {
+      background: var(--primary);
+    }
+
+    .prog-step.done {
+      background: #16a34a;
+    }
+
+    /* Options */
+    .option-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    @media (min-width: 560px) {
+      .option-grid.two-col {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .choice-btn {
+      width: 100%;
+      min-height: 50px;
+      padding: 12px 14px;
+      border-radius: 11px;
+      border: 2px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-size: 0.98rem;
+      font-weight: 500;
+      text-align: right;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      transition: all 0.15s;
+    }
+
+    .choice-btn:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .choice-btn.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      font-weight: 700;
+    }
+
+    .choice-btn.correct {
+      border-color: #16a34a;
+      background: var(--success-bg);
+      color: #14532d;
+    }
+
+    .choice-btn.wrong {
+      border-color: #dc2626;
+      background: var(--error-bg);
+      color: #7f1d1d;
+    }
+
+    .feedback {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.94rem;
+      display: none;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.error {
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+      color: #7f1d1d;
+    }
+
+    .feedback.success {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      color: #14532d;
+    }
+
+    .feedback.info {
+      background: var(--warning-bg);
+      border: 1px solid #fcd34d;
+      color: #78350f;
+    }
+
+    /* Sub-step tabs */
+    .sub-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+    }
+
+    .sub-tab {
+      flex: 1;
+      min-width: 95px;
+      min-height: 46px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .sub-tab.active {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .sub-tab.completed {
+      border-color: #16a34a;
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .sub-tab:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* 3-Step Pedagogical Stage Box */
+    .stage-box {
+      background: var(--surface-alt);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 14px;
+    }
+
+    .stage-box.locked {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .stage-title {
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--primary);
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Notebook Layout (Daf Mishbetzot - Given / To Find | 1-4 Steps) */
+    .notebook-sheet {
+      margin-top: 14px;
+      border: 2px solid #2563eb;
+      border-radius: 12px;
+      background-color: #ffffff;
+      background-image:
+        linear-gradient(to right, rgba(148, 163, 184, 0.22) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.22) 1px, transparent 1px);
+      background-size: 20px 20px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.1);
+      overflow: hidden;
+      animation: fadeSlideIn 0.35s ease-out;
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .notebook-banner {
+      background: #eff6ff;
+      border-bottom: 1.5px solid #93c5fd;
+      padding: 8px 14px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .notebook-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 620px) {
+      .notebook-grid {
+        grid-template-columns: 36% 64%;
+      }
+    }
+
+    /* Right column in RTL = נתון / צריך למצוא */
+    .nb-side-col {
+      border-bottom: 2px solid #2563eb;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 620px) {
+      .nb-side-col {
+        border-bottom: none;
+        border-left: 2.5px solid #2563eb;
+      }
+    }
+
+    .nb-given-box {
+      padding: 12px 14px;
+      border-bottom: 2px solid #2563eb;
+      flex: 1;
+    }
+
+    .nb-find-box {
+      padding: 12px 14px;
+    }
+
+    .nb-col-heading {
+      display: inline-block;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #1d4ed8;
+      border-bottom: 2px solid #1d4ed8;
+      padding-bottom: 2px;
+      margin-bottom: 8px;
+    }
+
+    .nb-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 0.96rem;
+      line-height: 1.7;
+    }
+
+    /* Left column in RTL = שלבי הפתרון 1-4 */
+    .nb-steps-col {
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nb-step-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nb-step-label {
+      font-weight: 700;
+      color: #1e40af;
+      font-size: 0.94rem;
+    }
+
+    .nb-step-content {
+      padding-right: 14px;
+      font-size: 1.02rem;
+      color: #0f172a;
+    }
+
+    .nb-final-ans {
+      display: inline-block;
+      background: #f0fdf4;
+      border: 1.5px solid #16a34a;
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-weight: 700;
+      color: #14532d;
+    }
+
+    /* Expression Builder */
+    .expr-display-wrap {
+      background: #fff;
+      border: 2px solid #94a3b8;
+      border-radius: 11px;
+      padding: 12px 14px;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      direction: ltr;
+    }
+
+    .expr-display {
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-size: 1.35rem;
+      color: #0f172a;
+      word-break: break-all;
+      flex: 1;
+      text-align: left;
+    }
+
+    .expr-placeholder {
+      color: #94a3b8;
+      font-family: sans-serif;
+      font-size: 0.92rem;
+      direction: rtl;
+      text-align: right;
+      width: 100%;
+    }
+
+    .token-pad {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      direction: ltr;
+      margin-bottom: 10px;
+    }
+
+    .tok-btn {
+      min-width: 48px;
+      min-height: 46px;
+      padding: 8px 13px;
+      border-radius: 10px;
+      border: 1.5px solid #cbd5e1;
+      background: #fff;
+      color: #0f172a;
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      transition: transform 0.08s, background 0.12s;
+    }
+
+    .tok-btn:active {
+      transform: scale(0.96);
+      background: #e2e8f0;
+    }
+
+    .tok-btn.op {
+      background: #eff6ff;
+      border-color: #93c5fd;
+      color: #1e40af;
+    }
+
+    .tok-btn.func {
+      background: #f0fdf4;
+      border-color: #86efac;
+      color: #166534;
+    }
+
+    .tok-btn.ctrl {
+      font-family: sans-serif;
+      font-size: 0.88rem;
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    /* Numerical Input Pad (Mobile First) */
+    .num-panel {
+      background: #fff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .sci-readout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px;
+      border-radius: 10px;
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-size: 1.45rem;
+      direction: ltr;
+      margin-bottom: 12px;
+      min-height: 54px;
+    }
+
+    .sci-part {
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+    }
+
+    .sci-part.active-target {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.18);
+    }
+
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      direction: ltr;
+      margin-bottom: 12px;
+    }
+
+    .key-btn {
+      min-height: 48px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0f172a;
+      cursor: pointer;
+    }
+
+    .key-btn:active {
+      background: #e2e8f0;
+    }
+
+    .key-btn.exp-toggle {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-color: #93c5fd;
+      font-size: 0.92rem;
+    }
+
+    .unit-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .unit-chip {
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1.5px solid #cbd5e1;
+      background: #fff;
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-size: 1.05rem;
+      cursor: pointer;
+      direction: ltr;
+    }
+
+    .unit-chip.selected {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .action-btn {
+      width: 100%;
+      min-height: 48px;
+      border: none;
+      border-radius: 11px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .action-btn:hover {
+      background: var(--primary-hover);
+    }
+
+    .action-btn.secondary {
+      background: #0f766e;
+    }
+
+    /* FBD Interactive Checkboxes */
+    .fbd-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 600px) {
+      .fbd-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .fbd-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    /* Summary Box */
+    .summary-textarea {
+      width: 100%;
+      min-height: 195px;
+      border-radius: 10px;
+      border: 1.5px solid #cbd5e1;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      background: #f8fafc;
+      color: #0f172a;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+
+    .summary-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .summary-actions button {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <h1 class="header-title">בונה הפתרון — פיזיקה 5 יח"ל (תשפ"ז)</h1>
+      <p class="header-sub">עבודת כוחות לא-משמרים ותנועה מעגלית אנכית (שאלה 8)</p>
+    </div>
+    <button class="btn-reset" onclick="initExercise()" title="הגרל נתונים חדשים">🔄 נתונים חדשים</button>
+  </div>
+</header>
+
+<main>
+  <!-- Progress Indicator -->
+  <div class="progress-wrap" aria-label="התקדמות בתרגיל">
+    <div class="prog-step active" id="prog-0"></div>
+    <div class="prog-step" id="prog-1"></div>
+    <div class="prog-step" id="prog-2"></div>
+    <div class="prog-step" id="prog-3"></div>
+    <div class="prog-step" id="prog-4"></div>
+  </div>
+
+  <!-- Problem Statement & Dynamic SVG Diagram -->
+  <section class="card">
+    <div class="card-header">
+      <h2>תיאור המערכת והנתונים</h2>
+      <span class="badge">תאוצת הכובד: <span class="math">g = 10 m/s²</span></span>
+    </div>
+    <p class="problem-text" id="problem-statement"></p>
+
+    <!-- Official Bagrut Formula Sheet Reference (Page 2-3, Summer 2027) -->
+    <div class="formula-ref-box">
+      <div class="formula-ref-title">נוסחאות רלוונטיות מתוך נספח הבגרות (עמ' 2–3):</div>
+      <div class="formula-pills">
+        <span class="formula-pill">W = F cos θ Δs</span>
+        <span class="formula-pill">W<sub>לא-משמרים</sub> = ΔE</span>
+        <span class="formula-pill">E<sub>k</sub> = ½mv²</span>
+        <span class="formula-pill">U<sub>G</sub> = mgh</span>
+        <span class="formula-pill">ΣF = ma</span>
+        <span class="formula-pill">a<sub>R</sub> = v²/r</span>
+        <span class="formula-pill">F⃗<sub>1,2</sub> = −F⃗<sub>2,1</sub></span>
+      </div>
+    </div>
+
+    <div class="diagram-box">
+      <svg id="main-diagram" viewBox="0 0 640 310" width="640" height="310" role="img" aria-label="תרשים מסילה חלקה ולולאה מעגלית">
+        <defs>
+          <marker id="arrow-blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#1d4ed8"/>
+          </marker>
+          <marker id="arrow-red" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#dc2626"/>
+          </marker>
+        </defs>
+        <!-- Ground line -->
+        <line x1="40" y1="265" x2="600" y2="265" stroke="#334155" stroke-width="2.5" />
+        <text x="530" y="255" font-size="16" fill="#334155" font-weight="bold">קרקע</text>
+
+        <!-- Curved ramp smoothly meeting ground at x=330, y=265 -->
+        <path d="M 110 65 Q 190 258 330 265" fill="none" stroke="#0f172a" stroke-width="2.5" />
+
+        <!-- Circular loop centered at (330, 195), radius R=70 -->
+        <circle cx="330" cy="195" r="70" fill="none" stroke="#0f172a" stroke-width="2.5" />
+
+        <!-- Radius line from center to A -->
+        <line x1="330" y1="195" x2="330" y2="265" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3" />
+        <circle cx="330" cy="195" r="3" fill="#475569" />
+
+        <!-- Block on ramp -->
+        <g transform="translate(110, 65) rotate(53)">
+          <rect x="-14" y="-16" width="28" height="16" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2" rx="2" />
+        </g>
+
+        <!-- Height bracket -->
+        <path d="M 98 65 C 86 65, 92 160, 82 165 C 92 170, 86 265, 98 265" fill="none" stroke="#475569" stroke-width="1.8" />
+
+        <!-- Points A and B -->
+        <circle cx="330" cy="265" r="4.5" fill="#dc2626" />
+        <text x="330" y="286" text-anchor="middle" font-family="Times New Roman, serif" font-style="italic" font-size="19" font-weight="bold" fill="#0f172a">A</text>
+
+        <circle cx="330" cy="125" r="4.5" fill="#dc2626" />
+        <text x="330" y="114" text-anchor="middle" font-family="Times New Roman, serif" font-style="italic" font-size="19" font-weight="bold" fill="#0f172a">B</text>
+
+        <!-- Dynamic SVG Labels -->
+        <text id="svg-mass-label" x="132" y="54" font-family="Times New Roman, serif" font-size="17" fill="#0f172a"></text>
+        <text id="svg-h-label" x="74" y="170" text-anchor="end" font-family="Times New Roman, serif" font-size="17" fill="#0f172a"></text>
+        <text id="svg-r-label" x="338" y="232" font-family="Times New Roman, serif" font-size="17" fill="#0f172a"></text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Step 0: Prerequisite Unit Conversion -->
+  <section class="card" id="unit-gate-card">
+    <div class="card-header">
+      <h2>שלב מקדים: המרת יחידות למערכת SI</h2>
+      <span class="badge" id="unit-badge">חובה להשלים</span>
+    </div>
+    <p style="margin-top:0;">לפני שניגש לבניית המשוואות מדף הנוסחאות, המר את הנתונים ליחידות תקניות (<span class="math">kg, m</span>):</p>
+    <div id="unit-questions-container"></div>
+    <button class="action-btn" id="btn-check-units" onclick="checkUnitGate()" style="margin-top:12px;">בדיקת המרת יחידות</button>
+    <div class="feedback" id="unit-feedback"></div>
+  </section>
+
+  <!-- Main Interactive Solution Builder (Locked until units solved) -->
+  <section class="card hidden" id="workspace-card">
+    <div class="card-header">
+      <h2>בונה הפתרון המודרך</h2>
+      <span class="badge" id="overall-status-badge">סעיף א׳ מתוך ד׳</span>
+    </div>
+
+    <!-- Navigation Tabs for Sub-questions א, ב, ג, ד -->
+    <div class="sub-tabs" role="tablist">
+      <button class="sub-tab active" id="tab-0" onclick="switchPart(0)">סעיף א׳ (מהירויות)</button>
+      <button class="sub-tab" id="tab-1" onclick="switchPart(1)" disabled>סעיף ב׳ (תרשים כוחות)</button>
+      <button class="sub-tab" id="tab-2" onclick="switchPart(2)" disabled>סעיף ג׳ (נקודה A)</button>
+      <button class="sub-tab" id="tab-3" onclick="switchPart(3)" disabled>סעיף ד׳ (נקודה B)</button>
+    </div>
+
+    <!-- PART A: Work of Non-Conservative Forces & Speed at A and B -->
+    <div id="part-0" class="part-pane">
+      <p><strong>סעיף א׳:</strong> מצא את מהירות הגוף בנקודות <span class="math">A</span> ו-<span class="math">B</span> תוך שימוש בנוסחאות דף הבגרות לעבודה של כוחות לא-משמרים.</p>
+
+      <!-- Sub-part A0: Justification via Non-Conservative Work (Official Formula Sheet) -->
+      <div class="stage-box" id="a0-box">
+        <div class="stage-title">שלב מקדים לסעיף א׳: חישוב עבודת הכוחות הלא-משמרים (<span class="math">W<sub>לא-משמרים</sub> = ΔE</span>)</div>
+        <p style="margin:4px 0 8px;font-weight:600;">בחר את הנימוק המדויק המבוסס על נוסחאות דף הבגרות (<span class="math">W = F cos θ Δs</span> ו-<span class="math">W<sub>לא-משמרים</sub> = ΔE</span>):</p>
+        <div class="option-grid" id="a0-formulas"></div>
+        <div class="feedback" id="a0-f-fb"></div>
+      </div>
+
+      <!-- Sub-part A1: Velocity at A -->
+      <div class="stage-box locked" id="a1-box">
+        <div class="stage-title">חלק 1 מתוך 2: מציאת המהירות <span class="math">v_A</span> בתחתית המסלול (נקודה <span class="math">A</span>)</div>
+
+        <!-- Step 1: Formula -->
+        <div id="a1-step1">
+          <p style="margin:4px 0 8px;font-weight:600;">1. הצב בנוסחת דף הבגרות <span class="math">W<sub>לא-משמרים</sub> = ΔE</span> (כאשר <span class="math">E = E<sub>k</sub> + U<sub>G</sub> = ½mv² + mgh</span>):</p>
+          <div class="option-grid" id="a1-formulas"></div>
+          <div class="feedback" id="a1-f-fb"></div>
+        </div>
+
+        <!-- Step 2: Expression Builder -->
+        <div id="a1-step2" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #cbd5e1;">
+          <p style="margin:4px 0 8px;font-weight:600;">2. בנה את הביטוי האלגברי למהירות <span class="math">v_A</span> (כאשר <span class="math">h_A = 0</span>):</p>
+          <div id="a1-builder"></div>
+          <div class="feedback" id="a1-e-fb"></div>
+        </div>
+
+        <!-- Step 3: Numerical Value -->
+        <div id="a1-step3" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #cbd5e1;">
+          <p style="margin:4px 0 8px;font-weight:600;">3. הצב נתונים וחשב את הערך המספרי של <span class="math">v_A</span> (סטייה מותרת 2%):</p>
+          <div id="a1-num"></div>
+          <div class="feedback" id="a1-n-fb"></div>
+        </div>
+
+        <!-- Formal Notebook Solution Card for A1 -->
+        <div id="a1-notebook" class="hidden"></div>
+      </div>
+
+      <!-- Sub-part A2: Velocity at B -->
+      <div class="stage-box locked" id="a2-box">
+        <div class="stage-title">חלק 2 מתוך 2: מציאת המהירות <span class="math">v_B</span> בשיא המסלול (נקודה <span class="math">B</span>, גובה <span class="math">2R</span>)</div>
+
+        <div id="a2-step1">
+          <p style="margin:4px 0 8px;font-weight:600;">1. הצב בנוסחה <span class="math">W<sub>לא-משמרים</sub> = ΔE</span> בין נקודת ההתחלה לנקודה <span class="math">B</span> (שבה <span class="math">W<sub>לא-משמרים</sub> = 0</span>):</p>
+          <div class="option-grid" id="a2-formulas"></div>
+          <div class="feedback" id="a2-f-fb"></div>
+        </div>
+
+        <div id="a2-step2" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #cbd5e1;">
+          <p style="margin:4px 0 8px;font-weight:600;">2. בנה את הביטוי האלגברי למהירות <span class="math">v_B</span>:</p>
+          <div id="a2-builder"></div>
+          <div class="feedback" id="a2-e-fb"></div>
+        </div>
+
+        <div id="a2-step3" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #cbd5e1;">
+          <p style="margin:4px 0 8px;font-weight:600;">3. הצב נתונים וחשב את הערך המספרי של <span class="math">v_B</span>:</p>
+          <div id="a2-num"></div>
+          <div class="feedback" id="a2-n-fb"></div>
+        </div>
+
+        <!-- Formal Notebook Solution Card for A2 -->
+        <div id="a2-notebook" class="hidden"></div>
+      </div>
+    </div>
+
+    <!-- PART B: Free Body Diagrams at A and B -->
+    <div id="part-1" class="part-pane hidden">
+      <p><strong>סעיף ב׳:</strong> ערוך תרשים כוחות על הגוף כאשר הוא נמצא בנקודה <span class="math">A</span> ובנקודה <span class="math">B</span> (המסילה חלקה, ולכן אין חיכוך).</p>
+      <div class="fbd-grid">
+        <!-- FBD at A -->
+        <div class="fbd-card">
+          <h3 style="margin:0 0 8px;font-size:1rem;">תרשים כוחות בנקודה <span class="math">A</span> (תחתית המעגל)</h3>
+          <div class="diagram-box" style="margin-bottom:10px;">
+            <svg viewBox="0 0 220 190" width="220" height="190">
+              <path d="M 30 105 Q 110 135 190 105" fill="none" stroke="#334155" stroke-width="2.5"/>
+              <rect x="94" y="96" width="32" height="20" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2" rx="3"/>
+              <circle cx="110" cy="106" r="3" fill="#0f172a"/>
+              <!-- Vector N_A upwards -->
+              <g id="fbd-A-N" class="hidden">
+                <line x1="110" y1="106" x2="110" y2="30" stroke="#1d4ed8" stroke-width="3" marker-end="url(#arrow-blue)"/>
+                <text x="120" y="42" font-family="Times New Roman, serif" font-style="italic" font-size="16" font-weight="bold" fill="#1d4ed8">N<tspan dy="4" font-size="12">A</tspan></text>
+              </g>
+              <!-- Vector mg downwards -->
+              <g id="fbd-A-mg" class="hidden">
+                <line x1="110" y1="106" x2="110" y2="176" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+                <text x="120" y="172" font-family="Times New Roman, serif" font-style="italic" font-size="16" font-weight="bold" fill="#dc2626">mg</text>
+              </g>
+              <!-- Distractor centrifugal -->
+              <g id="fbd-A-cent" class="hidden">
+                <line x1="98" y1="106" x2="98" y2="172" stroke="#b45309" stroke-width="2.5" stroke-dasharray="4,2"/>
+                <text x="48" y="168" font-family="Times New Roman, serif" font-style="italic" font-size="14" fill="#b45309">mv²/r</text>
+              </g>
+            </svg>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;min-height:42px;cursor:pointer;">
+            <input type="checkbox" id="chk-A-N" onchange="updateFbdPreview()" style="width:20px;height:20px;">
+            <span>כוח נורמלי <span class="math">N_A</span> כלפי מעלה (מהמסילה אל הגוף)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;min-height:42px;cursor:pointer;">
+            <input type="checkbox" id="chk-A-mg" onchange="updateFbdPreview()" style="width:20px;height:20px;">
+            <span>כוח הכובד <span class="math">mg</span> כלפי מטה (לפי <span class="math">F = mg</span>)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;min-height:42px;cursor:pointer;">
+            <input type="checkbox" id="chk-A-cent" onchange="updateFbdPreview()" style="width:20px;height:20px;">
+            <span>"כוח צנטריפוגלי" <span class="math">mv²/r</span> כלפי מטה</span>
+          </label>
+        </div>
+
+        <!-- FBD at B -->
+        <div class="fbd-card">
+          <h3 style="margin:0 0 8px;font-size:1rem;">תרשים כוחות בנקודה <span class="math">B</span> (שיא המעגל)</h3>
+          <div class="diagram-box" style="margin-bottom:10px;">
+            <svg viewBox="0 0 220 190" width="220" height="190">
+              <path d="M 30 55 Q 110 25 190 55" fill="none" stroke="#334155" stroke-width="2.5"/>
+              <rect x="94" y="44" width="32" height="20" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2" rx="3"/>
+              <circle cx="110" cy="54" r="3" fill="#0f172a"/>
+              <!-- Vector N_B downwards -->
+              <g id="fbd-B-Ndown" class="hidden">
+                <line x1="103" y1="54" x2="103" y2="128" stroke="#1d4ed8" stroke-width="3" marker-end="url(#arrow-blue)"/>
+                <text x="72" y="124" font-family="Times New Roman, serif" font-style="italic" font-size="16" font-weight="bold" fill="#1d4ed8">N<tspan dy="4" font-size="12">B</tspan></text>
+              </g>
+              <!-- Vector mg downwards -->
+              <g id="fbd-B-mg" class="hidden">
+                <line x1="117" y1="54" x2="117" y2="148" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+                <text x="126" y="144" font-family="Times New Roman, serif" font-style="italic" font-size="16" font-weight="bold" fill="#dc2626">mg</text>
+              </g>
+              <!-- Distractor N_B upwards -->
+              <g id="fbd-B-Nup" class="hidden">
+                <line x1="110" y1="54" x2="110" y2="10" stroke="#b45309" stroke-width="2.5" marker-end="url(#arrow-red)"/>
+                <text x="120" y="22" font-family="Times New Roman, serif" font-style="italic" font-size="15" fill="#b45309">N<tspan dy="4" font-size="11">B</tspan></text>
+              </g>
+            </svg>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;min-height:42px;cursor:pointer;">
+            <input type="checkbox" id="chk-B-Ndown" onchange="updateFbdPreview()" style="width:20px;height:20px;">
+            <span>כוח נורמלי <span class="math">N_B</span> כלפי מטה (לכיוון מרכז המעגל)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;min-height:42px;cursor:pointer;">
+            <input type="checkbox" id="chk-B-mg" onchange="updateFbdPreview()" style="width:20px;height:20px;">
+            <span>כוח הכובד <span class="math">mg</span> כלפי מטה</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;min-height:42px;cursor:pointer;">
+            <input type="checkbox" id="chk-B-Nup" onchange="updateFbdPreview()" style="width:20px;height:20px;">
+            <span>כוח נורמלי <span class="math">N_B</span> כלפי מעלה</span>
+          </label>
+        </div>
+      </div>
+      <button class="action-btn" onclick="checkPartB()" style="margin-top:14px;">בדיקת תרשימי הכוחות</button>
+      <div class="feedback" id="partB-fb"></div>
+
+      <!-- Formal Notebook Solution Card for Part B -->
+      <div id="partB-notebook" class="hidden"></div>
+    </div>
+
+    <!-- PART C: Radial Equation and Force at A (3-Step Pedagogical Flow) -->
+    <div id="part-2" class="part-pane hidden">
+      <p><strong>סעיף ג׳:</strong> רשום את משוואת הכוחות בציר הרדיאלי כשהגוף בנקודה <span class="math">A</span>, ומצא את הכוח בו לוחץ הגוף על המסילה שם (על פי החוק השלישי של ניוטון מדף הנוסחאות: <span class="math">F⃗<sub>1,2</sub> = −F⃗<sub>2,1</sub></span>, ולכן גודל כוח הלחיצה שווה לגודל <span class="math">N_A</span>).</p>
+      <div class="stage-box">
+        <div id="c-step1">
+          <p style="margin:4px 0 8px;font-weight:600;">1. בחר את משוואת הכוחות בציר הרדיאלי המתקבלת מהחוק השני של ניוטון (<span class="math">ΣF = ma</span>) ותאוצה רדיאלית (<span class="math">a<sub>R</sub> = v²/r</span>):</p>
+          <div class="option-grid" id="c-formulas"></div>
+          <div class="feedback" id="c-f-fb"></div>
+        </div>
+
+        <div id="c-step2" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #cbd5e1;">
+          <p style="margin:4px 0 8px;font-weight:600;">2. בודד ובנה את הביטוי האלגברי לכוח הנורמלי <span class="math">N_A</span> (באמצעות <span class="math">m, g, v_A, R</span>):</p>
+          <div id="c-builder"></div>
+          <div class="feedback" id="c-e-fb"></div>
+        </div>
+
+        <div id="c-step3" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #cbd5e1;">
+          <p style="margin:4px 0 8px;font-weight:600;">3. הצב נתונים וחשב את הכוח שבו הגוף לוחץ על המסילה בנקודה <span class="math">A</span>:</p>
+          <div id="c-num"></div>
+          <div class="feedback" id="c-n-fb"></div>
+        </div>
+
+        <!-- Formal Notebook Solution Card for Part C -->
+        <div id="c-notebook" class="hidden"></div>
+      </div>
+    </div>
+
+    <!-- PART D: Radial Equation and Force at B (3-Step Pedagogical Flow) -->
+    <div id="part-3" class="part-pane hidden">
+      <p><strong>סעיף ד׳:</strong> רשום את משוואת הכוחות בציר הרדיאלי כשהגוף בנקודה <span class="math">B</span>, ומצא את הכוח בו לוחץ הגוף על המסילה שם (<span class="math">N_B</span>, לפי <span class="math">F⃗<sub>1,2</sub> = −F⃗<sub>2,1</sub></span>).</p>
+      <div class="stage-box">
+        <div id="d-step1">
+          <p style="margin:4px 0 8px;font-weight:600;">1. בחר את משוואת הכוחות בציר הרדיאלי בנקודה <span class="math">B</span> על פי <span class="math">ΣF = ma<sub>R</sub></span> ו-<span class="math">a<sub>R</sub> = v²/r</span>:</p>
+          <div class="option-grid" id="d-formulas"></div>
+          <div class="feedback" id="d-f-fb"></div>
+        </div>
+
+        <div id="d-step2" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #cbd5e1;">
+          <p style="margin:4px 0 8px;font-weight:600;">2. בודד ובנה את הביטוי האלגברי לכוח הנורמלי <span class="math">N_B</span> (באמצעות <span class="math">m, g, v_B, R</span>):</p>
+          <div id="d-builder"></div>
+          <div class="feedback" id="d-e-fb"></div>
+        </div>
+
+        <div id="d-step3" class="hidden" style="margin-top:14px;padding-top:12px;border-top:1px dashed #cbd5e1;">
+          <p style="margin:4px 0 8px;font-weight:600;">3. הצב נתונים וחשב את הכוח שבו הגוף לוחץ על המסילה בנקודה <span class="math">B</span>:</p>
+          <div id="d-num"></div>
+          <div class="feedback" id="d-n-fb"></div>
+        </div>
+
+        <!-- Formal Notebook Solution Card for Part D -->
+        <div id="d-notebook" class="hidden"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary & Export Card -->
+  <section class="card hidden" id="summary-card">
+    <div class="card-header">
+      <h2>סיכום ביצועי התלמיד והגשה</h2>
+      <span class="badge badge-done">הושלם בהצלחה!</span>
+    </div>
+    <p style="margin-top:0;">להלן סיכום התהליך, התשובות הסופיות ומספר השגיאות בכל שלב:</p>
+    <textarea class="summary-textarea" id="summary-text" readonly></textarea>
+    <div class="summary-actions">
+      <button class="action-btn" onclick="copySummary()">📋 העתק סיכום ללוח</button>
+      <button class="action-btn secondary" onclick="sendToSheet()">📤 שלח דיווח לגיליון (Google Sheets)</button>
+    </div>
+    <div class="feedback" id="summary-fb"></div>
+  </section>
+</main>
+
+<script>
+  const GOOGLE_SCRIPT_URL = "";
+
+  // Global State
+  let params = {};
+  let stats = {
+    units: 0,
+    a0_formula: 0,
+    a1_formula: 0, a1_expr: 0, a1_num: 0,
+    a2_formula: 0, a2_expr: 0, a2_num: 0,
+    partB: 0,
+    c_formula: 0, c_expr: 0, c_num: 0,
+    d_formula: 0, d_expr: 0, d_num: 0
+  };
+  let progress = {
+    unitsDone: false,
+    a0Done: false,
+    a1Done: false,
+    a2Done: false,
+    partBDone: false,
+    partCDone: false,
+    partDDone: false
+  };
+
+  const builderState = {};
+  const numPadState = {};
+
+  function randChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // ==================== NOTEBOOK SOLUTION RENDERER ====================
+  // Renders the exact Israeli Bagrut physics notebook layout:
+  // Right column (RTL): נתון (top) / צריך למצוא (bottom)
+  // Left column (RTL): 1. נוסחה מקורית | 2. פיתוח ביטוי | 3. הצבה | 4. תשובה סופית כולל יחידות
+  function renderNotebookSolution(containerId, cfg) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = `
+      <div class="notebook-sheet">
+        <div class="notebook-banner">
+          <span>📝 דגם כתיבה מלא למחברת / בחינת הבגרות — ${cfg.title}</span>
+          <span>מבנה תקני (4 שלבים)</span>
+        </div>
+        <div class="notebook-grid">
+          <div class="nb-side-col">
+            <div class="nb-given-box">
+              <div class="nb-col-heading">נתון:</div>
+              <ul class="nb-list">
+                ${cfg.given.map(item => `<li>${item}</li>`).join("")}
+              </ul>
+            </div>
+            <div class="nb-find-box">
+              <div class="nb-col-heading">צריך למצוא:</div>
+              <div style="font-size:0.98rem;font-weight:600;">${cfg.find}</div>
+            </div>
+          </div>
+          <div class="nb-steps-col">
+            <div class="nb-step-row">
+              <span class="nb-step-label">1. נוסחה מקורית (מדף הנוסחאות):</span>
+              <div class="nb-step-content">${cfg.step1}</div>
+            </div>
+            <div class="nb-step-row">
+              <span class="nb-step-label">2. פיתוח ביטוי:</span>
+              <div class="nb-step-content">${cfg.step2}</div>
+            </div>
+            <div class="nb-step-row">
+              <span class="nb-step-label">3. הצבה:</span>
+              <div class="nb-step-content">${cfg.step3}</div>
+            </div>
+            <div class="nb-step-row">
+              <span class="nb-step-label">4. תשובה סופית כולל יחידות:</span>
+              <div class="nb-step-content"><span class="nb-final-ans">${cfg.step4}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    el.classList.remove("hidden");
+  }
+
+  function initExercise() {
+    for (let k in stats) stats[k] = 0;
+    for (let k in progress) progress[k] = false;
+
+    const scenarios = [
+      { m_g: 600, h_cm: 245, R_cm: 60 },
+      { m_g: 500, h_cm: 250, R_cm: 80 },
+      { m_g: 800, h_cm: 320, R_cm: 100 },
+      { m_g: 400, h_cm: 180, R_cm: 50 },
+      { m_g: 750, h_cm: 270, R_cm: 75 },
+      { m_g: 1200, h_cm: 200, R_cm: 50 }
+    ];
+    const chosen = randChoice(scenarios);
+    const g = 10;
+    const m = chosen.m_g / 1000;
+    const h = chosen.h_cm / 100;
+    const R = chosen.R_cm / 100;
+
+    const vA = Math.sqrt(2 * g * h);
+    const vB = Math.sqrt(2 * g * (h - 2 * R));
+    const NA = m * g + (m * vA * vA) / R;
+    const NB = (m * vB * vB) / R - m * g;
+
+    params = {
+      m_g: chosen.m_g,
+      h_cm: chosen.h_cm,
+      R_cm: chosen.R_cm,
+      m, h, R, g,
+      vA, vB, NA, NB
+    };
+
+    document.getElementById("problem-statement").innerHTML =
+      `גוף שמסתו <span class="math">m = ${params.m_g} g</span> מונח במנוחה על מסילה חלקה בגובה <span class="math">h = ${params.h_cm} cm</span> מהקרקע. ` +
+      `הגוף מחליק במסילה, ונכנס למסלול מעגלי שניצב לקרקע ורדיוסו <span class="math">R = ${params.R_cm} cm</span>. ` +
+      `הנקודה <span class="math">A</span> נמצאת בתחתית המסלול המעגלי, והנקודה <span class="math">B</span> נמצאת בשיא המסלול המעגלי.`;
+
+    document.getElementById("svg-mass-label").textContent = `m = ${params.m_g} g`;
+    document.getElementById("svg-h-label").textContent = `h = ${params.h_cm} cm`;
+    document.getElementById("svg-r-label").textContent = `R = ${params.R_cm} cm`;
+
+    document.getElementById("unit-gate-card").classList.remove("hidden");
+    document.getElementById("workspace-card").classList.add("hidden");
+    document.getElementById("summary-card").classList.add("hidden");
+    document.getElementById("unit-badge").textContent = "חובה להשלים";
+    document.getElementById("unit-badge").className = "badge";
+    hideFeedback("unit-feedback");
+
+    renderUnitGate();
+    setupAllParts();
+    updateProgressBar();
+  }
+
+  function updateProgressBar() {
+    const flags = [
+      progress.unitsDone,
+      progress.a0Done && progress.a1Done && progress.a2Done,
+      progress.partBDone,
+      progress.partCDone,
+      progress.partDDone
+    ];
+    for (let i = 0; i < 5; i++) {
+      const el = document.getElementById(`prog-${i}`);
+      el.className = "prog-step";
+      if (flags[i]) el.classList.add("done");
+      else if (i === 0 || flags[i - 1]) el.classList.add("active");
+    }
+  }
+
+  function showFeedback(id, type, html) {
+    const el = document.getElementById(id);
+    el.className = `feedback show ${type}`;
+    el.innerHTML = html;
+  }
+
+  function hideFeedback(id) {
+    const el = document.getElementById(id);
+    if (el) el.className = "feedback";
+  }
+
+  // ==================== STEP 0: UNIT CONVERSION GATE ====================
+  let unitAnswers = { m: null, h: null, R: null };
+
+  function renderUnitGate() {
+    unitAnswers = { m: null, h: null, R: null };
+    const questions = [
+      {
+        key: "m",
+        label: `מסת הגוף: <span class="math">m = ${params.m_g} g</span>`,
+        options: [
+          { val: params.m, text: `${params.m} kg` },
+          { val: params.m * 10, text: `${(params.m * 10).toFixed(2)} kg` },
+          { val: params.m / 10, text: `${(params.m / 10).toFixed(3)} kg` }
+        ]
+      },
+      {
+        key: "h",
+        label: `גובה התחלתי: <span class="math">h = ${params.h_cm} cm</span>`,
+        options: [
+          { val: params.h / 10, text: `${(params.h / 10).toFixed(3)} m` },
+          { val: params.h, text: `${params.h} m` },
+          { val: params.h * 10, text: `${(params.h * 10).toFixed(1)} m` }
+        ]
+      },
+      {
+        key: "R",
+        label: `רדיוס המעגל: <span class="math">R = ${params.R_cm} cm</span>`,
+        options: [
+          { val: params.R * 10, text: `${(params.R * 10).toFixed(1)} m` },
+          { val: params.R / 10, text: `${(params.R / 10).toFixed(3)} m` },
+          { val: params.R, text: `${params.R} m` }
+        ]
+      }
+    ];
+
+    const container = document.getElementById("unit-questions-container");
+    container.innerHTML = questions.map(q => `
+      <div style="margin-bottom:12px;">
+        <div style="font-weight:600;margin-bottom:6px;">${q.label}</div>
+        <div class="option-grid two-col" style="grid-template-columns: repeat(3, 1fr);">
+          ${q.options.map((opt, idx) => `
+            <button type="button" class="choice-btn" id="unit-btn-${q.key}-${idx}"
+              onclick="selectUnit('${q.key}', ${opt.val}, ${idx})">
+              <span class="math">${opt.text}</span>
+            </button>
+          `).join("")}
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function selectUnit(key, val, idx) {
+    unitAnswers[key] = val;
+    for (let i = 0; i < 3; i++) {
+      const btn = document.getElementById(`unit-btn-${key}-${i}`);
+      btn.classList.remove("selected", "wrong", "correct");
+      if (i === idx) btn.classList.add("selected");
+    }
+  }
+
+  function checkUnitGate() {
+    if (unitAnswers.m === null || unitAnswers.h === null || unitAnswers.R === null) {
+      showFeedback("unit-feedback", "info", "נא לבחור המרה עבור כל שלושת הנתונים לפני ההמשך.");
+      return;
+    }
+    const okM = Math.abs(unitAnswers.m - params.m) < 1e-6;
+    const okH = Math.abs(unitAnswers.h - params.h) < 1e-6;
+    const okR = Math.abs(unitAnswers.R - params.R) < 1e-6;
+
+    if (okM && okH && okR) {
+      progress.unitsDone = true;
+      document.getElementById("unit-badge").textContent = "הושלם ✓";
+      document.getElementById("unit-badge").className = "badge badge-done";
+      showFeedback("unit-feedback", "success",
+        `מצוין! הנתונים התקניים הם: <span class="math">m = ${params.m} kg, h = ${params.h} m, R = ${params.R} m</span>.`);
+      document.getElementById("workspace-card").classList.remove("hidden");
+      updateProgressBar();
+      setTimeout(() => {
+        document.getElementById("workspace-card").scrollIntoView({ behavior: "smooth" });
+      }, 300);
+    } else {
+      stats.units++;
+      let hints = [];
+      if (!okM) hints.push("כדי להמיר גרם (<span class='math'>g</span>) לקילוגרם (<span class='math'>kg</span>), חלק ב-1000.");
+      if (!okH || !okR) hints.push("כדי להמיר סנטימטר (<span class='math'>cm</span>) למטר (<span class='math'>m</span>), חלק ב-100.");
+      showFeedback("unit-feedback", "error", "יש טעות באחת ההמרות:<br>• " + hints.join("<br>• "));
+    }
+  }
+
+  // ==================== FORMULA SELECTION HELPER ====================
+  function renderFormulaChoices(containerId, feedbackId, statKey, choices, onSuccess) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = choices.map((c, idx) => `
+      <button type="button" class="choice-btn" id="${containerId}-opt-${idx}"
+        onclick="handleFormulaChoice('${containerId}', '${feedbackId}', '${statKey}', ${idx})">
+        <span>${c.label}</span>
+      </button>
+    `).join("");
+
+    window[`_choices_${containerId}`] = { choices, onSuccess };
+  }
+
+  function handleFormulaChoice(containerId, feedbackId, statKey, idx) {
+    const { choices, onSuccess } = window[`_choices_${containerId}`];
+    const chosen = choices[idx];
+    choices.forEach((_, i) => {
+      const btn = document.getElementById(`${containerId}-opt-${i}`);
+      btn.classList.remove("selected", "wrong", "correct");
+    });
+    const clickedBtn = document.getElementById(`${containerId}-opt-${idx}`);
+
+    if (chosen.correct) {
+      clickedBtn.classList.add("correct");
+      showFeedback(feedbackId, "success", chosen.feedback);
+      onSuccess();
+    } else {
+      stats[statKey]++;
+      clickedBtn.classList.add("wrong");
+      showFeedback(feedbackId, "error", chosen.feedback);
+    }
+  }
+
+  // ==================== ALGEBRAIC EXPRESSION BUILDER ====================
+  function createExpressionBuilder(id, tokens, targetFn, testVars, feedbackId, statKey, onSuccess) {
+    builderState[id] = [];
+    const container = document.getElementById(id);
+
+    container.innerHTML = `
+      <div class="expr-display-wrap">
+        <div class="expr-display" id="${id}-disp"><span class="expr-placeholder">הקש על הכפתורים למטה לבניית הביטוי...</span></div>
+      </div>
+      <div class="token-pad">
+        ${tokens.map(t => `
+          <button type="button" class="tok-btn ${t.cls || ''}" onclick="appendToken('${id}', '${t.code}', '${t.disp}')">${t.disp}</button>
+        `).join("")}
+        <button type="button" class="tok-btn ctrl" onclick="backspaceToken('${id}')">⌫ מחק</button>
+        <button type="button" class="tok-btn ctrl" onclick="clearTokens('${id}')">נקה</button>
+      </div>
+      <button type="button" class="action-btn" onclick="checkExpression('${id}')">בדיקת ביטוי אלגברי</button>
+    `;
+
+    window[`_expr_${id}`] = { targetFn, testVars, feedbackId, statKey, onSuccess };
+  }
+
+  function renderExprDisplay(id) {
+    const list = builderState[id];
+    const disp = document.getElementById(`${id}-disp`);
+    if (!list.length) {
+      disp.innerHTML = `<span class="expr-placeholder">הקש על הכפתורים למטה לבניית הביטוי...</span>`;
+    } else {
+      disp.textContent = list.map(item => item.disp).join("");
+    }
+  }
+
+  function appendToken(id, code, disp) {
+    builderState[id].push({ code, disp });
+    renderExprDisplay(id);
+  }
+
+  function backspaceToken(id) {
+    builderState[id].pop();
+    renderExprDisplay(id);
+  }
+
+  function clearTokens(id) {
+    builderState[id] = [];
+    renderExprDisplay(id);
+  }
+
+  function normalizeCode(raw) {
+    let s = raw;
+    s = s.replace(/(\d)([a-zA-Z(])/g, "$1*$2");
+    s = s.replace(/(\))([a-zA-Z0-9(])/g, "$1*$2");
+    s = s.replace(/([a-zA-Z0-9_])(\()/g, (match, p1, p2) => {
+      if (match === "t(") return match;
+      return `${p1}*${p2}`;
+    });
+    return s;
+  }
+
+  function checkExpression(id) {
+    const { targetFn, testVars, feedbackId, statKey, onSuccess } = window[`_expr_${id}`];
+    const list = builderState[id];
+    if (!list.length) {
+      showFeedback(feedbackId, "info", "נא לבנות ביטוי באמצעות הכפתורים לפני הבדיקה.");
+      return;
+    }
+    const rawCode = list.map(x => x.code).join("");
+    const jsCode = normalizeCode(rawCode);
+
+    try {
+      const fn = new Function(...testVars, `"use strict"; return (${jsCode});`);
+      const sampleSets = [
+        { m: 0.7, g: 9.8, h: 3.1, R: 0.5, vA: 6.2, vB: 3.4 },
+        { m: 1.3, g: 10.2, h: 4.5, R: 0.8, vA: 8.1, vB: 4.7 },
+        { m: 2.1, g: 9.5, h: 2.9, R: 0.4, vA: 5.5, vB: 2.9 },
+        { m: 0.45, g: 10.0, h: 5.2, R: 1.1, vA: 9.3, vB: 5.1 },
+        { m: 1.8, g: 11.0, h: 6.0, R: 0.9, vA: 10.4, vB: 6.2 }
+      ];
+
+      let allMatch = true;
+      for (const sample of sampleSets) {
+        const args = testVars.map(v => sample[v]);
+        const userVal = fn(...args);
+        const expectedVal = targetFn(sample);
+        if (typeof userVal !== "number" || !isFinite(userVal) || Math.abs(userVal - expectedVal) > 1e-5) {
+          allMatch = false;
+          break;
+        }
+      }
+
+      if (allMatch) {
+        showFeedback(feedbackId, "success", "ביטוי אלגברי נכון ומדויק! כעת ניתן לעבור להצבה המספרית.");
+        onSuccess();
+      } else {
+        stats[statKey]++;
+        showFeedback(feedbackId, "error", "הביטוי שנבנה אינו שקול מתמטית לביטוי הנדרש. בדוק סדר פעולות, סוגריים וסימנים.");
+      }
+    } catch (e) {
+      stats[statKey]++;
+      showFeedback(feedbackId, "error", "שגיאת תחביר בביטוי (ייתכן שחסרים סוגריים סוגרים או אופרטור). נסה לתקן.");
+    }
+  }
+
+  // ==================== MOBILE-FIRST SCIENTIFIC NUMPAD ====================
+  function createNumPad(id, units, expectedVal, expectedUnit, feedbackId, statKey, onSuccess) {
+    numPadState[id] = {
+      mantissa: "",
+      exponent: "0",
+      target: "mantissa",
+      unit: ""
+    };
+
+    const container = document.getElementById(id);
+    container.innerHTML = `
+      <div class="num-panel">
+        <div class="sci-readout">
+          <span class="sci-part active-target" id="${id}-m-box" onclick="setNumTarget('${id}', 'mantissa')">_</span>
+          <span>× 10</span>
+          <sup class="sci-part" id="${id}-e-box" onclick="setNumTarget('${id}', 'exponent')">0</sup>
+          <span id="${id}-u-box" style="margin-left:8px;color:#38bdf8;">[יחידה]</span>
+        </div>
+
+        <div class="keypad-grid">
+          <button type="button" class="key-btn" onclick="pressNumKey('${id}', '7')">7</button>
+          <button type="button" class="key-btn" onclick="pressNumKey('${id}', '8')">8</button>
+          <button type="button" class="key-btn" onclick="pressNumKey('${id}', '9')">9</button>
+          <button type="button" class="key-btn" onclick="pressNumBack('${id}')">⌫</button>
+
+          <button type="button" class="key-btn" onclick="pressNumKey('${id}', '4')">4</button>
+          <button type="button" class="key-btn" onclick="pressNumKey('${id}', '5')">5</button>
+          <button type="button" class="key-btn" onclick="pressNumKey('${id}', '6')">6</button>
+          <button type="button" class="key-btn" onclick="toggleNumSign('${id}')">+/-</button>
+
+          <button type="button" class="key-btn" onclick="pressNumKey('${id}', '1')">1</button>
+          <button type="button" class="key-btn" onclick="pressNumKey('${id}', '2')">2</button>
+          <button type="button" class="key-btn" onclick="pressNumKey('${id}', '3')">3</button>
+          <button type="button" class="key-btn exp-toggle" onclick="toggleExpTarget('${id}')">חזקת 10</button>
+
+          <button type="button" class="key-btn" onclick="pressNumKey('${id}', '0')">0</button>
+          <button type="button" class="key-btn" onclick="pressNumKey('${id}', '.')">.</button>
+          <button type="button" class="key-btn" onclick="clearNumPad('${id}')">C</button>
+          <button type="button" class="key-btn exp-toggle" onclick="setNumTarget('${id}', 'mantissa')">בסיס</button>
+        </div>
+
+        <div class="unit-row">
+          <span style="font-weight:600;font-size:0.92rem;">בחר יחידת מידה:</span>
+          ${units.map((u, idx) => `
+            <button type="button" class="unit-chip" id="${id}-unit-${idx}" onclick="selectNumUnit('${id}', '${u}', ${idx}, ${units.length})">${u}</button>
+          `).join("")}
+        </div>
+
+        <button type="button" class="action-btn" onclick="checkNumAnswer('${id}')">בדיקת תשובה סופית</button>
+      </div>
+    `;
+
+    window[`_num_${id}`] = { expectedVal, expectedUnit, feedbackId, statKey, onSuccess };
+  }
+
+  function updateNumDisplay(id) {
+    const st = numPadState[id];
+    const mBox = document.getElementById(`${id}-m-box`);
+    const eBox = document.getElementById(`${id}-e-box`);
+    const uBox = document.getElementById(`${id}-u-box`);
+
+    mBox.textContent = st.mantissa === "" ? "_" : st.mantissa;
+    eBox.textContent = st.exponent;
+    uBox.textContent = st.unit ? st.unit : "[יחידה]";
+
+    mBox.classList.toggle("active-target", st.target === "mantissa");
+    eBox.classList.toggle("active-target", st.target === "exponent");
+  }
+
+  function setNumTarget(id, target) {
+    numPadState[id].target = target;
+    updateNumDisplay(id);
+  }
+
+  function toggleExpTarget(id) {
+    const st = numPadState[id];
+    st.target = st.target === "mantissa" ? "exponent" : "mantissa";
+    updateNumDisplay(id);
+  }
+
+  function pressNumKey(id, ch) {
+    const st = numPadState[id];
+    if (st.target === "mantissa") {
+      if (ch === "." && st.mantissa.includes(".")) return;
+      if (st.mantissa === "" && ch === ".") st.mantissa = "0.";
+      else st.mantissa += ch;
+    } else {
+      if (ch === ".") return;
+      if (st.exponent === "0") st.exponent = ch;
+      else if (st.exponent === "-0") st.exponent = "-" + ch;
+      else st.exponent += ch;
+    }
+    updateNumDisplay(id);
+  }
+
+  function toggleNumSign(id) {
+    const st = numPadState[id];
+    if (st.target === "mantissa") {
+      if (st.mantissa.startsWith("-")) st.mantissa = st.mantissa.slice(1);
+      else st.mantissa = "-" + st.mantissa;
+    } else {
+      if (st.exponent.startsWith("-")) st.exponent = st.exponent.slice(1);
+      else st.exponent = "-" + st.exponent;
+    }
+    updateNumDisplay(id);
+  }
+
+  function pressNumBack(id) {
+    const st = numPadState[id];
+    if (st.target === "mantissa") {
+      st.mantissa = st.mantissa.slice(0, -1);
+    } else {
+      st.exponent = st.exponent.slice(0, -1);
+      if (st.exponent === "" || st.exponent === "-") st.exponent = "0";
+    }
+    updateNumDisplay(id);
+  }
+
+  function clearNumPad(id) {
+    const st = numPadState[id];
+    st.mantissa = "";
+    st.exponent = "0";
+    st.target = "mantissa";
+    updateNumDisplay(id);
+  }
+
+  function selectNumUnit(id, unit, idx, total) {
+    numPadState[id].unit = unit;
+    for (let i = 0; i < total; i++) {
+      document.getElementById(`${id}-unit-${i}`).classList.toggle("selected", i === idx);
+    }
+    updateNumDisplay(id);
+  }
+
+  function checkNumAnswer(id) {
+    const st = numPadState[id];
+    const { expectedVal, expectedUnit, feedbackId, statKey, onSuccess } = window[`_num_${id}`];
+
+    const mNum = parseFloat(st.mantissa);
+    const eNum = parseInt(st.exponent, 10) || 0;
+    if (isNaN(mNum)) {
+      showFeedback(feedbackId, "info", "נא להזין ערך מספרי באמצעות לוח המקשים.");
+      return;
+    }
+    if (!st.unit) {
+      showFeedback(feedbackId, "info", "נא לבחור יחידת מידה מתאימה.");
+      return;
+    }
+    if (st.unit !== expectedUnit) {
+      stats[statKey]++;
+      showFeedback(feedbackId, "error", `יחידת המידה שנבחרה (<span class="math">${st.unit}</span>) אינה מתאימה לגודל הפיזיקלי המבוקש.`);
+      return;
+    }
+
+    const userVal = mNum * Math.pow(10, eNum);
+    const relErr = Math.abs(userVal - expectedVal) / Math.max(Math.abs(expectedVal), 1e-9);
+
+    if (relErr <= 0.02) {
+      showFeedback(feedbackId, "success", `כל הכבוד! התשובה <span class="math">${expectedVal.toFixed(2)} ${expectedUnit}</span> נכונה!`);
+      onSuccess();
+    } else {
+      stats[statKey]++;
+      showFeedback(feedbackId, "error", "הערך המספרי אינו בטווח הדיוק המותר (2%). בדוק שוב את הצבת הנתונים ביחידות SI.");
+    }
+  }
+
+  // ==================== SETUP ALL PARTS (א, ב, ג, ד) ====================
+  function setupAllParts() {
+    [
+      "a1-step2", "a1-step3", "a2-step2", "a2-step3",
+      "c-step2", "c-step3", "d-step2", "d-step3",
+      "a1-notebook", "a2-notebook", "partB-notebook", "c-notebook", "d-notebook"
+    ].forEach(id => {
+      document.getElementById(id).classList.add("hidden");
+    });
+    document.getElementById("a1-box").classList.add("locked");
+    document.getElementById("a2-box").classList.add("locked");
+    hideFeedback("a0-f-fb");
+
+    switchPart(0);
+    for (let i = 0; i < 4; i++) {
+      const tab = document.getElementById(`tab-${i}`);
+      tab.classList.remove("completed");
+      if (i > 0) tab.disabled = true;
+    }
+
+    // --- PART A0: Non-Conservative Work Justification ---
+    renderFormulaChoices("a0-formulas", "a0-f-fb", "a0_formula", [
+      {
+        label: `הכוח הלא-משמר היחיד הוא <span class="math">N</span> (המסילה חלקה), ומכיוון שהוא מאונך לכיוון התנועה (<span class="math">θ = 90°</span>), לפי <span class="math">W = F cos θ Δs</span> מתקיים <span class="math">W<sub>לא-משמרים</sub> = W<sub>N</sub> = N cos 90° Δs = 0</span>, ולכן <span class="math">ΔE = 0</span>.`,
+        correct: true,
+        feedback: `נימוק מדויק לפי דף הנוסחאות! מכיוון ש-<span class="math">W<sub>לא-משמרים</sub> = W<sub>N</sub> = 0</span>, הנוסחה <span class="math">W<sub>לא-משמרים</sub> = ΔE</span> נותנת <span class="math">ΔE = 0</span>, כלומר <span class="math">E<sub>סופית</sub> = E<sub>התחלתית</sub></span>.`
+      },
+      {
+        label: `הכוח הנורמלי <span class="math">N</span> שווה לאפס לאורך כל המסילה, ולכן <span class="math">W<sub>לא-משמרים</sub> = 0</span>.`,
+        correct: false,
+        feedback: `שים לב: הכוח הנורמלי <span class="math">N</span> אינו שווה לאפס! המסילה מפעילה כוח נורמלי על הגוף, אך כיוון שהכוח מאונך להעתק בכל רגע (<span class="math">θ = 90°</span>), <strong>העבודה שלו</strong> היא זו ששווה לאפס (<span class="math">W<sub>N</sub> = N cos 90° Δs = 0</span>).`
+      },
+      {
+        label: `עבודת כוח הכובד שווה לאפס (<span class="math">W<sub>mg</sub> = 0</span>), ולכן <span class="math">W<sub>לא-משמרים</sub> = ΔE = 0</span>.`,
+        correct: false,
+        feedback: `כוח הכובד הוא <strong>כוח משמר</strong> (לא לא-משמר!) והוא דווקא מבצע עבודה חיובית בירידה. הכוח הלא-משמר היחיד הפועל על הגוף הוא הכוח הנורמלי <span class="math">N</span>.`
+      }
+    ], () => {
+      progress.a0Done = true;
+      document.getElementById("a1-box").classList.remove("locked");
+      document.getElementById("a1-box").scrollIntoView({ behavior: "smooth" });
+    });
+
+    // --- PART A1: Speed at A ---
+    renderFormulaChoices("a1-formulas", "a1-f-fb", "a1_formula", [
+      {
+        label: `<span class="math">W<sub>לא-משמרים</sub> = ΔE  ⇒  0 = (½mv<sub>A</sub>² + 0) − (0 + mgh)</span>`,
+        correct: true,
+        feedback: `נכון! הצבת <span class="math">W<sub>לא-משמרים</sub> = W<sub>N</sub> = 0</span>, <span class="math">E<sub>k</sub> = ½mv²</span> ו-<span class="math">U<sub>G</sub> = mgh</span> נותנת <span class="math">mgh = ½mv<sub>A</sub>²</span>.`
+      },
+      {
+        label: `<span class="math">v² = v<sub>0</sub>² + 2a(x − x<sub>0</sub>)</span> (תנועה שוות תאוצה)`,
+        correct: false,
+        feedback: `נוסחה זו מתאימה לתנועה לאורך קו ישר בתאוצה קבועה בלבד. כאן המסילה עקומה, ולכן משתמשים ב-<span class="math">W<sub>לא-משמרים</sub> = ΔE</span>.`
+      },
+      {
+        label: `<span class="math">W<sub>לא-משמרים</sub> = ΔE  ⇒  N·h = ½mv<sub>A</sub>² − mgh</span>`,
+        correct: false,
+        feedback: `כבר הוכחנו שעבודת הכוח הנורמלי היא <span class="math">W<sub>N</sub> = 0</span> (ולא <span class="math">N·h</span>) כי <span class="math">N</span> מאונך לכיוון התנועה.`
+      }
+    ], () => {
+      document.getElementById("a1-step2").classList.remove("hidden");
+    });
+
+    createExpressionBuilder("a1-builder", [
+      { code: "Math.sqrt(", disp: "√(" , cls: "func" },
+      { code: "2", disp: "2" },
+      { code: "*", disp: "·", cls: "op" },
+      { code: "g", disp: "g" },
+      { code: "h", disp: "h" },
+      { code: "R", disp: "R" },
+      { code: "m", disp: "m" },
+      { code: "/", disp: "/", cls: "op" },
+      { code: ")", disp: ")", cls: "op" }
+    ], (s) => Math.sqrt(2 * s.g * s.h), ["m", "g", "h", "R"], "a1-e-fb", "a1_expr", () => {
+      document.getElementById("a1-step3").classList.remove("hidden");
+    });
+
+    createNumPad("a1-num", ["m/s", "m/s²", "N", "J"], params.vA, "m/s", "a1-n-fb", "a1_num", () => {
+      progress.a1Done = true;
+      renderNotebookSolution("a1-notebook", {
+        title: "סעיף א׳ (חלק 1): מהירות בנקודה A",
+        given: [
+          `<span class="math">m = ${params.m_g} g = ${params.m} kg</span>`,
+          `<span class="math">h = ${params.h_cm} cm = ${params.h} m</span>`,
+          `<span class="math">h<sub>A</sub> = 0 m</span> , <span class="math">v<sub>0</sub> = 0 m/s</span>`,
+          `<span class="math">g = 10 m/s²</span>`
+        ],
+        find: `<span class="math">v<sub>A</sub> = ?</span>`,
+        step1: `<span class="math">W = F cos θ Δs</span> ; <span class="math">W<sub>לא-משמרים</sub> = ΔE</span> ; <span class="math">E<sub>k</sub> = ½mv²</span> ; <span class="math">U<sub>G</sub> = mgh</span>`,
+        step2: `<span class="math">W<sub>לא-משמרים</sub> = W<sub>N</sub> = N cos 90° Δs = 0  ⇒  ΔE = 0</span><br>` +
+               `<span class="math">½mv<sub>A</sub>² + 0 − (0 + mgh) = 0  ⇒  v<sub>A</sub> = √(2gh)</span>`,
+        step3: `<span class="math">v<sub>A</sub> = √(2 · 10 · ${params.h})</span>`,
+        step4: `<span class="math">v<sub>A</sub> = ${params.vA.toFixed(2)} m/s</span>`
+      });
+      document.getElementById("a2-box").classList.remove("locked");
+      setTimeout(() => {
+        document.getElementById("a1-notebook").scrollIntoView({ behavior: "smooth" });
+      }, 250);
+    });
+
+    // --- PART A2: Speed at B ---
+    renderFormulaChoices("a2-formulas", "a2-f-fb", "a2_formula", [
+      {
+        label: `<span class="math">W<sub>לא-משמרים</sub> = ΔE  ⇒  0 = (½mv<sub>B</sub>² + mg(2R)) − mgh</span>`,
+        correct: true,
+        feedback: `מדויק! שיא המעגל נמצא בגובה קוטר שלם מעל הקרקע (<span class='math'>h_B = 2R</span>), ועבודת הכוח הנורמלי עדיין <span class='math'>W<sub>N</sub> = 0</span>.`
+      },
+      {
+        label: `<span class="math">0 = (½mv<sub>B</sub>² + mgR) − mgh</span>`,
+        correct: false,
+        feedback: `טעות נפוצה! <span class='math'>R</span> הוא הרדיוס (מרכז המעגל), ואילו שיא המסלול <span class='math'>B</span> נמצא בגובה <span class='math'>2R</span>.`
+      },
+      {
+        label: `<span class="math">W<sub>N</sub> = ½mv<sub>B</sub>² + mg(2R)</span>`,
+        correct: false,
+        feedback: `זכור: <span class='math'>W<sub>לא-משמרים</sub> = W<sub>N</sub> = 0</span>, וחסרה האנרגיה ההתחלתית <span class='math'>U<sub>G,0</sub> = mgh</span> במשוואת <span class='math'>ΔE</span>.`
+      }
+    ], () => {
+      document.getElementById("a2-step2").classList.remove("hidden");
+    });
+
+    createExpressionBuilder("a2-builder", [
+      { code: "Math.sqrt(", disp: "√(", cls: "func" },
+      { code: "2", disp: "2" },
+      { code: "*", disp: "·", cls: "op" },
+      { code: "-", disp: "−", cls: "op" },
+      { code: "(", disp: "(", cls: "op" },
+      { code: ")", disp: ")", cls: "op" },
+      { code: "g", disp: "g" },
+      { code: "h", disp: "h" },
+      { code: "R", disp: "R" }
+    ], (s) => Math.sqrt(2 * s.g * (s.h - 2 * s.R)), ["g", "h", "R"], "a2-e-fb", "a2_expr", () => {
+      document.getElementById("a2-step3").classList.remove("hidden");
+    });
+
+    createNumPad("a2-num", ["m/s", "m/s²", "N", "J"], params.vB, "m/s", "a2-n-fb", "a2_num", () => {
+      progress.a2Done = true;
+      renderNotebookSolution("a2-notebook", {
+        title: "סעיף א׳ (חלק 2): מהירות בנקודה B",
+        given: [
+          `<span class="math">h = ${params.h} m</span> , <span class="math">R = ${params.R_cm} cm = ${params.R} m</span>`,
+          `<span class="math">h<sub>B</sub> = 2R = ${(2 * params.R).toFixed(2)} m</span>`,
+          `<span class="math">v<sub>0</sub> = 0 m/s</span> , <span class="math">g = 10 m/s²</span>`
+        ],
+        find: `<span class="math">v<sub>B</sub> = ?</span>`,
+        step1: `<span class="math">W<sub>לא-משמרים</sub> = ΔE</span> ; <span class="math">E<sub>k</sub> = ½mv²</span> ; <span class="math">U<sub>G</sub> = mgh</span>`,
+        step2: `<span class="math">W<sub>לא-משמרים</sub> = W<sub>N</sub> = 0  ⇒  (½mv<sub>B</sub>² + mg·2R) − mgh = 0</span><br>` +
+               `<span class="math">v<sub>B</sub> = √(2g(h − 2R))</span>`,
+        step3: `<span class="math">v<sub>B</sub> = √(2 · 10 · (${params.h} − 2 · ${params.R}))</span>`,
+        step4: `<span class="math">v<sub>B</sub> = ${params.vB.toFixed(2)} m/s</span>`
+      });
+      document.getElementById("tab-0").classList.add("completed");
+      document.getElementById("tab-1").disabled = false;
+      updateProgressBar();
+      setTimeout(() => {
+        document.getElementById("a2-notebook").scrollIntoView({ behavior: "smooth" });
+      }, 250);
+    });
+
+    // --- PART B: Reset checkboxes ---
+    ["chk-A-N", "chk-A-mg", "chk-A-cent", "chk-B-Ndown", "chk-B-mg", "chk-B-Nup"].forEach(id => {
+      document.getElementById(id).checked = false;
+    });
+    updateFbdPreview();
+    hideFeedback("partB-fb");
+
+    // --- PART C: Radial Force at A ---
+    renderFormulaChoices("c-formulas", "c-f-fb", "c_formula", [
+      {
+        label: `<span class="math">ΣF = ma<sub>R</sub>  ⇒  N<sub>A</sub> − mg = mv<sub>A</sub>² / R</span>`,
+        correct: true,
+        feedback: `נכון! לפי החוק השני של ניוטון (<span class='math'>ΣF = ma</span>) ותאוצה רדיאלית (<span class='math'>a<sub>R</sub> = v²/r</span>), בנקודה <span class='math'>A</span> מרכז המעגל מעל הגוף ולכן <span class='math'>N_A − mg = mv_A²/R</span>.`
+      },
+      {
+        label: `<span class="math">mg − N<sub>A</sub> = mv<sub>A</sub>² / R</span>`,
+        correct: false,
+        feedback: `הפוך! התאוצה הרדיאלית <span class='math'>a<sub>R</sub> = v²/r</span> מכוונת למרכז המעגל (כלפי מעלה), ולכן <span class='math'>N_A > mg</span>.`
+      },
+      {
+        label: `<span class="math">N<sub>A</sub> + mg = mv<sub>A</sub>² / R</span>`,
+        correct: false,
+        feedback: `הכוחות <span class='math'>N_A</span> (מעלה) ו-<span class='math'>mg</span> (מטה) מנוגדים בכיוונם בנקודה <span class='math'>A</span>.`
+      }
+    ], () => {
+      document.getElementById("c-step2").classList.remove("hidden");
+    });
+
+    createExpressionBuilder("c-builder", [
+      { code: "m", disp: "m" },
+      { code: "g", disp: "g" },
+      { code: "vA", disp: "v_A" },
+      { code: "**2", disp: "²", cls: "func" },
+      { code: "R", disp: "R" },
+      { code: "+", disp: "+", cls: "op" },
+      { code: "-", disp: "−", cls: "op" },
+      { code: "*", disp: "·", cls: "op" },
+      { code: "/", disp: "/", cls: "op" },
+      { code: "(", disp: "(", cls: "op" },
+      { code: ")", disp: ")", cls: "op" }
+    ], (s) => s.m * s.g + (s.m * s.vA * s.vA) / s.R, ["m", "g", "vA", "R"], "c-e-fb", "c_expr", () => {
+      document.getElementById("c-step3").classList.remove("hidden");
+    });
+
+    createNumPad("c-num", ["N", "kg", "m/s", "J"], params.NA, "N", "c-n-fb", "c_num", () => {
+      progress.partCDone = true;
+      renderNotebookSolution("c-notebook", {
+        title: "סעיף ג׳: משוואת כוחות וכוח לחיצה בנקודה A",
+        given: [
+          `<span class="math">m = ${params.m} kg</span> , <span class="math">R = ${params.R} m</span>`,
+          `<span class="math">v<sub>A</sub> = ${params.vA.toFixed(2)} m/s</span>`,
+          `<span class="math">g = 10 m/s²</span>`
+        ],
+        find: `<span class="math">N<sub>A</sub> = ?</span> (וכוח הלחיצה <span class="math">N'<sub>A</sub></span>)`,
+        step1: `<span class="math">ΣF = ma</span> ; <span class="math">a<sub>R</sub> = v²/r</span> ; <span class="math">F = mg</span> ; <span class="math">F⃗<sub>1,2</sub> = −F⃗<sub>2,1</sub></span>`,
+        step2: `ציר רדיאלי כלפי מעלה (למרכז): <span class="math">N<sub>A</sub> − mg = mv<sub>A</sub>² / R</span><br>` +
+               `<span class="math">N<sub>A</sub> = mg + mv<sub>A</sub>² / R</span>`,
+        step3: `<span class="math">N<sub>A</sub> = ${params.m} · 10 + (${params.m} · ${params.vA.toFixed(2)}²) / ${params.R}</span>`,
+        step4: `<span class="math">N<sub>A</sub> = ${params.NA.toFixed(2)} N</span> (כלפי מעלה; הגוף לוחץ בעוצמה <span class="math">${params.NA.toFixed(2)} N</span> כלפי מטה)`
+      });
+      document.getElementById("tab-2").classList.add("completed");
+      document.getElementById("tab-3").disabled = false;
+      updateProgressBar();
+      setTimeout(() => {
+        document.getElementById("c-notebook").scrollIntoView({ behavior: "smooth" });
+      }, 250);
+    });
+
+    // --- PART D: Radial Force at B ---
+    renderFormulaChoices("d-formulas", "d-f-fb", "d_formula", [
+      {
+        label: `<span class="math">ΣF = ma<sub>R</sub>  ⇒  N<sub>B</sub> + mg = mv<sub>B</sub>² / R</span>`,
+        correct: true,
+        feedback: `מדויק! בשיא המעגל <span class='math'>B</span>, גם <span class='math'>N_B</span> וגם <span class='math'>mg</span> פועלים כלפי מטה (לכיוון מרכז המעגל, כיוון התאוצה <span class='math'>a<sub>R</sub> = v²/r</span>).`
+      },
+      {
+        label: `<span class="math">N<sub>B</sub> − mg = mv<sub>B</sub>² / R</span>`,
+        correct: false,
+        feedback: `שים לב לכיוון הכוחות בשיא המסלול: המסילה נמצאת מעל הגוף ודוחפת אותו מטה, יחד עם כוח הכובד.`
+      },
+      {
+        label: `<span class="math">mg − N<sub>B</sub> = mv<sub>B</sub>² / R</span>`,
+        correct: false,
+        feedback: `כוח נורמלי אינו מושך כלפי מעלה — המסילה יכולה רק לדחוף את הגוף כלפי מטה.`
+      }
+    ], () => {
+      document.getElementById("d-step2").classList.remove("hidden");
+    });
+
+    createExpressionBuilder("d-builder", [
+      { code: "m", disp: "m" },
+      { code: "g", disp: "g" },
+      { code: "vB", disp: "v_B" },
+      { code: "**2", disp: "²", cls: "func" },
+      { code: "R", disp: "R" },
+      { code: "+", disp: "+", cls: "op" },
+      { code: "-", disp: "−", cls: "op" },
+      { code: "*", disp: "·", cls: "op" },
+      { code: "/", disp: "/", cls: "op" },
+      { code: "(", disp: "(", cls: "op" },
+      { code: ")", disp: ")", cls: "op" }
+    ], (s) => (s.m * s.vB * s.vB) / s.R - s.m * s.g, ["m", "g", "vB", "R"], "d-e-fb", "d_expr", () => {
+      document.getElementById("d-step3").classList.remove("hidden");
+    });
+
+    createNumPad("d-num", ["N", "kg", "m/s", "J"], params.NB, "N", "d-n-fb", "d_num", () => {
+      progress.partDDone = true;
+      renderNotebookSolution("d-notebook", {
+        title: "סעיף ד׳: משוואת כוחות וכוח לחיצה בנקודה B",
+        given: [
+          `<span class="math">m = ${params.m} kg</span> , <span class="math">R = ${params.R} m</span>`,
+          `<span class="math">v<sub>B</sub> = ${params.vB.toFixed(2)} m/s</span>`,
+          `<span class="math">g = 10 m/s²</span>`
+        ],
+        find: `<span class="math">N<sub>B</sub> = ?</span> (וכוח הלחיצה <span class="math">N'<sub>B</sub></span>)`,
+        step1: `<span class="math">ΣF = ma</span> ; <span class="math">a<sub>R</sub> = v²/r</span> ; <span class="math">F = mg</span> ; <span class="math">F⃗<sub>1,2</sub> = −F⃗<sub>2,1</sub></span>`,
+        step2: `ציר רדיאלי כלפי מטה (למרכז): <span class="math">N<sub>B</sub> + mg = mv<sub>B</sub>² / R</span><br>` +
+               `<span class="math">N<sub>B</sub> = mv<sub>B</sub>² / R − mg</span>`,
+        step3: `<span class="math">N<sub>B</sub> = (${params.m} · ${params.vB.toFixed(2)}²) / ${params.R} − ${params.m} · 10</span>`,
+        step4: `<span class="math">N<sub>B</sub> = ${params.NB.toFixed(2)} N</span> (כלפי מטה; הגוף לוחץ בעוצמה <span class="math">${params.NB.toFixed(2)} N</span> כלפי מעלה)`
+      });
+      document.getElementById("tab-3").classList.add("completed");
+      updateProgressBar();
+      generateSummary();
+    });
+  }
+
+  function switchPart(idx) {
+    const names = ["סעיף א׳ מתוך ד׳", "סעיף ב׳ מתוך ד׳", "סעיף ג׳ מתוך ד׳", "סעיף ד׳ מתוך ד׳"];
+    document.getElementById("overall-status-badge").textContent = names[idx];
+    for (let i = 0; i < 4; i++) {
+      document.getElementById(`part-${i}`).classList.toggle("hidden", i !== idx);
+      document.getElementById(`tab-${i}`).classList.toggle("active", i === idx);
+    }
+  }
+
+  // ==================== PART B HANDLERS ====================
+  function updateFbdPreview() {
+    document.getElementById("fbd-A-N").classList.toggle("hidden", !document.getElementById("chk-A-N").checked);
+    document.getElementById("fbd-A-mg").classList.toggle("hidden", !document.getElementById("chk-A-mg").checked);
+    document.getElementById("fbd-A-cent").classList.toggle("hidden", !document.getElementById("chk-A-cent").checked);
+
+    document.getElementById("fbd-B-Ndown").classList.toggle("hidden", !document.getElementById("chk-B-Ndown").checked);
+    document.getElementById("fbd-B-mg").classList.toggle("hidden", !document.getElementById("chk-B-mg").checked);
+    document.getElementById("fbd-B-Nup").classList.toggle("hidden", !document.getElementById("chk-B-Nup").checked);
+  }
+
+  function checkPartB() {
+    const aN = document.getElementById("chk-A-N").checked;
+    const aMg = document.getElementById("chk-A-mg").checked;
+    const aCent = document.getElementById("chk-A-cent").checked;
+
+    const bNdown = document.getElementById("chk-B-Ndown").checked;
+    const bMg = document.getElementById("chk-B-mg").checked;
+    const bNup = document.getElementById("chk-B-Nup").checked;
+
+    if (aN && aMg && !aCent && bNdown && bMg && !bNup) {
+      progress.partBDone = true;
+      showFeedback("partB-fb", "success",
+        "תרשימי כוחות מושלמים! זכור: 'כוח צנטריפטלי' אינו כוח נוסף בתרשים, אלא שקול הכוחות האמיתיים הפועלים על הגוף (ΣF = ma_R).");
+      renderNotebookSolution("partB-notebook", {
+        title: "סעיף ב׳: תרשים כוחות בנקודות A ו-B",
+        given: [
+          `המסילה חלקה (אין חיכוך <span class="math">f<sub>k</sub> = 0</span>)`,
+          `כוח הכובד: <span class="math">F = mg</span>`
+        ],
+        find: `תרשים כוחות ב-<span class="math">A</span> וב-<span class="math">B</span>`,
+        step1: `<span class="math">F = mg</span> ; כוח נורמלי <span class="math">N</span> ניצב למשטח המגע`,
+        step2: `• בנקודה <span class="math">A</span> (תחתית): המסילה מתחת לגוף ⇐ <span class="math">N<sub>A</sub></span> כלפי מעלה, <span class="math">mg</span> כלפי מטה.<br>` +
+               `• בנקודה <span class="math">B</span> (שיא): המסילה מעל הגוף ⇐ <span class="math">N<sub>B</sub></span> כלפי מטה, <span class="math">mg</span> כלפי מטה.`,
+        step3: `אין לסמן וקטור <span class="math">mv²/r</span> בתרשים (זוהי תוצאת שקול הכוחות <span class="math">ΣF = ma<sub>R</sub></span>).`,
+        step4: `תרשים הכוחות הושלם במלואו (עבור ללשונית סעיף ג׳)`
+      });
+      document.getElementById("tab-1").classList.add("completed");
+      document.getElementById("tab-2").disabled = false;
+      updateProgressBar();
+      setTimeout(() => {
+        document.getElementById("partB-notebook").scrollIntoView({ behavior: "smooth" });
+      }, 250);
+    } else {
+      stats.partB++;
+      let errs = [];
+      if (aCent) errs.push("אין לסמן כוח צנטריפוגלי/צנטריפטלי ככוח נפרד בתרשים הכוחות.");
+      if (!aN || !aMg) errs.push("בנקודה A פועלים הכוח הנורמלי כלפי מעלה וכוח הכובד כלפי מטה.");
+      if (bNup || !bNdown || !bMg) errs.push("בנקודה B המסילה נמצאת מעל הגוף ולכן מפעילה כוח נורמלי כלפי מטה יחד עם כוח הכובד.");
+      showFeedback("partB-fb", "error", "בדוק שוב את תרשימי הכוחות:<br>• " + errs.join("<br>• "));
+    }
+  }
+
+  // ==================== SUMMARY & EXPORT ====================
+  function generateSummary() {
+    const totalMistakes = Object.values(stats).reduce((a, b) => a + b, 0);
+    const report = [
+      `=== דוח פתרון תרגיל: עבודת כוחות לא-משמרים ותנועה מעגלית אנכית ===`,
+      `נתוני התרגיל שהוגרלו: m = ${params.m} kg, h = ${params.h} m, R = ${params.R} m, g = 10 m/s²`,
+      ``,
+      `עיקרון פיזיקלי (לפי דף נוסחאות תשפ"ז):`,
+      `• W_לא-משמרים = W_N = N·cos(90°)·Δs = 0  ⇒  W_לא-משמרים = ΔE = 0`,
+      ``,
+      `תוצאות סופיות:`,
+      `• סעיף א׳: מהירות בתחתית המעגל v_A = ${params.vA.toFixed(2)} m/s | מהירות בשיא המעגל v_B = ${params.vB.toFixed(2)} m/s`,
+      `• סעיף ב׳: תרשים כוחות בנקודות A ו-B הושלם בהצלחה`,
+      `• סעיף ג׳: כוח הלחיצה על המסילה בנקודה A: N_A = ${params.NA.toFixed(2)} N`,
+      `• סעיף ד׳: כוח הלחיצה על המסילה בנקודה B: N_B = ${params.NB.toFixed(2)} N`,
+      ``,
+      `פירוט שגיאות בדרך:`,
+      `• המרת יחידות SI: ${stats.units}`,
+      `• סעיף א׳ (נימוק W_N=0 / נוסחאות / ביטויים / חישוב): ${stats.a0_formula} / ${stats.a1_formula + stats.a2_formula} / ${stats.a1_expr + stats.a2_expr} / ${stats.a1_num + stats.a2_num}`,
+      `• סעיף ב׳ (תרשים כוחות): ${stats.partB}`,
+      `• סעיף ג׳ (נוסחה / ביטוי / חישוב): ${stats.c_formula} / ${stats.c_expr} / ${stats.c_num}`,
+      `• סעיף ד׳ (נוסחה / ביטוי / חישוב): ${stats.d_formula} / ${stats.d_expr} / ${stats.d_num}`,
+      `• סך הכל שגיאות: ${totalMistakes}`
+    ].join("\n");
+
+    document.getElementById("summary-text").value = report;
+    const card = document.getElementById("summary-card");
+    card.classList.remove("hidden");
+    setTimeout(() => {
+      document.getElementById("d-notebook").scrollIntoView({ behavior: "smooth" });
+    }, 250);
+  }
+
+  function copySummary() {
+    const ta = document.getElementById("summary-text");
+    ta.select();
+    navigator.clipboard.writeText(ta.value).then(() => {
+      showFeedback("summary-fb", "success", "הסיכום הועתק ללוח בהצלחה!");
+    }).catch(() => {
+      document.execCommand("copy");
+      showFeedback("summary-fb", "success", "הסיכום הועתק ללוח!");
+    });
+  }
+
+  function sendToSheet() {
+    if (!GOOGLE_SCRIPT_URL) {
+      showFeedback("summary-fb", "info",
+        "כדי לשלוח ישירות לגיליון Google Sheets, יש להגדיר כתובת Web App במשתנה <code>GOOGLE_SCRIPT_URL</code> בקוד. בינתיים ניתן להשתמש בכפתור ההעתקה ללוח.");
+      return;
+    }
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        params,
+        stats,
+        summary: document.getElementById("summary-text").value
+      })
+    }).then(() => {
+      showFeedback("summary-fb", "success", "הנתונים נשלחו לגיליון המורה בהצלחה!");
+    }).catch(() => {
+      showFeedback("summary-fb", "error", "אירעה שגיאה בשליחת הנתונים. אנא העתק את הסיכום ידנית.");
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", initExercise);
+</script>
+</body>
+</html>

@@ -4,185 +4,342 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>איליה וינוקור | מורה לפיזיקה - מאגר חומרים</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f1115;
+            --bg-color: #0b0e14;
             --card-bg: #ffffff;
-            --text-main: #1a1a1a;
-            --text-secondary: #555555;
-            --accent-purple: #7928ca;
+            --text-main: #111827;
+            --text-secondary: #4b5563;
             --accent-blue: #0070f3;
+            --accent-purple: #7928ca;
             --accent-green: #10b981;
             --accent-orange: #f59e0b;
+            --accent-cyan: #06b6d4;
+            --accent-slate: #475569;
         }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Heebo', system-ui, -apple-system, sans-serif;
         }
+
         body {
             background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 0%, #172033 0%, #0b0e14 60%);
             color: #fff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-bottom: 50px;
+            padding-bottom: 60px;
         }
+
         .header-profile {
             text-align: center;
-            padding: 40px 20px 30px;
-            max-width: 700px;
+            padding: 45px 20px 30px;
+            max-width: 720px;
         }
+
         .avatar {
-            width: 120px;
-            height: 120px;
+            width: 116px;
+            height: 116px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid rgba(255,255,255,0.2);
-            margin-bottom: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 3px solid rgba(255, 255, 255, 0.18);
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
+
         .header-profile h1 {
-            font-size: 1.6rem;
+            font-size: 1.85rem;
+            font-weight: 800;
             margin-bottom: 8px;
-            color: #fff;
+            letter-spacing: -0.02em;
         }
+
         .header-profile p {
-            font-size: 1rem;
-            color: #a0aec0;
+            font-size: 1.05rem;
+            color: #94a3b8;
+            line-height: 1.5;
         }
+
         .divider {
             width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #0070f3, #7928ca, #f59e0b);
-            margin-bottom: 30px;
+            max-width: 1060px;
+            height: 3px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, transparent, #0070f3, #7928ca, #f59e0b, transparent);
+            margin-bottom: 36px;
+            opacity: 0.85;
         }
+
         .cards-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
+            gap: 24px;
             width: 100%;
             max-width: 1100px;
             padding: 0 20px;
         }
+
         .card {
             background: var(--card-bg);
             color: var(--text-main);
             border-radius: 16px;
-            padding: 30px;
+            padding: 28px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
             transition: transform 0.25s ease, box-shadow 0.25s ease;
-            position: relative;
-            overflow: hidden;
+            border-top: 5px solid transparent;
         }
+
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
-        .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
         }
+
+        .icon-box {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-box svg {
+            width: 26px;
+            height: 26px;
+            stroke-width: 2;
+        }
+
+        .badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .badge-active {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .badge-soon {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
         .card h2 {
-            font-size: 1.4rem;
-            margin-bottom: 10px;
+            font-size: 1.38rem;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
+
         .card p {
             font-size: 0.95rem;
             color: var(--text-secondary);
-            margin-bottom: 25px;
-            line-height: 1.4;
+            margin-bottom: 24px;
+            line-height: 1.5;
         }
+
         .card-btn {
-            display: inline-block;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             padding: 12px 20px;
             border-radius: 10px;
             color: #fff;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 0.98rem;
             text-decoration: none;
-            transition: opacity 0.2s;
+            transition: filter 0.2s, transform 0.15s;
         }
+
         .card-btn:hover {
-            opacity: 0.9;
+            filter: brightness(1.08);
         }
-        .btn-mechanics { background-color: var(--accent-blue); }
-        .btn-klali { background-color: var(--accent-purple); }
-        .btn-optic { background-color: var(--accent-green); }
-        .btn-electricity { background-color: var(--accent-orange); }
-        .btn-hativa { background-color: #06b6d4; }
-        .btn-lab { background-color: #4b5563; }
+
+        /* Цветовые темы карточек */
+        .theme-blue { border-top-color: var(--accent-blue); }
+        .theme-blue .icon-box { background: #eff6ff; color: var(--accent-blue); }
+        .theme-blue .card-btn { background-color: var(--accent-blue); }
+
+        .theme-purple { border-top-color: var(--accent-purple); }
+        .theme-purple .icon-box { background: #f5f3ff; color: var(--accent-purple); }
+        .theme-purple .card-btn { background-color: var(--accent-purple); }
+
+        .theme-green { border-top-color: var(--accent-green); }
+        .theme-green .icon-box { background: #ecfdf5; color: var(--accent-green); }
+        .theme-green .card-btn { background-color: var(--accent-green); }
+
+        .theme-orange { border-top-color: var(--accent-orange); }
+        .theme-orange .icon-box { background: #fffbeb; color: var(--accent-orange); }
+        .theme-orange .card-btn { background-color: var(--accent-orange); }
+
+        .theme-cyan { border-top-color: var(--accent-cyan); }
+        .theme-cyan .icon-box { background: #ecfeff; color: var(--accent-cyan); }
+        .theme-cyan .card-btn { background-color: var(--accent-cyan); }
+
+        .theme-slate { border-top-color: var(--accent-slate); }
+        .theme-slate .icon-box { background: #f1f5f9; color: var(--accent-slate); }
+        .theme-slate .card-btn { background-color: var(--accent-slate); }
+
         @media (max-width: 600px) {
             .cards-container {
                 grid-template-columns: 1fr;
             }
             .header-profile h1 {
-                font-size: 1.3rem;
+                font-size: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
+
     <div class="header-profile">
         <img src="LOGO.png" alt="איליה וינוקור" class="avatar">
         <h1>איליה וינוקור | פיזיקה 5 יח"ל</h1>
-        <p>מאגר חומרי לימוד, תרגילים אינטראקטיביים והכנה לבגרות בפיזיקה</p>
+        <p>מאגר חומרי לימוד, סימולציות אינטראקטיביות והכנה לבגרות בפיזיקה</p>
     </div>
+
     <div class="divider"></div>
+
     <div class="cards-container">
-        <div class="card">
-            <div class="card-icon">🚗</div>
+        <!-- מכניקה -->
+        <div class="card theme-blue">
             <div>
+                <div class="card-top">
+                    <div class="icon-box">
+                        <!-- Вектор / Траектория -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"/>
+                            <path d="M7 16c3-7 7-9 12-9"/>
+                            <circle cx="19" cy="7" r="2"/>
+                        </svg>
+                    </div>
+                    <span class="badge badge-active">סימולציות ותרגול</span>
+                </div>
                 <h2>מכניקה</h2>
-                <p>קינמטיקה, דינמיקה, חוקי ניוטון, עבודה ואנרגיה.</p>
+                <p>קינמטיקה, זריקות, חוקי ניוטון, תנועה מעגלית, אנרגיה ותנע.</p>
             </div>
-            <a href="01_Mechanics/index.html" class="card-btn btn-mechanics">כנסו לפרק</a>
+            <a href="01_Mechanics/index.html" class="card-btn">כנסו לפרק ←</a>
         </div>
-        <div class="card">
-            <div class="card-icon">📄</div>
+
+        <!-- כללי - דף נוסחאות -->
+        <div class="card theme-purple">
             <div>
+                <div class="card-top">
+                    <div class="icon-box">
+                        <!-- Формулы / Документ -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="8" y1="13" x2="16" y2="13"/>
+                            <line x1="8" y1="17" x2="13" y2="17"/>
+                        </svg>
+                    </div>
+                    <span class="badge badge-active">עזר לבגרות</span>
+                </div>
                 <h2>כללי - דף נוסחאות</h2>
-                <p>דפי נוסחאות, קבועים פיזיקליים, נספחים וחומרי עזר לבגרות.</p>
+                <p>דפי נוסחאות רשמיים, קבועים פיזיקליים, נספחים וחומרי עזר לבגרות.</p>
             </div>
-            <a href="00_General/index.html" class="card-btn btn-klali">כנסו לפרק</a>
+            <a href="00_General/index.html" class="card-btn">כנסו לפרק ←</a>
         </div>
-        <div class="card">
-            <div class="card-icon">🔬</div>
+
+        <!-- קרינה וחומר -->
+        <div class="card theme-green">
             <div>
+                <div class="card-top">
+                    <div class="icon-box">
+                        <!-- Атом / Излучение -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="2"/>
+                            <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)"/>
+                            <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(150 12 12)"/>
+                            <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(90 12 12)"/>
+                        </svg>
+                    </div>
+                    <span class="badge badge-active">פעיל</span>
+                </div>
                 <h2>קרינה וחומר</h2>
-                <p>אופטיקה גיאומטרית, המודל החלקיקי ומבנה האטום.</p>
+                <p>אופטיקה גיאומטרית, גלים, המודל החלקיקי ומבנה האטום.</p>
             </div>
-            <a href="03_Optic/index.html" class="card-btn btn-optic">כנסו לפרק</a>
+            <a href="03_Optic/index.html" class="card-btn">כנסו לפרק ←</a>
         </div>
-        <div class="card">
-            <div class="card-icon">⚡</div>
+
+        <!-- חשמל ומגנטיות -->
+        <div class="card theme-orange">
             <div>
+                <div class="card-top">
+                    <div class="icon-box">
+                        <!-- Молния / Электричество -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                    <span class="badge badge-active">פעיל</span>
+                </div>
                 <h2>חשמל ומגנטיות</h2>
-                <p>שדה חשמלי, מעגלי זרם, שדה מגנטי והשרה אלקטרומגנטית.</p>
+                <p>אלקטרוסטטיקה, מעגלי זרם, שדה מגנטי והשראה אלקטרומגנטית.</p>
             </div>
-            <a href="02_Electricity/index.html" class="card-btn btn-electricity">כנסו לפרק</a>
+            <a href="02_Electricity/index.html" class="card-btn">כנסו לפרק ←</a>
         </div>
-        <div class="card">
-            <div class="card-icon">📚</div>
+
+        <!-- חטיבת ביניים -->
+        <div class="card theme-cyan">
             <div>
+                <div class="card-top">
+                    <div class="icon-box">
+                        <!-- Книга / Средняя школа -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                    </div>
+                    <span class="badge badge-active">פעיל</span>
+                </div>
                 <h2>חטיבת ביניים</h2>
                 <p>אנרגיה מכנית, תרמית, חשמלית ומבוא לפיזיקה.</p>
             </div>
-            <a href="05_Middle_school/index.html" class="card-btn btn-hativa">כנסו לפרק</a>
+            <a href="05_Middle_school/index.html" class="card-btn">כנסו לפרק ←</a>
         </div>
-        <div class="card">
-            <div class="card-icon">📊</div>
+
+        <!-- מעבדות וסימולציות -->
+        <div class="card theme-slate">
             <div>
+                <div class="card-top">
+                    <div class="icon-box">
+                        <!-- Колба / Лаборатория -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 3h6"/>
+                            <path d="M10 3v6.5L4.5 18a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 9.5V3"/>
+                            <path d="M7.5 14h9"/>
+                        </svg>
+                    </div>
+                    <span class="badge badge-soon">בפיתוח</span>
+                </div>
                 <h2>מעבדות וסימולציות</h2>
-                <p>הדמיות אינטראקטיביות, סימולציות 3D והנחיות לכתיבת דוחות.</p>
+                <p>הדמיות אינטראקטיביות, סימולציות והנחיות לכתיבת דוחות מעבדה.</p>
             </div>
-            <a href="04_Lab/index.html" class="card-btn btn-lab">כנסו למעבדה</a>
+            <a href="04_Lab/index.html" class="card-btn">כנסו למעבדה ←</a>
         </div>
     </div>
+
 </body>
 </html>

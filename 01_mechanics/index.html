@@ -4,181 +4,374 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>מכניקה - פיזיקה 5 יח"ל</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f1115;
+            --bg-color: #0b0e14;
             --card-bg: #ffffff;
-            --text-main: #1a1a1a;
-            --text-secondary: #555555;
+            --text-main: #111827;
+            --text-secondary: #4b5563;
             --accent-blue: #0070f3;
+            --accent-slate: #64748b;
         }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Heebo', system-ui, -apple-system, sans-serif;
         }
+
         body {
             background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 0%, #172033 0%, #0b0e14 60%);
             color: #fff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-bottom: 50px;
+            padding: 25px 20px 60px;
         }
+
         .container {
             width: 100%;
             max-width: 1100px;
-            padding: 20px;
         }
+
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
         .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             color: #60a5fa;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 0.98rem;
+            transition: opacity 0.2s;
         }
+
+        .back-link:hover {
+            opacity: 0.85;
+            text-decoration: underline;
+        }
+
+        .breadcrumbs {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
         .header-section {
             text-align: center;
-            padding: 20px 0 30px;
+            padding: 10px 0 36px;
         }
+
         .header-section h1 {
-            font-size: 2rem;
+            font-size: 2.1rem;
+            font-weight: 800;
             margin-bottom: 10px;
+            letter-spacing: -0.02em;
         }
+
         .header-section p {
-            color: #a0aec0;
-            font-size: 1.1rem;
+            color: #94a3b8;
+            font-size: 1.05rem;
         }
+
         .cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+            gap: 24px;
         }
+
         .card {
             background: var(--card-bg);
             color: var(--text-main);
             border-radius: 16px;
-            padding: 30px;
+            padding: 28px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
             transition: transform 0.25s ease, box-shadow 0.25s ease;
+            border-top: 5px solid var(--accent-blue);
         }
+
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
-        .card-icon {
-            font-size: 2.2rem;
-            margin-bottom: 15px;
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
         }
+
+        .icon-box {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: #eff6ff;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-box svg {
+            width: 26px;
+            height: 26px;
+            stroke-width: 2;
+        }
+
+        .badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .badge-active {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .badge-soon {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
         .card h2 {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
+
         .card p {
             font-size: 0.95rem;
             color: var(--text-secondary);
-            margin-bottom: 25px;
-            line-height: 1.4;
+            margin-bottom: 24px;
+            line-height: 1.5;
         }
+
         .card-btn {
-            display: inline-block;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             padding: 12px 20px;
             border-radius: 10px;
             background-color: var(--accent-blue);
             color: #fff;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 0.98rem;
             text-decoration: none;
-            transition: opacity 0.2s;
+            transition: filter 0.2s;
         }
+
         .card-btn:hover {
-            opacity: 0.9;
+            filter: brightness(1.08);
         }
+
+        /* Карточки в разработке */
+        .card-soon {
+            border-top-color: #cbd5e1;
+        }
+
+        .card-soon .icon-box {
+            background: #f1f5f9;
+            color: var(--accent-slate);
+        }
+
+        .card-soon .card-btn {
+            background-color: var(--accent-slate);
+        }
+
         @media (max-width: 600px) {
             .cards-container {
                 grid-template-columns: 1fr;
+            }
+            .header-section h1 {
+                font-size: 1.7rem;
             }
         }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <a href="../index.html" class="back-link">← חזרה לעמוד הראשי</a>
+        <div class="top-nav">
+            <a href="../index.html" class="back-link">← חזרה לעמוד הראשי</a>
+            <span class="breadcrumbs">ראשי / מכניקה</span>
+        </div>
+        
         <div class="header-section">
             <h1>מכניקה</h1>
-            <p>בחר נושא לצפייה בתרגילים, מבחני בגרות וחומרי עזר</p>
+            <p>בחר נושא לצפייה בסימולציות אינטראקטיביות, מבחני בגרות וחומרי עזר</p>
         </div>
+
         <div class="cards-container">
+            <!-- 1. קינמטיקה -->
             <div class="card">
-                <div class="card-icon">📈</div>
                 <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                                <polyline points="16 7 22 7 22 13"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-active">שאלות בגרות</span>
+                    </div>
                     <h2>קינמטיקה</h2>
-                    <p>תנועה קצובה, תנועה שקולה, מהירות, העתק וזמן.</p>
+                    <p>תנועה קצובה, תנועה שוות תאוצה, גרפים של מהירות-זמן ומקום-זמן.</p>
                 </div>
-                <a href="01_1_kinematics/index.html" class="card-btn">כנסו לפרק</a>
+                <a href="01_1_kinematics/index.html" class="card-btn">כנסו לפרק ←</a>
             </div>
+
+            <!-- 2. זריקות -->
             <div class="card">
-                <div class="card-icon">⚽</div>
                 <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 19c3-11 11-11 14 0"/>
+                                <circle cx="17" cy="19" r="2"/>
+                                <line x1="2" y1="19" x2="22" y2="19"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-active">סימולציה</span>
+                    </div>
                     <h2>זריקות</h2>
-                    <p>זריקה אנכית, זריקה אופקית וזריקה משופעת בשדה כבידה.</p>
+                    <p>נפילה חופשית, זריקה אנכית, זריקה אופקית וזריקה משופעת בשדה כבידה.</p>
                 </div>
-                <a href="01_2_projectiles/index.html" class="card-btn">כנסו לפרק</a>
+                <a href="01_2_projectiles/index.html" class="card-btn">כנסו לפרק ←</a>
             </div>
-            <div class="card">
-                <div class="card-icon">🏗️</div>
+
+            <!-- 3. כוחות -->
+            <div class="card card-soon">
                 <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 20h18L12 6z"/>
+                                <line x1="12" y1="6" x2="18" y2="2"/>
+                                <polyline points="15 2 18 2 18 5"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-soon">בפיתוח</span>
+                    </div>
                     <h2>כוחות</h2>
-                    <p>חוקי ניוטון, מתיחות חוטים, כוח נורמלי ומישור משופע.</p>
+                    <p>חוקי ניוטון, מתיחות חוטים, כוח נורמלי, חיכוך ומישור משופע.</p>
                 </div>
-                <a href="01_3_forces/index.html" class="card-btn">כנסו לפרק</a>
+                <a href="01_3_forces/index.html" class="card-btn">כנסו לפרק ←</a>
             </div>
+
+            <!-- 4. תנועה מעגלית -->
             <div class="card">
-                <div class="card-icon">🎡</div>
                 <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="8"/>
+                                <circle cx="12" cy="12" r="1.5"/>
+                                <line x1="12" y1="4" x2="12" y2="10"/>
+                                <polyline points="9 7 12 10 15 7"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-active">סימולציה</span>
+                    </div>
                     <h2>תנועה מעגלית</h2>
-                    <p>תאוצה רדיאלית, מהירות קווית וזוויתית, כוח צנטריפטալ.</p>
+                    <p>תאוצה רדיאלית, מהירות קווית וזוויתית, כוח צנטריפטלי וסיבוב אופקי/אנכי.</p>
                 </div>
-                <a href="01_4_circular_motion/index.html" class="card-btn">כנסו לפרק</a>
+                <a href="01_4_circular_motion/index.html" class="card-btn">כנסו לפרק ←</a>
             </div>
+
+            <!-- 5. אנרגיה -->
             <div class="card">
-                <div class="card-icon">⚡</div>
                 <div>
-                    <h2>אנרגיה</h2>
-                    <p>אנרגיה קינטית, פוטנציאלית, שימור אנרגיה ועבודה.</p>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-active">2 סימולציות</span>
+                    </div>
+                    <h2>עבודה ואנרגיה</h2>
+                    <p>אנרגיה קינטית, פוטנציאלית, שימור אנרגיה מכנית, עבודה ותנועה בלולאה.</p>
                 </div>
-                <a href="01_5_energy/index.html" class="card-btn">כנסו לפרק</a>
+                <a href="01_5_energy/index.html" class="card-btn">כנסו לפרק ←</a>
             </div>
+
+            <!-- 6. תנע -->
             <div class="card">
-                <div class="card-icon">🎱</div>
                 <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="8" cy="12" r="4"/>
+                                <circle cx="16" cy="12" r="4"/>
+                                <line x1="2" y1="12" x2="4" y2="12"/>
+                                <line x1="20" y1="12" x2="22" y2="12"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-active">סימולציה</span>
+                    </div>
                     <h2>תנע</h2>
-                    <p>מתקף, שימור תנע קווי והתנגשויות אלסטיות ואל-אלסטיות.</p>
+                    <p>מתקף, חוק שימור התנע הקווי והתנגשויות אלסטיות ופלסטיות.</p>
                 </div>
-                <a href="01_6_momentum/index.html" class="card-btn">כנסו לפרק</a>
+                <a href="01_6_momentum/index.html" class="card-btn">כנסו לפרק ←</a>
             </div>
-            <div class="card">
-                <div class="card-icon">🌍</div>
+
+            <!-- 7. כבידה -->
+            <div class="card card-soon">
                 <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"/>
+                                <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-25 12 12)"/>
+                                <circle cx="19" cy="8" r="1.5"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-soon">בפיתוח</span>
+                    </div>
                     <h2>כבידה</h2>
-                    <p>חוק הכבידה העולמי של ניוטון, לווינים ותנועת פלנטות.</p>
+                    <p>חוק הכבידה העולמי של ניוטון, לוויינים, חוקי קפלר ותנועת פלנטות.</p>
                 </div>
-                <a href="01_7_gravitation/index.html" class="card-btn">כנסו לפרק</a>
+                <a href="01_7_gravitation/index.html" class="card-btn">כנסו לפרק ←</a>
             </div>
-            <div class="card">
-                <div class="card-icon">🔄</div>
+
+            <!-- 8. תנועה הרמונית -->
+            <div class="card card-soon">
                 <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0 2 6 2 0"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-soon">בפיתוח</span>
+                    </div>
                     <h2>תנועה הרמונית</h2>
-                    <p>טלטול מתמטי, קפיצים, מחזור ותדירות תנודה.</p>
+                    <p>מטוטלת מתמטית, מערכת מסה-קפיץ, זמן מחזור ותדירות תנודה.</p>
                 </div>
-                <a href="01_8_harmonic_motion/index.html" class="card-btn">כנסו לפרק</a>
+                <a href="01_8_harmonic_motion/index.html" class="card-btn">כנסו לפרק ←</a>
             </div>
         </div>
     </div>
+
 </body>
 </html>
