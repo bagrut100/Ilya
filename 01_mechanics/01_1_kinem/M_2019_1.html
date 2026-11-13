@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>פתרון מלא: בגרות 2019, שאלה 1 - קינמטיקה (זריקה אנכית)</title>
+  <title>פתרון בחינת בגרות בפיזיקה - מכניקה 2019: שאלה 2 (חקר תנועה במערכת גופים ומישור משופע)</title>
 
   <!-- Google Fonts: Rubik -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
 
-  <!-- MathJax for rendering LaTeX formulas -->
+  <!-- MathJax Configuration -->
   <script>
     window.MathJax = {
       tex: {
@@ -29,15 +29,14 @@
       --primary-deep: #1e3a8a;
       --primary-light: #eff6ff;
       --primary-border: #bfdbfe;
-      --bg-page: #f1f5f9;
+      --bg-page: #f8fafc;
       --card-bg: #ffffff;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
+      --text-main: #0f172a;
+      --text-muted: #475569;
       --accent-green: #059669;
       --accent-green-bg: #ecfdf5;
       --accent-green-border: #a7f3d0;
-      --accent-red: #dc2626;
-      --border-color: #e2e8f0;
+      --border-color: #cbd5e1;
       --radius-lg: 20px;
       --radius-md: 14px;
       --radius-sm: 8px;
@@ -55,114 +54,75 @@
       background-color: var(--bg-page);
       color: var(--text-main);
       line-height: 1.6;
-      padding: 20px 12px 60px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
+      padding: 20px 14px 60px;
+      transition: background-color 0.3s ease;
     }
 
-    /* Top Layout & Canvas Controls Panel */
-    .controls-panel {
-      position: sticky;
-      top: 12px;
-      z-index: 1000;
-      background: rgba(30, 41, 59, 0.95);
-      backdrop-filter: blur(10px);
-      padding: 10px 18px;
-      border-radius: 9999px;
+    /* TOP VIEW CONTROLS */
+    .top-controls {
+      max-width: 1400px;
+      margin: 0 auto 16px;
       display: flex;
-      gap: 10px;
+      justify-content: space-between;
       align-items: center;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-      margin-bottom: 20px;
-      border: 1px solid #334155;
       flex-wrap: wrap;
-      justify-content: center;
+      gap: 12px;
     }
 
-    .layout-toggle-btn {
-      background: #334155;
-      color: #f8fafc;
-      border: 1px solid #475569;
-      padding: 8px 16px;
+    .layout-toggle-group {
+      display: inline-flex;
+      background: #e2e8f0;
+      padding: 4px;
       border-radius: 9999px;
-      cursor: pointer;
-      font-weight: 600;
+      gap: 4px;
+    }
+
+    .layout-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 16px;
+      border-radius: 9999px;
       font-family: inherit;
       font-size: 0.88rem;
-      transition: all 0.2s ease;
-    }
-
-    .layout-toggle-btn.active {
-      background: #3b82f6;
-      border-color: #60a5fa;
-      color: #ffffff;
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
-    }
-
-    .canvas-tool-btn {
-      background: #1e293b;
-      color: #94a3b8;
-      border: 1px solid #475569;
-      padding: 6px 14px;
-      border-radius: 6px;
+      font-weight: 600;
+      color: var(--text-muted);
       cursor: pointer;
-      font-family: inherit;
-      font-size: 0.82rem;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
     }
 
-    .canvas-tool-btn.active {
-      background: #ef4444;
-      color: #ffffff;
-      border-color: #f87171;
-    }
-
-    /* Flexible Containers */
-    .page-wrapper {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-
-    .layout-19-6 {
-      width: 100%;
-      max-width: 1400px;
-      min-height: 800px;
-      transition: max-width 0.3s ease;
-    }
-
-    .layout-6-19 {
-      width: 100%;
-      max-width: 480px;
-      min-height: 800px;
-      transition: max-width 0.3s ease;
-    }
-
-    .main-content-card {
+    .layout-btn.active {
       background: var(--card-bg);
-      border-radius: var(--radius-lg);
-      padding: 28px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border-color);
+      color: var(--primary-deep);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    /* CONTAINER LAYOUT MODES */
+    .container {
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
+      transition: max-width 0.3s ease;
     }
 
-    /* Header Banner */
+    .container.mode-19x6 {
+      max-width: 1400px;
+    }
+
+    .container.mode-6x19 {
+      max-width: 480px;
+    }
+
+    /* HEADER BANNER */
     .header-banner {
-      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
       color: #ffffff;
       border-radius: var(--radius-lg);
       padding: 28px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);
-      flex-wrap: wrap;
-      gap: 16px;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.25);
     }
 
     .header-content {
@@ -173,17 +133,18 @@
 
     .header-pill {
       align-self: flex-start;
-      background: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.16);
       backdrop-filter: blur(8px);
-      padding: 4px 14px;
+      padding: 4px 12px;
       border-radius: 9999px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 500;
     }
 
     .header-title {
       font-size: 1.85rem;
       font-weight: 800;
+      letter-spacing: -0.5px;
     }
 
     .header-subtitle {
@@ -192,17 +153,17 @@
     }
 
     .header-badge {
-      background: rgba(255, 255, 255, 0.14);
-      border: 1px solid rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
       border-radius: var(--radius-md);
       padding: 12px 18px;
       text-align: center;
+      min-width: 150px;
     }
 
     .header-badge .sub {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       opacity: 0.85;
-      margin-bottom: 2px;
     }
 
     .header-badge .main {
@@ -210,21 +171,33 @@
       font-weight: 700;
     }
 
-    /* Overview Grid */
+    /* TWO COLUMNS OVERVIEW */
     .overview-grid {
       display: grid;
-      grid-template-columns: 1.35fr 1fr;
-      gap: 24px;
+      grid-template-columns: 1.35fr 1.15fr;
+      gap: 20px;
     }
 
-    .layout-6-19 .overview-grid {
-      grid-template-columns: 1fr;
+    .container.mode-6x19 .overview-grid,
+    @media (max-width: 900px) {
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+      .header-banner {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .header-badge {
+        width: 100%;
+      }
     }
 
     .card {
-      background: #f8fafc;
+      background: var(--card-bg);
       border-radius: var(--radius-lg);
       padding: 24px;
+      box-shadow: var(--shadow);
       border: 1px solid var(--border-color);
     }
 
@@ -243,7 +216,7 @@
     }
 
     .card-title {
-      font-size: 1.2rem;
+      font-size: 1.22rem;
       font-weight: 700;
       color: var(--text-main);
     }
@@ -255,33 +228,59 @@
       margin-bottom: 16px;
     }
 
+    .data-table-wrap {
+      margin: 12px 0 16px;
+      overflow-x: auto;
+    }
+
+    .clean-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+      font-size: 0.92rem;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .clean-table th, .clean-table td {
+      border: 1px solid var(--border-color);
+      padding: 8px 10px;
+    }
+
+    .clean-table th {
+      background: #f1f5f9;
+      color: var(--primary-deep);
+      font-weight: 700;
+    }
+
     .assumptions-box {
       background: var(--primary-light);
       border: 1px solid var(--primary-border);
       border-radius: var(--radius-md);
-      padding: 16px 20px;
-      margin-bottom: 14px;
+      padding: 14px 18px;
     }
 
     .assumptions-title {
       font-weight: 700;
       color: var(--primary-deep);
-      font-size: 0.92rem;
-      margin-bottom: 8px;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
     }
 
     .assumptions-list {
       list-style-type: none;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      font-size: 0.9rem;
+      gap: 5px;
+      font-size: 0.88rem;
       color: #1e3a8a;
     }
 
     .assumptions-list li {
       position: relative;
-      padding-right: 18px;
+      padding-right: 16px;
     }
 
     .assumptions-list li::before {
@@ -290,58 +289,111 @@
       position: absolute;
       right: 2px;
       font-weight: bold;
-      font-size: 1.2rem;
-      line-height: 1;
     }
 
-    /* Graphics Container */
-    .graphics-container {
-      position: relative;
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      overflow: hidden;
+    /* GRAPH & CANVAS WRAPPER */
+    .interactive-graph-card {
       display: flex;
       flex-direction: column;
+      gap: 12px;
+    }
+
+    .graph-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
       align-items: center;
-      padding: 12px;
-      min-height: 310px;
-      justify-content: center;
+      justify-content: flex-start;
+      background: #f1f5f9;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
     }
 
-    .graph-title {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 8px;
+    .tool-btn {
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: var(--text-main);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.82rem;
       font-weight: 600;
-      width: 100%;
-      text-align: right;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
     }
 
-    .interactive-canvas-layer {
+    .tool-btn:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .tool-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary-dark);
+    }
+
+    .graph-stage-relative {
+      position: relative;
+      width: 100%;
+      height: 310px;
+      background: #ffffff;
+      border-radius: var(--radius-sm);
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .graph-svg-layer {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      cursor: crosshair;
-      z-index: 20;
+      pointer-events: none;
+      z-index: 1;
     }
 
-    /* Tabs Navigation */
+    .drawing-canvas-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      cursor: default;
+    }
+
+    .drawing-canvas-layer.tool-draw {
+      cursor: crosshair;
+    }
+
+    .drawing-canvas-layer.tool-laser {
+      cursor: cell;
+    }
+
+    /* TABS NAVIGATION */
     .tabs-wrapper {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       overflow-x: auto;
-      padding-bottom: 6px;
-      justify-content: flex-start;
-      border-bottom: 2px solid #e2e8f0;
-      margin-top: 4px;
+      padding: 4px 2px 10px;
+      -webkit-overflow-scrolling: touch;
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      background: rgba(248, 250, 252, 0.92);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius-md);
     }
 
     .tab-btn {
       background: #ffffff;
-      border: 1px solid var(--border-color);
+      border: 1.5px solid var(--border-color);
       color: var(--primary-deep);
       font-family: inherit;
       font-size: 0.92rem;
@@ -349,26 +401,26 @@
       padding: 9px 20px;
       border-radius: 9999px;
       cursor: pointer;
-      transition: all 0.2s ease;
       white-space: nowrap;
+      transition: all 0.2s;
     }
 
     .tab-btn:hover {
-      background: #f8fafc;
-      border-color: #cbd5e1;
+      background: #f1f5f9;
+      border-color: var(--primary);
     }
 
     .tab-btn.active {
       background: var(--primary);
       color: #ffffff;
       border-color: var(--primary);
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
 
-    /* Section Content */
+    /* SECTION CONTAINERS */
     .section-container {
       display: none;
-      animation: fadeIn 0.3s ease-in-out;
+      animation: fadeIn 0.25s ease-in-out;
     }
 
     .section-container.active {
@@ -376,7 +428,7 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
+      from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -384,7 +436,9 @@
       color: var(--primary-deep);
       font-size: 1.4rem;
       font-weight: 800;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 8px;
     }
 
     .details-grid {
@@ -394,15 +448,18 @@
       margin-bottom: 20px;
     }
 
-    .layout-6-19 .details-grid {
-      grid-template-columns: 1fr;
+    .container.mode-6x19 .details-grid,
+    @media (max-width: 768px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .info-card {
       background: #f8fafc;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      padding: 16px 18px;
+      padding: 16px 20px;
     }
 
     .info-card-title {
@@ -412,20 +469,16 @@
       margin-bottom: 8px;
     }
 
-    .info-card p, .info-card li {
-      font-size: 0.92rem;
-      color: #334155;
-    }
-
     .info-card ul {
       list-style: none;
-      padding-right: 0;
     }
 
     .info-card li {
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       position: relative;
       padding-right: 16px;
+      font-size: 0.92rem;
+      color: #334155;
     }
 
     .info-card li::before {
@@ -433,14 +486,13 @@
       color: var(--primary);
       position: absolute;
       right: 0;
-      font-size: 0.9rem;
     }
 
     .formula-helper-wrap {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin: 12px 0 18px;
+      margin: 12px 0 20px;
       flex-wrap: wrap;
     }
 
@@ -456,7 +508,7 @@
       border-radius: 9999px;
       padding: 4px 14px;
       color: var(--primary-dark);
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       font-weight: 600;
       direction: ltr;
       display: inline-block;
@@ -467,8 +519,7 @@
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
       padding: 22px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      margin-bottom: 18px;
     }
 
     .step-block {
@@ -486,7 +537,7 @@
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       border-radius: var(--radius-sm);
-      padding: 12px 18px;
+      padding: 12px 16px;
       margin: 10px 0;
       overflow-x: auto;
       direction: ltr;
@@ -497,38 +548,98 @@
       background: var(--accent-green-bg);
       border: 1.5px solid var(--accent-green-border);
       border-radius: var(--radius-md);
-      padding: 16px 20px;
+      padding: 14px 18px;
       display: flex;
-      align-items: center;
-      gap: 14px;
+      align-items: flex-start;
+      gap: 12px;
       margin-top: 16px;
     }
 
     .result-icon {
       background: var(--accent-green);
       color: white;
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       flex-shrink: 0;
+      margin-top: 2px;
     }
 
     .result-text {
       color: #065f46;
       font-size: 0.98rem;
       font-weight: 600;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
+    /* CHOICE CARDS (SECTION F) */
+    .choices-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .container.mode-6x19 .choices-grid,
+    @media (max-width: 860px) {
+      .choices-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .choices-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .choice-card {
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      background: #ffffff;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .choice-card.correct {
+      border-color: var(--accent-green);
+      background: #f0fdf4;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15);
+    }
+
+    .choice-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .choice-badge.badge-correct {
+      background: var(--accent-green);
+      color: #ffffff;
+    }
+
+    .choice-badge.badge-wrong {
+      background: #e2e8f0;
+      color: #64748b;
+    }
+
+    /* NAV BUTTONS */
     .nav-buttons-wrap {
       display: flex;
       justify-content: space-between;
       margin-top: 24px;
-      padding-top: 18px;
+      padding-top: 16px;
       border-top: 1px solid var(--border-color);
     }
 
@@ -542,7 +653,6 @@
       font-weight: 600;
       color: var(--text-muted);
       transition: all 0.2s;
-      font-size: 0.9rem;
     }
 
     .nav-step-btn:hover {
@@ -550,773 +660,1027 @@
       color: var(--primary);
       background: var(--primary-light);
     }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .top-controls, .graph-toolbar, .tabs-wrapper, .nav-buttons-wrap { display: none !important; }
+      .section-container { display: block !important; margin-bottom: 30px; page-break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Controls Panel -->
-  <div class="controls-panel">
-    <button class="layout-toggle-btn active" id="btn-19-6" onclick="setLayout('19-6')">פריסה רחבה (19:6)</button>
-    <button class="layout-toggle-btn" id="btn-6-19" onclick="setLayout('6-19')">פריסה אנכית (6:19)</button>
-    <div style="width: 1px; height: 20px; background: #475569;"></div>
-    <button class="canvas-tool-btn" id="laser-btn" onclick="toggleLaser()">מצביע לייזר דועך (2s)</button>
-    <button class="canvas-tool-btn" id="snap-btn" onclick="toggleSnap()">יישור קווים אוטומטי: כבוי</button>
-    <button class="canvas-tool-btn" onclick="clearDrawings()">נקה שרטוט</button>
+  <!-- TOP VIEWPORT SWITCH CONTROLS -->
+  <div class="top-controls">
+    <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-muted);">מצב תצוגה / פריסה:</div>
+    <div class="layout-toggle-group">
+      <button id="btn-layout-wide" class="layout-btn active" onclick="setLayoutMode('19x6')">פריסה רחבה (19X6)</button>
+      <button id="btn-layout-mobile" class="layout-btn" onclick="setLayoutMode('6x19')">פריסה אנכית / מובייל (6X19)</button>
+    </div>
   </div>
 
-  <!-- Page Wrapper -->
-  <div class="page-wrapper">
-    <div class="layout-19-6" id="main-wrapper">
+  <div id="main-container" class="container mode-19x6">
 
-      <div class="main-content-card">
+    <!-- HEADER BANNER -->
+    <header class="header-banner">
+      <div class="header-content">
+        <div class="header-pill">פתרון רשמי ומפורט | בחינת בגרות בפיזיקה 5 יח"ל</div>
+        <h1 class="header-title">בגרות 2019 מועד קיץ (שאלון 036361) – שאלה 2</h1>
+        <p class="header-subtitle">מכניקה | חוקי ניוטון, מישור משופע, קינמטיקה, גרף מהירות-זמן וקריעת חוט</p>
+      </div>
+      <div class="header-badge">
+        <div class="sub">רמת דרישה</div>
+        <div class="main">5 יח״ל | משרד החינוך</div>
+      </div>
+    </header>
 
-        <!-- HEADER -->
-        <header class="header-banner">
-          <div class="header-content">
-            <div class="header-pill">פתרונות מעוצבים בפיזיקה | בגרות 5 יח"ל</div>
-            <h1 class="header-title">פתרון מלא: בגרות 2019, שאלה 1</h1>
-            <p class="header-subtitle">קינמטיקה | זריקה אנכית מעלה מגג בניין, גרף מיקום-זמן פרבולי, מהירות ממוצעת ואי-תלות תנועות</p>
+    <!-- OVERVIEW SECTION: QUESTION FORMULATION & ORIGINAL SCHEMATIC -->
+    <div class="overview-grid">
+      <!-- Problem Statement -->
+      <div class="card">
+        <div class="card-title-wrap">
+          <div class="accent-bar"></div>
+          <h2 class="card-title">ניסוח השאלה והנתונים</h2>
+        </div>
+        <p class="description-text">
+          תלמידים ערכו ניסוי חקר תנועה באמצעות מערכת המורכבת משני גופים: גוף שמסתו $m_1 = 0.50\text{ kg}$ וגוף שמסתו $m_2$.<br>
+          הגוף $m_1$ מוחזק במנוחה על מישור משופע חלק, וקשור לגוף $m_2$ באמצעות חוט העובר על פני גלגלת חסרת חיכוך (ראו תרשים).<br>
+          המישור המשופע נטוי בזווית $\alpha = 30^\circ$ לאופק. בתחתית המישור מצוי חיישן תנועה $S_x$, הניצב למישור המשופע ומחובר למחשב.<br>
+          הכיוון החיובי של תנועת הגוף $m_2$ נקבע כלפי מטה, והכיוון החיובי של תנועת הגוף $m_1$ נקבע במעלה המישור (כיוון ציר $x$).<br>
+          הניחו כי התנגדות האוויר, מסת הגלגלת ומסת החוט זניחות.<br><br>
+          ברגע $t = 0$ הפעילו את החיישן, שחררו את הגוף $m_1$ והגוף התחיל לנוע במעלה המישור. על מסך המחשב התקבלה טבלת הערכים המציגה את מהירות הגוף $m_1$ כפונקציה של הזמן:
+        </p>
+
+        <div class="data-table-wrap">
+          <table class="clean-table">
+            <thead>
+              <tr>
+                <th>$t\text{ (s)}$</th>
+                <td>0.1</td>
+                <td>0.2</td>
+                <td>0.3</td>
+                <td>0.4</td>
+                <td>0.5</td>
+                <td>0.6</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>$v\text{ (m/s)}$</th>
+                <td>0.45</td>
+                <td>0.70</td>
+                <td>1.15</td>
+                <td>1.50</td>
+                <td>1.95</td>
+                <td>2.25</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="assumptions-box">
+          <div class="assumptions-title">הנחות עבודה ונתונים קבועים:</div>
+          <ul class="assumptions-list">
+            <li>מסת הגוף על המישור: $m_1 = 0.50\text{ kg}$, זווית המישור: $\alpha = 30^\circ$.</li>
+            <li>מישור חלק לחלוטין (אין חיכוך: $\mu = 0$). חוט אי-דפורמטיבי וגלגלת חסרת מסה וחיכוך.</li>
+            <li>הגוף $m_1$ אינו מגיע עד לגלגלת, והגוף $m_2$ אינו פוגע ברצפה במהלך המדידה.</li>
+            <li>תאוצת הנפילה החופשית: $g = 10.00\text{ m/s}^2$ (או $9.80\text{ m/s}^2$).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Schematic Diagram: Pure Technical Line Art Reconstruction -->
+      <div class="card interactive-graph-card">
+        <div class="card-title-wrap">
+          <div class="accent-bar"></div>
+          <h2 class="card-title">תרשים המערכת המקורית (Line Art)</h2>
+        </div>
+
+        <!-- Graph Tools Bar -->
+        <div class="graph-toolbar">
+          <button id="btn-draw" class="tool-btn" onclick="setDrawingTool('draw')">✏️ שרטוט חופשי</button>
+          <button id="btn-snap" class="tool-btn" onclick="toggleSnap()">📏 יישור קו אוטומטי: <span id="snap-state">כבוי</span></button>
+          <button id="btn-laser" class="tool-btn" onclick="setDrawingTool('laser')">🔴 מצביע לייזר (2 שנ')</button>
+          <button class="tool-btn" onclick="clearCanvas()">🗑️ נקה שרטוטים</button>
+        </div>
+
+        <!-- Interactive Stage -->
+        <div id="graph-stage" class="graph-stage-relative">
+          <svg class="graph-svg-layer" viewBox="0 0 460 300" preserveAspectRatio="none">
+            <!-- Inclined plane triangle: angle 30 deg, clean black outline -->
+            <polygon points="120,80 120,265 410,265" fill="none" stroke="#000000" stroke-width="2" />
+
+            <!-- Angle alpha arc and text -->
+            <path d="M 365 265 A 45 45 0 0 0 353 232" fill="none" stroke="#000000" stroke-width="1.3" />
+            <text x="345" y="254" font-size="16" font-family="Rubik, sans-serif" fill="#000000">α</text>
+
+            <!-- Pulley at apex (tangent to incline and vertical drop) -->
+            <!-- Apex is at (120, 80). Incline angle is 30 deg. Tangent slope = -tan(30) = -0.577 -->
+            <circle cx="95" cy="42" r="16" fill="none" stroke="#000000" stroke-width="2" />
+            <circle cx="95" cy="42" r="2.5" fill="#000000" />
+            <!-- Pulley axle support -->
+            <line x1="95" y1="42" x2="120" y2="80" stroke="#000000" stroke-width="1.8" />
+
+            <!-- Sensor Sx at the bottom of the plane (perpendicular to incline) -->
+            <!-- Incline: dx = 290, dy = -185. Normal vector = (185, 290) / len -->
+            <!-- Bottom point at (410, 265). Incline runs along angle 30 deg -->
+            <g transform="translate(398, 258) rotate(-30)">
+              <rect x="-4" y="-30" width="8" height="30" fill="none" stroke="#000000" stroke-width="2" />
+              <text x="14" y="-8" font-size="15" font-family="Rubik, sans-serif" fill="#000000">S<tspan font-size="11" dy="4">x</tspan></text>
+            </g>
+
+            <!-- Coordinate axis x: parallel to incline, pointing up -->
+            <g transform="translate(370, 210) rotate(-30)">
+              <line x1="0" y1="0" x2="-45" y2="0" stroke="#000000" stroke-width="1.8" />
+              <polygon points="-48,0 -40,-3.5 -40,3.5" fill="#000000" />
+              <text x="-25" y="-8" font-size="14" font-family="Rubik, sans-serif" fill="#000000">x</text>
+            </g>
+
+            <!-- Body m1 on incline: box oriented strictly at 30 deg -->
+            <!-- Center around incline at x=280, y=163 -->
+            <g transform="translate(280, 163) rotate(-30)">
+              <rect x="-35" y="-45" width="70" height="45" fill="none" stroke="#000000" stroke-width="2" />
+              <text x="0" y="-18" font-size="16" font-family="Rubik, sans-serif" fill="#000000" text-anchor="middle">m<tspan font-size="12" dy="4">1</tspan></text>
+            </g>
+
+            <!-- String from m1 to pulley: parallel to incline -->
+            <line x1="250" y1="145" x2="103" y2="28" stroke="#000000" stroke-width="1.8" />
+
+            <!-- String from pulley down to m2: vertical -->
+            <line x1="79" y1="42" x2="79" y2="120" stroke="#000000" stroke-width="1.8" />
+
+            <!-- Body m2 hanging vertically -->
+            <rect x="65" y="120" width="28" height="45" fill="none" stroke="#000000" stroke-width="2" />
+            <text x="50" y="148" font-size="16" font-family="Rubik, sans-serif" fill="#000000" text-anchor="end">m<tspan font-size="12" dy="4">2</tspan></text>
+          </svg>
+
+          <!-- Interactive User Layer -->
+          <canvas id="drawing-canvas" class="drawing-canvas-layer"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS NAVIGATION -->
+    <div class="tabs-wrapper" id="sections-tabs">
+      <button class="tab-btn active" onclick="switchSection('sec-a')">סעיף א': סרטוט גרף v(t)</button>
+      <button class="tab-btn" onclick="switchSection('sec-b')">סעיף ב': שיפוע הגרף ומשמעותו</button>
+      <button class="tab-btn" onclick="switchSection('sec-c')">סעיף ג': משוואות כוחות</button>
+      <button class="tab-btn" onclick="switchSection('sec-d')">סעיף ד': חישוב מתיחות החוט T</button>
+      <button class="tab-btn" onclick="switchSection('sec-e')">סעיף ה': יחס התאוצות לאחר קריעת החוט</button>
+      <button class="tab-btn" onclick="switchSection('sec-f')">סעיף ו': זיהוי גרף המהירויות</button>
+    </div>
+
+    <!-- MAIN INTERACTIVE SECTION CONTENT CARD -->
+    <div class="card" id="active-content-card">
+
+      <!-- ========== SECTION A ========== -->
+      <div id="sec-a" class="section-container active">
+        <h2 class="section-header-title">סעיף א': סרטוט גרף מהירות הגוף $m_1$ כפונקציה של הזמן (8 נקודות)</h2>
+
+        <div class="details-grid">
+          <div class="info-card">
+            <div class="info-card-title">דרישות פדגוגיות לסרטוט גרף ניסויי:</div>
+            <ul>
+              <li>בחירת קני מידה נוחים, אחידים ופרופורציונליים על גבי שני הצירים.</li>
+              <li>סימון מדויק של שמות הצירים והיחידות: $t\text{ (s)}$ בציר האופקי, $v\text{ (m/s)}$ בציר האנכי.</li>
+              <li>סימון כל 6 הנקודות הניסוייות מהטבלה באמצעות נקודות או צלבים ($+$).</li>
+              <li>העברת <strong>קו מגמה ליניארי רציף (ישר הכי מתאים)</strong> העובר באופן מאוזן בין הנקודות.</li>
+            </ul>
           </div>
-          <div class="header-badge">
-            <div class="sub">רמת קושי / נושא</div>
-            <div class="main">בגרות 5 יח"ל / מכניקה</div>
-          </div>
-        </header>
-
-        <!-- OVERVIEW GRID -->
-        <div class="overview-grid">
-          
-          <!-- Formulation & Assumptions -->
-          <div class="card">
-            <div class="card-title-wrap">
-              <div class="accent-bar"></div>
-              <h2 class="card-title">ניסוח השאלה המלא (סטנדרט בחינת בגרות)</h2>
-            </div>
-            <p class="description-text">
-              אדם עמד על גגו של בניין וזרק כדור בכיוון אנכי כלפי מעלה.<br>
-              הגרף הנתון מתאר את המיקום האנכי $y$ של הכדור כפונקציה של הזמן $t$ מרגע הזריקה ($t = 0$) ועד לסף פגיעתו בקרקע ($t = 4.00\text{ s}$).<br>
-              בגרף מסומנות הנקודות $A$, $B$, $C$ ו-$D$.<br>
-              הציר האנכי מכוון כלפי מעלה, וראשיתו בקרקע ($y = 0$). התנגדות האוויר ניתנת להזנחה. תאוצת הנפילה החופשית היא $g = 10.00\text{ m/s}^2$ כלפי מטה.
+          <div class="info-card">
+            <div class="info-card-title">נקודות המדידה מהניסוי:</div>
+            <p>$(0.1, 0.45)$, $(0.2, 0.70)$, $(0.3, 1.15)$, $(0.4, 1.50)$, $(0.5, 1.95)$, $(0.6, 2.25)$.</p>
+            <p style="margin-top: 6px; font-size: 0.88rem; color: #475569;">
+              הגוף שוחרר ממנוחה ($v(0) = 0$), וקו המגמה הליניארי מתלכד עם ראשית הצירים $(0, 0)$.
             </p>
-
-            <div class="assumptions-box">
-              <div class="assumptions-title">נתוני הנקודות המסומנות על הגרף:</div>
-              <ul class="assumptions-list">
-                <li><strong>נקודה A (רגע הזריקה מגג הבניין):</strong> $t_A = 0$, $y_A = 40.00\text{ m}$.</li>
-                <li><strong>נקודה B (שיא הגובה):</strong> $t_B = 1.00\text{ s}$, $y_B = 45.00\text{ m}$, מהירות רגעית $v_B = 0$.</li>
-                <li><strong>נקודה C (במהלך הירידה חזרה):</strong> $t_C = 3.00\text{ s}$, $y_C = 25.00\text{ m}$.</li>
-                <li><strong>נקודה D (סף הפגיעה בקרקע):</strong> $t_D = 4.00\text{ s}$, $y_D = 0$.</li>
-              </ul>
-            </div>
           </div>
+        </div>
 
-          <!-- SVG Diagram & Interactive Canvas -->
-          <div class="graphics-container">
-            <div class="graph-title">תרשים: גרף מיקום-זמן $y(t)$ של הכדור</div>
-            
-            <svg id="system-svg" viewBox="0 0 380 280" width="100%" height="250" xmlns="http://www.w3.org/2000/svg">
+        <div class="proof-card">
+          <div class="step-title">תרשים גרף מהירות-זמן וקו המגמה:</div>
+          <div style="display: flex; justify-content: center; margin: 16px 0;">
+            <svg viewBox="0 0 500 320" width="100%" max-width="480" height="290">
               <defs>
-                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                  <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b"/>
-                </marker>
-                <pattern id="graphGrid" width="17" height="19" patternUnits="userSpaceOnUse">
-                  <path d="M 17 0 L 0 0 0 19" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+                <pattern id="sec-a-grid" width="25" height="25" patternUnits="userSpaceOnUse">
+                  <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e2e8f0" stroke-width="0.8" />
                 </pattern>
               </defs>
 
-              <!-- Background Grid -->
-              <rect x="55" y="20" width="280" height="209" fill="url(#graphGrid)"/>
-
-              <!-- Guidelines for y = 5, 10, 15, 20, 25, 30, 35, 40, 45 m -->
-              <!-- y scale: 0m at 229, 45m at 20 => dy = 209/45 = 4.644 px/m -->
-              <line x1="55" y1="206" x2="335" y2="206" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-              <line x1="55" y1="183" x2="335" y2="183" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-              <line x1="55" y1="159" x2="335" y2="159" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-              <line x1="55" y1="136" x2="335" y2="136" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-              <line x1="55" y1="113" x2="335" y2="113" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-              <line x1="55" y1="90" x2="335" y2="90" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-              <line x1="55" y1="66" x2="335" y2="66" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-              <line x1="55" y1="43" x2="335" y2="43" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-              <line x1="55" y1="20" x2="335" y2="20" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-
-              <!-- Guidelines for t = 1, 2, 3, 4 s -->
-              <!-- t scale: 0s at 55, 4s at 325 => dt = 270/4 = 67.5 px/s -->
-              <line x1="122.5" y1="20" x2="122.5" y2="229" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-              <line x1="190" y1="20" x2="190" y2="229" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-              <line x1="257.5" y1="20" x2="257.5" y2="229" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-              <line x1="325" y1="20" x2="325" y2="229" stroke="#cbd5e1" stroke-dasharray="2,2"/>
+              <!-- Grid -->
+              <rect x="65" y="25" width="400" height="250" fill="url(#sec-a-grid)" />
 
               <!-- Axes -->
-              <line x1="55" y1="229" x2="345" y2="229" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
-              <line x1="55" y1="229" x2="55" y2="10" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+              <line x1="65" y1="275" x2="475" y2="275" stroke="#000000" stroke-width="2" />
+              <line x1="65" y1="275" x2="65" y2="15" stroke="#000000" stroke-width="2" />
+              <polygon points="478,275 469,271 469,279" fill="#000000" />
+              <polygon points="65,12 61,21 69,21" fill="#000000" />
 
               <!-- Axis Labels -->
-              <text x="345" y="246" font-size="12" font-weight="700" fill="#1e293b">t (s)</text>
-              <text x="48" y="16" font-size="12" font-weight="700" fill="#1e293b" text-anchor="end">y (m)</text>
+              <text x="480" y="295" font-size="13" font-weight="700" fill="#000000" font-family="Rubik">t(s)</text>
+              <text x="50" y="20" font-size="13" font-weight="700" fill="#000000" text-anchor="middle" font-family="Rubik">v(m/s)</text>
 
-              <!-- Y ticks -->
-              <text x="48" y="233" font-size="10" fill="#475569" text-anchor="end">0</text>
-              <text x="48" y="210" font-size="9" font-weight="600" fill="#475569" text-anchor="end">5</text>
-              <text x="48" y="187" font-size="9" font-weight="600" fill="#475569" text-anchor="end">10</text>
-              <text x="48" y="163" font-size="9" font-weight="600" fill="#475569" text-anchor="end">15</text>
-              <text x="48" y="140" font-size="9" font-weight="600" fill="#475569" text-anchor="end">20</text>
-              <text x="48" y="117" font-size="9" font-weight="600" fill="#475569" text-anchor="end">25</text>
-              <text x="48" y="94" font-size="9" font-weight="600" fill="#475569" text-anchor="end">30</text>
-              <text x="48" y="70" font-size="9" font-weight="600" fill="#475569" text-anchor="end">35</text>
-              <text x="48" y="47" font-size="9" font-weight="600" fill="#475569" text-anchor="end">40</text>
-              <text x="48" y="24" font-size="9" font-weight="600" fill="#475569" text-anchor="end">45</text>
+              <!-- X Ticks: 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 (50px per 0.1s) -->
+              <text x="65" y="293" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">0</text>
+              <text x="115" y="293" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">0.1</text>
+              <text x="165" y="293" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">0.2</text>
+              <text x="215" y="293" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">0.3</text>
+              <text x="265" y="293" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">0.4</text>
+              <text x="315" y="293" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">0.5</text>
+              <text x="365" y="293" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">0.6</text>
+              <text x="415" y="293" font-size="11" fill="#475569" text-anchor="middle" font-family="Rubik">0.7</text>
 
-              <!-- X ticks -->
-              <text x="55" y="246" font-size="10" fill="#475569" text-anchor="middle">0</text>
-              <text x="122.5" y="246" font-size="10" font-weight="600" fill="#475569" text-anchor="middle">1</text>
-              <text x="190" y="246" font-size="10" font-weight="600" fill="#475569" text-anchor="middle">2</text>
-              <text x="257.5" y="246" font-size="10" font-weight="600" fill="#475569" text-anchor="middle">3</text>
-              <text x="325" y="246" font-size="10" font-weight="600" fill="#475569" text-anchor="middle">4</text>
+              <!-- Y Ticks: 0, 0.5, 1.0, 1.5, 2.0, 2.5 (50px per 0.5 m/s => 100px per 1 m/s) -->
+              <text x="56" y="279" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">0</text>
+              <text x="56" y="229" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">0.5</text>
+              <text x="56" y="179" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">1.0</text>
+              <text x="56" y="129" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">1.5</text>
+              <text x="56" y="79" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">2.0</text>
+              <text x="56" y="29" font-size="11" fill="#475569" text-anchor="end" font-family="Rubik">2.5</text>
 
-              <!-- Parabolic path: y(t) = 40 + 10t - 5t^2 -->
-              <!-- (0, 40) -> (55, 43.2) -->
-              <!-- (1, 45) -> (122.5, 20) -->
-              <!-- (2, 40) -> (190, 43.2) -->
-              <!-- (3, 25) -> (257.5, 112.9) -->
-              <!-- (4, 0)  -> (325, 229) -->
-              <path d="M 55,43.2 Q 122.5,-3.2 190,43.2 T 325,229" fill="none" stroke="#2563eb" stroke-width="2.8"/>
+              <!-- Trend Line (Slope = 3.75 m/s^2): y = 275 - v*100. For t=0 -> v=0 (65, 275). For t=0.67 -> v=2.5 (400, 25) -->
+              <line x1="65" y1="275" x2="415" y2="16.25" stroke="#2563eb" stroke-width="2.5" />
 
-              <!-- Markers and Labels for A, B, C, D -->
-              <!-- Point A -->
-              <circle cx="55" cy="43.2" r="4.5" fill="#dc2626"/>
-              <text x="45" y="38" font-size="13" font-weight="800" fill="#dc2626">A</text>
+              <!-- Data Points (Plotted as crosses '+') -->
+              <!-- (0.1, 0.45) -> x=115, y=230 -->
+              <g stroke="#000000" stroke-width="1.8">
+                <line x1="111" y1="230" x2="119" y2="230" /><line x1="115" y1="226" x2="115" y2="234" />
+                <!-- (0.2, 0.70) -> x=165, y=205 -->
+                <line x1="161" y1="205" x2="169" y2="205" /><line x1="165" y1="201" x2="165" y2="209" />
+                <!-- (0.3, 1.15) -> x=215, y=160 -->
+                <line x1="211" y1="160" x2="219" y2="160" /><line x1="215" y1="156" x2="215" y2="164" />
+                <!-- (0.4, 1.50) -> x=265, y=125 -->
+                <line x1="261" y1="125" x2="269" y2="125" /><line x1="265" y1="121" x2="265" y2="129" />
+                <!-- (0.5, 1.95) -> x=315, y=80 -->
+                <line x1="311" y1="80" x2="319" y2="80" /><line x1="315" y1="76" x2="315" y2="84" />
+                <!-- (0.6, 2.25) -> x=365, y=50 -->
+                <line x1="361" y1="50" x2="369" y2="50" /><line x1="365" y1="46" x2="365" y2="54" />
+              </g>
 
-              <!-- Point B -->
-              <circle cx="122.5" cy="20" r="4.5" fill="#dc2626"/>
-              <text x="122.5" y="12" font-size="13" font-weight="800" fill="#dc2626" text-anchor="middle">B</text>
+              <!-- Calculation points circles on trendline: A(0,0) and B(0.4, 1.5) -->
+              <circle cx="65" cy="275" r="5" fill="none" stroke="#dc2626" stroke-width="2" />
+              <text x="75" y="265" font-size="11" font-weight="700" fill="#dc2626" font-family="Rubik">A (0, 0)</text>
 
-              <!-- Point C -->
-              <circle cx="257.5" cy="112.9" r="4.5" fill="#dc2626"/>
-              <text x="270" y="112" font-size="13" font-weight="800" fill="#dc2626">C</text>
-
-              <!-- Point D -->
-              <circle cx="325" cy="229" r="4.5" fill="#dc2626"/>
-              <text x="335" y="224" font-size="13" font-weight="800" fill="#dc2626">D</text>
+              <circle cx="265" cy="125" r="5" fill="none" stroke="#dc2626" stroke-width="2" />
+              <text x="250" y="115" font-size="11" font-weight="700" fill="#dc2626" font-family="Rubik">B (0.4, 1.5)</text>
             </svg>
-
-            <!-- Interactive Drawing and Laser Canvas Overlay -->
-            <canvas id="interactiveCanvas" class="interactive-canvas-layer"></canvas>
           </div>
 
-        </div>
-
-        <!-- TABS NAVIGATION -->
-        <div class="tabs-wrapper" id="tabsWrapper">
-          <button class="tab-btn active" onclick="switchSection('sec-a')">סעיף א' (מהירות התחלתית)</button>
-          <button class="tab-btn" onclick="switchSection('sec-b')">סעיף ב' (השוואת מהירות ותאוצה)</button>
-          <button class="tab-btn" onclick="switchSection('sec-c')">סעיף ג' (מהירות ממוצעת)</button>
-          <button class="tab-btn" onclick="switchSection('sec-d')">סעיף ד' (סרטוט גרף v-t)</button>
-          <button class="tab-btn" onclick="switchSection('sec-e')">סעיף ה' (כוח אופקי בנקודה C)</button>
-        </div>
-
-        <!-- SECTION CONTENT -->
-
-        <!-- SECTION A -->
-        <div id="sec-a" class="section-container active">
-          <h2 class="section-header-title">סעיף א': חישוב גודל המהירות ההתחלתית שבה נזרק הכדור (6 נקודות)</h2>
-
-          <div class="details-grid">
-            <div class="info-card">
-              <div class="info-card-title">נתוני נקודת שיא הגובה (B):</div>
-              <ul>
-                <li>ברגע $t_B = 1.00\text{ s}$: הכדור מגיע לשיא גובהו ($y_B = 45.00\text{ m}$).</li>
-                <li>בשיא הגובה המהירות הרגעית מתאפסת: $v_y(t_B) = 0$.</li>
-                <li>תאוצת הנפילה החופשית: $a_y = -g = -10.00\text{ m/s}^2$ (ציר אנכי מוגדר מעלה).</li>
-              </ul>
+          <div class="result-banner">
+            <div class="result-icon">✓</div>
+            <div class="result-text">
+              הנקודות הניסוייות מסתדרות בקירוב מצוין לאורך קו ישר העובר בראשית הצירים, המעיד על <strong>תנועה שוות-תאוצה</strong>.
             </div>
-            <div class="info-card">
-              <div class="info-card-title">השאלה הנשאלת:</div>
-              <p>חשב את גודל המהירות ההתחלתית שבה נזרק הכדור מגג הבניין ברגע $t = 0$.</p>
-            </div>
-          </div>
-
-          <div class="formula-helper-wrap">
-            <span class="formula-helper-label">נוסחאות דף עזר:</span>
-            <div class="formula-pill">$v_y(t) = v_0 - g t$</div>
-            <div class="formula-pill">$v_B^2 = v_0^2 - 2g(y_B - y_A)$</div>
-          </div>
-
-          <div class="proof-card">
-            <div class="step-block">
-              <div class="step-title">דרך א' – שימוש במשוואת מהירות-זמן בשיא הגובה:</div>
-              <p>
-                על פי משוואת מהירות-זמן של נפילה חופשית בתאוצת כובד קבועה:
-              </p>
-              <div class="math-display-box">
-                $$v_y(t) = v_0 - g \cdot t$$
-              </div>
-              <p>
-                ברגע $t_B = 1.00\text{ s}$ המהירות מתאפסת ($v_B = 0$):
-              </p>
-              <div class="math-display-box">
-                $$0 = v_0 - 10.00 \cdot 1.00 \implies v_0 = 10.00\text{ m/s}$$
-              </div>
-            </div>
-
-            <div class="step-block">
-              <div class="step-title">דרך ב' – אימות מתוך משוואת מהירות-מקום ועקרון שימור אנרגיה:</div>
-              <p>
-                הכדור עלה מגג הבניין ($y_A = 40.00\text{ m}$) עד לשיא הגובה ($y_B = 45.00\text{ m}$), כלומר עלייה של $\Delta y = 45.00 - 40.00 = 5.00\text{ m}$:
-              </p>
-              <div class="math-display-box">
-                $$v_B^2 = v_0^2 - 2g \Delta y \implies 0^2 = v_0^2 - 2 \cdot 10.00 \cdot 5.00$$
-                $$0 = v_0^2 - 100.00 \implies v_0^2 = 100.00 \implies v_0 = 10.00\text{ m/s}$$
-              </div>
-            </div>
-
-            <div class="result-banner">
-              <div class="result-icon">✓</div>
-              <div class="result-text">
-                גודל המהירות ההתחלתית שבה נזרק הכדור הוא <strong>$v_0 = 10.00\text{ m/s}$</strong>.
-              </div>
-            </div>
-          </div>
-
-          <div class="nav-buttons-wrap">
-            <div></div>
-            <button class="nav-step-btn" onclick="switchSection('sec-b')">הבא: סעיף ב' ←</button>
           </div>
         </div>
 
-        <!-- SECTION B -->
-        <div id="sec-b" class="section-container">
-          <h2 class="section-header-title">סעיף ב': השוואת מהירות ותאוצה בין נקודות המסלול (8 נקודות)</h2>
+        <div class="nav-buttons-wrap">
+          <div></div>
+          <button class="nav-step-btn" onclick="switchSection('sec-b')">הבא: סעיף ב' (שיפוע הגרף) ←</button>
+        </div>
+      </div>
 
-          <div class="details-grid">
-            <div class="info-card">
-              <div class="info-card-title">השוואת נקודות המסלול:</div>
-              <ul>
-                <li><strong>נקודה A:</strong> $y_A = 40.00\text{ m}$, $v_A = +10.00\text{ m/s}$ (עלייה).</li>
-                <li><strong>נקודה B:</strong> $y_B = 45.00\text{ m}$, $v_B = 0$ (שיא הגובה).</li>
-                <li><strong>נקודה C:</strong> $y_C = 25.00\text{ m}$, $t_C = 3.00\text{ s}$ (ירידה).</li>
-                <li>תאוצת הנפילה החופשית בכל הנקודות מוכתבת ע"י כוח הכובד בלבד.</li>
-              </ul>
-            </div>
-            <div class="info-card">
-              <div class="info-card-title">השאלות הנשאלות:</div>
-              <p><strong>(1)</strong> קבע אם גודל המהירות הרגעית של הכדור בנקודה C קטן מגודל המהירות הרגעית בנקודה A, גדול ממנו או שווה לו. נמק.</p>
-              <p><strong>(2)</strong> קבע אם התאוצה של הכדור בנקודה B זהה לתאוצתו בנקודה A. נמק (התייחס לגודל ולכיוון).</p>
-            </div>
+      <!-- ========== SECTION B ========== -->
+      <div id="sec-b" class="section-container">
+        <h2 class="section-header-title">סעיף ב': חישוב שיפוע הגרף ומשמעותו הפיזיקלית (5 נקודות)</h2>
+
+        <div class="details-grid">
+          <div class="info-card">
+            <div class="info-card-title">כלל עבודה קריטי במעבדה ובבגרות:</div>
+            <p>
+              לחישוב שיפוע קו המגמה <strong>אין להשתמש בנקודות מדידה גולמיות מן הטבלה</strong> (אלא אם הן מונחות במדויק על קו המגמה).
+              יש לבחור שתי נקודות על קו המגמה עצמו, מרוחקות זו מזו, הממוקמות בצמתי משבצות ברורים.
+            </p>
           </div>
-
-          <div class="proof-card">
-            <div class="step-block">
-              <div class="step-title">תת-סעיף (1) – השוואת גודל המהירות הרגעית בנקודה C לעומת נקודה A:</div>
-              <p>
-                <strong>קביעה:</strong> גודל המהירות הרגעית של הכדור בנקודה C <strong>גדול</strong> מגודל המהירות הרגעית בנקודה A.
-              </p>
-              <p><strong>נימוק (באמצעות שתי גישות שוות ערך):</strong></p>
-              <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
-                <li>
-                  <strong>גישה א' – שיקולי שימור אנרגיה מכנית וגובה:</strong><br>
-                  בהיעדר התנגדות אוויר, סכום האנרגיה הקינטית והאנרגיה הפוטנציאלית הכובדית נשמר לאורך כל התנועה ($E_{\text{total}} = E_k + E_p = \text{const}$). גובה הנקודה C ($y_C = 25.00\text{ m}$) נמוך מגובה הנקודה A ($y_A = 40.00\text{ m}$). מכיוון שהאנרגיה הפוטנציאלית ב-C קטנה מזו שב-A ($E_{p,C} < E_{p,A}$), האנרגיה הקינטית ב-C בהכרח גדולה מזו שב-A ($E_{k,C} > E_{k,A}$), ומכאן שגודל המהירות ב-C גדול מזה שב-A:
-                  <div class="math-display-box">
-                    $$|v_C| = \sqrt{v_0^2 + 2g(y_A - y_C)} = \sqrt{10.00^2 + 2 \cdot 10.00 \cdot (40.00 - 25.00)} = \sqrt{100.00 + 300.00} = 20.00\text{ m/s} > 10.00\text{ m/s}$$
-                  </div>
-                </li>
-                <li>
-                  <strong>גישה ב' – שיפוע המשיק לגרף $y(t)$:</strong><br>
-                  המהירות הרגעית מיוצגת על ידי שיפוע המשיק לעקומת המיקום-זמן ($v = \frac{dy}{dt}$). מהגרף ניתן לראות בבירור כי ערכו המוחלט של שיפוע המשיק בנקודה C תלול בהרבה משיפוע המשיק בנקודה A.
-                </li>
-              </ul>
-            </div>
-
-            <div class="step-block">
-              <div class="step-title">תת-סעיף (2) – השוואת התאוצה בנקודה B לתאוצה בנקודה A:</div>
-              <p>
-                <strong>קביעה:</strong> התאוצה של הכדור בנקודה B <strong>זהה לחלוטין</strong> לתאוצתו בנקודה A (הן בגודלה והן בכיוונה).
-              </p>
-              <p><strong>נימוק פיזיקלי מפורט:</strong></p>
-              <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
-                <li>התנגדות האוויר ניתנת להזנחה, ולכן לכל אורך מעופו של הכדור באוויר – כולל בשיא הגובה (נקודה B) וברגע הזריקה (נקודה A) – הכוח היחיד הפועל עליו הוא כוח הכובד ($W = mg$).</li>
-                <li>לפי החוק השני של ניוטון:
-                  <div class="math-display-box">
-                    $$\Sigma\vec{F} = m\vec{a} \implies m\vec{g} = m\vec{a} \implies \vec{a} = \vec{g}$$
-                  </div>
-                </li>
-                <li>תאוצת הכובד $g$ היא גודל קבוע: גודלה שווה תמיד ל-<strong>$10.00\text{ m/s}^2$</strong>, וכיוונה מכוון תמיד <strong>אנכית כלפי מטה</strong> לעבר מרכז כדור הארץ.</li>
-                <li>לפיכך, אף על פי שמהירות הכדור בשיא הגובה (B) מתאפסת רגעית, תאוצתו אינה מתאפסת, והיא זהה בגודלה ובכיוונה לתאוצה ברגע הזריקה (A).</li>
-              </ul>
-            </div>
-
-            <div class="result-banner">
-              <div class="result-icon">✓</div>
-              <div class="result-text">
-                (1) גודל המהירות ב-C <strong>גדול</strong> מגודל המהירות ב-A ($20.00\text{ m/s} > 10.00\text{ m/s}$).<br>
-                (2) התאוצה ב-B <strong>זהה</strong> לתאוצה ב-A: גודלה $10.00\text{ m/s}^2$ וכיוונה אנכית כלפי מטה.
-              </div>
-            </div>
-          </div>
-
-          <div class="nav-buttons-wrap">
-            <button class="nav-step-btn" onclick="switchSection('sec-a')">→ הקודם: סעיף א'</button>
-            <button class="nav-step-btn" onclick="switchSection('sec-c')">הבא: סעיף ג' ←</button>
+          <div class="info-card">
+            <div class="info-card-title">בחירת שתי נקודות על קו המגמה:</div>
+            <ul>
+              <li>נקודה A (ראשית הצירים): $(t_A, v_A) = (0.00\text{ s}, 0.00\text{ m/s})$.</li>
+              <li>נקודה B (בצומת רשת): $(t_B, v_B) = (0.40\text{ s}, 1.50\text{ m/s})$.</li>
+            </ul>
           </div>
         </div>
 
-        <!-- SECTION C -->
-        <div id="sec-c" class="section-container">
-          <h2 class="section-header-title">סעיף ג': חישוב המהירות הממוצעת במהלך התנועה כולה (6 נקודות)</h2>
+        <div class="formula-helper-wrap">
+          <span class="formula-helper-label">נוסחאות דף עזר:</span>
+          <div class="formula-pill">$\text{Slope} = \frac{\Delta v}{\Delta t} = \frac{v_B - v_A}{t_B - t_A}$</div>
+          <div class="formula-pill">$a = \text{const}$</div>
+        </div>
 
-          <div class="details-grid">
-            <div class="info-card">
-              <div class="info-card-title">נתוני נקודות הקצה של התנועה:</div>
-              <ul>
-                <li>רגע הזריקה (נקודה A): $t_1 = 0$, $y_1 = 40.00\text{ m}$.</li>
-                <li>סף הפגיעה בקרקע (נקודה D): $t_2 = 4.00\text{ s}$, $y_2 = 0$.</li>
-                <li>משך הזמן הכולל שחלף: $\Delta t = 4.00 - 0 = 4.00\text{ s}$.</li>
-              </ul>
+        <div class="proof-card">
+          <div class="step-block">
+            <div class="step-title">1. חישוב שיפוע קו המגמה:</div>
+            <div class="math-display-box">
+              $$\text{Slope} = \frac{v_B - v_A}{t_B - t_A} = \frac{1.50 - 0.00}{0.40 - 0.00} = \frac{1.50}{0.40} = 3.75\text{ m/s}^2$$
             </div>
-            <div class="info-card">
-              <div class="info-card-title">השאלה הנשאלת:</div>
-              <p>חשב את המהירות הממוצעת (<span class="highlight-bold">גודל וכיוון</span>) של הכדור במהלך תנועתו, מרגע הזריקה ($t = 0$) ועד לסף פגיעתו בקרקע ($t = 4.00\text{ s}$).</p>
-            </div>
+            <p><em>(טווח ערכים מקובל בבדיקת הבגרות בהתאם לסרטוט הידני של קו המגמה: $3.70\text{ m/s}^2 - 3.85\text{ m/s}^2$).</em></p>
           </div>
 
-          <div class="formula-helper-wrap">
-            <span class="formula-helper-label">נוסחאות דף עזר:</span>
-            <div class="formula-pill">$\bar{v} = \frac{\Delta y}{\Delta t} = \frac{y_{\text{final}} - y_{\text{initial}}}{t_{\text{final}} - t_{\text{initial}}}$</div>
+          <div class="step-block">
+            <div class="step-title">2. המשמעות הפיזיקלית של השיפוע:</div>
+            <p>
+              השיפוע של גרף מהירות-זמן ($v-t$) מייצג את קצב שינוי המהירות של הגוף ביחס לזמן, כלומר את <strong>תאוצת הגוף $m_1$ במעלה המישור</strong>:
+            </p>
+            <div class="math-display-box">
+              $$a = \frac{\Delta v}{\Delta t} = 3.75\text{ m/s}^2$$
+            </div>
+            <p>
+              מכיוון שקו המגמה הוא קו ישר, התאוצה קבועה לאורך כל תנועת המערכת לפני קריעת החוט.
+            </p>
           </div>
 
-          <div class="proof-card">
-            <div class="step-block">
-              <div class="step-title">פיתוח וחישוב וקטור המהירות הממוצעת:</div>
-              <p>
-                וקטור המהירות הממוצעת מוגדר כהעתק הכולל של הגוף מחולק במשך הזמן הכולל שבו התרחש ההעתק (הערך תלוי בנקודות הקצה בלבד ואינו תלוי בדרך שעבר הכדור):
-              </p>
-              <div class="math-display-box">
-                $$\bar{v} = \frac{\Delta y}{\Delta t} = \frac{y_D - y_A}{t_D - t_A}$$
-              </div>
-              <p>הצבת ערכי המיקום והזמן מתוך הגרף:</p>
-              <div class="math-display-box">
-                $$\bar{v} = \frac{0 - 40.00\text{ m}}{4.00\text{ s} - 0\text{ s}} = \frac{-40.00\text{ m}}{4.00\text{ s}} = -10.00\text{ m/s}$$
-              </div>
-              <p>
-                <strong>משמעות פיזיקלית (גודל וכיוון):</strong><br>
-                - <strong>גודל המהירות הממוצעת:</strong> $|\bar{v}| = 10.00\text{ m/s}$.<br>
-                - <strong>כיוון המהירות הממוצעת:</strong> הסימן השלילי מציין כי הווקטור מכוון <strong>אנכית כלפי מטה</strong> (בכיוון השלילי של ציר ה-$y$).
-              </p>
+          <div class="result-banner">
+            <div class="result-icon">✓</div>
+            <div class="result-text">
+              שיפוע הגרף שווה ל-<strong>$3.75\text{ m/s}^2$</strong>.<br>
+              <strong>משמעותו הפיזיקלית:</strong> תאוצת הגוף $m_1$ (וקצב שינוי מהירותו) במעלה המישור המשופע.
             </div>
-
-            <div class="result-banner">
-              <div class="result-icon">✓</div>
-              <div class="result-text">
-                המהירות הממוצעת: גודלה <strong>$10.00\text{ m/s}$</strong>, וכיוונה <strong>אנכית כלפי מטה</strong> (ערך בציר מעלה: $-10.00\text{ m/s}$).
-              </div>
-            </div>
-          </div>
-
-          <div class="nav-buttons-wrap">
-            <button class="nav-step-btn" onclick="switchSection('sec-b')">→ הקודם: סעיף ב'</button>
-            <button class="nav-step-btn" onclick="switchSection('sec-d')">הבא: סעיף ד' ←</button>
           </div>
         </div>
 
-        <!-- SECTION D -->
-        <div id="sec-d" class="section-container">
-          <h2 class="section-header-title">סעיף ד': סרטוט גרף מהירות-זמן $v(t)$ וסימון הנקודות a, b, c, d (8 נקודות)</h2>
+        <div class="nav-buttons-wrap">
+          <button class="nav-step-btn" onclick="switchSection('sec-a')">→ הקודם: סעיף א'</button>
+          <button class="nav-step-btn" onclick="switchSection('sec-c')">הבא: סעיף ג' (משוואות כוחות) ←</button>
+        </div>
+      </div>
 
-          <div class="details-grid">
-            <div class="info-card">
-              <div class="info-card-title">חישוב ערכי המהירות בכל נקודה:</div>
-              <ul>
-                <li>משוואת המהירות: $v(t) = v_0 - gt = 10.00 - 10.00 t$.</li>
-                <li><strong>נקודה a ($t = 0$):</strong> $v_a = +10.00\text{ m/s}$.</li>
-                <li><strong>נקודה b ($t = 1.00\text{ s}$):</strong> $v_b = 0$.</li>
-                <li><strong>נקודה c ($t = 3.00\text{ s}$):</strong> $v_c = 10.00 - 10.00 \cdot 3.00 = -20.00\text{ m/s}$.</li>
-                <li><strong>נקודה d ($t = 4.00\text{ s}$):</strong> $v_d = 10.00 - 10.00 \cdot 4.00 = -30.00\text{ m/s}$.</li>
-              </ul>
-            </div>
-            <div class="info-card">
-              <div class="info-card-title">השאלה הנשאלת:</div>
-              <p>סרטט במחברתך גרף של מהירות הכדור כפונקציה של הזמן במהלך תנועתו מ-$t = 0$ עד $t = 4.00\text{ s}$. בגרף שסרטטת סמן באותיות a, b, c, d את הנקודות המייצגות את מהירות הכדור בנקודות A, B, C, D בהתאמה.</p>
-            </div>
+      <!-- ========== SECTION C ========== -->
+      <div id="sec-c" class="section-container">
+        <h2 class="section-header-title">סעיף ג': רישום משוואות הכוחות עבור כל אחד משני הגופים (6 נקודות)</h2>
+
+        <div class="details-grid">
+          <div class="info-card">
+            <div class="info-card-title">הכוחות הפועלים על גוף $m_1$:</div>
+            <ul>
+              <li>מתיחות החוט $\vec{T}$ – במעלה המישור המשופע (בכיוון $+x$).</li>
+              <li>כוח נורמלי $\vec{N}$ – מאונך למשטח המישור המשופע כלפי מעלה.</li>
+              <li>כוח הכובד $m_1 \vec{g}$ – אנכית כלפי מטה. רכיביו:
+                <ul>
+                  <li>במקביל למישור מטה: $m_1 g \sin\alpha$.</li>
+                  <li>במאונך למישור: $m_1 g \cos\alpha$.</li>
+                </ul>
+              </li>
+            </ul>
           </div>
-
-          <div class="proof-card">
-            <div class="step-block">
-              <div class="step-title">תרשים גרפי וקטורי מדויק: גרף מהירות-זמן $v(t)$</div>
-              <p>
-                הגרף הוא קו ישר רציף בעל שיפוע קבוע $a = -g = -10.00\text{ m/s}^2$:
-              </p>
-              
-              <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; align-items: center; margin: 16px 0;">
-                <svg viewBox="0 0 440 260" width="100%" height="230" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <marker id="arrow-v" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b"/>
-                    </marker>
-                  </defs>
-
-                  <!-- Guidelines for v = 10, 0, -10, -20, -30 m/s -->
-                  <!-- v=10 at y=35, v=0 at y=80, v=-10 at y=125, v=-20 at y=170, v=-30 at y=215 -->
-                  <line x1="50" y1="35" x2="400" y2="35" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-                  <line x1="50" y1="80" x2="400" y2="80" stroke="#94a3b8" stroke-width="1.2"/> <!-- axis line v=0 -->
-                  <line x1="50" y1="125" x2="400" y2="125" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-                  <line x1="50" y1="170" x2="400" y2="170" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-                  <line x1="50" y1="215" x2="400" y2="215" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-
-                  <!-- Guidelines for t = 1, 2, 3, 4 s -->
-                  <!-- t=0 at x=65, t=1 at x=145, t=2 at x=225, t=3 at x=305, t=4 at x=385 -->
-                  <line x1="145" y1="25" x2="145" y2="225" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-                  <line x1="225" y1="25" x2="225" y2="225" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-                  <line x1="305" y1="25" x2="305" y2="225" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-                  <line x1="385" y1="25" x2="385" y2="225" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-
-                  <!-- Axes (t axis at v=0 -> y=80) -->
-                  <line x1="65" y1="80" x2="415" y2="80" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-v)"/>
-                  <line x1="65" y1="230" x2="65" y2="15" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-v)"/>
-
-                  <!-- Axis Labels -->
-                  <text x="415" y="98" font-size="12" font-weight="700" fill="#1e293b">t (s)</text>
-                  <text x="56" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="end">v (m/s)</text>
-
-                  <!-- Y ticks -->
-                  <text x="58" y="39" font-size="11" font-weight="600" fill="#475569" text-anchor="end">10</text>
-                  <text x="58" y="84" font-size="11" font-weight="600" fill="#475569" text-anchor="end">0</text>
-                  <text x="58" y="129" font-size="11" font-weight="600" fill="#475569" text-anchor="end">-10</text>
-                  <text x="58" y="174" font-size="11" font-weight="600" fill="#475569" text-anchor="end">-20</text>
-                  <text x="58" y="219" font-size="11" font-weight="600" fill="#475569" text-anchor="end">-30</text>
-
-                  <!-- X ticks -->
-                  <text x="65" y="98" font-size="11" fill="#475569" text-anchor="middle">0</text>
-                  <text x="145" y="98" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">1</text>
-                  <text x="225" y="98" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">2</text>
-                  <text x="305" y="98" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">3</text>
-                  <text x="385" y="98" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">4</text>
-
-                  <!-- Line v(t) = 10 - 10t from (0, 10) to (4, -30) -->
-                  <line x1="65" y1="35" x2="385" y2="215" stroke="#2563eb" stroke-width="3"/>
-
-                  <!-- Point a (0, 10) -->
-                  <circle cx="65" cy="35" r="4.5" fill="#dc2626"/>
-                  <text x="80" y="32" font-size="12" font-weight="800" fill="#dc2626">a (0, 10)</text>
-
-                  <!-- Point b (1, 0) -->
-                  <circle cx="145" cy="80" r="4.5" fill="#dc2626"/>
-                  <text x="145" y="70" font-size="12" font-weight="800" fill="#dc2626" text-anchor="middle">b (1, 0)</text>
-
-                  <!-- Point c (3, -20) -->
-                  <circle cx="305" cy="170" r="4.5" fill="#dc2626"/>
-                  <text x="325" y="172" font-size="12" font-weight="800" fill="#dc2626">c (3, -20)</text>
-
-                  <!-- Point d (4, -30) -->
-                  <circle cx="385" cy="215" r="4.5" fill="#dc2626"/>
-                  <text x="360" y="235" font-size="12" font-weight="800" fill="#dc2626">d (4, -30)</text>
-                </svg>
-              </div>
-            </div>
-
-            <div class="result-banner">
-              <div class="result-icon">✓</div>
-              <div class="result-text">
-                הגרף הוא קו ישר יורד בעל שיפוע קבוע $a = -10.00\text{ m/s}^2$, המתחיל ב-$a(0, 10.00\text{ m/s})$, חותך את ציר הזמן ב-$b(1.00\text{ s}, 0)$, ומסתיים ב-$d(4.00\text{ s}, -30.00\text{ m/s})$.
-              </div>
-            </div>
-          </div>
-
-          <div class="nav-buttons-wrap">
-            <button class="nav-step-btn" onclick="switchSection('sec-c')">→ הקודם: סעיף ג'</button>
-            <button class="nav-step-btn" onclick="switchSection('sec-e')">הבא: סעיף ה' ←</button>
+          <div class="info-card">
+            <div class="info-card-title">הכוחות הפועלים על גוף $m_2$:</div>
+            <ul>
+              <li>כוח הכובד $m_2 \vec{g}$ – אנכית כלפי מטה (בכיוון התנועה המוגדר חיובי).</li>
+              <li>מתיחות החוט $\vec{T}$ – אנכית כלפי מעלה.</li>
+              <li>מכיוון שהחוט אינו נמתח ומסתו זניחה, גודל המתיחות $T$ וגודל התאוצה $a$ זהים עבור שני הגופים.</li>
+            </ul>
           </div>
         </div>
 
-        <!-- SECTION E -->
-        <div id="sec-e" class="section-container">
-          <h2 class="section-header-title">סעיף ה': השפעת כוח אופקי רגעי בנקודה C על הגרף $y(t)$ (5 נקודות)</h2>
+        <div class="formula-helper-wrap">
+          <span class="formula-helper-label">נוסחאות דף עזר:</span>
+          <div class="formula-pill">$\Sigma \vec{F} = m \vec{a}$</div>
+          <div class="formula-pill">$W_x = m g \sin\alpha$</div>
+          <div class="formula-pill">$W_y = m g \cos\alpha$</div>
+        </div>
 
-          <div class="details-grid">
-            <div class="info-card">
-              <div class="info-card-title">התנאים החדשים:</div>
-              <ul>
-                <li>הכדור נזרק באותם תנאים התחלתיים בדיוק ($y_0 = 40.00\text{ m}$, $v_0 = 10.00\text{ m/s}$ מעלה).</li>
-                <li>ברגע המעבר בנקודה C ($t = 3.00\text{ s}$) מופעל כוח <strong>אופקי רגעי בלבד</strong>.</li>
-                <li>הגרף המדובר הוא גרף <strong>המיקום האנכי כפונקציה של הזמן</strong> ($y(t)$).</li>
-              </ul>
-            </div>
-            <div class="info-card">
-              <div class="info-card-title">השאלה הנשאלת:</div>
-              <p>קבע אם הגרף $y(t)$ הנתון בשאלה ישתנה בגלל הפעלת הכוח. נמק את קביעתך.</p>
+        <div class="proof-card">
+          <div class="step-block">
+            <div class="step-title">1. תרשימי כוחות וקטוריים (Line Art):</div>
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; margin: 16px 0;">
+              <!-- FBD Body 1 -->
+              <svg viewBox="0 0 240 220" width="220" height="200">
+                <!-- Incline surface dashed line -->
+                <line x1="20" y1="180" x2="220" y2="65" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,3" />
+                <!-- Body center at (120, 122) -->
+                <g transform="translate(120, 122) rotate(-30)">
+                  <rect x="-25" y="-20" width="50" height="40" fill="none" stroke="#000000" stroke-width="2" />
+                  <circle cx="0" cy="0" r="3" fill="#000000" />
+                  <!-- Normal Force N -->
+                  <line x1="0" y1="0" x2="0" y2="-65" stroke="#000000" stroke-width="2" />
+                  <polygon points="0,-70 -4,-58 4,-58" fill="#000000" />
+                  <text x="8" y="-55" font-size="13" font-family="Rubik">N</text>
+                  <!-- Tension T (up incline) -->
+                  <line x1="0" y1="0" x2="-65" y2="0" stroke="#000000" stroke-width="2" />
+                  <polygon points="-70,0 -58,-4 -58,4" fill="#000000" />
+                  <text x="-65" y="-8" font-size="13" font-family="Rubik">T</text>
+                  <!-- m1 g sin(alpha) (down incline) -->
+                  <line x1="0" y1="0" x2="55" y2="0" stroke="#000000" stroke-width="2" />
+                  <polygon points="60,0 48,-4 48,4" fill="#000000" />
+                  <text x="45" y="-8" font-size="11" font-family="Rubik">m₁g·sinα</text>
+                  <!-- m1 g cos(alpha) (into incline) -->
+                  <line x1="0" y1="0" x2="0" y2="55" stroke="#000000" stroke-width="2" />
+                  <polygon points="0,60 -4,48 4,48" fill="#000000" />
+                  <text x="8" y="52" font-size="11" font-family="Rubik">m₁g·cosα</text>
+                </g>
+                <!-- True Gravity m1g directly down -->
+                <line x1="120" y1="122" x2="120" y2="195" stroke="#000000" stroke-width="1.8" stroke-dasharray="4,3" />
+                <polygon points="120,200 116,190 124,190" fill="#000000" />
+                <text x="126" y="195" font-size="13" font-family="Rubik">m₁g</text>
+                <text x="120" y="25" font-size="13" font-weight="700" fill="#000000" text-anchor="middle" font-family="Rubik">תרשים כוחות: גוף m₁</text>
+              </svg>
+
+              <!-- FBD Body 2 -->
+              <svg viewBox="0 0 180 220" width="180" height="200">
+                <rect x="70" y="90" width="40" height="50" fill="none" stroke="#000000" stroke-width="2" />
+                <circle cx="90" cy="115" r="3" fill="#000000" />
+                <!-- Tension T upwards -->
+                <line x1="90" y1="115" x2="90" y2="40" stroke="#000000" stroke-width="2" />
+                <polygon points="90,34 86,46 94,46" fill="#000000" />
+                <text x="98" y="48" font-size="14" font-family="Rubik">T</text>
+                <!-- Gravity m2g downwards -->
+                <line x1="90" y1="115" x2="90" y2="190" stroke="#000000" stroke-width="2" />
+                <polygon points="90,196 86,184 94,184" fill="#000000" />
+                <text x="98" y="190" font-size="14" font-family="Rubik">m₂g</text>
+                <!-- +y direction label -->
+                <line x1="40" y1="100" x2="40" y2="145" stroke="#64748b" stroke-width="1.5" />
+                <polygon points="40,150 37,140 43,140" fill="#64748b" />
+                <text x="32" y="130" font-size="11" fill="#64748b" font-family="Rubik">+y</text>
+                <text x="90" y="25" font-size="13" font-weight="700" fill="#000000" text-anchor="middle" font-family="Rubik">תרשים כוחות: גוף m₂</text>
+              </svg>
             </div>
           </div>
 
-          <div class="formula-helper-wrap">
-            <span class="formula-helper-label">עקרונות פיזיקליים:</span>
-            <div class="formula-pill">$\vec{F} = F_x \hat{i} \implies F_y = 0$</div>
-            <div class="formula-pill">עקרון אי-תלות התנועות במרחב</div>
-          </div>
-
-          <div class="proof-card">
-            <div class="step-block">
-              <div class="step-title">קביעה חד-משמעית:</div>
-              <p>
-                <strong>הגרף $y(t)$ לא ישתנה כלל.</strong>
-              </p>
+          <div class="step-block">
+            <div class="step-title">2. רישום משוואות החוק השני של ניוטון:</div>
+            <p><strong>עבור גוף $m_1$:</strong></p>
+            <p>בציר המקביל למישור המשופע (כיוון ציר $x$ במעלה המישור מוגדר כחיובי):</p>
+            <div class="math-display-box">
+              $$\Sigma F_x = T - m_1 g \sin\alpha = m_1 a$$
+            </div>
+            <p>בציר הניצב למישור המשופע (אין תנועה, שיווי משקל לפי החוק הראשון של ניוטון):</p>
+            <div class="math-display-box">
+              $$\Sigma F_y = N - m_1 g \cos\alpha = 0 \implies N = m_1 g \cos\alpha$$
             </div>
 
-            <div class="step-block">
-              <div class="step-title">נימוק פיזיקלי מפורט (עקרון אי-תלות התנועות):</div>
-              <ul style="margin-right: 20px; line-height: 1.8; color: #334155; margin-top: 6px;">
-                <li>הכוח שהופעל על הכדור הוא <strong>כוח אופקי</strong> (פועל לאורך ציר ה-$x$).</li>
-                <li>על פי חוקי ניוטון ועקרון הסופרפוזיציה, כוח אופקי מעניק תאוצה בכיוון האופקי בלבד ומשנה אך ורק את רכיב המהירות האופקי $v_x$ ואת המיקום האופקי $x(t)$.</li>
-                <li>לכוח אופקי <strong>אין כל רכיב או היטל לאורך הציר האנכי</strong> ($F_y = 0$).</li>
-                <li>לאורך הציר האנכי ($y$) ממשיך לפעול אך ורק כוח הכובד ($F_{g,y} = -mg$), ולכן התאוצה האנכית נשארת ללא כל שינוי: $a_y = -g = -10.00\text{ m/s}^2$.</li>
-                <li>כמו כן, הפעלת הכוח האופקי אינה משנה את המיקום האנכי $y_C = 25.00\text{ m}$ או את המהירות האנכית $v_{y,C} = -20.00\text{ m/s}$ ברגע הפעלת הכוח.</li>
-                <li>על פי <strong>עקרון אי-תלות התנועות</strong> של גלילאו, התנועה לאורך ציר ה-$y$ מתנהלת באופן בלתי תלוי לחלוטין בתנועה לאורך ציר ה-$x$.</li>
-              </ul>
-              <p style="margin-top: 8px;">
-                לפיכך, פונקציית המיקום האנכי $y(t) = 40.00 + 10.00 t - 5.00 t^2$ נותרת בעינה לכל אורך התנועה, והגרף $y(t)$ אינו משתנה כלל.
-              </p>
-            </div>
-
-            <div class="result-banner">
-              <div class="result-icon">✓</div>
-              <div class="result-text">
-                הגרף $y(t)$ <strong>לא ישתנה כלל</strong>. נימוק: הכוח שהופעל הוא אופקי ואין לו רכיב בכיוון האנכי ($F_y = 0$). על פי עקרון אי-תלות התנועות, התנועה האנכית נקבעת אך ורק על ידי כוח הכובד ותנאי ההתחלה האנכיים שנותרו ללא שינוי.
-              </div>
+            <p style="margin-top: 14px;"><strong>עבור גוף $m_2$:</strong></p>
+            <p>בציר האנכי (הכיוון כלפי מטה מוגדר כחיובי בהתאם לכיוון התנועה):</p>
+            <div class="math-display-box">
+              $$\Sigma F_y = m_2 g - T = m_2 a$$
             </div>
           </div>
 
-          <div class="nav-buttons-wrap">
-            <button class="nav-step-btn" onclick="switchSection('sec-d')">→ הקודם: סעיף ד'</button>
-            <div></div>
+          <div class="result-banner">
+            <div class="result-icon">✓</div>
+            <div class="result-text">
+              <strong>משוואות התנועה לאורך צירי התנועה:</strong><br>
+              גוף $m_1$: $T - m_1 g \sin\alpha = m_1 a$<br>
+              גוף $m_2$: $m_2 g - T = m_2 a$
+            </div>
           </div>
         </div>
 
+        <div class="nav-buttons-wrap">
+          <button class="nav-step-btn" onclick="switchSection('sec-b')">→ הקודם: סעיף ב'</button>
+          <button class="nav-step-btn" onclick="switchSection('sec-d')">הבא: סעיף ד' (מתיחות החוט) ←</button>
+        </div>
+      </div>
+
+      <!-- ========== SECTION D ========== -->
+      <div id="sec-d" class="section-container">
+        <h2 class="section-header-title">סעיף ד': חישוב מתיחות החוט במהלך התנועה (5 נקודות)</h2>
+
+        <div class="details-grid">
+          <div class="info-card">
+            <div class="info-card-title">נתונים ידועים לחישוב:</div>
+            <ul>
+              <li>מסת הגוף הראשון: $m_1 = 0.50\text{ kg}$.</li>
+              <li>זווית הנטייה: $\alpha = 30^\circ \implies \sin(30^\circ) = 0.50$.</li>
+              <li>תאוצת המערכת משיפוע הגרף (סעיף ב'): $a = 3.75\text{ m/s}^2$.</li>
+              <li>תאוצת הכובד: $g = 10.00\text{ m/s}^2$ (ובדיקה עבור $g = 9.80\text{ m/s}^2$).</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <div class="info-card-title">יתרון פדגוגי – פתרון ישיר ללא $m_2$:</div>
+            <p>
+              משוואת התנועה של גוף $m_1$ מכילה נעלם אחד בלבד – את מתיחות החוט $T$.
+              לכן אין צורך לחשב מראש את מסתו של $m_2$, וניתן לחלץ את $T$ ישירות ובאופן מדויק.
+            </p>
+          </div>
+        </div>
+
+        <div class="formula-helper-wrap">
+          <span class="formula-helper-label">נוסחאות דף עזר:</span>
+          <div class="formula-pill">$T = m_1 (a + g \sin\alpha)$</div>
+          <div class="formula-pill">$m_2 = \frac{T}{g - a}$</div>
+        </div>
+
+        <div class="proof-card">
+          <div class="step-block">
+            <div class="step-title">דרך א': הצבה ישירה במשוואת הכוחות של גוף $m_1$ (עבור $g = 10.00\text{ m/s}^2$)</div>
+            <p>נבודד את מתיחות החוט $T$ מתוך משוואת התנועה בציר $x$:</p>
+            <div class="math-display-box">
+              $$T - m_1 g \sin\alpha = m_1 a \implies T = m_1 (a + g \sin\alpha)$$
+            </div>
+            <p>נציב את הנתונים:</p>
+            <div class="math-display-box">
+              $$T = 0.50 \cdot [3.75 + 10.00 \cdot \sin(30^\circ)] = 0.50 \cdot [3.75 + 5.00] = 0.50 \cdot 8.75 = 4.375\text{ N}$$
+            </div>
+            <p><em>עבור הצבה של $g = 9.80\text{ m/s}^2$:</em></p>
+            <div class="math-display-box">
+              $$T = 0.50 \cdot [3.75 + 9.80 \cdot 0.50] = 0.50 \cdot [3.75 + 4.90] = 0.50 \cdot 8.65 = 4.325\text{ N}$$
+            </div>
+          </div>
+
+          <div class="step-block">
+            <div class="step-title">דרך ב': מציאת מסת הגוף התלוי $m_2$ ואימות המתיחות</div>
+            <p>נחבר את שתי משוואות התנועה של המערכת כדי לבודד את $m_2$:</p>
+            <div class="math-display-box">
+              $$(T - m_1 g \sin\alpha) + (m_2 g - T) = m_1 a + m_2 a$$
+              $$m_2 g - m_1 g \sin\alpha = (m_1 + m_2) a$$
+              $$m_2 (g - a) = m_1 (a + g \sin\alpha)$$
+              $$m_2 = \frac{m_1 (a + g \sin\alpha)}{g - a} = \frac{0.50 \cdot (3.75 + 5.00)}{10.00 - 3.75} = \frac{4.375}{6.25} = 0.70\text{ kg}$$
+            </div>
+            <p>נציב כעת את $m_2 = 0.70\text{ kg}$ במשוואת הכוחות של גוף 2:</p>
+            <div class="math-display-box">
+              $$T = m_2 (g - a) = 0.70 \cdot (10.00 - 3.75) = 0.70 \cdot 6.25 = 4.375\text{ N}$$
+            </div>
+          </div>
+
+          <div class="result-banner">
+            <div class="result-icon">✓</div>
+            <div class="result-text">
+              מתיחות החוט במהלך התנועה היא: <strong>$4.375\text{ N}$</strong> (או $4.38\text{ N}$; עבור $g = 9.8\text{ m/s}^2$: $4.33\text{ N}$).
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons-wrap">
+          <button class="nav-step-btn" onclick="switchSection('sec-c')">→ הקודם: סעיף ג'</button>
+          <button class="nav-step-btn" onclick="switchSection('sec-e')">הבא: סעיף ה' (יחס תאוצות) ←</button>
+        </div>
+      </div>
+
+      <!-- ========== SECTION E ========== -->
+      <div id="sec-e" class="section-container">
+        <h2 class="section-header-title">סעיף ה': חישוב היחס $\frac{a_1}{a_2}$ בין תאוצות הגופים לאחר קריעת החוט (5 נקודות)</h2>
+
+        <div class="details-grid">
+          <div class="info-card">
+            <div class="info-card-title">השינוי הפיזיקלי ברגע קריעת החוט:</div>
+            <p>
+              ברגע שהחוט נקרע, מתיחות החוט מתאפסת מיד ($T = 0$).<br>
+              כל גוף ממשיך לנוע באופן עצמאי לחלוטין בהשפעת הכוחות הפועלים עליו בלבד, בהתאם לצירי התנועה שהוגדרו מראש.
+            </p>
+          </div>
+          <div class="info-card">
+            <div class="info-card-title">הגדרת הכיוונים החיוביים המקורית:</div>
+            <ul>
+              <li><strong>עבור גוף $m_1$:</strong> הכיוון החיובי נקבע <strong>במעלה המישור</strong> ($+x$).</li>
+              <li><strong>עבור גוף $m_2$:</strong> הכיוון החיובי נקבע <strong>כלפי מטה</strong> ($+y'$).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="formula-helper-wrap">
+          <span class="formula-helper-label">נוסחאות דף עזר:</span>
+          <div class="formula-pill">$a_1 = -g \sin\alpha$</div>
+          <div class="formula-pill">$a_2 = +g$</div>
+          <div class="formula-pill">$\frac{a_1}{a_2} = -\sin\alpha$</div>
+        </div>
+
+        <div class="proof-card">
+          <div class="step-block">
+            <div class="step-title">1. תאוצת הגוף $m_2$ לאחר קריעת החוט:</div>
+            <p>
+              הכוח היחיד הפועל על הגוף $m_2$ הוא כוח הכובד כלפי מטה. הגוף מבצע <strong>נפילה חופשית</strong>.
+              מכיוון שהכיוון החיובי נקבע מטה:
+            </p>
+            <div class="math-display-box">
+              $$\Sigma F_y = m_2 g = m_2 a_2 \implies a_2 = +g = +10.00\text{ m/s}^2$$
+            </div>
+          </div>
+
+          <div class="step-block">
+            <div class="step-title">2. תאוצת הגוף $m_1$ לאחר קריעת החוט:</div>
+            <p>
+              על גוף $m_1$ פועל לאורך המישור אך ורק רכיב כוח הכובד במורד המישור ($T = 0$, ואין חיכוך).
+              מכיוון שהכיוון החיובי של ציר $x$ הוגדר במעלה המישור:
+            </p>
+            <div class="math-display-box">
+              $$\Sigma F_x = -m_1 g \sin\alpha = m_1 a_1 \implies a_1 = -g \sin\alpha = -g \sin(30^\circ) = -0.50 \cdot g = -5.00\text{ m/s}^2$$
+            </div>
+          </div>
+
+          <div class="step-block">
+            <div class="step-title">3. חישוב היחס בין התאוצות:</div>
+            <p><strong>יחס וקטורי אלגברי (כולל כיוון וסימן ביחס לצירים):</strong></p>
+            <div class="math-display-box">
+              $$\frac{a_1}{a_2} = \frac{-g \sin\alpha}{g} = -\sin\alpha = -\sin(30^\circ) = -0.50$$
+            </div>
+            <p><strong>יחס בין גודלי התאוצות (סקלרי / בערך מוחלט):</strong></p>
+            <div class="math-display-box">
+              $$\frac{|a_1|}{|a_2|} = \frac{0.50 \cdot g}{g} = 0.50$$
+            </div>
+            <p style="font-size: 0.9rem; color: #475569;">
+              במחוון בחינת הבגרות מתקבלות שתי הצורות: היחס האלגברי עם סימן ($-0.50$) או יחס הגדלים ($0.50$).
+            </p>
+          </div>
+
+          <div class="result-banner">
+            <div class="result-icon">✓</div>
+            <div class="result-text">
+              היחס בין התאוצות הוא: <strong>$\frac{a_1}{a_2} = -0.50$</strong> (או כגודל מוחלט: <strong>$0.50$</strong>).
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons-wrap">
+          <button class="nav-step-btn" onclick="switchSection('sec-d')">→ הקודם: סעיף ד'</button>
+          <button class="nav-step-btn" onclick="switchSection('sec-f')">הבא: סעיף ו' (זיהוי גרף מהירויות) ←</button>
+        </div>
+      </div>
+
+      <!-- ========== SECTION F ========== -->
+      <div id="sec-f" class="section-container">
+        <h2 class="section-header-title">סעיף ו': קביעת הגרף המתאר נכון את מהירות הגופים מרגע קריעת החוט (4 נקודות)</h2>
+
+        <div class="details-grid">
+          <div class="info-card">
+            <div class="info-card-title">מצב הגופים ברגע קריעת החוט ($t = 1.00\text{ s}$):</div>
+            <ul>
+              <li>שני הגופים היו מחוברים בחוט עד לרגע הקריעה, ולכן <strong>גודל מהירותם ברגע זה זהה</strong>.</li>
+              <li>מכיוון ששניהם נעו בכיוון החיובי של ציריהם, שתי המהירויות חיוביות ומתחילות בדיוק מ<strong>אותה נקודה חיובית בציר האנכי</strong>.</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <div class="info-card-title">התנהגות המהירויות ושיפועי הגרפים:</div>
+            <ul>
+              <li><strong>עבור גוף $m_2$:</strong> התאוצה חיובית ($a_2 = +g$). הגוף מאיץ מטה $\implies$ הגרף של $m_2$ <strong>עולה</strong> בשיפוע תלול ($+g$).</li>
+              <li><strong>עבור גוף $m_1$:</strong> התאוצה שלילית ($a_1 = -0.5g$). הגוף מאט במעלה המישור עד לעצירה רגעית ומשנה כיוון $\implies$ הגרף של $m_1$ <strong>יורד</strong> בשיפוע מתון יותר (חותך את ציר הזמן).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="proof-card">
+          <div class="step-title">ניתוח ארבעת הגרפים הנתונים:</div>
+
+          <div class="choices-grid">
+            <!-- Graph 1 -->
+            <div class="choice-card">
+              <svg viewBox="0 0 160 140" width="100%" height="110">
+                <line x1="20" y1="100" x2="145" y2="100" stroke="#000000" stroke-width="1.5" />
+                <line x1="20" y1="125" x2="20" y2="15" stroke="#000000" stroke-width="1.5" />
+                <!-- m2 starts above, m1 starts at zero -->
+                <line x1="20" y1="65" x2="80" y2="25" stroke="#000000" stroke-width="2" />
+                <text x="85" y="25" font-size="11" font-family="Rubik">m₂</text>
+                <line x1="20" y1="100" x2="120" y2="125" stroke="#000000" stroke-width="2" />
+                <text x="125" y="125" font-size="11" font-family="Rubik">m₁</text>
+                <text x="145" y="115" font-size="10" font-family="Rubik">t(s)</text>
+                <text x="12" y="18" font-size="10" font-family="Rubik">v</text>
+              </svg>
+              <div style="font-weight: 700; font-size: 0.95rem;">גרף 1</div>
+              <div class="choice-badge badge-wrong">שגוי: נקודות התחלה שונות</div>
+            </div>
+
+            <!-- Graph 2 -->
+            <div class="choice-card">
+              <svg viewBox="0 0 160 140" width="100%" height="110">
+                <line x1="20" y1="100" x2="145" y2="100" stroke="#000000" stroke-width="1.5" />
+                <line x1="20" y1="125" x2="20" y2="15" stroke="#000000" stroke-width="1.5" />
+                <!-- Same start point, but m1 is steeper than m2 -->
+                <line x1="20" y1="65" x2="80" y2="25" stroke="#000000" stroke-width="2" />
+                <text x="85" y="25" font-size="11" font-family="Rubik">m₂</text>
+                <line x1="20" y1="65" x2="135" y2="110" stroke="#000000" stroke-width="2" />
+                <text x="138" y="112" font-size="11" font-family="Rubik">m₁</text>
+                <text x="145" y="115" font-size="10" font-family="Rubik">t(s)</text>
+                <text x="12" y="18" font-size="10" font-family="Rubik">v</text>
+              </svg>
+              <div style="font-weight: 700; font-size: 0.95rem;">גרף 2</div>
+              <div class="choice-badge badge-wrong">שגוי: שיפוע m₁ תלול פחות אך חיתוך מאוחר מדי ביחס לתלילות</div>
+            </div>
+
+            <!-- Graph 3 (CORRECT) -->
+            <div class="choice-card correct">
+              <svg viewBox="0 0 160 140" width="100%" height="110">
+                <line x1="20" y1="100" x2="145" y2="100" stroke="#000000" stroke-width="1.5" />
+                <line x1="20" y1="125" x2="20" y2="15" stroke="#000000" stroke-width="1.5" />
+                <!-- Same start point, m2 steep slope +g, m1 slope -0.5g (less steep) -->
+                <line x1="20" y1="65" x2="80" y2="15" stroke="#059669" stroke-width="2.5" />
+                <text x="85" y="20" font-size="12" font-weight="700" fill="#059669" font-family="Rubik">m₂</text>
+                <line x1="20" y1="65" x2="115" y2="115" stroke="#059669" stroke-width="2.5" />
+                <text x="118" y="120" font-size="12" font-weight="700" fill="#059669" font-family="Rubik">m₁</text>
+                <circle cx="20" cy="65" r="3.5" fill="#059669" />
+                <text x="145" y="115" font-size="10" font-family="Rubik">t(s)</text>
+                <text x="12" y="18" font-size="10" font-family="Rubik">v</text>
+              </svg>
+              <div style="font-weight: 700; font-size: 0.95rem; color: #065f46;">גרף 3 (הגרף הנכון)</div>
+              <div class="choice-badge badge-correct">התשובה הנכונה</div>
+            </div>
+
+            <!-- Graph 4 -->
+            <div class="choice-card">
+              <svg viewBox="0 0 160 140" width="100%" height="110">
+                <line x1="20" y1="100" x2="145" y2="100" stroke="#000000" stroke-width="1.5" />
+                <line x1="20" y1="125" x2="20" y2="15" stroke="#000000" stroke-width="1.5" />
+                <!-- Same start, but both slopes have equal steepness |a1| = |a2| -->
+                <line x1="20" y1="65" x2="70" y2="15" stroke="#000000" stroke-width="2" />
+                <text x="75" y="20" font-size="11" font-family="Rubik">m₂</text>
+                <line x1="20" y1="65" x2="70" y2="115" stroke="#000000" stroke-width="2" />
+                <text x="75" y="120" font-size="11" font-family="Rubik">m₁</text>
+                <text x="145" y="115" font-size="10" font-family="Rubik">t(s)</text>
+                <text x="12" y="18" font-size="10" font-family="Rubik">v</text>
+              </svg>
+              <div style="font-weight: 700; font-size: 0.95rem;">גרף 4</div>
+              <div class="choice-badge badge-wrong">שגוי: שיפועים שווים בתלילותם</div>
+            </div>
+          </div>
+
+          <div class="step-block">
+            <div class="step-title">נימוק פיזיקלי מסכם ומנוסח לבגרות:</div>
+            <p>
+              1. <strong>נקודת ההתחלה:</strong> ברגע קריעת החוט שני הגופים נעו יחד באותה מהירות ובכיוון החיובי של ציריהם. לכן, שתי העקומות חייבות לצאת מ<strong>אותה נקודה חיובית על ציר המהירות</strong> (פוסל את גרף 1).<br><br>
+              2. <strong>כיוון השיפועים:</strong> תאוצת הגוף $m_2$ היא חיובית ($+g$), ולכן הגרף שלו עולה (מהירותו גדלה). לעומת זאת, תאוצת הגוף $m_1$ היא שלילית ($-0.5g$), ולכן הגרף שלו יורד (מהירותו קטנה עד להתאפסותה והחלפת כיוון).<br><br>
+              3. <strong>תלילות השיפועים (היחס בין התאוצות):</strong> מסעיף ה' מצאנו כי:
+            </p>
+            <div class="math-display-box">
+              $$|a_2| = g = 2 \cdot |a_1| \implies |a_2| > |a_1|$$
+            </div>
+            <p>
+              כלומר, <strong>שיפוע הגרף של הגוף $m_2$ תלול פי 2 משיפוע הגרף של הגוף $m_1$</strong> (בגרף 4 השיפועים שווים בתלילותם, ולכן הוא נפסל; בגרף 2 שיפוע $m_1$ מתון בצורה לא פרופורציונלית ביחס לערך הפיזיקלי).<br><br>
+              הגרף היחיד המקיים במדויק את כל התנאים הפיזיקליים הללו הוא <strong>גרף 3</strong>.
+            </p>
+          </div>
+
+          <div class="result-banner">
+            <div class="result-icon">✓</div>
+            <div class="result-text">
+              הגרף הנכון הוא <strong>גרף 3</strong>.
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons-wrap">
+          <button class="nav-step-btn" onclick="switchSection('sec-e')">→ הקודם: סעיף ה'</button>
+          <div></div>
+        </div>
       </div>
 
     </div>
   </div>
 
   <script>
-    // Tab Navigation Logic with smooth scroll
+    /* =========================================================
+       1. TABS NAVIGATION & SMOOTH SCROLL
+       ========================================================= */
     function switchSection(sectionId) {
-      document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      const sections = document.querySelectorAll('.section-container');
+      sections.forEach(sec => sec.classList.remove('active'));
 
-      const target = document.getElementById(sectionId);
-      if (target) {
-        target.classList.add('active');
+      const buttons = document.querySelectorAll('#sections-tabs .tab-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      const targetSec = document.getElementById(sectionId);
+      if (targetSec) {
+        targetSec.classList.add('active');
       }
 
-      const tabs = ['sec-a', 'sec-b', 'sec-c', 'sec-d', 'sec-e'];
-      const idx = tabs.indexOf(sectionId);
-      const buttons = document.querySelectorAll('.tab-btn');
-      if (idx !== -1 && buttons[idx]) {
-        buttons[idx].classList.add('active');
+      const secIds = ['sec-a', 'sec-b', 'sec-c', 'sec-d', 'sec-e', 'sec-f'];
+      const index = secIds.indexOf(sectionId);
+      if (index !== -1 && buttons[index]) {
+        buttons[index].classList.add('active');
       }
 
-      const tabsWrapper = document.getElementById('tabsWrapper');
-      if (tabsWrapper) {
-        tabsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Smooth scroll directly to active card content
+      const card = document.getElementById('active-content-card');
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // Typeset MathJax if required
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise();
       }
     }
 
-    // Layout Toggling Logic (19:6 vs 6:19)
-    function setLayout(mode) {
-      const wrapper = document.getElementById('main-wrapper');
-      const btn19 = document.getElementById('btn-19-6');
-      const btn6 = document.getElementById('btn-6-19');
+    /* =========================================================
+       2. DUAL LAYOUT SWITCHER (19X6 Wide vs 6X19 Vertical)
+       ========================================================= */
+    function setLayoutMode(mode) {
+      const container = document.getElementById('main-container');
+      const btnWide = document.getElementById('btn-layout-wide');
+      const btnMobile = document.getElementById('btn-layout-mobile');
 
-      if (mode === '19-6') {
-        wrapper.className = 'layout-19-6';
-        btn19.classList.add('active');
-        btn6.classList.remove('active');
+      if (mode === '19x6') {
+        container.classList.remove('mode-6x19');
+        container.classList.add('mode-19x6');
+        btnWide.classList.add('active');
+        btnMobile.classList.remove('active');
       } else {
-        wrapper.className = 'layout-6-19';
-        btn6.classList.add('active');
-        btn19.classList.remove('active');
+        container.classList.remove('mode-19x6');
+        container.classList.add('mode-6x19');
+        btnMobile.classList.add('active');
+        btnWide.classList.remove('active');
       }
-      setTimeout(resizeCanvas, 150);
+
+      setTimeout(resizeCanvas, 50);
     }
 
-    // Canvas & Interactive Tools Logic (Disabled automatically by default)
-    const canvas = document.getElementById('interactiveCanvas');
+    /* =========================================================
+       3. INTERACTIVE CANVAS: DRAWING, LASER POINTER & SNAP
+       ========================================================= */
+    const stage = document.getElementById('graph-stage');
+    const canvas = document.getElementById('drawing-canvas');
     const ctx = canvas.getContext('2d');
+
+    let currentTool = 'none'; // 'none', 'draw', 'laser'
     let isDrawing = false;
-    let startX = 0, startY = 0;
-    let currentX = 0, currentY = 0;
+    let snapEnabled = false;
+    let startX = 0;
+    let startY = 0;
 
-    let laserMode = false;
-    let snapToStraightLine = false;
+    const drawnPaths = [];
+    let currentPath = null;
 
-    let laserTrail = [];
-    const LASER_LIFETIME = 2000; // Exactly 2 seconds (2000ms)
-
-    let persistentPaths = [];
+    let laserPoints = [];
+    let laserAnimationId = null;
 
     function resizeCanvas() {
-      const parent = canvas.parentElement;
-      canvas.width = parent.clientWidth;
-      canvas.height = parent.clientHeight;
-      redraw();
-    }
-    window.addEventListener('resize', resizeCanvas);
-    window.addEventListener('load', resizeCanvas);
+      const rect = stage.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
 
-    function toggleLaser() {
-      laserMode = !laserMode;
-      const btn = document.getElementById('laser-btn');
-      btn.classList.toggle('active', laserMode);
-      if (laserMode) {
-        laserTrail = [];
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+
+      ctx.scale(dpr, dpr);
+      redrawStaticDrawings();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('DOMContentLoaded', () => {
+      resizeCanvas();
+    });
+
+    function setDrawingTool(tool) {
+      const btnDraw = document.getElementById('btn-draw');
+      const btnLaser = document.getElementById('btn-laser');
+
+      if (currentTool === tool) {
+        currentTool = 'none';
+        btnDraw.classList.remove('active');
+        btnLaser.classList.remove('active');
+        canvas.className = 'drawing-canvas-layer';
+      } else {
+        currentTool = tool;
+        btnDraw.classList.toggle('active', tool === 'draw');
+        btnLaser.classList.toggle('active', tool === 'laser');
+        canvas.className = 'drawing-canvas-layer tool-' + tool;
+
+        if (tool === 'laser' && !laserAnimationId) {
+          laserLoop();
+        }
       }
     }
 
     function toggleSnap() {
-      snapToStraightLine = !snapToStraightLine;
-      const btn = document.getElementById('snap-btn');
-      btn.innerText = snapToStraightLine ? "יישור קווים אוטומטי: פעיל" : "יישור קווים אוטומטי: כבוי";
-      btn.classList.toggle('active', snapToStraightLine);
+      snapEnabled = !snapEnabled;
+      const stateSpan = document.getElementById('snap-state');
+      const btnSnap = document.getElementById('btn-snap');
+      stateSpan.textContent = snapEnabled ? 'פעיל' : 'כבוי';
+      btnSnap.classList.toggle('active', snapEnabled);
     }
 
-    function clearDrawings() {
-      persistentPaths = [];
-      laserTrail = [];
-      redraw();
+    function clearCanvas() {
+      drawnPaths.length = 0;
+      laserPoints.length = 0;
+      redrawStaticDrawings();
     }
 
     function getCoords(e) {
       const rect = canvas.getBoundingClientRect();
-      const cx = e.touches ? e.touches[0].clientX : e.clientX;
-      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       return {
-        x: cx - rect.left,
-        y: cy - rect.top
+        x: clientX - rect.left,
+        y: clientY - rect.top
       };
     }
 
-    // Mouse & Touch Handlers
-    canvas.addEventListener('mousedown', (e) => {
-      const p = getCoords(e);
+    canvas.addEventListener('pointerdown', (e) => {
+      if (currentTool === 'none') return;
       isDrawing = true;
-      startX = p.x;
-      startY = p.y;
-      currentX = p.x;
-      currentY = p.y;
-    });
+      const pos = getCoords(e);
+      startX = pos.x;
+      startY = pos.y;
 
-    canvas.addEventListener('mousemove', (e) => {
-      const p = getCoords(e);
-      currentX = p.x;
-      currentY = p.y;
-      if (laserMode) {
-        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+      if (currentTool === 'draw') {
+        currentPath = {
+          snap: snapEnabled,
+          color: '#2563eb',
+          width: 2.5,
+          points: [{ x: pos.x, y: pos.y }]
+        };
+      } else if (currentTool === 'laser') {
+        addLaserPoint(pos.x, pos.y);
       }
     });
 
-    window.addEventListener('mouseup', () => {
+    window.addEventListener('pointermove', (e) => {
+      if (!isDrawing || currentTool === 'none') {
+        if (currentTool === 'laser' && !isDrawing) {
+          const rect = canvas.getBoundingClientRect();
+          if (e.clientX >= rect.left && e.clientX <= rect.right &&
+              e.clientY >= rect.top && e.clientY <= rect.bottom) {
+            addLaserPoint(e.clientX - rect.left, e.clientY - rect.top);
+          }
+        }
+        return;
+      }
+
+      const pos = getCoords(e);
+
+      if (currentTool === 'draw') {
+        if (snapEnabled) {
+          redrawStaticDrawings();
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(pos.x, pos.y);
+          ctx.strokeStyle = '#2563eb';
+          ctx.lineWidth = 2.5;
+          ctx.lineCap = 'round';
+          ctx.setLineDash([4, 4]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        } else {
+          currentPath.points.push(pos);
+          redrawStaticDrawings();
+          renderPath(currentPath);
+        }
+      } else if (currentTool === 'laser') {
+        addLaserPoint(pos.x, pos.y);
+      }
+    });
+
+    window.addEventListener('pointerup', (e) => {
       if (!isDrawing) return;
       isDrawing = false;
-      if (!laserMode) {
-        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
+
+      if (currentTool === 'draw' && currentPath) {
+        if (snapEnabled) {
+          const pos = getCoords(e);
+          currentPath.points = [{ x: startX, y: startY }, { x: pos.x, y: pos.y }];
+        }
+        if (currentPath.points.length > 1) {
+          drawnPaths.push(currentPath);
+        }
+        currentPath = null;
+        redrawStaticDrawings();
       }
     });
 
-    canvas.addEventListener('touchstart', (e) => {
-      const p = getCoords(e);
-      isDrawing = true;
-      startX = p.x;
-      startY = p.y;
-      currentX = p.x;
-      currentY = p.y;
-    }, { passive: true });
-
-    canvas.addEventListener('touchmove', (e) => {
-      const p = getCoords(e);
-      currentX = p.x;
-      currentY = p.y;
-      if (laserMode) {
-        laserTrail.push({ x: p.x, y: p.y, time: Date.now() });
+    function addLaserPoint(x, y) {
+      laserPoints.push({ x, y, time: performance.now() });
+      if (!laserAnimationId) {
+        laserLoop();
       }
-    }, { passive: true });
-
-    window.addEventListener('touchend', () => {
-      if (isDrawing && !laserMode) {
-        persistentPaths.push({ type: 'line', x1: startX, y1: startY, x2: currentX, y2: currentY });
-      }
-      isDrawing = false;
-    });
-
-    // Render loop for Live Drawings & Laser Trail Fade-Out
-    function render() {
-      const now = Date.now();
-      laserTrail = laserTrail.filter(pt => now - pt.time < LASER_LIFETIME);
-      redraw();
-      requestAnimationFrame(render);
     }
 
-    function redraw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Persistent straight lines
-      ctx.strokeStyle = '#2563eb';
-      ctx.lineWidth = 2.5;
+    function renderPath(path) {
+      if (!path.points || path.points.length < 2) return;
+      ctx.beginPath();
+      ctx.moveTo(path.points[0].x, path.points[0].y);
+      for (let i = 1; i < path.points.length; i++) {
+        ctx.lineTo(path.points[i].x, path.points[i].y);
+      }
+      ctx.strokeStyle = path.color || '#2563eb';
+      ctx.lineWidth = path.width || 2.5;
       ctx.lineCap = 'round';
-      persistentPaths.forEach(item => {
-        if (item.type === 'line') {
-          ctx.beginPath();
-          ctx.moveTo(item.x1, item.y1);
-          ctx.lineTo(item.x2, item.y2);
-          ctx.stroke();
-        }
-      });
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+    }
 
-      // Preview line while dragging
-      if (isDrawing && !laserMode && snapToStraightLine) {
-        ctx.strokeStyle = '#3b82f6';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(currentX, currentY);
-        ctx.stroke();
-        ctx.setLineDash([]);
+    function redrawStaticDrawings() {
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      for (const p of drawnPaths) {
+        renderPath(p);
       }
+    }
 
-      // Render Laser Trail with gradual 2000ms decay
-      const now = Date.now();
-      if (laserTrail.length > 1) {
-        for (let i = 1; i < laserTrail.length; i++) {
-          const pt1 = laserTrail[i - 1];
-          const pt2 = laserTrail[i];
-          const age = now - pt2.time;
-          const alpha = Math.max(0, 1 - age / LASER_LIFETIME);
+    function laserLoop() {
+      const now = performance.now();
+      const DURATION = 2000;
+
+      laserPoints = laserPoints.filter(pt => now - pt.time < DURATION);
+
+      redrawStaticDrawings();
+
+      if (laserPoints.length > 0) {
+        for (let i = 0; i < laserPoints.length; i++) {
+          const pt = laserPoints[i];
+          const age = now - pt.time;
+          const alpha = Math.max(0, 1 - age / DURATION);
+          const radius = 5 * (1 - age / (DURATION * 1.5)) + 2;
 
           ctx.beginPath();
-          ctx.moveTo(pt1.x, pt1.y);
-          ctx.lineTo(pt2.x, pt2.y);
-          ctx.strokeStyle = `rgba(239, 68, 68, ${alpha})`;
-          ctx.lineWidth = 3.5 * alpha + 1;
-          ctx.lineCap = 'round';
-          ctx.shadowBlur = 10;
+          ctx.arc(pt.x, pt.y, Math.max(1, radius), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(239, 68, 68, ${alpha})`;
           ctx.shadowColor = 'rgba(239, 68, 68, 0.8)';
-          ctx.stroke();
-          ctx.shadowBlur = 0;
-        }
-      }
-
-      // Laser Pointer Tip
-      if (laserMode && laserTrail.length > 0) {
-        const last = laserTrail[laserTrail.length - 1];
-        if (now - last.time < 150) {
-          ctx.beginPath();
-          ctx.arc(last.x, last.y, 4, 0, 2 * Math.PI);
-          ctx.fillStyle = '#ef4444';
-          ctx.shadowBlur = 12;
-          ctx.shadowColor = '#f87171';
+          ctx.shadowBlur = 8;
           ctx.fill();
           ctx.shadowBlur = 0;
         }
+        laserAnimationId = requestAnimationFrame(laserLoop);
+      } else {
+        laserAnimationId = null;
       }
     }
-
-    render();
   </script>
 </body>
 </html>
