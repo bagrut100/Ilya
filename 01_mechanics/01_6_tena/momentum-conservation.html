@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שימור תנע בהתנגשויות</title>
+<style>
+/* Layout idea: controls column on the right, stage (scene + synced graphs) on the left,
+   results underneath. Single light theme on purpose: it is projected in a classroom. */
+:root {
+  color-scheme: light;
+  --bg: #eef1f6;
+  --panel: #ffffff;
+  --ink: #14181f;
+  --muted: #56606e;
+  --line: #cfd6e2;
+  --b1: #1464d2;      /* body 1 everywhere */
+  --b2: #e0530a;      /* body 2 everywhere */
+  --sum: #14181f;     /* totals */
+  --cm: #0b8a43;      /* centre of mass, "ok" */
+  --heat: #8a2be2;    /* spring / heat energy */
+  --bad: #c62828;
+  --accent: #0d3b8c;
+  --font: system-ui, "Segoe UI", Arial, "Noto Sans Hebrew", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 18px/1.45 var(--font); padding: 14px 16px 28px; }
+h1 { font-size: 30px; margin: 0; line-height: 1.2; }
+h1 small { font-size: 18px; font-weight: 500; color: var(--muted); margin-inline-start: 10px; }
+h2 { font-size: 21px; margin: 0 0 10px; }
+h3 { font-size: 19px; margin: 0; }
+[dir="ltr"] { unicode-bidi: isolate; }
+.top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tabs button { font: 600 19px var(--font); padding: 10px 18px; border: 2px solid var(--line); border-radius: 10px;
+  background: var(--panel); color: var(--ink); cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.layout { display: grid; grid-template-columns: 370px minmax(0, 1fr); gap: 14px; align-items: start; }
+.stage { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.controls { display: flex; flex-direction: column; gap: 16px; }
+.ctl { display: flex; flex-direction: column; gap: 4px; }
+.ctl label { font-weight: 600; }
+.ctl .sym { font-weight: 800; font-size: 20px; margin-inline-end: 6px; }
+.c1 { color: var(--b1); } .c2 { color: var(--b2); }
+.ctl-row { display: flex; align-items: center; gap: 8px; }
+.ctl-row input[type="range"] { flex: 1; min-width: 0; height: 26px; accent-color: var(--accent); }
+.ctl.b1 input[type="range"] { accent-color: var(--b1); }
+.ctl.b2 input[type="range"] { accent-color: var(--b2); }
+.ctl-row input[type="number"] { width: 92px; font: 600 18px var(--font); padding: 5px 6px; border: 2px solid var(--line);
+  border-radius: 8px; text-align: center; background: #fff; color: var(--ink); }
+.unit { width: 40px; color: var(--muted); font-weight: 600; }
+.group { display: flex; flex-direction: column; gap: 10px; }
+.presets { display: flex; flex-direction: column; gap: 6px; }
+.presets button { font: 600 17px var(--font); text-align: start; padding: 8px 12px; border: 2px solid var(--line);
+  border-radius: 8px; background: #f6f8fb; color: var(--ink); cursor: pointer; }
+.presets button:hover { border-color: var(--accent); }
+.switch { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; }
+.switch input { width: 24px; height: 24px; accent-color: var(--accent); flex: none; }
+canvas { display: block; width: 100%; }
+#scene { height: 360px; border-radius: 8px; background: #f8fafc; }
+.transport { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
+.transport button { font: 700 19px var(--font); padding: 10px 18px; border-radius: 10px; border: 2px solid var(--accent);
+  background: #fff; color: var(--accent); cursor: pointer; }
+.transport button.primary { background: var(--accent); color: #fff; }
+.transport button:disabled { opacity: .45; cursor: default; }
+.slow { display: flex; align-items: center; gap: 8px; font-weight: 600; flex: 1; min-width: 260px; }
+.slow input { flex: 1; min-width: 80px; accent-color: var(--accent); }
+.slow output { min-width: 64px; font-weight: 800; }
+.status { margin-top: 12px; padding: 10px 14px; border-radius: 8px; background: #e8eefb; font-weight: 600; font-size: 19px; min-height: 48px; }
+.status.warn { background: #fdecd6; }
+.status.done { background: #e3f4e9; }
+.gbar { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-bottom: 8px; }
+.seg { display: inline-flex; border: 2px solid var(--accent); border-radius: 10px; overflow: hidden; }
+.seg button { font: 600 17px var(--font); padding: 7px 14px; border: 0; background: #fff; color: var(--accent); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.graph { border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; }
+.ghead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; margin-bottom: 2px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 16px; font-weight: 600; }
+.legend i { display: inline-block; width: 30px; height: 0; border-top: 4px solid; vertical-align: middle; margin-inline-end: 6px; }
+.legend i.thick { border-top-width: 7px; }
+.legend i.dash { border-top-style: dashed; }
+.legend i.area { height: 14px; border: 0; opacity: .45; }
+.checks [dir="ltr"], .status [dir="ltr"], #predictOut [dir="ltr"] { white-space: nowrap; }
+.gcanvas { height: 230px; cursor: ew-resize; touch-action: none; }
+.results { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 14px; }
+.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: center; font-size: 18px; }
+thead th { background: #f1f4f9; }
+tbody th { text-align: start; background: #f8fafc; font-weight: 600; white-space: nowrap; }
+td.num { font-weight: 700; }
+tr.sep td, tr.sep th { border-top: 3px solid var(--line); }
+td small { display: block; color: var(--muted); font-weight: 500; font-size: 13px; }
+.chip { display: inline-block; padding: 1px 9px; border-radius: 999px; font-weight: 800; color: #fff; margin-inline-start: 6px; }
+.chip.ok { background: var(--cm); } .chip.bad { background: var(--bad); }
+.checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.checks li { display: flex; gap: 10px; align-items: flex-start; }
+.checks .mark { flex: none; width: 28px; height: 28px; border-radius: 50%; color: #fff; font-weight: 800;
+  display: inline-flex; align-items: center; justify-content: center; }
+.mark.ok { background: var(--cm); } .mark.bad { background: var(--bad); } .mark.info { background: var(--muted); }
+.predict-form { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.predict-form label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
+.predict-form input { width: 130px; font: 700 20px var(--font); padding: 6px; border: 2px solid var(--line); border-radius: 8px; text-align: center; }
+.predict-form button { font: 700 20px var(--font); padding: 9px 26px; border-radius: 10px; border: 0; background: var(--accent); color: #fff; cursor: pointer; }
+#predictOut { margin-top: 10px; font-weight: 600; }
+.note { color: var(--muted); font-size: 15px; margin: 14px 2px 0; max-width: 110ch; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid #f5a623; outline-offset: 2px; }
+@media (max-width: 1050px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .results { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>שימור תנע <small>התנגשויות על מסילה אופקית ללא חיכוך</small></h1>
+  <nav class="tabs" role="tablist" aria-label="סוג ההתנגשות">
+    <button role="tab" data-mode="elastic">התנגשות אלסטית לחלוטין</button>
+    <button role="tab" data-mode="inelastic">התנגשות לא אלסטית</button>
+    <button role="tab" data-mode="plastic">התנגשות פלסטית לחלוטין</button>
+    <button role="tab" data-mode="bullet">קליע חודר גוש עץ</button>
+  </nav>
+</header>
+
+<div class="layout">
+  <aside class="panel controls" aria-label="נתונים">
+    <div class="group">
+      <h2>נתוני הניסוי</h2>
+      <div id="params" class="group"></div>
+    </div>
+    <div class="group">
+      <h2>מצבים מוכנים</h2>
+      <div id="presets" class="presets"></div>
+    </div>
+    <div class="group">
+      <h2>מצב ניבוי</h2>
+      <label class="switch"><input type="checkbox" id="predict"> הסתר את התוצאה עד שהתלמידים מנבאים</label>
+    </div>
+  </aside>
+
+  <div class="stage">
+    <section class="panel" aria-label="הדמיה">
+      <canvas id="scene" dir="ltr"></canvas>
+      <div class="transport">
+        <button id="btnPlay" class="primary">▶ הפעל</button>
+        <button id="btnPause">⏸ עצור</button>
+        <button id="btnStep">⏭ צעד</button>
+        <button id="btnReset">↺ אפס</button>
+        <label class="slow" for="slow">האטת זמן
+          <input type="range" id="slow" min="0" max="2" step="0.01" value="0" dir="ltr">
+          <output id="slowOut" for="slow" dir="ltr">×1.00</output>
+        </label>
+        <label class="switch" id="autoWrap"><input type="checkbox" id="auto" checked> האטה אוטומטית ברגע ההתנגשות</label>
+      </div>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="panel" aria-label="גרפים">
+      <div class="gbar">
+        <h2 style="margin:0">גרפים</h2>
+        <div class="seg" role="group" aria-label="ציר הזמן">
+          <button id="zoomOn" aria-pressed="true">זום על ההתנגשות</button>
+          <button id="zoomOff" aria-pressed="false">כל התנועה</button>
+        </div>
+        <label class="switch"><input type="checkbox" id="showE"> הצג גרף אנרגיה <span dir="ltr">E(t)</span></label>
+        <span style="color:var(--muted);font-size:16px">אפשר לגרור את הקו האנכי על הגרף</span>
+      </div>
+      <div class="graph"><div class="ghead"><h3>מהירות <span dir="ltr">v(t)</span></h3><div class="legend" id="lg-gv"></div></div><canvas id="gv" class="gcanvas" dir="ltr"></canvas></div>
+      <div class="graph"><div class="ghead"><h3>כוח <span dir="ltr">F(t)</span></h3><div class="legend" id="lg-gf"></div></div><canvas id="gf" class="gcanvas" dir="ltr"></canvas></div>
+      <div class="graph"><div class="ghead"><h3>תנע <span dir="ltr">p(t)</span></h3><div class="legend" id="lg-gp"></div></div><canvas id="gp" class="gcanvas" dir="ltr"></canvas></div>
+      <div class="graph" id="box-ge" hidden><div class="ghead"><h3>אנרגיה <span dir="ltr">E(t)</span></h3><div class="legend" id="lg-ge"></div></div><canvas id="ge" class="gcanvas" dir="ltr"></canvas></div>
+    </section>
+
+    <div class="results">
+      <section class="panel" aria-label="טבלה">
+        <h2>לפני ואחרי ההתנגשות</h2>
+        <div class="tablewrap" id="table"></div>
+      </section>
+      <div class="side">
+        <section class="panel" id="predictPanel" hidden>
+          <h2>מה יקרה אחרי ההתנגשות?</h2>
+          <form class="predict-form" id="predictForm">
+            <label for="pu1"><span><span dir="ltr" class="c1">u₁</span> <span id="pn1"></span> <span dir="ltr">(m/s)</span></span><input id="pu1" type="number" step="any" dir="ltr"></label>
+            <label for="pu2"><span><span dir="ltr" class="c2">u₂</span> <span id="pn2"></span> <span dir="ltr">(m/s)</span></span><input id="pu2" type="number" step="any" dir="ltr"></label>
+            <button type="submit">בדוק</button>
+          </form>
+          <div id="predictOut"></div>
+        </section>
+        <section class="panel" id="checksPanel">
+          <h2>בדיקות</h2>
+          <ul class="checks" id="checks"></ul>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="note">איך זה מחושב: התנועה מחושבת צעד אחר צעד מתוך הכוחות בלבד (שיטת Verlet, <span dir="ltr">dt ≤ 0.05 ms</span>). במצבים 1–3 המגע הוא פגוש־קפיץ קשיח, <span dir="ltr">k = 20,000 N/m</span>. כאשר <span dir="ltr">e &lt; 1</span> הקפיץ מחזיר רק חלק <span dir="ltr">e²</span> מהאנרגיה שנאגרה בו, והיתר הופך לחום. הנוסחאות המוכרות משמשות רק להשוואה בלוח הבדיקות.</p>
+<script>
+/* ======================================================================
+ * PHYSICS CORE  (no DOM, no drawing — can be run and tested in Node)
+ *
+ * Two bodies on a frictionless horizontal rail, 1-D motion.
+ * Everything is integrated numerically (velocity Verlet). The outcome of a
+ * collision is never taken from a textbook formula: it emerges from the
+ * interaction force. Formulas appear only in `expected()` for verification.
+ *
+ * To add a new mode (e.g. "explosion"), add an entry to MODES with:
+ *   layout(P)            -> initial positions, camera view, geometry
+ *   init(P, lay)         -> interaction state `c` (phase, history, tStop)
+ *   force(s, c, P)       -> force on body 2 [N]; body 1 gets the opposite
+ *                           (Newton's third law is built into the integrator)
+ *   maxDt(s, c, F, P)    -> largest allowed time step right now
+ *   afterStep(s, c, P)   -> phase changes / history update after a step
+ * ==================================================================== */
+const Physics = (() => {
+  'use strict';
+
+  const CFG = {
+    K_BUFFER: 20000,       // N/m   stiffness of the spring bumper
+    BUFFER_LEN: 0.25,      // m     rest length of the bumper (on body 1)
+    DT_FREE: 1e-4,         // s     step while no force acts (0.1 ms)
+    DT_CONTACT_MAX: 5e-5,  // s     upper bound for the step during contact
+    VIEW_HALF: 5,          // m     half-width of the camera view (carts)
+    REC_EVERY: 0.01,       // s     recording interval during free motion
+    MIN_CLOSING: 1e-6,     // m/s   below this closing speed: "no collision"
+    POST_TIME: 2.0,        // s     how long to keep simulating after contact
+  };
+
+  const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+  /** Half-width of a cart [m]; grows slowly with mass (visual + geometry). */
+  const halfWidth = m => 0.20 + 0.11 * Math.cbrt(m);
+
+  /** Time until a freely moving body (centre x, half-width w) reaches the view edge. */
+  function timeToEdge(x, v, w, view) {
+    if (v > 1e-9) return (view.xmax - w - x) / v;
+    if (v < -1e-9) return (x - w - view.xmin) / (-v);
+    return Infinity;
+  }
+
+  /* ------------------------------------------------------------------
+   * Buffer collision (modes 1-3).
+   * Contact element: a spring that is softer when loaded than when
+   * unloaded (hysteretic spring = spring + rate-independent damper):
+   *     loading   : F = k * d                     (d = compression)
+   *     unloading : F = k*dMax - (k/e^2)*(dMax-d) (never negative)
+   * The energy returned on unloading is e^2 of the stored energy, so the
+   * coefficient of restitution is exactly e.  e = 1 -> ideal spring,
+   * e = 0 -> nothing is returned: the force stops when the velocities
+   * become equal and the bodies stay together.
+   * ---------------------------------------------------------------- */
+  function bufferMode(restitutionOf) {
+    return {
+      kind: 'buffer',
+      layout(P) {
+        const w1 = halfWidth(P.m1), w2 = halfWidth(P.m2);
+        const off = w1 + CFG.BUFFER_LEN + w2;       // centre distance at first touch
+        const view = { xmin: -CFG.VIEW_HALF, xmax: CFG.VIEW_HALF };
+        const closing = P.v1 - P.v2;
+        let x1, x2;
+        if (closing > CFG.MIN_CLOSING) {
+          // place the bodies so that they touch near x = 0 after ~1 s
+          const vmax = Math.max(Math.abs(P.v1), Math.abs(P.v2));
+          const tc = Math.min(1.2, 3.6 / vmax);
+          x1 = -off / 2 - P.v1 * tc;
+          x2 = off / 2 - P.v2 * tc;
+        } else {
+          x1 = -off / 2 - 0.5;
+          x2 = off / 2 + 0.5;
+        }
+        return { x1, x2, w1, w2, off, view, bufferLen: CFG.BUFFER_LEN };
+      },
+      init(P, lay) {
+        const e = clamp(restitutionOf(P), 0, 1);
+        const k = P.k || CFG.K_BUFFER;
+        const mu = P.m1 * P.m2 / (P.m1 + P.m2);            // reduced mass
+        const halfPeriod = Math.PI * Math.sqrt(mu / k);     // elastic contact time
+        const dtLoad = Math.min(CFG.DT_CONTACT_MAX, halfPeriod / 800);
+        const dtUnload = e > 0 ? Math.min(dtLoad, e * halfPeriod / 400) : dtLoad;
+        const c = {
+          phase: 'free', e, k, mu, off: lay.off, lay,
+          dMax: 0, dSet: 0, dtLoad, dtUnload,
+          tC: null, tE: null, tStop: Infinity,
+          collides: (P.v1 - P.v2) > CFG.MIN_CLOSING, outcome: 'none',
+        };
+        if (!c.collides) {
+          const te = Math.min(timeToEdge(lay.x1, P.v1, lay.w1, lay.view),
+                              timeToEdge(lay.x2, P.v2, lay.w2, lay.view));
+          c.tStop = clamp(te, 0.5, 3.0);
+        }
+        return c;
+      },
+      force(s, c) {
+        if (c.phase === 'free' || c.phase === 'done') return 0;
+        const d = s.x1 - s.x2 + c.off;                      // compression
+        if (d <= 0) return 0;
+        if (c.phase === 'load') return c.k * d;
+        return Math.max(0, c.k * c.dMax - (c.k / (c.e * c.e)) * (c.dMax - d));
+      },
+      maxDt(s, c, F) {
+        const u = s.v1 - s.v2;                              // closing speed
+        if (c.phase === 'free') {
+          if (c.collides) {
+            const d = s.x1 - s.x2 + c.off;
+            if (d < 0 && u > 0) return Math.min(CFG.DT_FREE, -d / u); // land on first touch
+          }
+          return CFG.DT_FREE;
+        }
+        if (c.phase === 'load') {
+          // e = 0: the force is switched off when the velocities become equal;
+          // shorten the last step so that it ends (almost) exactly there
+          if (c.e === 0 && F > 0 && u > 0) return Math.min(c.dtLoad, u * c.mu / F);
+          return c.dtLoad;
+        }
+        if (c.phase === 'unload') return c.dtUnload;
+        return CFG.DT_FREE;
+      },
+      afterStep(s, c, P) {
+        const u = s.v1 - s.v2, d = s.x1 - s.x2 + c.off;
+        if (c.phase === 'free') {
+          if (c.collides && d >= -1e-9) { c.phase = 'load'; c.tC = s.t; }
+        } else if (c.phase === 'load') {
+          if (c.e === 0) {
+            c.dMax = Math.max(c.dMax, d);
+            if (u <= 0) {
+              // Velocities are equal (to O(dt^2)): the bodies are now locked
+              // together. Remove the tiny numerical residue, keeping momentum.
+              const vc = (P.m1 * s.v1 + P.m2 * s.v2) / (P.m1 + P.m2);
+              s.v1 = s.v2 = vc; s.welded = true;
+              c.dSet = c.dMax; c.outcome = 'stuck';
+              this.finish(s, c);
+            }
+          } else if (d < c.dMax) {
+            c.phase = 'unload';                             // maximum compression passed
+          } else {
+            c.dMax = d;
+          }
+        } else if (c.phase === 'unload') {
+          const dZero = c.dMax * (1 - c.e * c.e);           // force reaches zero here
+          if (d <= dZero) { c.dSet = dZero; c.outcome = 'separated'; this.finish(s, c); }
+        }
+      },
+      finish(s, c) {
+        c.phase = 'done'; c.tE = s.t;
+        const te = Math.min(timeToEdge(s.x1, s.v1, c.lay.w1, c.lay.view),
+                            timeToEdge(s.x2, s.v2, c.lay.w2, c.lay.view));
+        c.tStop = s.t + clamp(te, 0.3, CFG.POST_TIME);
+      },
+    };
+  }
+
+  /* ------------------------------------------------------------------
+   * Bullet through a wooden block (mode 4).
+   * Body 1 = bullet (point particle), body 2 = block of length L.
+   * While the bullet is inside and moves relative to the block, a constant
+   * resistance F acts on it; the block gets +F (Newton III).
+   * The acceleration is constant inside each phase, so the instants of the
+   * events (entry, exit, relative stop) are located exactly inside a step.
+   * ---------------------------------------------------------------- */
+  const bulletMode = {
+    kind: 'bullet',
+    layout(P) {
+      const W = clamp(8 * P.L, 0.8, 2.4);                   // view width [m]
+      const view = { xmin: -0.45 * W, xmax: 0.55 * W };
+      return { x1: -P.L / 2 - 0.3 * W, x2: 0, w1: 0, w2: P.L / 2, view, W };
+    },
+    init(P, lay) {
+      return {
+        phase: 'free', lay, pending: null,
+        dt: Math.min(1e-6, (P.L / P.v1) / 400),
+        tC: null, tE: null, tStop: Infinity,
+        collides: true, outcome: 'none', depth: 0,
+      };
+    },
+    force(s, c, P) { return c.phase === 'inside' ? P.F : 0; },
+    maxDt(s, c, F, P) {
+      const u = s.v1 - s.v2;                                // speed relative to block
+      const pen = s.x1 - (s.x2 - P.L / 2);                  // penetration depth
+      c.pending = null;
+      if (c.phase === 'free') {
+        if (u > 0 && pen < 0) {
+          const tau = -pen / u;
+          if (tau <= CFG.DT_FREE) { c.pending = 'enter'; return tau; }
+        }
+        return CFG.DT_FREE;
+      }
+      if (c.phase === 'inside') {
+        const a = -P.F * (1 / P.m1 + 1 / P.m2);             // relative acceleration (<0)
+        const tStick = u / (-a);                            // relative velocity -> 0
+        const disc = u * u + 2 * a * (P.L - pen);           // pen + u*t + a*t^2/2 = L
+        const tExit = disc >= 0 ? (u - Math.sqrt(disc)) / (-a) : Infinity;
+        if (tExit <= tStick) { if (tExit <= c.dt) { c.pending = 'exit'; return tExit; } }
+        else if (tStick <= c.dt) { c.pending = 'stick'; return tStick; }
+        return c.dt;
+      }
+      return CFG.DT_FREE;
+    },
+    afterStep(s, c, P) {
+      if (c.pending === 'enter') { c.phase = 'inside'; c.tC = s.t; }
+      else if (c.pending === 'exit' || c.pending === 'stick') {
+        c.depth = s.x1 - (s.x2 - P.L / 2);
+        if (c.pending === 'stick') {
+          const vc = (P.m1 * s.v1 + P.m2 * s.v2) / (P.m1 + P.m2);
+          s.v1 = s.v2 = vc; s.welded = true; c.outcome = 'stuck';
+        } else c.outcome = 'exit';
+        c.phase = 'done'; c.tE = s.t;
+        // keep going until the block has moved a visible distance
+        const v2 = Math.abs(s.v2);
+        c.tStop = s.t + clamp(0.25 * c.lay.W / Math.max(v2, 1e-9), 1e-4, 2.0);
+      }
+      c.pending = null;
+    },
+  };
+
+  const MODES = {
+    elastic: bufferMode(() => 1),
+    inelastic: bufferMode(P => P.e),
+    plastic: bufferMode(() => 0),
+    bullet: bulletMode,
+  };
+
+  /** One velocity-Verlet step. F0 = force on body 2 at the start of the step. */
+  function verletStep(s, c, P, def, dt, F0) {
+    const v1h = s.v1 - 0.5 * dt * F0 / P.m1;
+    const v2h = s.v2 + 0.5 * dt * F0 / P.m2;
+    s.x1 += dt * v1h; s.x2 += dt * v2h; s.t += dt;
+    const F1 = def.force(s, c, P);
+    s.v1 = v1h - 0.5 * dt * F1 / P.m1;
+    s.v2 = v2h + 0.5 * dt * F1 / P.m2;
+    return F1;
+  }
+
+  /**
+   * Run a whole experiment and return its recording.
+   * rec.F = force on body 2 (force on body 1 is -rec.F).
+   * rec.U = work done against the interaction force (spring energy + heat).
+   */
+  function simulate(modeId, P) {
+    const def = MODES[modeId];
+    const lay = def.layout(P);
+    const s = { t: 0, x1: lay.x1, x2: lay.x2, v1: P.v1, v2: P.v2, welded: false };
+    const c = def.init(P, lay);
+    const rec = { mode: modeId, kind: def.kind, P, lay, t: [], x1: [], x2: [], v1: [], v2: [], F: [], U: [] };
+    const push = (F, U) => {
+      rec.t.push(s.t); rec.x1.push(s.x1); rec.x2.push(s.x2);
+      rec.v1.push(s.v1); rec.v2.push(s.v2); rec.F.push(F); rec.U.push(U);
+    };
+    let F = def.force(s, c, P), U = 0, lastRec = 0, steps = 0;
+    push(F, U);
+    while (s.t < c.tStop - 1e-12 && steps++ < 5e6) {
+      let dt = def.maxDt(s, c, F, P);
+      if (c.tStop - s.t < dt) dt = c.tStop - s.t;
+      const x1o = s.x1, x2o = s.x2, phase0 = c.phase;
+      const F1 = verletStep(s, c, P, def, dt, F);
+      U += 0.5 * (F + F1) * ((s.x1 - x1o) - (s.x2 - x2o));
+      const dense = phase0 !== 'free' && phase0 !== 'done';
+      // snapshot of the state before a possible phase change
+      const snap = [s.t, s.x1, s.x2, s.v1, s.v2];
+      def.afterStep(s, c, P);
+      const changed = c.phase !== phase0;
+      if (dense || changed || snap[0] - lastRec >= CFG.REC_EVERY) {
+        rec.t.push(snap[0]); rec.x1.push(snap[1]); rec.x2.push(snap[2]);
+        rec.v1.push(snap[3]); rec.v2.push(snap[4]); rec.F.push(F1); rec.U.push(U);
+        lastRec = snap[0];
+      }
+      F = def.force(s, c, P);
+      if (changed && (F !== F1 || s.v1 !== snap[3])) push(F, U); // jump: second sample at same t
+    }
+    if (rec.t[rec.t.length - 1] !== s.t) push(F, U);
+    rec.collided = c.tC !== null;
+    rec.tC = c.tC; rec.tE = c.tE; rec.tEnd = s.t;
+    rec.outcome = c.outcome;            // 'none' | 'separated' | 'stuck' | 'exit'
+    rec.dMax = c.dMax || 0; rec.dSet = c.dSet || 0; rec.depth = c.depth || 0;
+    rec.e = c.e; rec.steps = steps;
+    return rec;
+  }
+
+  /** Index i such that rec.t[i] <= t < rec.t[i+1] (binary search). */
+  function indexAt(rec, t) {
+    let lo = 0, hi = rec.t.length - 1;
+    if (t <= rec.t[0]) return 0;
+    if (t >= rec.t[hi]) return hi - 1;
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (rec.t[mid] <= t) lo = mid; else hi = mid; }
+    return lo;
+  }
+
+  /** Linearly interpolated state at time t. */
+  function sampleAt(rec, t) {
+    const n = rec.t.length - 1;
+    t = clamp(t, rec.t[0], rec.t[n]);
+    const i = indexAt(rec, t), j = i + 1;
+    const span = rec.t[j] - rec.t[i];
+    const f = span > 0 ? (t - rec.t[i]) / span : 1;
+    const L = key => rec[key][i] + (rec[key][j] - rec[key][i]) * f;
+    return { t, x1: L('x1'), x2: L('x2'), v1: L('v1'), v2: L('v2'), F: L('F'), U: L('U') };
+  }
+
+  /** Textbook formulas — used ONLY to verify the numerical result. */
+  function expected(modeId, P) {
+    const M = P.m1 + P.m2, p = P.m1 * P.v1 + P.m2 * P.v2, u = P.v1 - P.v2;
+    if (modeId === 'bullet') {
+      const mu = P.m1 * P.m2 / M;
+      const stopDepth = mu * u * u / (2 * P.F);            // depth needed to stop
+      if (stopDepth <= P.L) return { v1: p / M, v2: p / M, outcome: 'stuck', depth: stopDepth, heat: P.F * stopDepth };
+      const uOut = Math.sqrt(u * u - 2 * P.F * P.L / mu);
+      return { v1: p / M + P.m2 / M * uOut, v2: p / M - P.m1 / M * uOut, outcome: 'exit', depth: P.L, heat: P.F * P.L };
+    }
+    if (u <= CFG.MIN_CLOSING) return { v1: P.v1, v2: P.v2, outcome: 'none' };
+    const e = modeId === 'elastic' ? 1 : modeId === 'plastic' ? 0 : P.e;
+    return { v1: (p - P.m2 * e * u) / M, v2: (p + P.m1 * e * u) / M, outcome: e === 0 ? 'stuck' : 'separated' };
+  }
+
+  /** Before/after quantities and the numerical self-checks. */
+  function summarize(rec) {
+    const P = rec.P, n = rec.t.length - 1, M = P.m1 + P.m2;
+    const ek = (m, v) => 0.5 * m * v * v;
+    const at = i => ({
+      v1: rec.v1[i], v2: rec.v2[i],
+      p1: P.m1 * rec.v1[i], p2: P.m2 * rec.v2[i],
+      E1: ek(P.m1, rec.v1[i]), E2: ek(P.m2, rec.v2[i]),
+    });
+    const b = at(0), a = at(n);
+    b.p = b.p1 + b.p2; a.p = a.p1 + a.p2; b.E = b.E1 + b.E2; a.E = a.E1 + a.E2;
+    // impulse = area under F(t), trapezoid rule on the recorded curve
+    let J = 0;
+    for (let i = 1; i <= n; i++) J += 0.5 * (rec.F[i] + rec.F[i - 1]) * (rec.t[i] - rec.t[i - 1]);
+    // worst deviation of total momentum and of the centre-of-mass path
+    const pScale = Math.abs(b.p1) + Math.abs(b.p2) || 1e-12;
+    const xcm0 = (P.m1 * rec.x1[0] + P.m2 * rec.x2[0]) / M, vcm = b.p / M;
+    let pDev = 0, cmDev = 0, path = 1e-12;
+    for (let i = 0; i <= n; i++) {
+      pDev = Math.max(pDev, Math.abs(P.m1 * rec.v1[i] + P.m2 * rec.v2[i] - b.p));
+      const xcm = (P.m1 * rec.x1[i] + P.m2 * rec.x2[i]) / M;
+      cmDev = Math.max(cmDev, Math.abs(xcm - (xcm0 + vcm * rec.t[i])));
+      path = Math.max(path, Math.abs(rec.x1[i] - rec.x1[0]), Math.abs(rec.x2[i] - rec.x2[0]));
+    }
+    const closing0 = b.v1 - b.v2;
+    return {
+      before: b, after: a,
+      dp1: a.p1 - b.p1, dp2: a.p2 - b.p2,
+      dE: a.E - b.E, dEpct: b.E > 0 ? 100 * (a.E - b.E) / b.E : 0,
+      J2: J, J1: -J,
+      pErr: pDev / pScale, pOK: pDev / pScale < 1e-3,
+      vcm, cmErr: cmDev / path, cmOK: cmDev / path < 1e-3,
+      eMeasured: rec.collided && closing0 > 0 ? (a.v2 - a.v1) / closing0 : null,
+      heat: rec.U[n],
+      expected: expected(rec.mode, P),
+    };
+  }
+
+  return { CFG, MODES, simulate, sampleAt, indexAt, summarize, expected, halfWidth };
+})();
+
+</script>
+<script>
+/* ======================================================================
+ * UI + RENDERING  (uses only the public API of Physics)
+ * Flow: controls -> rebuild() -> Physics.simulate() -> recording
+ *       playback moves a time cursor over the recording and redraws.
+ * ==================================================================== */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+
+  const COL = {
+    b1: '#1464d2', b1d: '#0b3f8a', b2: '#e0530a', b2d: '#9a3602', sum: '#14181f',
+    cm: '#0b8a43', heat: '#8a2be2', ink: '#14181f', muted: '#56606e', grid: '#e1e6ee',
+    rail: '#3b4350', clay: '#c2255c',
+  };
+  const FONT = 'system-ui, "Segoe UI", Arial, "Noto Sans Hebrew", sans-serif';
+
+  /* ---------------- controls definition ---------------- */
+  const CART = ['elastic', 'inelastic', 'plastic'];
+  const CTRL = [
+    { id: 'm1', sym: 'm₁', name: 'מסת גוף 1', unit: 'kg', min: 0.1, max: 10, step: 0.1, modes: CART, body: 1 },
+    { id: 'v1', sym: 'v₁', name: 'מהירות גוף 1', unit: 'm/s', min: -5, max: 5, step: 0.1, modes: CART, body: 1 },
+    { id: 'm2', sym: 'm₂', name: 'מסת גוף 2', unit: 'kg', min: 0.1, max: 10, step: 0.1, modes: CART, body: 2 },
+    { id: 'v2', sym: 'v₂', name: 'מהירות גוף 2', unit: 'm/s', min: -5, max: 5, step: 0.1, modes: CART, body: 2 },
+    { id: 'e', sym: 'e', name: 'מקדם התקומה', unit: '', min: 0, max: 1, step: 0.01, modes: ['inelastic'] },
+    { id: 'bm', sym: 'm₁', name: 'מסת הקליע', unit: 'g', min: 1, max: 50, step: 1, modes: ['bullet'], body: 1 },
+    { id: 'bv', sym: 'v₁', name: 'מהירות הקליע', unit: 'm/s', min: 50, max: 1000, step: 10, modes: ['bullet'], body: 1 },
+    { id: 'bM', sym: 'M', name: 'מסת הגוש', unit: 'kg', min: 0.05, max: 10, step: 0.05, modes: ['bullet'], body: 2 },
+    { id: 'bL', sym: 'L', name: 'אורך הגוש', unit: 'cm', min: 2, max: 50, step: 1, modes: ['bullet'], body: 2 },
+    { id: 'bF', sym: 'F', name: 'כוח ההתנגדות', unit: 'N', min: 500, max: 30000, step: 100, modes: ['bullet'] },
+  ];
+  const PRESETS = [
+    { name: 'מסות שוות, גוף 2 במנוחה', set: { m1: 1, m2: 1, v1: 3, v2: 0 } },
+    { name: 'גוף קל פוגע בגוף כבד', set: { m1: 0.5, m2: 5, v1: 4, v2: 0 } },
+    { name: 'גוף כבד פוגע בגוף קל', set: { m1: 5, m2: 0.5, v1: 2, v2: 0 } },
+    { name: 'תנועה זה לקראת זה', set: { m1: 2, m2: 1, v1: 2, v2: -3 } },
+    { name: 'גוף מהיר משיג גוף איטי', set: { m1: 1, m2: 2, v1: 4, v2: 1 } },
+    { name: 'קליע בגוש כבד (נתקע)', mode: 'bullet', set: { bm: 10, bv: 400, bM: 2, bL: 20, bF: 6000 } },
+    { name: 'קליע בגוש קל (חודר)', mode: 'bullet', set: { bm: 10, bv: 400, bM: 0.2, bL: 8, bF: 6000 } },
+  ];
+
+  /* ---------------- application state ---------------- */
+  const st = {
+    mode: 'elastic',
+    par: { m1: 1, m2: 1, v1: 3, v2: 0, e: 0.5, bm: 10, bv: 400, bM: 2, bL: 20, bF: 6000 },
+    rec: null, sum: null, D: null, plan: [], vmax: 1, v2max: 1,
+    t: 0, playing: false, slow: 1, auto: true, zoom: true, showE: false,
+    predict: false, revealed: false, guess: null,
+  };
+  const isBullet = () => st.mode === 'bullet';
+  const names = () => isBullet() ? ['הקליע', 'הגוש'] : ['גוף 1', 'גוף 2'];
+
+  /** UI parameters -> SI parameters for the physics core. */
+  function physParams() {
+    const p = st.par;
+    if (isBullet()) return { m1: p.bm / 1000, m2: p.bM, v1: p.bv, v2: 0, L: p.bL / 100, F: p.bF };
+    return { m1: p.m1, m2: p.m2, v1: p.v1, v2: p.v2, e: p.e };
+  }
+
+  /* ---------------- number formatting ---------------- */
+  const minus = s => s.replace('-', '−');
+  function fmt(x, d) {
+    if (!isFinite(x)) return '—';
+    if (Math.abs(x) < 0.5 * Math.pow(10, -d)) x = 0;
+    return minus(x.toFixed(d));
+  }
+  const fmtA = x => { const a = Math.abs(x); return fmt(x, a >= 1000 ? 1 : a >= 100 ? 2 : 3); };
+  const fmtS = x => { const a = Math.abs(x); return fmt(x, a >= 100 ? 1 : 2); };       // short, for the scene
+  const fmtRate = r => r >= 0.1 ? r.toFixed(2) : r.toPrecision(2);
+  const L = s => `<span dir="ltr">${s}</span>`;
+  const pct = x => (100 * x).toFixed(4) + '%';
+
+  /* ---------------- simulation + playback plan ---------------- */
+  function rebuild() {
+    const rec = Physics.simulate(st.mode, physParams());
+    const P = rec.P, n = rec.t.length;
+    st.rec = rec; st.sum = Physics.summarize(rec);
+    const D = { v1: rec.v1, v2: rec.v2, F2: rec.F, U: rec.U, F1: [], p1: [], p2: [], pT: [], E1: [], E2: [], ET: [] };
+    let vmax = 0.5, v2max = 1e-9;
+    for (let i = 0; i < n; i++) {
+      const a = rec.v1[i], b = rec.v2[i];
+      D.F1.push(-rec.F[i]);
+      D.p1.push(P.m1 * a); D.p2.push(P.m2 * b); D.pT.push(P.m1 * a + P.m2 * b);
+      D.E1.push(0.5 * P.m1 * a * a); D.E2.push(0.5 * P.m2 * b * b); D.ET.push(0.5 * P.m1 * a * a + 0.5 * P.m2 * b * b);
+      vmax = Math.max(vmax, Math.abs(a), Math.abs(b)); v2max = Math.max(v2max, Math.abs(b));
+    }
+    st.D = D; st.vmax = vmax; st.v2max = v2max;
+    st.t = 0; st.playing = false; st.revealed = false; st.guess = null;
+    $('predictOut').innerHTML = '';
+    makePlan();
+    renderStatic();
+    draw();
+  }
+
+  /** Playback plan: time segments with their own speed (sim-seconds per real second). */
+  function makePlan() {
+    const r = st.rec, plan = [];
+    if (r.kind === 'bullet') {
+      // slow part: flight + penetration (+ exit flight); fast part: the block rolling away
+      let tA = r.tE + 0.6 * (r.tE - r.tC);
+      if (r.outcome === 'exit') {
+        const s = Physics.sampleAt(r, r.tE);
+        tA = r.tE + (r.lay.view.xmax - s.x1) / s.v1;
+      }
+      tA = Math.min(tA, r.tEnd);
+      plan.push({ t0: 0, t1: tA, rate: tA / 6 });
+      if (r.tEnd > tA) plan.push({ t0: tA, t1: r.tEnd, rate: (r.tEnd - tA) / 3.5 });
+    } else if (r.collided && st.auto) {
+      const pad = 0.3 * (r.tE - r.tC);
+      const a = Math.max(0, r.tC - pad), b = Math.min(r.tEnd, r.tE + pad);
+      if (a > 0) plan.push({ t0: 0, t1: a, rate: 1 });
+      plan.push({ t0: a, t1: b, rate: Math.min(1, (b - a) / 3.5) });
+      if (r.tEnd > b) plan.push({ t0: b, t1: r.tEnd, rate: 1 });
+    } else plan.push({ t0: 0, t1: r.tEnd, rate: 1 });
+    st.plan = plan;
+  }
+  const rateNow = () => {
+    for (const sg of st.plan) if (st.t < sg.t1) return sg.rate * st.slow;
+    return st.plan[st.plan.length - 1].rate * st.slow;
+  };
+  /** In predict mode the animation may not pass the first touch until "check". */
+  const tLimit = () => (st.predict && !st.revealed) ? (st.rec.collided ? st.rec.tC : 0) : st.rec.tEnd;
+  const hidden = () => st.predict && !st.revealed;
+
+  /** Advance the cursor by `wall` real seconds, respecting segment speeds. */
+  function advance(wall) {
+    let t = st.t;
+    for (const sg of st.plan) {
+      if (wall <= 0) break;
+      if (t >= sg.t1) continue;
+      const r = sg.rate * st.slow, need = (sg.t1 - t) / r;
+      if (wall < need) { t += wall * r; wall = 0; } else { t = sg.t1; wall -= need; }
+    }
+    st.t = Math.min(t, tLimit());
+    if (st.t >= tLimit() - 1e-15) st.playing = false;
+  }
+
+  /* ---------------- canvas helpers ---------------- */
+  function prep(cv) {
+    const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    const pw = Math.round(w * dpr), ph = Math.round(h * dpr);
+    if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; }
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx, w, h };
+  }
+  function text(ctx, str, x, y, o = {}) {
+    ctx.font = `${o.weight || 600} ${o.size || 16}px ${FONT}`;
+    ctx.textAlign = o.align || 'left'; ctx.textBaseline = o.base || 'alphabetic';
+    ctx.direction = o.rtl ? 'rtl' : 'ltr';
+    if (o.halo) { ctx.lineWidth = 5; ctx.strokeStyle = o.halo; ctx.lineJoin = 'round'; ctx.strokeText(str, x, y); }
+    ctx.fillStyle = o.color || COL.ink; ctx.fillText(str, x, y);
+  }
+  function rrect(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath(); ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  function arrow(ctx, x, y, len, color) {
+    ctx.fillStyle = color; ctx.strokeStyle = color;
+    if (Math.abs(len) < 2) { ctx.beginPath(); ctx.arc(x, y, 4, 0, 7); ctx.fill(); return; }
+    const dir = Math.sign(len), head = Math.min(13, Math.abs(len));
+    ctx.lineWidth = 5; ctx.lineCap = 'butt';
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + len - dir * head, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + len, y); ctx.lineTo(x + len - dir * head, y - 8); ctx.lineTo(x + len - dir * head, y + 8);
+    ctx.closePath(); ctx.fill();
+  }
+  function niceStep(raw) {
+    const p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+    return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p;
+  }
+  const decimals = step => clamp(-Math.floor(Math.log10(step) + 1e-9), 0, 7);
+
+  /* ======================================================================
+   * SCENE
+   * ==================================================================== */
+  function drawScene() {
+    const { ctx, w, h } = prep($('scene'));
+    const rec = st.rec, lay = rec.lay, s = Physics.sampleAt(rec, st.t), P = rec.P;
+    const sc = w / (lay.view.xmax - lay.view.xmin);
+    const cam = { s: sc, X: x => (x - lay.view.xmin) * sc, yRail: h - 70 };
+
+    // rail with a ruler
+    ctx.fillStyle = COL.rail; ctx.fillRect(0, cam.yRail, w, 6);
+    const tick = niceStep((lay.view.xmax - lay.view.xmin) / 10), dec = decimals(tick);
+    for (let x = Math.ceil(lay.view.xmin / tick) * tick; x <= lay.view.xmax + 1e-9; x += tick) {
+      const px = cam.X(x);
+      ctx.fillRect(px - 1, cam.yRail + 6, 2, 7);
+      if (px > 24 && px < w - 24) text(ctx, minus((Math.abs(x) < 1e-9 ? 0 : x).toFixed(dec)), px, cam.yRail + 28, { size: 13, weight: 500, color: COL.muted, align: 'center' });
+    }
+    text(ctx, 'x (m)', w - 6, cam.yRail + 28, { size: 13, weight: 600, color: COL.muted, align: 'right' });
+
+    if (rec.kind === 'bullet') sceneBullet(ctx, w, cam, rec, s, P);
+    else sceneCarts(ctx, w, cam, rec, s, P);
+
+    // centre of mass: dots at equal time intervals + current marker
+    const M = P.m1 + P.m2, xcm = q => (P.m1 * q.x1 + P.m2 * q.x2) / M, yc = cam.yRail + 46;
+    const dT = rec.tEnd / 14;
+    ctx.fillStyle = COL.cm;
+    for (let k = 0; k * dT <= st.t + 1e-12; k++) {
+      ctx.beginPath(); ctx.arc(cam.X(xcm(Physics.sampleAt(rec, k * dT))), yc, 3.5, 0, 7); ctx.fill();
+    }
+    const cx = cam.X(xcm(s));
+    ctx.beginPath(); ctx.arc(cx, yc, 10, 0, 7); ctx.fillStyle = '#fff'; ctx.fill();
+    ctx.fillStyle = COL.cm;
+    ctx.beginPath(); ctx.moveTo(cx, yc); ctx.arc(cx, yc, 10, -Math.PI / 2, 0); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(cx, yc); ctx.arc(cx, yc, 10, Math.PI / 2, Math.PI); ctx.closePath(); ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = COL.cm; ctx.beginPath(); ctx.arc(cx, yc, 10, 0, 7); ctx.stroke();
+    ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(cx, yc - 10); ctx.lineTo(cx, cam.yRail + 6); ctx.stroke(); ctx.setLineDash([]);
+    const right = cx < w - 130;
+    text(ctx, 'מרכז המסה', cx + (right ? 16 : -16), yc + 5, { size: 15, weight: 700, color: COL.cm, align: right ? 'left' : 'right', rtl: true });
+
+    // clock + playback speed
+    const tStr = rec.kind === 'bullet' ? `t = ${(s.t * 1000).toFixed(3)} ms` : `t = ${s.t.toFixed(3)} s`;
+    text(ctx, tStr, 12, 26, { size: 18, weight: 700 });
+    const rate = rateNow();
+    if (rate < 0.995) {
+      text(ctx, '×' + fmtRate(rate), 12, 50, { size: 18, weight: 800, color: COL.bad });
+      text(ctx, 'הילוך איטי', 18 + ctx.measureText('×' + fmtRate(rate)).width, 50, { size: 16, weight: 600, color: COL.bad, rtl: true });
+    }
+  }
+
+  /** Two-line label (v and p) for one body. */
+  function bodyLabel(ctx, idx, v, p, x, y, align, color) {
+    const sub = idx === 1 ? '₁' : '₂';
+    text(ctx, `v${sub} = ${fmtS(v)} m/s`, x, y, { size: 18, weight: 700, color, align, halo: '#f8fafc' });
+    text(ctx, `p${sub} = ${fmtS(p)} kg·m/s`, x, y + 22, { size: 18, weight: 700, color, align, halo: '#f8fafc' });
+  }
+
+  function cart(ctx, cam, x, w, color) {
+    const s = cam.s, bb = cam.yRail - 0.15 * s, bh = 0.45 * s, bt = bb - bh;
+    ctx.fillStyle = '#2b313b';
+    for (const k of [-0.55, 0.55]) { ctx.beginPath(); ctx.arc(cam.X(x + k * w), cam.yRail - 0.085 * s, 0.085 * s, 0, 7); ctx.fill(); }
+    ctx.fillStyle = color; rrect(ctx, cam.X(x - w), bt, 2 * w * s, bh, 0.06 * s); ctx.fill();
+    return { top: bt, axis: bb - 0.2 * s };
+  }
+
+  /** Bumper on the right side of body 1: a spring, or a lump of clay in the plastic mode. */
+  function buffer(ctx, cam, xa, len, restLen, yAxis, plastic) {
+    const s = cam.s, x0 = cam.X(xa), x1 = cam.X(xa + len);
+    if (plastic) {
+      const hh = 0.24 * s * Math.sqrt(restLen / len);       // gets fatter when squeezed
+      ctx.fillStyle = COL.clay; rrect(ctx, x0, yAxis - hh / 2, x1 - x0, hh, 0.05 * s); ctx.fill();
+      return;
+    }
+    const n = 14, amp = 0.09 * s;
+    ctx.strokeStyle = '#2b313b'; ctx.lineWidth = Math.max(2, 0.012 * s); ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(x0, yAxis);
+    for (let i = 1; i < n; i++) ctx.lineTo(x0 + (x1 - x0) * i / n, yAxis + (i % 2 ? -amp : amp));
+    ctx.lineTo(x1, yAxis); ctx.stroke();
+    ctx.lineWidth = Math.max(4, 0.025 * s);
+    ctx.beginPath(); ctx.moveTo(x1, yAxis - 0.12 * s); ctx.lineTo(x1, yAxis + 0.12 * s); ctx.stroke();
+  }
+
+  function sceneCarts(ctx, w, cam, rec, s, P) {
+    const lay = rec.lay, plastic = rec.mode === 'plastic' || rec.e === 0;
+    const hull = (s.x2 - lay.w2) - (s.x1 + lay.w1);
+    const rest = lay.bufferLen - (rec.tE !== null && s.t >= rec.tE ? rec.dSet : 0);
+    const len = Math.max(0.01, Math.min(hull, rest));
+    const paint = c => {
+      const g1 = cart(ctx, c, s.x1, lay.w1, COL.b1);
+      cart(ctx, c, s.x2, lay.w2, COL.b2);
+      buffer(ctx, c, s.x1 + lay.w1, len, lay.bufferLen, g1.axis, plastic);
+      return g1;
+    };
+    const g = paint(cam);
+    // numbers on the carts
+    const midY = g.top + 0.225 * cam.s;
+    text(ctx, '1', cam.X(s.x1), midY - 2, { size: 24, weight: 800, color: '#fff', align: 'center', base: 'middle' });
+    text(ctx, '2', cam.X(s.x2), midY - 2, { size: 24, weight: 800, color: '#fff', align: 'center', base: 'middle' });
+    // velocity arrows (same scale for both bodies)
+    const aS = 120 / st.vmax, ya = g.top - 16;
+    arrow(ctx, cam.X(s.x1), ya, s.v1 * aS, COL.b1d);
+    arrow(ctx, cam.X(s.x2), ya, s.v2 * aS, COL.b2d);
+    // labels: body 1 grows to the left, body 2 to the right, so they never overlap
+    let a1 = Math.max(cam.X(s.x1) + 18, 200), a2 = Math.min(cam.X(s.x2) - 18, w - 200);
+    if (a2 < a1 + 14) { if (a1 === 200) a2 = a1 + 14; else a1 = a2 - 14; }
+    bodyLabel(ctx, 1, s.v1, P.m1 * s.v1, a1, g.top - 62, 'right', COL.b1d);
+    bodyLabel(ctx, 2, s.v2, P.m2 * s.v2, a2, g.top - 62, 'left', COL.b2d);
+
+    // magnifier on the bumper while the bodies are close
+    if (rec.collided && hull - rest < 0.3 && w > 700) {
+      const Z = 5, iw = 320, ih = 118, ix = w / 2 - iw / 2, iy = 8, xm = s.x1 + lay.w1 + lay.bufferLen / 2;
+      const zc = { s: cam.s * Z, X: x => ix + iw / 2 + (x - xm) * cam.s * Z, yRail: iy + ih / 2 + 8 + 0.35 * cam.s * Z };
+      ctx.save();
+      rrect(ctx, ix, iy, iw, ih, 10); ctx.fillStyle = '#fff'; ctx.fill(); ctx.clip();
+      paint(zc);
+      ctx.restore();
+      rrect(ctx, ix, iy, iw, ih, 10); ctx.lineWidth = 2; ctx.strokeStyle = COL.muted; ctx.stroke();
+      text(ctx, 'הגדלה ×5', ix + iw - 10, iy + 20, { size: 15, weight: 700, color: COL.ink, align: 'right', rtl: true, halo: '#fff' });
+    }
+  }
+
+  function sceneBullet(ctx, w, cam, rec, s, P) {
+    const hB = 150, top = cam.yRail - hB, yb = cam.yRail - hB / 2;
+    const xl = cam.X(s.x2 - P.L / 2), bw = P.L * cam.s, xb = cam.X(s.x1);
+    // bullet (drawn enlarged: 46 px long whatever the scale)
+    ctx.fillStyle = COL.b1;
+    ctx.beginPath(); ctx.moveTo(xb - 23, yb - 8); ctx.lineTo(xb + 8, yb - 8);
+    ctx.quadraticCurveTo(xb + 20, yb - 7, xb + 23, yb); ctx.quadraticCurveTo(xb + 20, yb + 7, xb + 8, yb + 8);
+    ctx.lineTo(xb - 23, yb + 8); ctx.closePath(); ctx.fill();
+    // semi-transparent wooden block over it
+    ctx.fillStyle = 'rgba(224,83,10,0.30)'; ctx.fillRect(xl, top, bw, hB);
+    ctx.save(); ctx.beginPath(); ctx.rect(xl, top, bw, hB); ctx.clip();
+    ctx.strokeStyle = 'rgba(122,60,10,0.30)'; ctx.lineWidth = 2;
+    for (let i = 1; i < 7; i++) {
+      const y = top + i * hB / 7;
+      ctx.beginPath(); ctx.moveTo(xl, y);
+      ctx.bezierCurveTo(xl + bw * 0.3, y - 7, xl + bw * 0.6, y + 7, xl + bw, y - 2); ctx.stroke();
+    }
+    // channel drilled by the bullet
+    if (rec.tC !== null && s.t >= rec.tC) {
+      ctx.strokeStyle = 'rgba(70,30,5,0.45)'; ctx.lineWidth = 7;
+      ctx.beginPath(); ctx.moveTo(xl, yb); ctx.lineTo(Math.min(xb, xl + bw), yb); ctx.stroke();
+    }
+    ctx.restore();
+    ctx.lineWidth = 3; ctx.strokeStyle = COL.b2; ctx.strokeRect(xl, top, bw, hB);
+    text(ctx, '2', xl + 10, top + 26, { size: 22, weight: 800, color: COL.b2d });
+    // arrows: different scales for bullet and block (the block is ~100 times slower)
+    arrow(ctx, xb, yb - 20, s.v1 * 140 / st.vmax, COL.b1d);
+    arrow(ctx, cam.X(s.x2), top - 12, s.v2 * 90 / st.v2max, COL.b2d);
+    bodyLabel(ctx, 1, s.v1, P.m1 * s.v1, clamp(xb + 10, 210, w - 8), top - 52, 'right', COL.b1d);
+    bodyLabel(ctx, 2, s.v2, P.m2 * s.v2, Math.min(xl + bw + 14, w - 215), top + 24, 'left', COL.b2d);
+    text(ctx, 'הקליע מוגדל; לחצי המהירות של הקליע ושל הגוש קנה מידה שונה', w - 10, 22, { size: 14, weight: 500, color: COL.muted, align: 'right', rtl: true });
+  }
+
+  /* ======================================================================
+   * GRAPHS
+   * ==================================================================== */
+  const GRAPHS = [
+    { id: 'gv', unit: 'v (m/s)', series: () => [
+      { a: st.D.v1, c: COL.b1, f: s => s.v1 }, { a: st.D.v2, c: COL.b2, f: s => s.v2 }] },
+    { id: 'gf', unit: 'F (N)', fill: true, series: () => [
+      { a: st.D.F1, c: COL.b1, f: s => -s.F }, { a: st.D.F2, c: COL.b2, f: s => s.F }] },
+    { id: 'gp', unit: 'p (kg·m/s)', series: () => { const P = st.rec.P; return [
+      { a: st.D.pT, c: COL.sum, lw: 7, f: s => P.m1 * s.v1 + P.m2 * s.v2 },
+      { a: st.D.p1, c: COL.b1, f: s => P.m1 * s.v1 }, { a: st.D.p2, c: COL.b2, f: s => P.m2 * s.v2 }]; } },
+    { id: 'ge', unit: 'E (J)', series: () => { const P = st.rec.P, e = (m, v) => 0.5 * m * v * v; return [
+      { a: st.D.ET, c: COL.sum, lw: 7, f: s => e(P.m1, s.v1) + e(P.m2, s.v2) },
+      { a: st.D.U, c: COL.heat, dash: [9, 6], f: s => s.U },
+      { a: st.D.E1, c: COL.b1, f: s => e(P.m1, s.v1) }, { a: st.D.E2, c: COL.b2, f: s => e(P.m2, s.v2) }]; } },
+  ];
+  const GM = { l: 76, r: 18, t: 28, b: 32 };
+
+  /** Time window shown on all graphs. */
+  function gwin() {
+    const r = st.rec;
+    if (st.zoom && r.collided) {
+      const pad = 0.6 * (r.tE - r.tC);
+      return [Math.max(0, r.tC - pad), Math.min(r.tEnd, r.tE + pad)];
+    }
+    return [0, r.tEnd];
+  }
+
+  function drawGraph(g) {
+    const cv = $(g.id);
+    if (cv.offsetParent === null) return;
+    const { ctx, w, h } = prep(cv), rec = st.rec;
+    const pw = w - GM.l - GM.r, ph = h - GM.t - GM.b, [t0, t1] = gwin();
+    const X = t => GM.l + (t - t0) / (t1 - t0) * pw;
+    const hide = hidden() ? (rec.collided ? rec.tC : 0) : Infinity;
+    const i0 = Physics.indexAt(rec, t0), i1 = Math.min(rec.t.length - 1, Physics.indexAt(rec, t1) + 1);
+    const iScale = hide < Infinity ? Math.min(i1, Physics.indexAt(rec, hide)) : i1;   // do not leak the result via the scale
+    const ser = g.series();
+    let lo = 0, hi = 0;
+    for (const s of ser) for (let i = i0; i <= iScale; i++) { const v = s.a[i]; if (v < lo) lo = v; if (v > hi) hi = v; }
+    if (hi - lo < 1e-12) hi = 1;
+    const padY = (hi - lo) * 0.12; if (hi > 0) hi += padY; if (lo < 0) lo -= padY;
+    const Y = v => GM.t + (hi - v) / (hi - lo) * ph;
+
+    // grid + axis labels
+    const ys = niceStep((hi - lo) / 4.5), yd = decimals(ys);
+    ctx.lineWidth = 1;
+    for (let v = Math.ceil(lo / ys - 1e-9) * ys; v <= hi + 1e-9; v += ys) {
+      const z = Math.abs(v) < ys * 1e-6;
+      ctx.strokeStyle = z ? '#7c8695' : COL.grid; ctx.lineWidth = z ? 1.5 : 1;
+      ctx.beginPath(); ctx.moveTo(GM.l, Y(v)); ctx.lineTo(w - GM.r, Y(v)); ctx.stroke();
+      text(ctx, minus((z ? 0 : v).toFixed(yd)), GM.l - 8, Y(v), { size: 15, weight: 500, color: COL.muted, align: 'right', base: 'middle' });
+    }
+    const ms = (t1 - t0) < 0.25, mult = ms ? 1000 : 1;
+    const ts = niceStep((t1 - t0) * mult / 8), td = decimals(ts);
+    for (let v = Math.ceil(t0 * mult / ts - 1e-9) * ts; v <= t1 * mult + 1e-9; v += ts) {
+      const x = X(v / mult);
+      ctx.strokeStyle = COL.grid; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, GM.t); ctx.lineTo(x, GM.t + ph); ctx.stroke();
+      if (x < w - GM.r - 50) text(ctx, v.toFixed(td), x, h - 10, { size: 15, weight: 500, color: COL.muted, align: 'center' });
+    }
+    text(ctx, ms ? 't (ms)' : 't (s)', w - GM.r, h - 10, { size: 15, weight: 700, color: COL.ink, align: 'right' });
+    ctx.strokeStyle = '#7c8695'; ctx.lineWidth = 1.5; ctx.strokeRect(GM.l, GM.t, pw, ph);
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(GM.l, GM.t, hide < Infinity ? clamp(X(hide) - GM.l, 0, pw) : pw, ph); ctx.clip();
+    // contact interval
+    if (rec.collided && hide === Infinity) {
+      ctx.fillStyle = 'rgba(20,24,31,0.06)'; ctx.fillRect(X(rec.tC), GM.t, X(rec.tE) - X(rec.tC), ph);
+    }
+    const trace = s => {
+      ctx.beginPath();
+      for (let i = i0; i <= i1; i++) { const x = X(rec.t[i]), y = Y(s.a[i]); if (i === i0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+    };
+    if (g.fill) for (const s of ser) {               // shaded area = impulse
+      trace(s); ctx.lineTo(X(rec.t[i1]), Y(0)); ctx.lineTo(X(rec.t[i0]), Y(0)); ctx.closePath();
+      ctx.globalAlpha = 0.22; ctx.fillStyle = s.c; ctx.fill(); ctx.globalAlpha = 1;
+    }
+    // curves: solid up to the cursor, pale after it
+    const xc = X(st.t);
+    for (const pass of [0, 1]) {
+      ctx.save(); ctx.beginPath();
+      if (pass === 0) ctx.rect(GM.l, GM.t, xc - GM.l, ph); else ctx.rect(xc, GM.t, w, ph);
+      ctx.clip(); ctx.globalAlpha = pass === 0 ? 1 : 0.3;
+      for (const s of ser) {
+        trace(s); ctx.strokeStyle = s.c; ctx.lineWidth = s.lw || 3.5; ctx.lineJoin = 'round';
+        ctx.setLineDash(s.dash || []); ctx.stroke(); ctx.setLineDash([]);
+      }
+      ctx.restore();
+    }
+    // impulse values written on the shaded areas
+    if (g.fill && rec.collided && hide === Infinity) {
+      let pk = 0; for (let i = i0; i <= i1; i++) pk = Math.max(pk, st.D.F2[i]);
+      const xa = X(rec.tC), xb = X(rec.tE), S = st.sum;
+      let x = (xa + xb) / 2, align = 'center';
+      if (xb - xa < 190) { if (xb + 200 < w - GM.r) { x = xb + 10; align = 'left'; } else { x = xa - 10; align = 'right'; } }
+      text(ctx, `J₂ = ${fmtA(S.J2)} N·s`, x, Y(0.42 * pk), { size: 18, weight: 800, color: COL.b2d, align, base: 'middle', halo: '#fff' });
+      text(ctx, `J₁ = ${fmtA(S.J1)} N·s`, x, Y(-0.42 * pk), { size: 18, weight: 800, color: COL.b1d, align, base: 'middle', halo: '#fff' });
+    }
+    ctx.restore();
+    if (hide < Infinity && X(hide) < w - GM.r - 40)
+      text(ctx, '?', (Math.max(X(hide), GM.l) + w - GM.r) / 2, GM.t + ph / 2, { size: 64, weight: 800, color: '#c3cad6', align: 'center', base: 'middle' });
+    text(ctx, g.unit, GM.l, GM.t - 9, { size: 16, weight: 700, color: COL.ink });
+
+    // time cursor with the current values
+    if (st.t >= t0 - 1e-12 && st.t <= t1 + 1e-12) {
+      ctx.strokeStyle = COL.ink; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(xc, GM.t); ctx.lineTo(xc, GM.t + ph); ctx.stroke();
+      ctx.fillStyle = COL.ink; ctx.beginPath(); ctx.moveTo(xc - 7, GM.t); ctx.lineTo(xc + 7, GM.t); ctx.lineTo(xc, GM.t + 9); ctx.closePath(); ctx.fill();
+      const q = Physics.sampleAt(rec, st.t);
+      for (const s of ser) {
+        const y = Y(s.f(q)); if (y < GM.t || y > GM.t + ph) continue;
+        ctx.beginPath(); ctx.arc(xc, y, 5.5, 0, 7); ctx.fillStyle = s.c; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+      }
+    }
+  }
+
+  function scrub(cv, ev) {
+    const r = cv.getBoundingClientRect(), [t0, t1] = gwin();
+    const f = (ev.clientX - r.left - GM.l) / (r.width - GM.l - GM.r);
+    st.t = clamp(t0 + f * (t1 - t0), 0, tLimit());
+    st.playing = false;
+    draw();
+  }
+
+  /* ======================================================================
+   * TABLE, CHECKS, LEGENDS, STATUS  (HTML)
+   * ==================================================================== */
+  function renderLegends() {
+    const [n1, n2] = names();
+    const item = (color, label, cls = '') => `<span><i class="${cls}" style="border-color:${color};background:${cls === 'area' ? color : 'none'}"></i>${label}</span>`;
+    $('lg-gv').innerHTML = item(COL.b1, n1) + item(COL.b2, n2);
+    $('lg-gf').innerHTML = item(COL.b1, `הכוח על ${n1}`) + item(COL.b2, `הכוח על ${n2}`) +
+      item('#7c8695', `השטח הצבוע: מתקף ${L('J = Δp')}`, 'area');
+    $('lg-gp').innerHTML = item(COL.b1, n1) + item(COL.b2, n2) + item(COL.sum, `התנע הכולל ${L('Σp')}`, 'thick');
+    const u = { elastic: 'אנרגיה אלסטית בקפיץ', inelastic: 'אנרגיה בקפיץ וחום', plastic: 'אנרגיה שהפכה לחום', bullet: 'חום (עבודת כוח ההתנגדות)' }[st.mode];
+    $('lg-ge').innerHTML = item(COL.b1, `${L('Eₖ')} ${n1}`) + item(COL.b2, `${L('Eₖ')} ${n2}`) +
+      item(COL.sum, `אנרגיה קינטית כוללת ${L('ΣEₖ')}`, 'thick') + item(COL.heat, u, 'dash');
+  }
+
+  function renderTable() {
+    const S = st.sum, b = S.before, a = S.after, hid = hidden(), [n1, n2] = names();
+    const M = st.rec.P.m1 + st.rec.P.m2;
+    const num = (x, extra = '') => `<td class="num" dir="ltr">${x}${extra}</td>`;
+    const q = '<td class="num">?</td>';
+    const row = (label, cells, cls = '') => `<tr class="${cls}"><th scope="row">${label}</th>${cells.join('')}</tr>`;
+    const A = (...xs) => hid ? xs.map(() => q) : xs;
+    const okChip = S.pOK ? '<span class="chip ok">✓</span>' : '<span class="chip bad">✗</span>';
+    const cmNote = '<small dir="rtl">מרכז המסה</small>';
+    $('table').innerHTML = `<table>
+      <thead><tr><th></th><th class="c1">${n1}</th><th class="c2">${n2}</th><th>המערכת</th></tr></thead><tbody>
+      ${row(`${L('v')} לפני ${L('(m/s)')}`, [num(fmtA(b.v1)), num(fmtA(b.v2)), num(fmtA(b.p / M), cmNote)])}
+      ${row(`${L('v')} אחרי ${L('(m/s)')}`, A(num(fmtA(a.v1)), num(fmtA(a.v2)), num(fmtA(a.p / M), cmNote)))}
+      ${row(`${L('p')} לפני ${L('(kg·m/s)')}`, [num(fmtA(b.p1)), num(fmtA(b.p2)), num(fmtA(b.p))], 'sep')}
+      ${row(`${L('p')} אחרי ${L('(kg·m/s)')}`, A(num(fmtA(a.p1)), num(fmtA(a.p2)), num(fmtA(a.p))))}
+      ${row(`${L('Δp')} ${L('(kg·m/s)')}`, A(num(fmtA(S.dp1)), num(fmtA(S.dp2)), `<td class="num"><span dir="ltr">${fmtA(a.p - b.p)}</span>${okChip}</td>`))}
+      ${row(`${L('Eₖ')} לפני ${L('(J)')}`, [num(fmtA(b.E1)), num(fmtA(b.E2)), num(fmtA(b.E))], 'sep')}
+      ${row(`${L('Eₖ')} אחרי ${L('(J)')}`, A(num(fmtA(a.E1)), num(fmtA(a.E2)), num(fmtA(a.E))))}
+      ${row(`${L('ΔEₖ')} ${L('(J)')}`, A(num(fmtA(a.E1 - b.E1)), num(fmtA(a.E2 - b.E2)), `<td class="num"><span dir="ltr">${fmtA(S.dE)}</span><small dir="ltr">${fmt(S.dEpct, 2)}%</small></td>`))}
+      </tbody></table>`;
+  }
+
+  function renderChecks() {
+    $('checksPanel').hidden = hidden();
+    if (hidden()) return;
+    const S = st.sum, r = st.rec, b = S.before, a = S.after, X = S.expected, [n1, n2] = names();
+    const out = [];
+    const add = (ok, html) => out.push(`<li><span class="mark ${ok === null ? 'info' : ok ? 'ok' : 'bad'}">${ok === null ? 'i' : ok ? '✓' : '✗'}</span><span>${html}</span></li>`);
+    const close = (x, y, sc) => Math.abs(x - y) <= 1e-3 * Math.max(Math.abs(sc === undefined ? y : sc), 1e-9);
+    add(S.pOK, `התנע הכולל נשמר: ${L(`Σp = ${fmtA(b.p)} → ${fmtA(a.p)} kg·m/s`)} (סטייה ${L(pct(S.pErr))})`);
+    add(S.cmOK, `מרכז המסה נע במהירות קבועה ${L(`v = ${fmtA(S.vcm)} m/s`)} (סטייה ${L(pct(S.cmErr))})`);
+    if (!r.collided) add(null, 'אין התנגשות, ולכן אין כוח ואין מתקף.');
+    else {
+      const sc = Math.max(Math.abs(S.dp2), 1e-9);
+      add(close(S.J2, S.dp2, sc), `השטח מתחת ל־${L('F(t)')} שווה לשינוי התנע של ${n2}: ${L(`J₂ = ${fmtA(S.J2)} N·s`)}, ${L(`Δp₂ = ${fmtA(S.dp2)} kg·m/s`)}`);
+      add(close(S.J1, S.dp1, sc), `וכך גם עבור ${n1}: ${L(`J₁ = ${fmtA(S.J1)} N·s`)}, ${L(`Δp₁ = ${fmtA(S.dp1)} kg·m/s`)}`);
+      const vs = Math.max(Math.abs(b.v1), Math.abs(b.v2));
+      if (r.kind === 'bullet') {
+        const d = r.depth, FL = r.P.F * d;
+        add(close(-S.dE, FL), r.outcome === 'exit'
+          ? `האנרגיה שאבדה שווה ל־${L('F·L')}: ${L(`|ΔEₖ| = ${fmtA(-S.dE)} J`)}, ${L(`F·L = ${fmtA(FL)} J`)}`
+          : `הקליע נתקע בעומק ${L(`d = ${fmt(d * 100, 2)} cm`)}. האנרגיה שאבדה שווה ל־${L('F·d')}: ${L(`|ΔEₖ| = ${fmtA(-S.dE)} J`)}, ${L(`F·d = ${fmtA(FL)} J`)}`);
+      } else if (st.mode === 'elastic') {
+        add(Math.abs(S.dEpct) < 0.1, `האנרגיה הקינטית נשמרה: ${L(`ΣEₖ = ${fmtA(b.E)} → ${fmtA(a.E)} J`)}`);
+      } else if (r.outcome === 'stuck') {
+        add(close(a.v1, X.v1, vs) && Math.abs(a.v1 - a.v2) < 1e-9, `הגופים נעים יחד: ${L(`u = ${fmtA(a.v1)} m/s`)}. לפי הנוסחה ${L(`(m₁v₁ + m₂v₂)/(m₁ + m₂) = ${fmtA(X.v1)} m/s`)}`);
+      } else {
+        add(Math.abs(S.eMeasured - r.e) < 2e-3, `מקדם התקומה שנמדד: ${L(`e = (u₂ − u₁)/(v₁ − v₂) = ${fmt(S.eMeasured, 3)}`)} (נדרש ${L(fmt(r.e, 2))})`);
+      }
+      if (r.outcome !== 'stuck' || r.kind === 'bullet')
+        add(close(a.v1, X.v1, vs) && close(a.v2, X.v2, vs), `השוואה לנוסחאות: ${L(`u₁ = ${fmtA(a.v1)}`)} (נוסחה ${L(fmtA(X.v1))}), ${L(`u₂ = ${fmtA(a.v2)}`)} (נוסחה ${L(fmtA(X.v2))}) ${L('m/s')}`);
+    }
+    $('checks').innerHTML = out.join('');
+  }
+
+  let lastStatus = '';
+  function renderStatus() {
+    const r = st.rec, a = st.sum.after;
+    let cls = '', msg;
+    if (hidden()) msg = r.collided && st.t >= r.tC - 1e-12
+      ? 'רגע המגע. מה יהיו המהירויות אחרי ההתנגשות? הזינו ניבוי ולחצו ״בדוק״.'
+      : 'מצב ניבוי: ההדמיה תיעצר ברגע המגע. הזינו את המהירויות שאחרי ההתנגשות ולחצו ״בדוק״.';
+    else if (!r.collided) { cls = 'warn'; msg = `אין התנגשות: ${L('v₁ ≤ v₂')}, גוף 1 אינו משיג את גוף 2, ולכן המהירויות אינן משתנות.`; }
+    else if (st.t < r.tC) msg = r.kind === 'bullet' ? 'הקליע בדרך אל הגוש.' : 'הגופים מתקרבים זה לזה.';
+    else if (st.t < r.tE) msg = r.kind === 'bullet'
+      ? `הקליע בתוך הגוש: כוח ההתנגדות מאט את הקליע, וכוח שווה ומנוגד מאיץ את הגוש.`
+      : `הגופים במגע: הכוחות שווים בגודלם ומנוגדים בכיוונם, ${L('F₁₂ = −F₂₁')}.`;
+    else {
+      cls = 'done';
+      if (r.kind === 'bullet') msg = r.outcome === 'stuck'
+        ? `הקליע נעצר בתוך הגוש בעומק ${L(`d = ${fmt(r.depth * 100, 2)} cm`)} ונשאר תקוע בו. מכאן זו התנגשות פלסטית: שניהם נעים יחד במהירות ${L(`${fmtA(a.v1)} m/s`)}.`
+        : `הקליע חדר דרך כל הגוש ויצא מצדו השני במהירות ${L(`${fmtA(a.v1)} m/s`)}. הגוש נע במהירות ${L(`${fmtA(a.v2)} m/s`)}.`;
+      else msg = r.outcome === 'stuck'
+        ? `הגופים נצמדו ונעים יחד במהירות ${L(`u = ${fmtA(a.v1)} m/s`)}.`
+        : `הגופים נפרדו: ${L(`u₁ = ${fmtA(a.v1)} m/s`)}, ${L(`u₂ = ${fmtA(a.v2)} m/s`)}.`;
+    }
+    if (msg + cls !== lastStatus) { lastStatus = msg + cls; const el = $('status'); el.className = 'status ' + cls; el.innerHTML = msg; }
+  }
+
+  /** Everything that changes only when the experiment (or reveal state) changes. */
+  function renderStatic() {
+    renderLegends(); renderTable(); renderChecks();
+    const [n1, n2] = names();
+    $('pn1').textContent = n1; $('pn2').textContent = n2;
+    $('predictPanel').hidden = !st.predict;
+  }
+
+  function draw() {
+    drawScene();
+    for (const g of GRAPHS) drawGraph(g);
+    renderStatus();
+    $('btnPlay').disabled = st.playing;
+    $('btnPause').disabled = !st.playing;
+  }
+
+  /* ======================================================================
+   * CONTROLS + EVENTS
+   * ==================================================================== */
+  function buildControls() {
+    $('params').innerHTML = CTRL.map(c => `
+      <div class="ctl ${c.body ? 'b' + c.body : ''}" data-modes="${c.modes.join(' ')}">
+        <label for="n-${c.id}"><span class="sym ${c.body ? 'c' + c.body : ''}" dir="ltr">${c.sym}</span> ${c.name}</label>
+        <div class="ctl-row">
+          <input type="range" id="r-${c.id}" min="${c.min}" max="${c.max}" step="${c.step}" dir="ltr" aria-label="${c.name}">
+          <input type="number" id="n-${c.id}" min="${c.min}" max="${c.max}" step="${c.step}" dir="ltr">
+          <span class="unit" dir="ltr">${c.unit}</span>
+        </div>
+      </div>`).join('');
+    for (const c of CTRL) {
+      $('r-' + c.id).addEventListener('input', ev => setParam(c, +ev.target.value));
+      $('n-' + c.id).addEventListener('change', ev => setParam(c, +ev.target.value));
+    }
+    $('presets').innerHTML = PRESETS.map((p, i) => `<button type="button" data-i="${i}">${p.name}</button>`).join('');
+    $('presets').addEventListener('click', ev => {
+      const b = ev.target.closest('button'); if (!b) return;
+      const p = PRESETS[+b.dataset.i];
+      Object.assign(st.par, p.set);
+      if (p.mode) st.mode = p.mode; else if (isBullet()) st.mode = 'elastic';
+      syncControls(); rebuild();
+    });
+  }
+  function setParam(c, v) {
+    if (!isFinite(v)) v = st.par[c.id];
+    v = clamp(Math.round(v / c.step) * c.step, c.min, c.max);
+    st.par[c.id] = +v.toFixed(4);
+    syncControls(); rebuild();
+  }
+  function syncControls() {
+    for (const c of CTRL) {
+      $('r-' + c.id).value = st.par[c.id]; $('n-' + c.id).value = st.par[c.id];
+      $('r-' + c.id).closest('.ctl').hidden = !c.modes.includes(st.mode);
+    }
+    document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.mode === st.mode));
+    $('autoWrap').hidden = isBullet();
+  }
+
+  function play() {
+    if (st.t >= tLimit() - 1e-15) {
+      if (hidden()) { $('pu1').focus(); return; }
+      st.t = 0;
+    }
+    st.playing = true; draw();
+  }
+
+  function init() {
+    buildControls();
+    document.querySelector('.tabs').addEventListener('click', ev => {
+      const b = ev.target.closest('button'); if (!b) return;
+      st.mode = b.dataset.mode; syncControls(); rebuild();
+    });
+    $('btnPlay').addEventListener('click', play);
+    $('btnPause').addEventListener('click', () => { st.playing = false; draw(); });
+    $('btnStep').addEventListener('click', () => { st.playing = false; advance(1 / 25); st.playing = false; draw(); });
+    $('btnReset').addEventListener('click', () => { st.t = 0; st.playing = false; draw(); });
+    $('slow').addEventListener('input', ev => {
+      st.slow = Math.pow(10, -ev.target.value);
+      $('slowOut').textContent = '×' + (st.slow >= 0.1 ? st.slow.toFixed(2) : st.slow.toFixed(3));
+      draw();
+    });
+    $('auto').addEventListener('change', ev => { st.auto = ev.target.checked; makePlan(); draw(); });
+    const setZoom = z => {
+      st.zoom = z; $('zoomOn').setAttribute('aria-pressed', z); $('zoomOff').setAttribute('aria-pressed', !z); draw();
+    };
+    $('zoomOn').addEventListener('click', () => setZoom(true));
+    $('zoomOff').addEventListener('click', () => setZoom(false));
+    $('showE').addEventListener('change', ev => { st.showE = ev.target.checked; $('box-ge').hidden = !st.showE; draw(); });
+    $('predict').addEventListener('change', ev => {
+      st.predict = ev.target.checked; st.revealed = false; st.guess = null; st.playing = false;
+      $('predictOut').innerHTML = ''; st.t = Math.min(st.t, tLimit());
+      renderStatic(); draw();
+    });
+    $('predictForm').addEventListener('submit', ev => {
+      ev.preventDefault();
+      const g1 = parseFloat($('pu1').value), g2 = parseFloat($('pu2').value);
+      if (!isFinite(g1) || !isFinite(g2)) { $('predictOut').textContent = 'יש להזין שתי מהירויות.'; return; }
+      const a = st.sum.after, b = st.sum.before;
+      const tol = Math.max(0.02 * Math.max(Math.abs(a.v1), Math.abs(a.v2), Math.abs(b.v1), Math.abs(b.v2)), 0.01);
+      const line = (sym, cls, g, real) => {
+        const ok = Math.abs(g - real) <= tol;
+        return `<div><span class="chip ${ok ? 'ok' : 'bad'}">${ok ? '✓' : '✗'}</span> ${L(`<b class="${cls}">${sym}</b>`)}: ניבוי ${L(fmtA(g))}, בפועל ${L(fmtA(real))}, הפרש ${L(fmtA(g - real))} ${L('m/s')}</div>`;
+      };
+      const good = Math.abs(g1 - a.v1) <= tol && Math.abs(g2 - a.v2) <= tol;
+      $('predictOut').innerHTML = line('u₁', 'c1', g1, a.v1) + line('u₂', 'c2', g2, a.v2) +
+        `<div style="margin-top:6px">${good ? 'הניבוי מדויק.' : `הניבוי אינו תואם. בדקו: האם ${L('Σp')} לפני שווה ל־${L('Σp')} אחרי?`}</div>`;
+      st.revealed = true; renderStatic(); st.playing = true; draw();
+    });
+    for (const g of GRAPHS) {
+      const cv = $(g.id);
+      cv.addEventListener('pointerdown', ev => { cv.setPointerCapture(ev.pointerId); cv.dataset.drag = '1'; scrub(cv, ev); });
+      cv.addEventListener('pointermove', ev => { if (cv.dataset.drag) scrub(cv, ev); });
+      const end = () => { delete cv.dataset.drag; };
+      cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+    }
+    window.addEventListener('resize', draw);
+
+    syncControls(); rebuild();
+    let last = performance.now();
+    const frame = now => {
+      const wall = Math.min(0.05, (now - last) / 1000); last = now;
+      if (st.playing) { advance(wall); draw(); }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+
+  window.__sim = st;   // handy for debugging in the console
+  init();
+})();
+</script>
+</body>
+</html>

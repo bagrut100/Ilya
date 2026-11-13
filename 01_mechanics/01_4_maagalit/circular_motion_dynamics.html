@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>תנועה מעגלית: דינמיקה</title>
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#1c2731; --muted:#5b6b78; --line:#cfd8dc;
+    --accent:#0b5cad; --accent-ink:#ffffff; --ok:#1b5e20; --okbg:#e8f5e9; --bad:#b71c1c; --badbg:#ffebee;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{font-family:"Segoe UI","Arial Hebrew",Arial,"Noto Sans Hebrew",sans-serif;font-size:17px;color:var(--ink);
+       background:var(--bg);display:flex;flex-direction:column;min-height:100vh}
+  .ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  header.top{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:10px 18px;background:var(--card);
+       border-bottom:1px solid var(--line)}
+  header.top h1{font-size:24px;margin:0;white-space:nowrap}
+  #tabs{display:flex;gap:6px;flex-wrap:wrap}
+  #tabs button{font:inherit;font-weight:600;font-size:17px;padding:9px 14px;border:2px solid var(--line);
+       background:#fff;color:var(--ink);border-radius:10px;cursor:pointer}
+  #tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  #tabs button:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible{outline:3px solid #ffb300;outline-offset:2px}
+  main.layout{flex:1;min-height:610px;display:grid;grid-template-columns:clamp(250px,22vw,340px) minmax(0,1fr) clamp(250px,22vw,340px);gap:12px;padding:12px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;overflow-y:auto;min-height:0}
+  .panel h2{font-size:19px;margin:4px 0 8px;padding-bottom:4px;border-bottom:2px solid var(--line)}
+  .panel section+section, .panel details{margin-top:14px}
+  .stage{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0}
+  .canvasWrap{flex:1;min-height:420px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .status{min-height:46px;padding:9px 14px;border-radius:10px;font-weight:600;font-size:17px;background:var(--okbg);color:var(--ok);
+       border:1px solid #a5d6a7}
+  .status.bad{background:var(--badbg);color:var(--bad);border-color:#ef9a9a}
+  .status.info{background:#e3f2fd;color:#0d47a1;border-color:#90caf9}
+  .transport{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);
+       border-radius:14px;padding:8px 12px}
+  .btn{font:inherit;font-weight:700;font-size:17px;padding:9px 16px;border-radius:10px;border:2px solid var(--accent);
+       background:#fff;color:var(--accent);cursor:pointer;white-space:nowrap}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn[aria-pressed="true"]{background:#ffb300;border-color:#ff8f00;color:#1c2731}
+  .btn:disabled{opacity:.45;cursor:default}
+  .grow{flex:1;min-width:170px;display:flex;align-items:center;gap:8px}
+  .seg{display:inline-flex;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{font:inherit;font-weight:600;padding:7px 12px;border:0;background:#fff;color:var(--ink);cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+  .chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);
+       border-radius:14px;padding:8px 12px}
+  .chips .cap{font-weight:700}
+  .chip{font:inherit;font-weight:700;font-size:16px;padding:7px 13px;border-radius:999px;border:2px solid var(--accent);
+       background:var(--accent);color:#fff;cursor:pointer;white-space:nowrap}
+  .chip[aria-pressed="false"]{background:#fff;color:#7a8791;border-color:var(--line);text-decoration:line-through}
+  .acts{display:flex;gap:6px;flex-wrap:wrap}
+  .acts button{font:inherit;font-weight:700;padding:7px 11px;border-radius:9px;border:2px solid var(--line);background:#fff;color:var(--accent);cursor:pointer}
+  /* sliders */
+  .prm{margin:10px 0 14px}
+  .prm .head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:600}
+  .prm .val{white-space:nowrap;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent;margin:2px 0;direction:ltr}
+  input[type=range]::-webkit-slider-runnable-track{height:10px;border-radius:6px;background:#cfd8dc}
+  input[type=range]::-moz-range-track{height:10px;border-radius:6px;background:#cfd8dc}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:var(--accent);
+       border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);margin-top:-9px;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #fff;
+       box-shadow:0 1px 4px rgba(0,0,0,.35);cursor:pointer}
+  .opt{margin:8px 0 12px}
+  .opt .cap{font-weight:600;margin-bottom:4px}
+  label.chk{display:flex;align-items:center;gap:9px;padding:5px 2px;cursor:pointer;font-weight:600}
+  label.chk input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+  .sw{width:26px;height:8px;border-radius:4px;flex:none}
+  .sw.acc{height:0;border-top:4px dashed;background:none!important;border-radius:0}
+  /* readouts */
+  .row{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px dashed #e0e6ea}
+  .row .he{flex:1}
+  .row .sy{font-family:"Cambria Math","Times New Roman",serif;font-style:italic;font-weight:700;font-size:19px}
+  .row .vl{font-weight:700;font-variant-numeric:tabular-nums;min-width:96px;text-align:left}
+  details>summary{cursor:pointer;font-size:19px;font-weight:700;padding:6px 0;border-bottom:2px solid var(--line)}
+  #formulas h4{margin:12px 0 4px;font-size:17px;color:var(--accent)}
+  #formulas p{margin:6px 0;line-height:1.45}
+  .fm{direction:ltr;text-align:left;unicode-bidi:isolate;font-family:"Cambria Math","Times New Roman",serif;font-size:20px;
+      background:#f4f6f8;border-radius:8px;padding:6px 10px;margin:5px 0;overflow-x:auto;white-space:nowrap}
+  .note{background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:8px 10px;font-weight:600}
+  #quizBox{display:flex;flex-direction:column;gap:8px}
+  #quizInfo{font-weight:600;color:var(--muted);min-height:24px}
+  footer#legend{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;padding:8px 18px;background:var(--card);
+      border-top:1px solid var(--line);font-size:16px;font-weight:600}
+  footer#legend .it{display:flex;align-items:center;gap:7px}
+  footer#legend .sy{font-family:"Cambria Math","Times New Roman",serif;font-style:italic;font-weight:700}
+  @media (max-width:1000px){
+    html,body{height:auto}
+    main.layout{grid-template-columns:1fr;flex:none;min-height:0}
+    .stage{order:-1}
+    .canvasWrap{min-height:62vh}
+    .panel{overflow:visible}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>תנועה מעגלית: דינמיקה</h1>
+  <nav id="tabs" role="tablist" aria-label="תרחישים"></nav>
+</header>
+
+<main class="layout">
+  <aside class="panel" id="info">
+    <section>
+      <h2>ערכים בזמן אמת</h2>
+      <div id="readouts"></div>
+    </section>
+    <details id="fbox" open>
+      <summary>נוסחאות</summary>
+      <div id="formulas"></div>
+    </details>
+  </aside>
+
+  <section class="stage">
+    <div class="transport">
+      <button class="btn primary" id="bPlay"></button>
+      <button class="btn" id="bStep">צעד</button>
+      <button class="btn" id="bReset">איפוס</button>
+      <div class="grow">
+        <label for="spd" style="font-weight:600;white-space:nowrap">מהירות הנפשה</label>
+        <input type="range" id="spd" min="0.05" max="2" step="0.05" value="1">
+        <span class="ltr" id="spdVal" style="font-weight:700;min-width:54px">×1.00</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="ltr" style="font-weight:700">g =</span>
+        <div class="seg" id="gSeg">
+          <button type="button" data-g="10" aria-pressed="true"><span class="ltr">10 m/s²</span></button>
+          <button type="button" data-g="9.8" aria-pressed="false"><span class="ltr">9.8 m/s²</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="chips" id="chips" aria-label="מה מוצג בשרטוט">
+      <span class="cap">הצג:</span>
+      <button type="button" class="chip" data-k="forces">כוחות</button>
+      <button type="button" class="chip" data-k="sum">שקול <span class="ltr"><i>ΣF</i></span></button>
+      <button type="button" class="chip" data-k="aR">תאוצה <span class="ltr"><i>a<sub>R</sub></i></span></button>
+      <button type="button" class="chip" data-k="v">מהירות <span class="ltr"><i>v</i></span></button>
+      <button type="button" class="chip" data-k="axes">צירים</button>
+      <button type="button" class="chip" data-k="comps">רכיבים</button>
+      <button type="button" class="chip" data-k="nums">ערכים מספריים</button>
+    </div>
+    <div class="canvasWrap" id="wrap"><canvas id="cv"></canvas></div>
+    <div id="status" class="status" role="status"></div>
+  </section>
+
+  <aside class="panel" id="ctl">
+    <section>
+      <h2>פרמטרים</h2>
+      <div id="params"></div>
+    </section>
+    <section>
+      <h2>תצוגה</h2>
+      <div id="showList"></div>
+    </section>
+    <section>
+      <h2>שאלה לכיתה</h2>
+      <div id="quizBox">
+        <button class="btn" id="bQuiz" aria-pressed="false">הסתר וקטורים – שרטטו בעצמכם</button>
+        <button class="btn" id="bNext" disabled>הצג וקטור הבא</button>
+        <button class="btn" id="bAll" disabled>הצג הכול</button>
+        <div id="quizInfo"></div>
+      </div>
+    </section>
+  </aside>
+</main>
+
+<footer id="legend" aria-label="מקרא צבעים"></footer>
+
+<script>
+"use strict";
+/* =====================================================================
+   Circular motion dynamics - interactive simulation (single file, offline)
+   Structure:
+     1. constants, helpers, global UI state
+     2. vector registry (one fixed colour per vector type in all scenarios)
+     3. canvas drawing helpers
+     4. scenarios: Disk, Pendulum, Bank, Turn, Loop (common interface)
+     5. UI wiring, main loop
+   Scenario interface:
+     id, title, p (parameter values), o (option values)
+     options()  -> option descriptors      params() -> slider descriptors
+     forceKeys()-> force vector keys        extraKeys() -> other vector keys
+     reset()    step(dt, dtReal)   derive() -> fills this.d
+     draw(ctx,W,H)   readouts() -> rows   formulas() -> html   status() -> {html, lvl}
+   ===================================================================== */
+
+/* ---------- 1. constants & helpers ---------- */
+const TAU = Math.PI * 2, DEG = Math.PI / 180;
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const $ = s => document.querySelector(s);
+const ltr = s => '<bdi dir="ltr" class="ltr">' + s + '</bdi>';
+
+/** number formatting that never prints NaN or "-0.00" */
+function num(x, d = 2) {
+  if (Number.isNaN(x)) return '—';
+  if (!Number.isFinite(x)) return '∞';
+  const r = x.toFixed(d);
+  return Number(r) === 0 ? (0).toFixed(d) : r;
+}
+/** force formatting: N, or kN for large values */
+function fN(F) {
+  if (!Number.isFinite(F)) return '∞';
+  const a = Math.abs(F);
+  if (a >= 1e4) return num(F / 1000, a >= 1e6 ? 0 : 1) + ' kN';
+  return num(F, a >= 100 ? 1 : 2) + ' N';
+}
+const deg = (rad, d = 1) => num(rad / DEG, d) + '°';
+
+/* global UI state */
+const UI = {
+  g: 10, running: true, speed: 1, sc: null,
+  quiz: false, revealed: new Set(),
+  show: { mg: true, N: true, T: true, f: true, Lift: true, Rg: true, sum: true, aR: true, at: true, a: false, v: true, axes: true, comps: false, forces: true, nums: true }
+};
+
+/* ---------- 2. vector registry: fixed colour system ---------- */
+const VEC = {
+  mg:   { color: '#d32f2f', he: 'כוח הכובד',                 sym: { b: 'mg' },          html: 'mg' },
+  N:    { color: '#1565c0', he: 'כוח נורמלי',                sym: { b: 'N' },           html: 'N' },
+  T:    { color: '#7b1fa2', he: 'מתיחות החוט',               sym: { b: 'T' },           html: 'T' },
+  f:    { color: '#ef6c00', he: 'כוח חיכוך',                 sym: { b: 'f' },           html: 'f' },
+  Lift: { color: '#00897b', he: 'כוח עילוי',                 sym: { b: 'L' },           html: 'L' },
+  Rg:   { color: '#3949ab', he: 'תגובת המשטח (N+f)',         sym: { b: 'F', s: 'N+f' }, html: 'F<sub>N+f</sub>' },
+  sum:  { color: '#111111', he: 'כוח שקול',                  sym: { b: 'ΣF' },          html: 'ΣF' },
+  aR:   { color: '#2e7d32', he: 'תאוצה רדיאלית (צנטריפטלית)', sym: { b: 'a', s: 'R' },   html: 'a<sub>R</sub>', acc: true },
+  at:   { color: '#c2185b', he: 'תאוצה משיקית',              sym: { b: 'a', s: 'τ' },   html: 'a<sub>τ</sub>', acc: true },
+  a:    { color: '#6d4c41', he: 'תאוצה כוללת',               sym: { b: 'a' },           html: 'a',             acc: true },
+  v:    { color: '#546e7a', he: 'מהירות',                    sym: { b: 'v' },           html: 'v' }
+};
+const AXIS_COLOR = '#7a8791';
+const FORCE_KEYS = ['mg', 'N', 'T', 'f', 'Lift', 'Rg'];
+
+/** is the vector with this key currently drawn? (handles class-question mode) */
+function visible(key) {
+  if (key === 'v') return UI.show.v;
+  if (UI.quiz) return UI.revealed.has(key);
+  if (FORCE_KEYS.indexOf(key) >= 0 && !UI.show.forces) return false;     // master switch "forces"
+  return UI.show[key] !== false;
+}
+const compsOn = key => UI.show.comps && visible(key);
+
+/* ---------- 3. canvas helpers ---------- */
+function rr(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+}
+function line(ctx, x1, y1, x2, y2, color, w = 1.5, dash) {
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = w; if (dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore();
+}
+/** plain text with a white halo. o: {size,color,align,base,rtl,bold} */
+function label(ctx, str, x, y, o = {}) {
+  ctx.save();
+  ctx.font = (o.bold ? '700 ' : '600 ') + (o.size || 15) + 'px "Segoe UI",Arial,sans-serif';
+  ctx.textAlign = o.align || 'center'; ctx.textBaseline = o.base || 'middle';
+  try { ctx.direction = o.rtl ? 'rtl' : 'ltr'; } catch (e) { /* old browsers */ }
+  ctx.lineJoin = 'round'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,.92)';
+  ctx.strokeText(str, x, y);
+  ctx.fillStyle = o.color || '#263238'; ctx.fillText(str, x, y);
+  ctx.restore();
+}
+/** arrow. o: {width, head, dash, hollow} */
+function arrow(ctx, x1, y1, x2, y2, color, o = {}) {
+  const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
+  if (!(len >= 1)) return;
+  const w = o.width || 4, hl = Math.min(o.head || 15, len * 0.6), ux = dx / len, uy = dy / len, hw = hl * 0.5;
+  ctx.save();
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = w; ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
+  if (o.dash) ctx.setLineDash(o.dash);
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2 - ux * hl * 0.85, y2 - uy * hl * 0.85); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - ux * hl - uy * hw, y2 - uy * hl + ux * hw);
+  ctx.lineTo(x2 - ux * hl + uy * hw, y2 - uy * hl - ux * hw);
+  ctx.closePath();
+  if (o.hollow) { ctx.fillStyle = '#fff'; ctx.fill(); ctx.lineWidth = Math.max(2, w * 0.7); ctx.stroke(); }
+  else ctx.fill();
+  ctx.restore();
+}
+/** math symbol: italic letter, optional subscript, optional vector arrow above. s: {b, s, vec} */
+function sym(ctx, x, y, s, color, size = 21) {
+  ctx.save();
+  try { ctx.direction = 'ltr'; } catch (e) { /* ignore */ }
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round';
+  const fMain = 'italic 700 ' + size + 'px "Cambria Math","Times New Roman",serif';
+  const fSub = 'italic 700 ' + Math.round(size * 0.66) + 'px "Cambria Math","Times New Roman",serif';
+  ctx.font = fMain; const wb = ctx.measureText(s.b).width;
+  let ws = 0; if (s.s) { ctx.font = fSub; ws = ctx.measureText(s.s).width + 1; }
+  const x0 = x - (wb + ws) / 2, y0 = y + size * 0.32;
+  ctx.strokeStyle = 'rgba(255,255,255,.92)'; ctx.lineWidth = 4; ctx.fillStyle = color;
+  ctx.font = fMain; ctx.strokeText(s.b, x0, y0); ctx.fillText(s.b, x0, y0);
+  if (s.s) { ctx.font = fSub; ctx.strokeText(s.s, x0 + wb + 1, y0 + size * 0.22); ctx.fillText(s.s, x0 + wb + 1, y0 + size * 0.22); }
+  if (s.vec !== false) {              // small arrow above the letter
+    const ay = y0 - size * 0.84, ax2 = x0 + wb + 1;
+    ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x0, ay); ctx.lineTo(ax2, ay);
+    ctx.moveTo(ax2 - 5, ay - 3.5); ctx.lineTo(ax2, ay); ctx.lineTo(ax2 - 5, ay + 3.5); ctx.stroke();
+  }
+  ctx.restore();
+}
+/** draw a registered vector (force / acceleration / velocity) with its label.
+    o.side: perpendicular label shift (px); o.shift: perpendicular shift of the whole arrow (px) */
+function drawVec(ctx, key, ox, oy, dx, dy, o = {}) {
+  if (!visible(key)) return;
+  const V = VEC[key], len = Math.hypot(dx, dy);
+  if (!(len >= 2)) return;
+  const ux = dx / len, uy = dy / len;
+  if (o.shift) { ox += -uy * o.shift; oy += ux * o.shift; }
+  arrow(ctx, ox, oy, ox + dx, oy + dy, V.color,
+    V.acc ? { width: 3.5, hollow: true, dash: [8, 5] } : { width: key === 'sum' ? 5.5 : (key === 'v' ? 3 : 4.2) });
+  const side = o.side || 0;
+  sym(ctx, ox + dx + ux * 20 - uy * side, oy + dy + uy * 20 + ux * side, V.sym, V.color);
+}
+/** two dashed components c1 + c2 of a force, with closing guide lines */
+function drawComps(ctx, key, ox, oy, c1, c2, n1, n2) {
+  if (!compsOn(key)) return;
+  const col = VEC[key].color, b = VEC[key].sym.b;
+  const tx = ox + c1[0] + c2[0], ty = oy + c1[1] + c2[1];
+  [[c1, n1], [c2, n2]].forEach(([c, n]) => {
+    const len = Math.hypot(c[0], c[1]); if (!(len >= 4)) return;
+    arrow(ctx, ox, oy, ox + c[0], oy + c[1], col, { width: 2, dash: [6, 4], head: 10 });
+    line(ctx, ox + c[0], oy + c[1], tx, ty, col, 1, [3, 4]);
+    sym(ctx, ox + c[0] + c[0] / len * 16, oy + c[1] + c[1] / len * 16, { b, s: n, vec: false }, col, 17);
+  });
+}
+/** coordinate axes at (ox,oy); ex, ey are screen vectors (already with length) */
+function drawAxes(ctx, ox, oy, ex, ey, lx = 'x', ly = 'y') {
+  if (!UI.show.axes) return;
+  [[ex, lx], [ey, ly]].forEach(([e, l]) => {
+    const len = Math.hypot(e[0], e[1]); if (!(len >= 6)) return;
+    line(ctx, ox - e[0] * 0.25, oy - e[1] * 0.25, ox, oy, AXIS_COLOR, 1.5);
+    arrow(ctx, ox, oy, ox + e[0], oy + e[1], AXIS_COLOR, { width: 1.6, head: 9 });
+    sym(ctx, ox + e[0] + e[0] / len * 8 + e[1] / len * 13, oy + e[1] + e[1] / len * 8 - e[0] / len * 13, { b: l, vec: false }, AXIS_COLOR, 18);
+  });
+}
+/** common force scale (px per newton) inside one scenario */
+const fScale = (mg, Fmax) => Math.min(88 / Math.max(mg, 1e-9), 200 / Math.max(Fmax, 1e-9));
+
+/** top-view inset box geometry */
+function topBox(W, H) {
+  const S = clamp(Math.min(W, H) * 0.36, 150, 230);
+  return { x: 12, y: 12, S, cx: 12 + S / 2, cy: 12 + S / 2 + 11, rmax: S / 2 - 36 };
+}
+/** top view: circle, body, tangent velocity, a_R to the centre.
+    o: {rp, bx, by (px, y up), tx, ty (unit tangent, y up), v, aR, onPath, diskR, diskAngle} */
+function drawTopView(ctx, b, o) {
+  ctx.save();
+  rr(ctx, b.x, b.y, b.S, b.S, 12); ctx.fillStyle = 'rgba(255,255,255,.96)'; ctx.fill();
+  ctx.strokeStyle = '#b0bec5'; ctx.lineWidth = 1.5; ctx.stroke();
+  label(ctx, 'מבט מלמעלה', b.x + b.S / 2, b.y + 14, { size: 14, rtl: true, color: '#455a64' });
+  rr(ctx, b.x + 1, b.y + 24, b.S - 2, b.S - 25, 10); ctx.clip();
+  if (o.diskR) {
+    ctx.beginPath(); ctx.arc(b.cx, b.cy, o.diskR, 0, TAU); ctx.fillStyle = '#eceff1'; ctx.fill();
+    ctx.strokeStyle = '#90a4ae'; ctx.lineWidth = 2; ctx.stroke();
+    for (let i = 0; i < 6; i++) {
+      const a = -(o.diskAngle || 0) + i * TAU / 6;
+      line(ctx, b.cx, b.cy, b.cx + o.diskR * Math.cos(a), b.cy + o.diskR * Math.sin(a), '#cfd8dc', 1.5);
+    }
+  }
+  ctx.beginPath(); ctx.arc(b.cx, b.cy, Math.max(o.rp, 0.5), 0, TAU);
+  ctx.strokeStyle = '#607d8b'; ctx.lineWidth = 1.6; ctx.setLineDash([6, 5]); ctx.stroke(); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(b.cx, b.cy, 3.5, 0, TAU); ctx.fillStyle = '#37474f'; ctx.fill();
+  const bx = b.cx + o.bx, by = b.cy - o.by;
+  const onPath = o.onPath !== false;
+  if (onPath && o.rp > 4) line(ctx, b.cx, b.cy, bx, by, '#90a4ae', 1.2, [3, 3]);
+  if (onPath && o.aR > 1e-6 && o.rp > 8 && visible('aR')) {
+    const L = Math.min(o.rp * 0.62, 46), d = Math.hypot(b.cx - bx, b.cy - by) || 1;
+    drawVec(ctx, 'aR', bx, by, (b.cx - bx) / d * L, (b.cy - by) / d * L, { side: 14 });
+  }
+  if (o.v > 1e-6) drawVec(ctx, 'v', bx, by, o.tx * 44, -o.ty * 44);
+  ctx.beginPath(); ctx.arc(bx, by, 8, 0, TAU); ctx.fillStyle = '#263238'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.restore();
+}
+/* ---- simple orthographic 3-D overview (camera raised by `elev`) ---- */
+function make3D(cx, cy, s, elev) {
+  const se = Math.sin(elev), ce = Math.cos(elev);
+  return {
+    s, P: (x, y, z) => [cx + s * x, cy - s * (y * se + z * ce)],     // point
+    V: (x, y, z) => [s * x, -s * (y * se + z * ce)],                 // vector
+    depth: (x, y, z) => y * ce - z * se                              // larger = farther from the camera
+  };
+}
+function poly(ctx, pts, fill, stroke, lw = 1) {
+  ctx.beginPath(); pts.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.stroke(); }
+}
+const mixRGB = (a, b, t) => 'rgb(' + a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',') + ')';
+/** split the canvas into an overview region (a) and a force-diagram region (b) */
+function splitRegions(W, H) {
+  if (W >= 700) { const wa = Math.round(W * 0.44); return { a: { x: 0, y: 0, w: wa, h: H }, b: { x: wa, y: 0, w: W - wa, h: H } }; }
+  const ha = Math.round(H * 0.42); return { a: { x: 0, y: 0, w: W, h: ha }, b: { x: 0, y: ha, w: W, h: H - ha } };
+}
+function inRegion(ctx, r, title, bg, fn) {
+  ctx.save(); ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip(); ctx.translate(r.x, r.y);
+  if (bg) { ctx.fillStyle = bg; ctx.fillRect(0, 0, r.w, r.h); }
+  fn(r.w, r.h);
+  label(ctx, title, r.w / 2, 16, { size: 15, rtl: true, color: '#455a64', bold: true });
+  ctx.restore();
+}
+/** ground ellipse, vertical axis and dashed radius for the overview pictures */
+function draw3DCircleGuides(ctx, cam, bx, by, bz) {
+  const O = cam.P(0, 0, 0), A = cam.P(0, 0, bz), B = cam.P(bx, by, bz);
+  line(ctx, O[0], O[1], A[0], A[1] - 26, '#607d8b', 1.4, [5, 4]);
+  line(ctx, A[0], A[1], B[0], B[1], '#455a64', 1.5, [6, 4]);
+  ctx.beginPath(); ctx.arc(A[0], A[1], 3.5, 0, TAU); ctx.fillStyle = '#263238'; ctx.fill();
+  sym(ctx, (A[0] + B[0]) / 2, (A[1] + B[1]) / 2 - 12, { b: 'R', vec: false }, '#263238', 18);
+}
+
+/** angle arc with a Greek label; canvas angles a0 -> a1 (clockwise) */
+function angleArc(ctx, x, y, r, a0, a1, txt = 'α') {
+  if (Math.abs(a1 - a0) < 0.012) return;
+  ctx.save(); ctx.strokeStyle = '#455a64'; ctx.lineWidth = 1.8;
+  ctx.beginPath(); ctx.arc(x, y, r, Math.min(a0, a1), Math.max(a0, a1)); ctx.stroke(); ctx.restore();
+  const am = (a0 + a1) / 2;
+  sym(ctx, x + (r + 15) * Math.cos(am), y + (r + 15) * Math.sin(am), { b: txt, vec: false }, '#263238', 20);
+}
+/** formula-panel helpers */
+const fm = s => '<div class="fm" dir="ltr">' + s + '</div>';
+const sq = s => '√<span style="border-top:1.5px solid currentColor;padding:0 2px">' + s + '</span>';
+
+/* =====================================================================
+   4. SCENARIOS
+   ===================================================================== */
+
+/* ---------- 4.1 body on a rotating horizontal disk ---------- */
+const Disk = {
+  id: 'disk', title: 'סיבוב על דיסק',
+  p: { R: 1.2, w: 2, m: 1, mu: 0.5 }, o: {}, RD: 2.35, K: 0.36,
+  options() { return []; },
+  params() {
+    return [
+      { key: 'R', he: 'רדיוס', sym: 'R', unit: 'm', min: 0.2, max: 2, step: 0.05, dec: 2 },
+      { key: 'w', he: 'מהירות זוויתית', sym: 'ω', unit: 'rad/s', min: 0, max: 8, step: 0.05, dec: 2 },
+      { key: 'm', he: 'מסה', sym: 'm', unit: 'kg', min: 0.1, max: 5, step: 0.1, dec: 1 },
+      { key: 'mu', he: 'מקדם חיכוך סטטי', sym: 'μ', unit: '', min: 0.05, max: 1, step: 0.01, dec: 2 }
+    ];
+  },
+  forceKeys() { return ['mg', 'N', 'f']; },
+  extraKeys() { return ['sum', 'aR']; },
+  reset() { this.th = 0; this.disk = 0; this.slip = null; this.derive(); },
+  derive() {
+    const p = this.p, g = UI.g, d = this.d = {};
+    d.mg = p.m * g; d.N = d.mg; d.v = p.w * p.R; d.aR = p.w * p.w * p.R;
+    d.fReq = p.m * d.aR; d.fMax = p.mu * d.N; d.ok = d.fReq <= d.fMax + 1e-9;
+    d.vmax = Math.sqrt(p.mu * g * p.R); d.wmax = Math.sqrt(p.mu * g / p.R);
+    d.T = p.w > 1e-6 ? TAU / p.w : Infinity;
+  },
+  step(dt) {
+    this.derive();
+    const p = this.p, d = this.d;
+    this.disk += p.w * dt;
+    if (!this.slip) {
+      if (d.ok) { this.th += p.w * dt; return; }
+      // static friction is not enough: the body leaves along the tangent
+      const c = Math.cos(this.th), s = Math.sin(this.th);
+      this.slip = { x: p.R * c, y: p.R * s, z: 0, vx: -d.v * s, vy: d.v * c, vz: 0, v: d.v, done: false };
+    }
+    if (d.ok) { this.slip = null; return; }          // conditions restored: body is placed back
+    const s = this.slip; if (s.done) return;
+    s.x += s.vx * dt; s.y += s.vy * dt;
+    if (Math.hypot(s.x, s.y) > this.RD) { s.vz -= UI.g * dt; s.z += s.vz * dt; }
+    if (s.z < -2.2 || Math.hypot(s.x, s.y) > 6) s.done = true;
+  },
+  draw(ctx, W, H) {
+    const p = this.p, d = this.d, K = this.K, RD = this.RD, th = this.th, sl = this.slip;
+    const s = Math.min(W * 0.42, H * 0.6) / RD, cx = W * 0.56, cy = H * 0.58;
+    const P = (x, y, z) => [cx + s * x, cy - s * z - s * K * y];
+    const pv = (vx, vy, vz) => [vx, -vz - K * vy];           // oblique projection of a vector
+    // axle and base
+    ctx.fillStyle = '#78909c'; ctx.fillRect(cx - 9, cy, 18, s * RD * K + 48);
+    ctx.fillStyle = '#546e7a'; rr(ctx, cx - 50, cy + s * RD * K + 44, 100, 14, 5); ctx.fill();
+    // rim
+    ctx.fillStyle = '#90a4ae';
+    ctx.beginPath(); ctx.ellipse(cx, cy + 14, s * RD, s * RD * K, 0, 0, TAU); ctx.fill();
+    ctx.fillRect(cx - s * RD, cy, 2 * s * RD, 14);
+    // disk surface with rotating sectors
+    for (let i = 0; i < 12; i++) {
+      const a0 = this.disk + i * TAU / 12;
+      ctx.beginPath(); ctx.moveTo(cx, cy);
+      for (let j = 0; j <= 6; j++) { const a = a0 + (TAU / 12) * j / 6, q = P(RD * Math.cos(a), RD * Math.sin(a), 0); ctx.lineTo(q[0], q[1]); }
+      ctx.closePath(); ctx.fillStyle = i % 2 ? '#e1e8ec' : '#f3f6f8'; ctx.fill();
+    }
+    ctx.beginPath(); ctx.ellipse(cx, cy, s * RD, s * RD * K, 0, 0, TAU); ctx.strokeStyle = '#78909c'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(cx, cy, s * p.R, s * p.R * K, 0, 0, TAU);
+    ctx.strokeStyle = '#546e7a'; ctx.lineWidth = 1.6; ctx.setLineDash([7, 6]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(cx, cy, 4, 0, TAU); ctx.fillStyle = '#37474f'; ctx.fill();
+    // body position
+    const bw = sl ? [sl.x, sl.y, sl.z] : [p.R * Math.cos(th), p.R * Math.sin(th), 0];
+    const B = P(bw[0], bw[1], bw[2]);
+    const onDisk = !sl || Math.hypot(sl.x, sl.y) <= RD;
+    if (!sl) {
+      line(ctx, cx, cy, B[0], B[1], '#546e7a', 1.5, [5, 4]);
+      sym(ctx, (cx + B[0]) / 2, (cy + B[1]) / 2 + 15, { b: 'R', vec: false }, '#37474f', 19);
+    }
+    const ox = B[0], oy = B[1] - 11;
+    ctx.fillStyle = '#37474f'; rr(ctx, ox - 14, oy - 11, 28, 22, 5); ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+    // vectors
+    const sF = fScale(d.mg, Math.max(d.mg, Math.min(d.fReq, d.fMax)));
+    const inw = sl ? [0, 0, 0] : [-Math.cos(th), -Math.sin(th), 0];
+    const ex = pv(inw[0] * 82, inw[1] * 82, 0);
+    if (!sl) drawAxes(ctx, ox, oy, ex, [0, -82]);
+    drawVec(ctx, 'mg', ox, oy, 0, d.mg * sF);
+    if (onDisk) drawVec(ctx, 'N', ox, oy, 0, -d.N * sF);
+    if (!sl) {
+      const fv = pv(inw[0] * d.fReq * sF, inw[1] * d.fReq * sF, 0);
+      drawVec(ctx, 'sum', ox, oy, fv[0], fv[1], { side: 18 });        // resultant starts at the body centre (drawn under f)
+      drawVec(ctx, 'f', ox, oy, fv[0], fv[1], { side: -16 });
+      drawVec(ctx, 'aR', ox, oy, fv[0] * 0.72, fv[1] * 0.72, { shift: 15, side: 6 });
+    }
+    const tv = sl ? [sl.vx / (sl.v || 1), sl.vy / (sl.v || 1)] : [-Math.sin(th), Math.cos(th)];
+    const vNow = sl ? sl.v : d.v;
+    if (vNow > 0.01 && !(sl && sl.done)) { const q = pv(tv[0] * 66, tv[1] * 66, 0); drawVec(ctx, 'v', ox, oy, q[0], q[1]); }
+    if (UI.quiz) label(ctx, 'אילו כוחות פועלים על הגוף? שרטטו במחברת', W / 2 + 60, H - 22, { size: 17, rtl: true, color: '#0d47a1' });
+    // top view
+    const b = topBox(W, H), t = b.rmax / 2.0;
+    drawTopView(ctx, b, { rp: t * p.R, bx: t * bw[0], by: t * bw[1], tx: tv[0], ty: tv[1], v: vNow, aR: d.aR,
+      onPath: !sl, diskR: t * RD, diskAngle: this.disk });
+  },
+  readouts() {
+    const d = this.d, p = this.p, sl = !!this.slip;
+    return [
+      ['כוח הכובד', 'mg', fN(d.mg), 'mg'], ['כוח נורמלי', 'N', fN(d.N), 'N'],
+      [sl ? 'חיכוך נדרש' : 'חיכוך סטטי', 'f', fN(d.fReq), 'f'],
+      ['חיכוך סטטי מרבי', 'μN', fN(d.fMax), 'f'],
+      ['כוח שקול', 'ΣF', sl ? '—' : fN(d.fReq), 'sum'],
+      ['תאוצה צנטריפטלית', 'a<sub>R</sub>', num(d.aR) + ' m/s²', 'aR'],
+      ['מהירות קווית', 'v', num(d.v) + ' m/s'], ['מהירות זוויתית', 'ω', num(p.w) + ' rad/s'],
+      ['זמן מחזור', 'T', num(d.T) + ' s'],
+      ['מהירות מרבית', 'v<sub>max</sub>', num(d.vmax) + ' m/s'],
+      ['מהירות זוויתית מרבית', 'ω<sub>max</sub>', num(d.wmax) + ' rad/s']
+    ];
+  },
+  status() {
+    const d = this.d;
+    if (this.slip) return { lvl: 'bad', html: 'הגוף מחליק ועף בכיוון המשיק! נדרש ' + ltr('f = ' + fN(d.fReq)) + ' אך ' + ltr('μN = ' + fN(d.fMax)) + '. מהירות מרבית: ' + ltr('v<sub>max</sub> = √(μgR) = ' + num(d.vmax) + ' m/s') };
+    return { lvl: 'ok', html: 'החיכוך הסטטי הוא הכוח הצנטריפטלי: ' + ltr('f = ' + fN(d.fReq) + ' ≤ μN = ' + fN(d.fMax)) + '. מהירות מרבית: ' + ltr('v<sub>max</sub> = √(μgR) = ' + num(d.vmax) + ' m/s') };
+  },
+  formulas() {
+    return '<h4>ציר X (אל מרכז המעגל)</h4>' + fm('ΣF<sub>x</sub> = f<sub>s</sub> = m·v²/R = m·ω²·R') +
+      '<h4>ציר Y (אנכי)</h4>' + fm('ΣF<sub>y</sub> = N − mg = 0 &nbsp;⟹&nbsp; N = mg') +
+      '<h4>תנאי לאי־החלקה</h4>' + fm('f<sub>s</sub> ≤ μ·N = μ·mg') + fm('v<sub>max</sub> = ' + sq('μ·g·R') + ' &nbsp;,&nbsp; ω<sub>max</sub> = ' + sq('μ·g/R')) +
+      '<p>כאשר הכוח הנדרש גדול מ־' + ltr('μN') + ' החיכוך הסטטי אינו מספיק, והגוף ממשיך בכיוון המשיק למעגל.</p>';
+  }
+};
+
+/* ---------- 4.2 conical pendulum ---------- */
+const Pendulum = {
+  id: 'pend', title: 'מטוטלת חרוטית',
+  p: { L: 1, a: 35, w: 4, m: 1 }, o: { mode: 'a' }, K: 0.36,
+  options() { return [{ key: 'mode', type: 'seg', he: 'מה קובעים?', choices: [['a', 'זווית α'], ['w', 'מהירות זוויתית ω']] }]; },
+  params() {
+    const list = [{ key: 'L', he: 'אורך החוט', sym: 'L', unit: 'm', min: 0.3, max: 2, step: 0.05, dec: 2 }];
+    if (this.o.mode === 'a') list.push({ key: 'a', he: 'זווית החוט מהאנך', sym: 'α', unit: '°', min: 1, max: 85, step: 0.5, dec: 1 });
+    else list.push({ key: 'w', he: 'מהירות זוויתית', sym: 'ω', unit: 'rad/s', min: 0.5, max: 12, step: 0.05, dec: 2 });
+    list.push({ key: 'm', he: 'מסה', sym: 'm', unit: 'kg', min: 0.1, max: 5, step: 0.1, dec: 1 });
+    return list;
+  },
+  onOption() {                       // keep the state continuous when the control mode changes
+    const d = this.d; if (!d) return;
+    if (this.o.mode === 'w') this.p.w = clamp(Math.round(d.w * 20) / 20, 0.5, 12);
+    else this.p.a = clamp(Math.round(d.al / DEG * 2) / 2, 1, 85);
+  },
+  forceKeys() { return ['mg', 'T']; },
+  extraKeys() { return ['sum', 'aR']; },
+  reset() { this.th = 0; this.derive(); },
+  derive() {
+    const p = this.p, g = UI.g, d = this.d = {};
+    d.mg = p.m * g; d.hang = false;
+    if (this.o.mode === 'a') {
+      d.al = p.a * DEG; d.w = Math.sqrt(g / (p.L * Math.cos(d.al))); d.T = d.mg / Math.cos(d.al);
+    } else {
+      d.w = p.w; const c = g / (p.w * p.w * p.L);
+      if (c >= 1) { d.al = 0; d.hang = true; d.T = d.mg; }       // too slow: the string stays vertical
+      else { d.al = Math.acos(c); d.T = p.m * p.w * p.w * p.L; }
+    }
+    d.R = p.L * Math.sin(d.al); d.Lc = p.L * Math.cos(d.al); d.Hh = p.L - d.Lc;
+    d.v = d.hang ? 0 : d.w * d.R; d.aR = d.hang ? 0 : d.w * d.w * d.R; d.sum = p.m * d.aR;
+    d.per = d.hang ? NaN : TAU * Math.sqrt(d.Lc / g);
+  },
+  step(dt) { this.derive(); this.th += this.d.w * dt; },
+  draw(ctx, W, H) {
+    const p = this.p, d = this.d, K = this.K, th = this.th;
+    const Lref = Math.max(p.L, 1.1);
+    const s = Math.min((H - 235) / Lref, W * 0.3 / Math.max(d.R, 0.55 * Lref)), cx = W * 0.62, py = 62;
+    const P = (x, y, zDown) => [cx + s * x, py + s * zDown - s * K * y];
+    const pv = (vx, vy, vUp) => [vx, -vUp - K * vy];
+    const B = P(d.R * Math.cos(th), d.R * Math.sin(th), d.Lc), C = P(0, 0, d.Lc), Bot = P(0, 0, p.L);
+    // ceiling
+    ctx.fillStyle = '#cfd8dc'; ctx.fillRect(cx - 80, py - 14, 160, 14);
+    line(ctx, cx - 80, py, cx + 80, py, '#455a64', 3);
+    for (let i = -72; i <= 72; i += 16) line(ctx, cx + i, py - 2, cx + i + 10, py - 13, '#78909c', 1.5);
+    // axis, rest position, orbit
+    line(ctx, cx, py, Bot[0], Bot[1], '#78909c', 1.5, [6, 5]);
+    ctx.beginPath(); ctx.arc(Bot[0], Bot[1], 12, 0, TAU); ctx.strokeStyle = '#b0bec5'; ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+    if (d.R * s > 2) {
+      ctx.beginPath(); ctx.ellipse(C[0], C[1], s * d.R, s * d.R * K, 0, 0, TAU);
+      ctx.strokeStyle = '#546e7a'; ctx.lineWidth = 1.6; ctx.setLineDash([7, 6]); ctx.stroke(); ctx.setLineDash([]);
+      line(ctx, C[0], C[1], B[0], B[1], '#546e7a', 1.5, [5, 4]);
+      label(ctx, 'R = L·sinα', C[0] + (B[0] - C[0]) * 0.3, C[1] + (B[1] - C[1]) * 0.3 + 16, { size: 15, color: '#37474f' });
+    }
+    // dimension ticks on the axis
+    [[py], [C[1]], [Bot[1]]].forEach(([y]) => line(ctx, cx - 7, y, cx + 7, y, '#455a64', 2));
+    label(ctx, 'L·cosα', cx - 12, (py + C[1]) / 2 + 22, { size: 15, align: 'right', color: '#37474f' });
+    if (Bot[1] - C[1] > 16) label(ctx, 'H = L − L·cosα', cx - 12, (C[1] + Bot[1]) / 2, { size: 15, align: 'right', color: '#37474f' });
+    // string and angle
+    line(ctx, cx, py, B[0], B[1], '#37474f', 3);
+    const sa = Math.atan2(B[1] - py, B[0] - cx);
+    angleArc(ctx, cx, py, 46, Math.PI / 2, sa, 'α');
+    const sgn = B[0] >= cx ? 1 : -1;
+    sym(ctx, (cx + B[0]) / 2 + 17 * sgn, (py + B[1]) / 2 - 4, { b: 'L', vec: false }, '#263238', 20);
+    // bob
+    const gr = ctx.createRadialGradient(B[0] - 4, B[1] - 4, 2, B[0], B[1], 14);
+    gr.addColorStop(0, '#90a4ae'); gr.addColorStop(1, '#263238');
+    ctx.beginPath(); ctx.arc(B[0], B[1], 13, 0, TAU); ctx.fillStyle = gr; ctx.fill();
+    // vectors
+    const sF = fScale(d.mg, d.T), ct = Math.cos(th), st = Math.sin(th), sa2 = Math.sin(d.al), ca2 = Math.cos(d.al);
+    drawAxes(ctx, B[0], B[1], pv(-ct * 82, -st * 82, 0), [0, -82]);
+    const Tx = pv(-ct * d.T * sa2 * sF, -st * d.T * sa2 * sF, 0), Ty = [0, -d.T * ca2 * sF];
+    drawComps(ctx, 'T', B[0], B[1], Tx, Ty, 'x', 'y');
+    drawVec(ctx, 'mg', B[0], B[1], 0, d.mg * sF);
+    drawVec(ctx, 'T', B[0], B[1], Tx[0] + Ty[0], Tx[1] + Ty[1]);
+    const sv = pv(-ct * d.sum * sF, -st * d.sum * sF, 0);
+    drawVec(ctx, 'sum', B[0], B[1], sv[0], sv[1], { side: -18 });
+    drawVec(ctx, 'aR', B[0], B[1], sv[0] * 0.72, sv[1] * 0.72, { shift: 15, side: 6 });
+    if (d.v > 0.01) { const q = pv(-st * 66, ct * 66, 0); drawVec(ctx, 'v', B[0], B[1], q[0], q[1]); }
+    if (UI.quiz) label(ctx, 'אילו כוחות פועלים על הגוף? שרטטו במחברת', W / 2 + 60, H - 22, { size: 17, rtl: true, color: '#0d47a1' });
+    const b = topBox(W, H), rp = d.hang ? 0 : b.rmax * clamp(d.R / Math.max(p.L, 1e-9), 0.12, 1);
+    drawTopView(ctx, b, { rp, bx: rp * ct, by: rp * st, tx: -st, ty: ct, v: d.v, aR: d.aR });
+  },
+  readouts() {
+    const d = this.d;
+    return [
+      ['כוח הכובד', 'mg', fN(d.mg), 'mg'], ['מתיחות החוט', 'T', fN(d.T), 'T'],
+      ['רכיב אופקי', 'T·sinα', fN(d.T * Math.sin(d.al)), 'T'], ['רכיב אנכי', 'T·cosα', fN(d.T * Math.cos(d.al)), 'T'],
+      ['כוח שקול', 'ΣF', fN(d.sum), 'sum'],
+      ['תאוצה צנטריפטלית', 'a<sub>R</sub>', num(d.aR) + ' m/s²', 'aR'],
+      ['מהירות קווית', 'v', num(d.v) + ' m/s'], ['מהירות זוויתית', 'ω', num(d.w) + ' rad/s'],
+      ['זמן מחזור', 'T', (d.hang ? '—' : num(d.per) + ' s')],
+      ['זווית', 'α', deg(d.al)],
+      ['רדיוס המעגל', 'R = L·sinα', num(d.R) + ' m'], ['', 'L·cosα', num(d.Lc) + ' m'],
+      ['גובה מעל נקודת שיווי המשקל', 'H', num(d.Hh) + ' m']
+    ];
+  },
+  status() {
+    const d = this.d;
+    if (d.hang) return { lvl: 'info', html: 'המהירות הזוויתית קטנה מ־' + ltr('√(g/L) = ' + num(Math.sqrt(UI.g / this.p.L)) + ' rad/s') + ' – החוט נשאר אנכי ' + ltr('(α = 0)') };
+    return { lvl: 'ok', html: 'זמן המחזור: ' + ltr('T = 2π√(L·cosα/g) = ' + num(d.per) + ' s') + ' &nbsp;|&nbsp; ' + ltr('tanα = v²/(gR) = ' + num(Math.tan(d.al))) };
+  },
+  formulas() {
+    return '<h4>ציר X (אל מרכז המעגל)</h4>' + fm('ΣF<sub>x</sub> = T·sinα = m·v²/R = m·ω²·R') +
+      '<h4>ציר Y (אנכי)</h4>' + fm('ΣF<sub>y</sub> = T·cosα − mg = 0') +
+      '<h4>גאומטריה</h4>' + fm('R = L·sinα &nbsp;,&nbsp; H = L − L·cosα') +
+      '<h4>תוצאות</h4>' + fm('tanα = v²/(g·R) = ω²·R/g') + fm('ω² = g/(L·cosα)') +
+      '<p>זמן המחזור:</p>' + fm('T = 2π·' + sq('L·cosα/g')) +
+      '<p>זמן המחזור אינו תלוי במסה.</p>';
+  }
+};
+
+/* ---------- 4.3 banked road (cross-section) ---------- */
+const Bank = {
+  id: 'bank', title: 'כביש מוגבה',
+  p: { a: 20, R: 50, m: 1000, mu: 0.3, v: 15 }, o: { fr: false },
+  options() { return [{ key: 'fr', type: 'check', he: 'עם חיכוך' }]; },
+  params() {
+    const list = [
+      { key: 'a', he: 'זווית ההטיה', sym: 'α', unit: '°', min: 0, max: 80, step: 0.5, dec: 1 },
+      { key: 'R', he: 'רדיוס הסיבוב', sym: 'R', unit: 'm', min: 10, max: 200, step: 1, dec: 0 },
+      { key: 'm', he: 'מסה', sym: 'm', unit: 'kg', min: 500, max: 3000, step: 50, dec: 0 }
+    ];
+    if (this.o.fr) {
+      list.push({ key: 'mu', he: 'מקדם חיכוך', sym: 'μ', unit: '', min: 0, max: 1, step: 0.01, dec: 2 });
+      list.push({ key: 'v', he: 'מהירות', sym: 'v', unit: 'm/s', min: 0, max: 40, step: 0.1, dec: 1 });
+    }
+    return list;
+  },
+  forceKeys() { return this.o.fr ? ['mg', 'N', 'f'] : ['mg', 'N']; },
+  extraKeys() { return ['sum', 'aR']; },
+  reset() { this.th = 0; this.off = 0; this.derive(); },
+  derive() {
+    const p = this.p, g = UI.g, d = this.d = {};
+    const al = d.al = p.a * DEG, sn = Math.sin(al), cs = Math.cos(al);
+    d.mg = p.m * g; d.vDes = Math.sqrt(g * p.R * Math.tan(al));
+    if (!this.o.fr) {
+      d.v = d.vDes; d.N = d.mg / cs; d.f = 0; d.fMax = 0; d.ok = true; d.vmin = d.vmax = d.vDes;
+    } else {
+      d.v = p.v; const ac = d.v * d.v / p.R;
+      d.N = p.m * (g * cs + ac * sn);
+      d.f = p.m * (g * sn - ac * cs);          // > 0: friction points up the slope
+      d.fMax = p.mu * d.N; d.ok = Math.abs(d.f) <= d.fMax + 1e-6;
+      const den = cs - p.mu * sn, nm = sn - p.mu * cs;
+      d.vmax = den > 1e-9 ? Math.sqrt(g * p.R * (sn + p.mu * cs) / den) : Infinity;
+      d.vmin = nm > 0 ? Math.sqrt(g * p.R * nm / (cs + p.mu * sn)) : 0;
+    }
+    d.aR = d.v * d.v / p.R; d.sum = p.m * d.aR; d.w = d.v / p.R;
+    d.per = d.v > 1e-6 ? TAU * p.R / d.v : Infinity;
+  },
+  step(dt, dtReal) {
+    this.derive(); const d = this.d;
+    this.th += d.w * dt;
+    if (d.ok) this.off = 0;
+    else this.off = clamp(this.off + (d.f < 0 ? 1 : -1) * 70 * dtReal, -125, 125);   // sliding up / down the slope
+  },
+  draw(ctx, W, H) {
+    const r = splitRegions(W, H);
+    inRegion(ctx, r.a, 'מבט כללי – מסלול מוטה', '#f6f8fa', (w, h) => this.draw3D(ctx, w, h));
+    inRegion(ctx, r.b, 'חתך רוחב – תרשים כוחות', null, (w, h) => this.drawSection(ctx, w, h));
+    if (r.a.h === H) line(ctx, r.a.w, 0, r.a.w, H, '#cfd8dc', 2); else line(ctx, 0, r.a.h, W, r.a.h, '#cfd8dc', 2);
+  },
+  /** velodrome-like overview: banked ring, car moving on it, v and a_R */
+  draw3D(ctx, w, h) {
+    const d = this.d, al = d.al, sn = Math.sin(al), cs = Math.cos(al), th = this.th;
+    const s = Math.min(w * 0.36, (h - 70) / 1.9), cam = make3D(w / 2, h / 2 + 0.28 * s, s, 30 * DEG);
+    const Ws = 0.56, ri = 1 - Ws / 2 * cs, ro = 1 + Ws / 2 * cs, zo = Ws * sn, n = 60, items = [];
+    const ell = (R, z, fill, stroke, dash) => {
+      ctx.beginPath(); for (let i = 0; i <= 72; i++) { const a = i * TAU / 72, q = cam.P(R * Math.cos(a), R * Math.sin(a), z); if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1.5; if (dash) ctx.setLineDash(dash); ctx.stroke(); ctx.setLineDash([]); }
+    };
+    ell(1.42, 0, '#e9eef1'); ell(ri, 0, '#dcedc8');
+    for (let i = 0; i < n; i++) {
+      const a0 = i * TAU / n, a1 = a0 + TAU / n, am = a0 + TAU / n / 2, c0 = Math.cos(a0), s0 = Math.sin(a0), c1 = Math.cos(a1), s1 = Math.sin(a1);
+      const sh = 0.5 + 0.5 * Math.cos(am - 2.2);
+      items.push({ z: cam.depth(Math.cos(am), Math.sin(am), zo / 2), f: () => poly(ctx, [cam.P(ri * c0, ri * s0, 0), cam.P(ri * c1, ri * s1, 0), cam.P(ro * c1, ro * s1, zo), cam.P(ro * c0, ro * s0, zo)],
+        mixRGB([176, 190, 197], [236, 239, 241], sh), 'rgba(84,110,122,.35)', 1) });
+      if (zo > 0.004) items.push({ z: cam.depth(ro * Math.cos(am) * 1.02, ro * Math.sin(am) * 1.02, zo / 2), f: () => poly(ctx, [cam.P(ro * c0, ro * s0, zo), cam.P(ro * c1, ro * s1, zo), cam.P(ro * c1, ro * s1, 0), cam.P(ro * c0, ro * s0, 0)],
+        mixRGB([84, 110, 122], [144, 164, 174], sh), 'rgba(55,71,79,.4)', 1) });
+    }
+    // car: a small box lying on the banked surface
+    const ct = Math.cos(th), st = Math.sin(th), off = this.off / 125 * Ws * 0.36;
+    const T = [-st, ct, 0], U = [cs * ct, cs * st, sn], N = [-sn * ct, -sn * st, cs];
+    const base = [ct + U[0] * off, st + U[1] * off, zo / 2 + U[2] * off];
+    const pt = (a, b, c) => [base[0] + T[0] * a + U[0] * b + N[0] * c, base[1] + T[1] * a + U[1] * b + N[1] * c, base[2] + T[2] * a + U[2] * b + N[2] * c];
+    items.push({ z: cam.depth(base[0], base[1], base[2]) - 0.03, f: () => {
+      const L = 0.19, Wd = 0.1, Hc = 0.11, v8 = [];
+      for (const a of [-L, L]) for (const b of [-Wd, Wd]) for (const c of [0.012, Hc]) v8.push(pt(a, b, c));
+      const faces = [[0, 1, 3, 2], [4, 5, 7, 6], [0, 1, 5, 4], [2, 3, 7, 6], [0, 2, 6, 4], [1, 3, 7, 5]];
+      const cols = ['#37474f', '#37474f', '#455a64', '#455a64', '#263238', '#ffb300'];
+      faces.map((fc, i) => ({ fc, i, z: fc.reduce((m, k) => m + cam.depth(v8[k][0], v8[k][1], v8[k][2]), 0) }))
+        .sort((A, B) => B.z - A.z).forEach(o => poly(ctx, o.fc.map(k => cam.P(v8[k][0], v8[k][1], v8[k][2])), cols[o.i], '#fff', 1));
+    } });
+    items.sort((A, B) => B.z - A.z).forEach(o => o.f());
+    const top = pt(0, 0, 0.12), B = cam.P(top[0], top[1], top[2]);
+    draw3DCircleGuides(ctx, cam, top[0], top[1], top[2]);
+    if (d.aR > 1e-6) { const q = cam.V(-ct * 0.5, -st * 0.5, 0); drawVec(ctx, 'aR', B[0], B[1], q[0], q[1], { side: 12 }); }
+    if (d.v > 1e-6) { const q = cam.V(T[0] * 0.55, T[1] * 0.55, 0); drawVec(ctx, 'v', B[0], B[1], q[0], q[1]); }
+    label(ctx, 'α = ' + deg(al), w / 2, h - 16, { size: 15, color: '#37474f' });
+  },
+  drawSection(ctx, W, H) {
+    const p = this.p, d = this.d, al = d.al, sn = Math.sin(al), cs = Math.cos(al);
+    const C0 = [W * 0.55, H * 0.62], u = [cs, -sn], n = [-sn, -cs], Lh = Math.min(200, W * 0.36);
+    const P1 = [C0[0] - u[0] * Lh, C0[1] - u[1] * Lh], P2 = [C0[0] + u[0] * Lh, C0[1] + u[1] * Lh];
+    const base = P1[1] + 26;
+    // road wedge
+    ctx.beginPath(); ctx.moveTo(P1[0], P1[1]); ctx.lineTo(P2[0], P2[1]); ctx.lineTo(P2[0], base); ctx.lineTo(P1[0] - 30, base); ctx.lineTo(P1[0] - 30, P1[1]); ctx.closePath();
+    ctx.fillStyle = '#dfe5e8'; ctx.fill(); ctx.strokeStyle = '#607d8b'; ctx.lineWidth = 2; ctx.stroke();
+    line(ctx, P1[0], P1[1], P2[0], P2[1], '#37474f', 5);
+    line(ctx, 20, base, W - 20, base, '#78909c', 2);
+    line(ctx, P1[0], P1[1], P1[0] + 110, P1[1], '#607d8b', 1.4, [5, 4]);
+    angleArc(ctx, P1[0], P1[1], 62, -al, 0, 'α');
+    label(ctx, 'אל מרכז המעגל ←', 22, base + 20, { size: 15, align: 'left', rtl: true, color: '#455a64' });
+    // car (rear view) on the slope
+    const C = [C0[0] + u[0] * this.off, C0[1] + u[1] * this.off];
+    ctx.save(); ctx.translate(C[0], C[1]); ctx.rotate(-al);
+    ctx.fillStyle = '#263238'; rr(ctx, -40, -18, 15, 18, 4); ctx.fill(); rr(ctx, 25, -18, 15, 18, 4); ctx.fill();
+    ctx.fillStyle = '#90a4ae'; rr(ctx, -44, -46, 88, 34, 9); ctx.fill();
+    ctx.fillStyle = '#b0bec5'; ctx.beginPath(); ctx.moveTo(-32, -46); ctx.lineTo(-24, -66); ctx.lineTo(24, -66); ctx.lineTo(32, -46); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#eceff1'; ctx.beginPath(); ctx.moveTo(-25, -48); ctx.lineTo(-19, -62); ctx.lineTo(19, -62); ctx.lineTo(25, -48); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#546e7a'; rr(ctx, -38, -38, 14, 7, 3); ctx.fill(); rr(ctx, 24, -38, 14, 7, 3); ctx.fill();
+    ctx.restore();
+    const G = [C[0] + n[0] * 34, C[1] + n[1] * 34];             // centre of mass
+    ctx.beginPath(); ctx.arc(G[0], G[1], 4, 0, TAU); ctx.fillStyle = '#111'; ctx.fill();
+    // vectors
+    const fShow = d.f;                                           // required friction (flagged in the status line when impossible)
+    const sF = fScale(d.mg, Math.max(d.N, d.mg));
+    drawAxes(ctx, G[0], G[1], [-86, 0], [0, -86]);
+    drawComps(ctx, 'N', G[0], G[1], [n[0] * d.N * sF, 0], [0, n[1] * d.N * sF], 'x', 'y');
+    if (this.o.fr) drawComps(ctx, 'f', G[0], G[1], [u[0] * fShow * sF, 0], [0, u[1] * fShow * sF], 'x', 'y');
+    drawVec(ctx, 'mg', G[0], G[1], 0, d.mg * sF);
+    drawVec(ctx, 'N', G[0], G[1], n[0] * d.N * sF, n[1] * d.N * sF);
+    if (this.o.fr) drawVec(ctx, 'f', G[0], G[1], u[0] * fShow * sF, u[1] * fShow * sF);
+    if (d.ok) {
+      drawVec(ctx, 'sum', G[0], G[1], -d.sum * sF, 0, { side: 18 });
+      drawVec(ctx, 'aR', G[0], G[1], -d.sum * sF * 0.72, 0, { shift: -15, side: -6 });
+    }
+    if (UI.quiz) label(ctx, 'אילו כוחות פועלים על המכונית? שרטטו במחברת', W / 2, 42, { size: 16, rtl: true, color: '#0d47a1' });
+  },
+  readouts() {
+    const d = this.d, rows = [['כוח הכובד', 'mg', fN(d.mg), 'mg'], ['כוח נורמלי', 'N', fN(d.N), 'N']];
+    if (this.o.fr) {
+      rows.push([Math.abs(d.f) < 1e-6 ? 'חיכוך' : (d.f > 0 ? 'חיכוך (במעלה המדרון)' : 'חיכוך (במורד המדרון)'), 'f', fN(Math.abs(d.f)), 'f']);
+      rows.push(['חיכוך סטטי מרבי', 'μN', fN(d.fMax), 'f']);
+    }
+    rows.push(['כוח שקול', 'ΣF', d.ok ? fN(d.sum) : '—', 'sum'], ['תאוצה צנטריפטלית', 'a<sub>R</sub>', num(d.aR) + ' m/s²', 'aR'],
+      ['מהירות', 'v', num(d.v) + ' m/s'], ['', 'v', num(d.v * 3.6, 1) + ' km/h'],
+      ['מהירות מתוכננת (ללא חיכוך)', 'v<sub>0</sub>', num(d.vDes) + ' m/s']);
+    if (this.o.fr) rows.push(['מהירות מזערית', 'v<sub>min</sub>', num(d.vmin) + ' m/s'], ['מהירות מרבית', 'v<sub>max</sub>', num(d.vmax) + ' m/s']);
+    rows.push(['זמן מחזור', 'T', num(d.per, 1) + ' s'], ['זווית ההטיה', 'α', deg(d.al)]);
+    return rows;
+  },
+  status() {
+    const d = this.d;
+    if (!this.o.fr) return { lvl: 'ok', html: 'ללא חיכוך – הרכיב האופקי של הנורמל הוא הכוח הצנטריפטלי. מהירות מתוכננת: ' + ltr('v = √(gR·tanα) = ' + num(d.vDes) + ' m/s') };
+    const rng = ltr(num(d.vmin) + ' ≤ v ≤ ' + num(d.vmax) + ' m/s');
+    if (!d.ok) return { lvl: 'bad', html: (d.f < 0 ? 'מהירות גבוהה מדי – המכונית מחליקה במעלה המדרון (החוצה)! ' : 'מהירות נמוכה מדי – המכונית מחליקה במורד המדרון (פנימה)! ') + 'תחום מותר: ' + rng };
+    const dir = Math.abs(d.f) < 1e-6 ? 'אין צורך בחיכוך' : (d.f > 0 ? 'החיכוך פועל במעלה המדרון' : 'החיכוך פועל במורד המדרון');
+    return { lvl: 'ok', html: dir + '. תחום מהירויות מותר: ' + rng };
+  },
+  formulas() {
+    let h = '<h4>ללא חיכוך – ציר X (אל מרכז המעגל)</h4>' + fm('ΣF<sub>x</sub> = N·sinα = m·v²/R') +
+      '<h4>ציר Y (אנכי)</h4>' + fm('ΣF<sub>y</sub> = N·cosα − mg = 0') +
+      '<h4>מהירות מתוכננת</h4>' + fm('tanα = v²/(g·R) &nbsp;⟹&nbsp; v = ' + sq('g·R·tanα'));
+    if (this.o.fr) {
+      h += '<h4>עם חיכוך (f במורד המדרון, v גדולה)</h4>' + fm('N·sinα + f·cosα = m·v²/R') + fm('N·cosα − f·sinα − mg = 0') +
+        '<h4>עם חיכוך (f במעלה המדרון, v קטנה)</h4>' + fm('N·sinα − f·cosα = m·v²/R') + fm('N·cosα + f·sinα − mg = 0') +
+        '<h4>תחום המהירויות (f ≤ μN)</h4>' +
+        fm('v<sub>max</sub> = ' + sq('g·R·(sinα + μ·cosα)/(cosα − μ·sinα)')) +
+        fm('v<sub>min</sub> = ' + sq('g·R·(sinα − μ·cosα)/(cosα + μ·sinα)')) +
+        '<p>אם ' + ltr('μ ≥ tanα') + ' אז ' + ltr('v<sub>min</sub> = 0') + '; אם ' + ltr('μ·tanα ≥ 1') + ' אין מהירות מרבית.</p>';
+    }
+    return h;
+  }
+};
+
+/* ---------- 4.4 turning bicycle / aeroplane (rear view) ---------- */
+const Turn = {
+  id: 'turn', title: 'פנייה של אופניים / מטוס',
+  pv: { bike: { v: 6, R: 10, m: 80 }, plane: { v: 120, R: 2000, m: 50000 } },
+  get p() { return this.pv[this.o.mode]; },
+  o: { mode: 'bike', single: false },
+  options() {
+    const list = [{ key: 'mode', type: 'seg', he: 'כלי התחבורה', choices: [['bike', 'אופניים'], ['plane', 'מטוס']] }];
+    if (this.o.mode === 'bike') list.push({ key: 'single', type: 'check', he: 'הצג את N ו־f כתגובה אחת' });
+    return list;
+  },
+  params() {
+    return this.o.mode === 'bike' ? [
+      { key: 'v', he: 'מהירות', sym: 'v', unit: 'm/s', min: 0, max: 15, step: 0.1, dec: 1 },
+      { key: 'R', he: 'רדיוס הסיבוב', sym: 'R', unit: 'm', min: 3, max: 50, step: 0.5, dec: 1 },
+      { key: 'm', he: 'מסה (רוכב + אופניים)', sym: 'm', unit: 'kg', min: 40, max: 120, step: 1, dec: 0 }
+    ] : [
+      { key: 'v', he: 'מהירות', sym: 'v', unit: 'm/s', min: 50, max: 300, step: 1, dec: 0 },
+      { key: 'R', he: 'רדיוס הסיבוב', sym: 'R', unit: 'm', min: 500, max: 8000, step: 50, dec: 0 },
+      { key: 'm', he: 'מסה', sym: 'm', unit: 'kg', min: 1000, max: 100000, step: 1000, dec: 0 }
+    ];
+  },
+  forceKeys() { return this.o.mode === 'plane' ? ['mg', 'Lift'] : (this.o.single ? ['mg', 'Rg'] : ['mg', 'N', 'f']); },
+  extraKeys() { return ['sum', 'aR']; },
+  reset() { this.th = 0; this.derive(); },
+  derive() {
+    const p = this.p, g = UI.g, d = this.d = {};
+    d.mg = p.m * g; d.aR = p.v * p.v / p.R; d.sum = p.m * d.aR;
+    d.al = Math.atan2(d.aR, g); d.big = Math.hypot(d.mg, d.sum);   // reaction / lift = mg / cos(alpha)
+    d.w = p.v / p.R; d.per = p.v > 1e-6 ? TAU * p.R / p.v : Infinity;
+  },
+  step(dt) { this.derive(); this.th += this.d.w * dt; },
+  draw(ctx, W, H) {
+    const r = splitRegions(W, H), bike = this.o.mode === 'bike';
+    inRegion(ctx, r.a, bike ? 'מבט כללי – רוכב בסיבוב' : 'מבט כללי – מטוס בסיבוב', '#f6f8fa', (w, h) => this.draw3D(ctx, w, h));
+    inRegion(ctx, r.b, 'מבט מאחור – תרשים כוחות', null, (w, h) => this.drawSection(ctx, w, h));
+    if (r.a.h === H) line(ctx, r.a.w, 0, r.a.w, H, '#cfd8dc', 2); else line(ctx, 0, r.a.h, W, r.a.h, '#cfd8dc', 2);
+  },
+  /** 3-D overview: the leaning rider / banked aeroplane moving round the circle */
+  draw3D(ctx, w, h) {
+    const d = this.d, p = this.p, al = d.al, sn = Math.sin(al), cs = Math.cos(al), th = this.th, bike = this.o.mode === 'bike';
+    const s = Math.min(w * 0.36, (h - 70) / (bike ? 1.9 : 2.3)), cam = make3D(w / 2, h / 2 + (bike ? 0.3 : 0.5) * s, s, 30 * DEG);
+    const ct = Math.cos(th), st = Math.sin(th), T = [-st, ct, 0], Rin = [-ct, -st, 0];
+    const ell = (R, z, fill, stroke, dash, lw) => {
+      ctx.beginPath(); for (let i = 0; i <= 72; i++) { const a = i * TAU / 72, q = cam.P(R * Math.cos(a), R * Math.sin(a), z); if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 1.5; if (dash) ctx.setLineDash(dash); ctx.stroke(); ctx.setLineDash([]); }
+    };
+    const add3 = (o, A, a, Bv, b) => [o[0] + A[0] * a + Bv[0] * b, o[1] + A[1] * a + Bv[1] * b, o[2] + A[2] * a + Bv[2] * b];
+    const P3 = q => cam.P(q[0], q[1], q[2]);
+    let org;
+    if (bike) {
+      ell(1.42, 0, '#e3ecd9'); ell(1.17, 0, '#cfd8dc', '#90a4ae'); ell(0.83, 0, '#e3ecd9', '#90a4ae'); ell(1, 0, null, '#fff', [9, 8], 2);
+      const k = 0.62, base = [ct, st, 0], Lv = [Rin[0] * sn, Rin[1] * sn, cs];           // lean axis
+      const Q = (a, b) => P3(add3(base, T, a * k, Lv, b * k));
+      const seg = (a1, b1, a2, b2, col, lw) => { const A = Q(a1, b1), B = Q(a2, b2); ctx.save(); ctx.lineCap = 'round'; line(ctx, A[0], A[1], B[0], B[1], col, lw); ctx.restore(); };
+      const up = P3([base[0], base[1], 1.75 * k]), b0 = P3(base);
+      line(ctx, b0[0], b0[1], up[0], up[1], '#78909c', 1.4, [5, 4]);                    // vertical reference
+      for (const a of [-0.52, 0.52]) {                                                 // wheels
+        const pts = []; for (let i = 0; i < 24; i++) { const g = i * TAU / 24; pts.push(Q(a + 0.34 * Math.cos(g), 0.34 + 0.34 * Math.sin(g))); }
+        poly(ctx, pts, 'rgba(255,255,255,.55)', '#263238', 4);
+      }
+      seg(-0.52, 0.34, 0, 0.42, '#455a64', 3); seg(0, 0.42, 0.52, 0.34, '#455a64', 3); seg(0, 0.42, -0.12, 0.92, '#455a64', 3);
+      seg(0.52, 0.34, 0.42, 1.0, '#455a64', 3); seg(-0.12, 0.92, 0.42, 0.9, '#455a64', 3);
+      seg(-0.12, 0.95, 0.05, 0.45, '#37474f', 7); seg(-0.12, 0.98, 0.22, 1.5, '#546e7a', 12); seg(0.2, 1.42, 0.42, 1.02, '#546e7a', 6);
+      const hd = Q(0.28, 1.7); ctx.beginPath(); ctx.arc(hd[0], hd[1], Math.max(5, 0.15 * k * s), 0, TAU); ctx.fillStyle = '#263238'; ctx.fill();
+      org = add3(base, T, 0, Lv, 1.0 * k);
+    } else {
+      const z0 = 0.62, k = 0.52, c = [ct, st, z0];
+      const Wv = [-Rin[0] * cs, -Rin[1] * cs, sn], Nv = [Rin[0] * sn, Rin[1] * sn, cs];     // wing axis (outwards) and "up" of the plane
+      ell(1.42, 0, '#e3ecd9'); ell(1, 0, null, '#b0bec5', [4, 6]); ell(1, z0, null, '#607d8b', [8, 6]);
+      const wing = [[0.22, 0], [-0.02, 1], [-0.2, 1], [-0.16, 0], [-0.2, -1], [-0.02, -1]];
+      const stab = [[-0.78, 0], [-0.92, 0.36], [-1.02, 0.36], [-0.98, 0], [-1.02, -0.36], [-0.92, -0.36]];
+      const fin = [[-0.72, 0], [-0.96, 0.4], [-1.05, 0.4], [-1.0, 0]];
+      const inPl = (arr, Bv) => arr.map(q => add3(c, T, q[0] * k, Bv, q[1] * k));
+      const w3 = inPl(wing, Wv);
+      poly(ctx, w3.map(q => cam.P(q[0], q[1], 0)), 'rgba(38,50,56,.16)');                       // shadow on the ground
+      const g0 = cam.P(c[0], c[1], 0), cc = P3(c); line(ctx, g0[0], g0[1], cc[0], cc[1], '#78909c', 1.3, [4, 4]);
+      const nose = P3(add3(c, T, 1.0 * k, Nv, 0)), tail = P3(add3(c, T, -1.0 * k, Nv, 0));
+      const body = () => { ctx.save(); ctx.lineCap = 'round'; line(ctx, tail[0], tail[1], nose[0], nose[1], '#eceff1', Math.max(6, 0.2 * k * s)); ctx.restore(); };
+      const wings = () => { poly(ctx, w3.map(P3), '#90a4ae', '#455a64', 1.5); poly(ctx, inPl(stab, Wv).map(P3), '#90a4ae', '#455a64', 1.2); };
+      // the camera sees the upper side unless the plane's "up" points away from it
+      const seenFromAbove = cam.depth(Nv[0], Nv[1], Nv[2]) < 0;
+      if (seenFromAbove) { wings(); body(); } else { body(); wings(); }
+      poly(ctx, inPl(fin, Nv).map(P3), '#78909c', '#455a64', 1.2);
+      // horizontal reference through the plane (shows the bank angle)
+      const h1 = P3([c[0] - Rin[0] * 0.42, c[1] - Rin[1] * 0.42, z0]), h2 = P3([c[0] + Rin[0] * 0.42, c[1] + Rin[1] * 0.42, z0]);
+      line(ctx, h1[0], h1[1], h2[0], h2[1], '#78909c', 1.3, [5, 4]);
+      org = c;
+    }
+    const B = P3(org);
+    draw3DCircleGuides(ctx, cam, org[0], org[1], org[2]);
+    if (d.aR > 1e-6) { const q = cam.V(Rin[0] * 0.5, Rin[1] * 0.5, 0); drawVec(ctx, 'aR', B[0], B[1], q[0], q[1], { side: 12 }); }
+    if (p.v > 1e-6) { const q = cam.V(T[0] * 0.55, T[1] * 0.55, 0); drawVec(ctx, 'v', B[0], B[1], q[0], q[1]); }
+    label(ctx, 'α = ' + deg(al), w / 2, h - 16, { size: 15, color: '#37474f' });
+  },
+  drawSection(ctx, W, H) {
+    const p = this.p, d = this.d, al = d.al, sn = Math.sin(al), cs = Math.cos(al), l = [-sn, -cs];
+    const sF = fScale(d.mg, d.big);
+    if (this.o.mode === 'bike') {
+      const gy = H * 0.84, C = [W * 0.62, gy], k = clamp((gy - 40) / 250, 1, 1.6);   // figure scale
+      ctx.fillStyle = '#dfe5e8'; ctx.fillRect(20, gy, W - 40, 22); line(ctx, 20, gy, W - 20, gy, '#37474f', 4);
+      label(ctx, 'אל מרכז המעגל ←', 22, gy + 40, { size: 15, align: 'left', rtl: true, color: '#455a64' });
+      line(ctx, C[0], C[1], C[0], C[1] - 215 * k, '#78909c', 1.5, [6, 5]);
+      line(ctx, C[0], C[1], C[0] + l[0] * 215 * k, C[1] + l[1] * 215 * k, '#78909c', 1.5, [6, 5]);
+      angleArc(ctx, C[0], C[1], 200 * k, -Math.PI / 2 - al, -Math.PI / 2, 'α');
+      // rider and bicycle, leaning towards the centre
+      ctx.save(); ctx.translate(C[0], C[1]); ctx.rotate(-al); ctx.scale(k, k); ctx.lineCap = 'round';
+      ctx.fillStyle = '#263238'; ctx.beginPath(); ctx.ellipse(0, -35, 7.5, 35, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#90a4ae'; ctx.beginPath(); ctx.ellipse(0, -35, 2.5, 26, 0, 0, TAU); ctx.fill();
+      line(ctx, 0, -66, 0, -96, '#455a64', 5);
+      line(ctx, -29, -116, 29, -116, '#455a64', 5);
+      line(ctx, -8, -98, -16, -54, '#37474f', 8); line(ctx, 8, -98, 16, -54, '#37474f', 8);
+      ctx.fillStyle = '#263238'; rr(ctx, -24, -56, 14, 6, 2); ctx.fill(); rr(ctx, 10, -56, 14, 6, 2); ctx.fill();
+      ctx.fillStyle = '#546e7a'; rr(ctx, -14, -102, 28, 8, 4); ctx.fill();
+      ctx.fillStyle = '#78909c'; rr(ctx, -18, -156, 36, 58, 13); ctx.fill();
+      line(ctx, -17, -146, -27, -118, '#78909c', 8); line(ctx, 17, -146, 27, -118, '#78909c', 8);
+      ctx.fillStyle = '#b0bec5'; ctx.beginPath(); ctx.arc(0, -172, 13, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#455a64'; ctx.beginPath(); ctx.arc(0, -174, 14, Math.PI, TAU); ctx.fill();
+      ctx.restore();
+      const G = [C[0] + l[0] * 108 * k, C[1] + l[1] * 108 * k];
+      ctx.beginPath(); ctx.arc(G[0], G[1], 5, 0, TAU); ctx.fillStyle = '#111'; ctx.fill();
+      ctx.beginPath(); ctx.arc(G[0], G[1], 5, 0, TAU); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+      drawAxes(ctx, G[0], G[1], [-86, 0], [0, -86]);
+      drawVec(ctx, 'mg', G[0], G[1], 0, d.mg * sF);
+      if (this.o.single) {
+        drawComps(ctx, 'Rg', C[0], C[1], [-d.sum * sF, 0], [0, -d.mg * sF], 'x', 'y');
+        drawVec(ctx, 'Rg', C[0], C[1], l[0] * d.big * sF, l[1] * d.big * sF, { side: -22 });
+      } else {
+        drawVec(ctx, 'N', C[0], C[1], 0, -d.mg * sF, { side: 16 });
+        drawVec(ctx, 'f', C[0], C[1], -d.sum * sF, 0, { side: 16 });
+      }
+      drawVec(ctx, 'sum', G[0], G[1], -d.sum * sF, 0, { side: 18 });
+      drawVec(ctx, 'aR', G[0], G[1], -d.sum * sF * 0.72, 0, { shift: -15, side: -6 });
+    } else {
+      const Pc = [W * 0.55, H * 0.56];
+      line(ctx, 30, Pc[1], W - 30, Pc[1], '#90a4ae', 1.5, [8, 6]);
+      label(ctx, 'אל מרכז המעגל ←', 22, H - 24, { size: 15, align: 'left', rtl: true, color: '#455a64' });
+      // aeroplane seen from behind, banked by alpha
+      ctx.save(); ctx.translate(Pc[0], Pc[1]); ctx.rotate(-al);
+      const ws = Math.min(180, W * 0.36);
+      ctx.fillStyle = '#b0bec5'; ctx.strokeStyle = '#607d8b'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(0, 5, ws, 9, 0, 0, TAU); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#90a4ae'; ctx.beginPath(); ctx.moveTo(-5, -20); ctx.lineTo(5, -20); ctx.lineTo(2.5, -74); ctx.lineTo(-2.5, -74); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(0, -34, 54, 4.5, 0, 0, TAU); ctx.fill(); ctx.stroke();
+      [-0.47, 0.47].forEach(k => {
+        ctx.fillStyle = '#78909c'; ctx.beginPath(); ctx.arc(k * ws, 19, 12, 0, TAU); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#263238'; ctx.beginPath(); ctx.arc(k * ws, 19, 5.5, 0, TAU); ctx.fill();
+      });
+      ctx.fillStyle = '#eceff1'; ctx.beginPath(); ctx.arc(0, 0, 27, 0, TAU); ctx.fill(); ctx.stroke();
+      ctx.restore();
+      angleArc(ctx, Pc[0], Pc[1], Math.min(120, W * 0.25), -al, 0, 'α');
+      ctx.beginPath(); ctx.arc(Pc[0], Pc[1], 4.5, 0, TAU); ctx.fillStyle = '#111'; ctx.fill();
+      drawAxes(ctx, Pc[0], Pc[1], [-86, 0], [0, -86]);
+      drawComps(ctx, 'Lift', Pc[0], Pc[1], [-d.sum * sF, 0], [0, -d.mg * sF], 'x', 'y');
+      drawVec(ctx, 'mg', Pc[0], Pc[1], 0, d.mg * sF);
+      drawVec(ctx, 'Lift', Pc[0], Pc[1], l[0] * d.big * sF, l[1] * d.big * sF);
+      drawVec(ctx, 'sum', Pc[0], Pc[1], -d.sum * sF, 0, { side: 18 });
+      drawVec(ctx, 'aR', Pc[0], Pc[1], -d.sum * sF * 0.72, 0, { shift: -15, side: -6 });
+    }
+    if (UI.quiz) label(ctx, 'אילו כוחות פועלים? שרטטו במחברת', W / 2, 42, { size: 16, rtl: true, color: '#0d47a1' });
+  },
+  readouts() {
+    const d = this.d, p = this.p, rows = [['כוח הכובד', 'mg', fN(d.mg), 'mg']];
+    if (this.o.mode === 'plane') rows.push(['כוח עילוי', 'L', fN(d.big), 'Lift'], ['רכיב אנכי', 'L·cosα', fN(d.mg), 'Lift'], ['רכיב אופקי', 'L·sinα', fN(d.sum), 'Lift']);
+    else if (this.o.single) rows.push(['תגובת המשטח', 'F<sub>N+f</sub>', fN(d.big), 'Rg'], ['רכיב אנכי (N)', 'N', fN(d.mg), 'Rg'], ['רכיב אופקי (f)', 'f', fN(d.sum), 'Rg']);
+    else rows.push(['כוח נורמלי', 'N', fN(d.mg), 'N'], ['חיכוך סטטי', 'f', fN(d.sum), 'f']);
+    rows.push(['כוח שקול', 'ΣF', fN(d.sum), 'sum'], ['תאוצה צנטריפטלית', 'a<sub>R</sub>', num(d.aR) + ' m/s²', 'aR'],
+      ['מהירות', 'v', num(p.v, 1) + ' m/s'], ['', 'v', num(p.v * 3.6, 0) + ' km/h'],
+      ['זמן מחזור', 'T', num(d.per, 1) + ' s'], ['זווית ההטיה', 'α', deg(d.al)], ['', 'tanα', num(Math.tan(d.al), 3)]);
+    if (this.o.mode === 'bike') rows.push(['מקדם חיכוך מזערי נדרש', 'μ<sub>min</sub> = tanα', num(Math.tan(d.al), 2)]);
+    else rows.push(['מקדם עומס', 'L/mg', num(d.big / d.mg, 2)]);
+    return rows;
+  },
+  status() {
+    const d = this.d, s = ltr('tanα = v²/(gR) = ' + num(Math.tan(d.al), 3) + ' → α = ' + deg(d.al));
+    return { lvl: 'ok', html: (this.o.mode === 'bike' ? 'תגובת המשטח עוברת דרך מרכז המסה: ' : 'הרכיב האופקי של העילוי הוא הכוח הצנטריפטלי: ') + s };
+  },
+  formulas() {
+    if (this.o.mode === 'bike') return '<h4>ציר X (אל מרכז המעגל)</h4>' + fm('ΣF<sub>x</sub> = f = m·v²/R') +
+      '<h4>ציר Y (אנכי)</h4>' + fm('ΣF<sub>y</sub> = N − mg = 0') +
+      '<h4>זווית ההטיה</h4>' + fm('tanα = f/N = v²/(g·R)') +
+      '<p>השקול של ' + ltr('N') + ' ו־' + ltr('f') + ' (תגובת המשטח) מכוון לאורך הקו העובר דרך מרכז המסה – לכן הרוכב אינו מתהפך.</p>' +
+      '<h4>תנאי לאי־החלקה</h4>' + fm('f ≤ μ·N &nbsp;⟹&nbsp; tanα ≤ μ');
+    return '<h4>ציר X (אל מרכז המעגל)</h4>' + fm('ΣF<sub>x</sub> = L·sinα = m·v²/R') +
+      '<h4>ציר Y (אנכי)</h4>' + fm('ΣF<sub>y</sub> = L·cosα − mg = 0') +
+      '<h4>זווית ההטיה</h4>' + fm('tanα = v²/(g·R)') + fm('L = mg/cosα') +
+      '<p>כוח העילוי ' + ltr('L') + ' ניצב לכנפיים. הרכיב האנכי מאזן את כוח הכובד, והרכיב האופקי הוא הכוח הצנטריפטלי.</p>';
+  }
+};
+
+/* ---------- 4.5 vertical loop (track or string) ---------- */
+const Loop = {
+  id: 'loop', title: 'מעגל אנכי',
+  p: { R: 1, h: 3, m: 0.5 }, o: { mode: 'track' }, BETA: 55 * DEG,
+  options() {
+    return [{ key: 'mode', type: 'seg', he: 'סוג התנועה', choices: [['track', 'בתוך מסילה'], ['string', 'על חוט']] },
+      { type: 'actions', he: 'בחירת גובה מהירה', choices: [['h = R', 1], ['h = 2R', 2], ['h = 2.5R', 2.5], ['h = 3R', 3], ['h = 4R', 4]],
+        run: k => { this.p.h = +(k * this.p.R).toFixed(2); this.reset(); } }];
+  },
+  /** drag on the ramp: choose the release height with the mouse / finger */
+  pointer(type, x, y) {
+    const vw = this.view; if (this.o.mode !== 'track' || !vw) return false;
+    if (type === 'down') { if ((x - vw.ox) / vw.s > -0.3 * this.p.R) return false; this.drag = true; this.dragHv = vw.hv; }
+    if (!this.drag) return false;
+    if (type === 'up') { this.drag = false; this.dragHv = null; this.reset(); return true; }
+    this.p.h = clamp(Math.round((vw.oy - y) / vw.s * 20) / 20, 0.1, Math.min(+(4 * this.p.R).toFixed(2), vw.hv));
+    this.phase = 'hold'; this.s = -this.entryU(this.p.h); this.v = 0; this.fl = null; this.derive();
+    return true;
+  },
+  params() {
+    return [
+      { key: 'R', he: 'רדיוס המעגל', sym: 'R', unit: 'm', min: 0.5, max: 2, step: 0.05, dec: 2 },
+      { key: 'h', he: this.o.mode === 'track' ? 'גובה השחרור' : 'גובה שקול למהירות בתחתית', sym: 'h', unit: 'm', min: 0.1, max: +(4 * this.p.R).toFixed(2), step: 0.05, dec: 2 },
+      { key: 'm', he: 'מסה', sym: 'm', unit: 'kg', min: 0.1, max: 5, step: 0.1, dec: 1 }
+    ];
+  },
+  onParam(k) { if (k === 'R') this.p.h = Math.min(this.p.h, +(4 * this.p.R).toFixed(2)); this.reset(); },
+  onOption() { this.reset(); },
+  forceKeys() { return ['mg', this.o.mode === 'track' ? 'N' : 'T']; },
+  extraKeys() { return ['sum', 'aR', 'at', 'a']; },
+  /* track geometry: straight incline -> fillet arc -> short flat -> loop -> exit flat.
+     s is the arc length; s = 0 at the loop bottom, s < 0 on the entry track. */
+  geo() { const R = this.p.R; return { R, d: 0.5 * R, rf: R, b: this.BETA }; },   // fillet radius = R, so the largest force is N at the loop bottom
+  entryU(y) {
+    const { d, rf, b } = this.geo(), ya = rf * (1 - Math.cos(b));
+    if (y <= ya) return d + rf * Math.acos(clamp(1 - y / rf, -1, 1));
+    return d + rf * b + (y - ya) / Math.sin(b);
+  },
+  pt(s) {
+    const { R, d, rf, b } = this.geo();
+    if (this.o.mode === 'string' || (s >= 0 && s <= TAU * R)) {
+      const f = s / R; return { x: R * Math.sin(f), y: R * (1 - Math.cos(f)), tx: Math.cos(f), ty: Math.sin(f), rho: R, loop: true, phi: f };
+    }
+    if (s > TAU * R) return { x: s - TAU * R, y: 0, tx: 1, ty: 0, rho: Infinity };
+    const u = -s;
+    if (u <= d) return { x: -u, y: 0, tx: 1, ty: 0, rho: Infinity };
+    if (u <= d + rf * b) { const g = (u - d) / rf; return { x: -d - rf * Math.sin(g), y: rf * (1 - Math.cos(g)), tx: Math.cos(g), ty: -Math.sin(g), rho: rf }; }
+    const w = u - d - rf * b;
+    return { x: -d - rf * Math.sin(b) - w * Math.cos(b), y: rf * (1 - Math.cos(b)) + w * Math.sin(b), tx: Math.cos(b), ty: -Math.sin(b), rho: Infinity };
+  },
+  reset() {
+    this.phase = 'run'; this.fl = null; this.wait = 0; this.cache = null; this.drag = false; this.dragHv = null;
+    if (this.o.mode === 'track') { this.s = -this.entryU(this.p.h); this.v = 0; }
+    else { this.s = 0; this.v = Math.sqrt(2 * UI.g * this.p.h); }
+    this.derive();
+  },
+  /** detachment point (N = 0) and the following parabola; cached per parameter set */
+  detachInfo() {
+    const p = this.p, g = UI.g, R = p.R, key = R + '|' + p.h + '|' + g;
+    if (this.cache && this.cache.key === key) return this.cache.val;
+    let val = null;
+    if (p.h > R * 1.0005 && p.h < 2.5 * R - 1e-9) {
+      const c = clamp(-2 * (p.h - R) / (3 * R), -1, 1), f = Math.acos(c), vd = Math.sqrt(Math.max(0, -g * R * c));
+      const x0 = R * Math.sin(f), y0 = R * (1 - c), vx = vd * Math.cos(f), vy = vd * Math.sin(f);
+      const path = [[x0, y0]]; let t = 0, tLand = 0;
+      for (let i = 1; i < 6000; i++) {
+        t = i * 0.002; const x = x0 + vx * t, y = y0 + vy * t - 0.5 * g * t * t;
+        if (i % 4 === 0) path.push([x, y]);
+        tLand = t;
+        if (t > 0.05 && (x * x + (y - R) * (y - R) >= R * R || y <= 0)) { path.push([x, y]); break; }
+      }
+      val = { phi: f, x0, y0, vx, vy, vd, path, tLand };
+    }
+    this.cache = { key, val }; return val;
+  },
+  derive() {
+    const p = this.p, g = UI.g, R = p.R, d = this.d = {};
+    d.mg = p.m * g; d.E = p.m * g * p.h; d.vb = Math.sqrt(2 * g * p.h); d.vcrit = Math.sqrt(g * R); d.hmin = 2.5 * R;
+    d.Nb = d.mg + p.m * d.vb * d.vb / R;
+    d.side = p.h >= R ? { v: Math.sqrt(2 * g * (p.h - R)), N: 2 * d.mg * (p.h - R) / R } : null;
+    d.topP = p.h >= 2.5 * R - 1e-9 ? { v: Math.sqrt(2 * g * (p.h - 2 * R)), N: Math.max(0, 2 * d.mg * (p.h - 2 * R) / R - d.mg) } : null;
+    d.detach = this.detachInfo();
+    if (this.phase === 'run' || this.phase === 'hold') {
+      const q = this.pt(this.s), v = this.v;
+      d.free = false; d.x = q.x; d.y = q.y; d.tx = q.tx; d.ty = q.ty; d.loop = !!q.loop; d.phi = q.phi; d.curved = Number.isFinite(q.rho);
+      d.vs = v; d.v = Math.abs(v);
+      d.aR = d.curved ? v * v / q.rho : 0; d.at = -g * q.ty;
+      d.N = Math.max(0, p.m * (d.aR + g * q.tx));
+      d.a = Math.hypot(d.aR, d.at);
+    } else {
+      const f = this.fl; d.free = true; d.x = f.x; d.y = f.y; d.v = Math.hypot(f.vx, f.vyNow);
+      d.tx = d.v > 1e-9 ? f.vx / d.v : 1; d.ty = d.v > 1e-9 ? f.vyNow / d.v : 0; d.vs = d.v;
+      d.N = 0; d.aR = 0; d.at = 0; d.a = g; d.loop = false; d.curved = false;
+    }
+    d.Ek = 0.5 * p.m * d.v * d.v; d.Ep = p.m * g * d.y;
+  },
+  step(dt, dtReal) {
+    const p = this.p, g = UI.g, R = p.R;
+    if (this.phase === 'hold') { this.derive(); return; }
+    if (this.phase === 'done') { this.wait += dtReal; if (this.wait > 3) this.reset(); this.derive(); return; }
+    const det = this.detachInfo();
+    let left = dt;
+    while (left > 1e-9) {
+      const h = Math.min(0.001, left); left -= h;
+      if (this.phase === 'run') {
+        let q = this.pt(this.s);
+        this.v += -g * q.ty * h; this.s += this.v * h;
+        q = this.pt(this.s);
+        const e = 2 * g * (p.h - q.y);                         // energy conservation fixes |v|
+        this.v = e > 0 ? (this.v >= 0 ? 1 : -1) * Math.sqrt(e) : 0;
+        if (this.o.mode === 'string') {
+          if (this.s > TAU * R && !det) this.s -= TAU * R;
+        } else if (this.s > TAU * R + 1.7 * R) { this.reset(); return; }
+        if (det && this.v > 0 && q.loop && this.s >= det.phi * R && this.s < TAU * R) {   // N (or T) reaches zero
+          this.phase = 'fly'; this.fl = { t: 0, x: det.x0, y: det.y0, vx: det.vx, vyNow: det.vy };
+        }
+      } else if (this.phase === 'fly') {
+        const f = this.fl; f.t = Math.min(f.t + h, det.tLand);
+        f.x = det.x0 + det.vx * f.t; f.y = det.y0 + det.vy * f.t - 0.5 * g * f.t * f.t; f.vyNow = det.vy - g * f.t;
+        if (f.t >= det.tLand) { this.phase = 'done'; this.wait = 0; break; }
+      }
+    }
+    this.derive();
+  },
+  draw(ctx, W, H) {
+    const p = this.p, d = this.d, R = p.R, track = this.o.mode === 'track', rb = 11, fk = track ? 'N' : 'T';
+    // view bounds
+    let xmin, xmax;
+    const hv = track ? (this.dragHv || Math.max(p.h, 3 * R)) : p.h;      // height the view is fitted to (frozen while dragging)
+    if (track) { xmin = this.pt(-this.entryU(hv + 0.2 * R)).x - 0.35 * R; xmax = 2.9 * R; }
+    else { xmin = -2.2 * R; xmax = 2.2 * R; }
+    const ymin = -0.3 * R, ymax = Math.max(hv, 2 * R) + 0.65 * R;
+    const s = Math.min((W - 50) / (xmax - xmin), (H - 40) / (ymax - ymin));
+    const ox = (W - (xmax - xmin) * s) / 2 - xmin * s, oy = H - 20 + ymin * s - (H - 40 - (ymax - ymin) * s) / 2;
+    const S = (x, y) => [ox + s * x, oy - s * y];
+    this.view = { ox, oy, s, hv };
+    // ground
+    line(ctx, 10, S(0, 0)[1] + rb + 3, W - 10, S(0, 0)[1] + rb + 3, '#cfd8dc', 2);
+    // reference heights
+    const hl = S(xmin, p.h), hm = S(xmin, d.hmin), cc = S(0, R), xe = S(1.4 * R, 0)[0], up = p.h >= d.hmin ? -1 : 1;
+    line(ctx, 14, hm[1], xe, hm[1], '#ef9a9a', 1.5, [3, 5]);
+    label(ctx, 'h_min = 2.5R = ' + num(d.hmin) + ' m', Math.min(xe + 8, W - 176), hm[1] - up * 10, { size: 14, align: 'left', color: '#b71c1c' });
+    line(ctx, 14, hl[1], xe, hl[1], '#607d8b', 1.6, [8, 5]);
+    label(ctx, 'h = ' + num(p.h) + ' m', Math.min(xe + 8, W - 176), hl[1] + up * 10, { size: 14, align: 'left', color: '#37474f' });
+    // rail / string
+    if (track) {
+      ctx.save(); ctx.strokeStyle = '#455a64'; ctx.lineWidth = 5; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      ctx.beginPath();
+      const s0 = -this.entryU(hv + 0.2 * R), s1 = TAU * R + 1.7 * R, n = 420;
+      for (let i = 0; i <= n; i++) {
+        const q = this.pt(s0 + (s1 - s0) * i / n), a = S(q.x, q.y), X = a[0] + q.ty * rb, Y = a[1] + q.tx * rb;
+        if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+      }
+      ctx.stroke(); ctx.restore();
+    } else {
+      ctx.beginPath(); ctx.arc(cc[0], cc[1], s * R, 0, TAU); ctx.strokeStyle = '#78909c'; ctx.lineWidth = 1.6;
+      ctx.setLineDash([7, 6]); ctx.stroke(); ctx.setLineDash([]);
+    }
+    ctx.beginPath(); ctx.arc(cc[0], cc[1], 4, 0, TAU); ctx.fillStyle = '#37474f'; ctx.fill();
+    // characteristic points: bottom, side, top
+    const fl = track ? 'N' : 'T';
+    const mark = (x, y, name, info, dx, dy, align) => {
+      const a = S(x, y);
+      ctx.beginPath(); ctx.arc(a[0], a[1], 5, 0, TAU); ctx.fillStyle = '#ffb300'; ctx.fill(); ctx.strokeStyle = '#263238'; ctx.lineWidth = 1.5; ctx.stroke();
+      label(ctx, name, a[0] + dx, a[1] + dy, { size: 15, rtl: true, align, bold: true });
+      if (info) {
+        label(ctx, 'v = ' + num(info.v) + ' m/s', a[0] + dx, a[1] + dy + 19, { size: 14, align });
+        label(ctx, fl + ' = ' + (visible(fk) ? fN(info.N) : '?'), a[0] + dx, a[1] + dy + 37, { size: 14, align, color: VEC[fk].color });
+      } else label(ctx, 'לא מגיע', a[0] + dx, a[1] + dy + 19, { size: 14, align, rtl: true, color: '#b71c1c' });
+    };
+    mark(0, 0, 'תחתית', { v: d.vb, N: d.Nb }, 0, -62, 'center');
+    mark(R, R, 'צד', d.side, rb + 16, -18, 'left');
+    mark(0, 2 * R, 'שיא', d.topP, 0, 26, 'center');
+    label(ctx, 'מהירות קריטית בשיא', cc[0], S(0, 2 * R)[1] - rb - 34, { size: 14, rtl: true, color: '#b71c1c' });
+    label(ctx, 'v = √(gR) = ' + num(d.vcrit) + ' m/s', cc[0], S(0, 2 * R)[1] - rb - 16, { size: 14, color: '#b71c1c' });
+    // detachment point and parabola
+    const det = d.detach;
+    if (det) {
+      const a = S(det.x0, det.y0);
+      ctx.beginPath(); ctx.arc(a[0], a[1], 9, 0, TAU); ctx.strokeStyle = '#d50000'; ctx.lineWidth = 3; ctx.stroke();
+      label(ctx, 'נקודת ניתוק', a[0] + (det.x0 >= 0 ? 16 : -16), a[1] - 22, { size: 15, rtl: true, bold: true, color: '#d50000', align: det.x0 >= 0 ? 'left' : 'right' });
+      label(ctx, fl + ' = 0', a[0] + (det.x0 >= 0 ? 16 : -16), a[1] - 4, { size: 14, color: '#d50000', align: det.x0 >= 0 ? 'left' : 'right' });
+      label(ctx, 'y = ' + num(det.y0) + ' m,  φ = ' + deg(det.phi), a[0] + (det.x0 >= 0 ? 16 : -16), a[1] + 14, { size: 14, color: '#d50000', align: det.x0 >= 0 ? 'left' : 'right' });
+      line(ctx, cc[0], cc[1], a[0], a[1], '#d50000', 1.2, [4, 4]);
+      if (d.free) {
+        ctx.save(); ctx.strokeStyle = '#d50000'; ctx.lineWidth = 2; ctx.setLineDash([6, 5]); ctx.beginPath();
+        const tNow = this.fl.t, done = this.phase === 'done';
+        det.path.forEach((q, i) => {            // path samples are 0.008 s apart; the last one is the landing point
+          if (!done && (i * 0.008 > tNow || i === det.path.length - 1)) return;
+          const b = S(q[0], q[1]); if (i === 0) ctx.moveTo(b[0], b[1]); else ctx.lineTo(b[0], b[1]);
+        });
+        if (!done) { const b = S(d.x, d.y); ctx.lineTo(b[0], b[1]); }
+        ctx.stroke(); ctx.restore();
+      }
+    }
+    if (track) {                                   // release point and drag hint
+      const st0 = this.pt(-this.entryU(p.h)), a = S(st0.x, st0.y);
+      ctx.beginPath(); ctx.arc(a[0], a[1], rb + 5, 0, TAU); ctx.strokeStyle = '#0b5cad'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+      label(ctx, 'גררו את הכדור לאורך המדרון לבחירת גובה השחרור', 16, H - 14, { size: 15, rtl: true, align: 'left', color: '#0b5cad' });
+    }
+    // ball
+    const B = S(d.x, d.y);
+    if (!track) line(ctx, cc[0], cc[1], B[0], B[1], '#37474f', d.free ? 1.2 : 2.6, d.free ? [4, 4] : null);
+    const gr = ctx.createRadialGradient(B[0] - 3, B[1] - 3, 2, B[0], B[1], rb + 1);
+    gr.addColorStop(0, '#b0bec5'); gr.addColorStop(1, '#263238');
+    ctx.beginPath(); ctx.arc(B[0], B[1], rb, 0, TAU); ctx.fillStyle = gr; ctx.fill();
+    // vectors (screen: tangent ts, inward normal ns)
+    const ts = [d.tx, -d.ty], ns = [-d.ty, -d.tx];
+    const sF = fScale(d.mg, d.Nb), sA = sF * p.m * 0.8;
+    if (!d.free) {
+      drawAxes(ctx, B[0], B[1], [ns[0] * 80, ns[1] * 80], [ts[0] * 80, ts[1] * 80], d.curved ? 'R' : 'y', d.curved ? 'τ' : 'x');
+      if (d.curved || Math.abs(d.ty) > 1e-6)
+        drawComps(ctx, 'mg', B[0], B[1], [ns[0] * (-d.mg * d.tx) * sF, ns[1] * (-d.mg * d.tx) * sF], [ts[0] * (-d.mg * d.ty) * sF, ts[1] * (-d.mg * d.ty) * sF], d.curved ? 'R' : 'y', d.curved ? 'τ' : 'x');
+    }
+    drawVec(ctx, 'mg', B[0], B[1], 0, d.mg * sF);
+    if (!d.free) {
+      drawVec(ctx, fk, B[0], B[1], ns[0] * d.N * sF, ns[1] * d.N * sF, { side: -14 });
+      const sx = ns[0] * d.N * sF, sy = ns[1] * d.N * sF + d.mg * sF;
+      drawVec(ctx, 'sum', B[0], B[1], sx, sy, { side: 14 });
+      drawVec(ctx, 'aR', B[0], B[1], ns[0] * d.aR * sA, ns[1] * d.aR * sA, { shift: 14, side: 10 });
+      drawVec(ctx, 'at', B[0], B[1], ts[0] * d.at * sA, ts[1] * d.at * sA, { shift: -14, side: -8 });
+      drawVec(ctx, 'a', B[0], B[1], (ns[0] * d.aR + ts[0] * d.at) * sA, (ns[1] * d.aR + ts[1] * d.at) * sA, { side: -14 });
+    } else {
+      drawVec(ctx, 'sum', B[0], B[1], 0, d.mg * sF, { side: -34 });
+      drawVec(ctx, 'mg', B[0], B[1], 0, d.mg * sF);
+      drawVec(ctx, 'a', B[0], B[1], 0, UI.g * sA, { shift: 15, side: 8 });
+    }
+    if (d.v > 0.02) { const L = Math.min(110, d.v * 9) * (d.free ? 1 : Math.sign(d.vs)); drawVec(ctx, 'v', B[0], B[1], ts[0] * L, ts[1] * L); }
+    // energy bar
+    const bw = 210, bx = W - bw - 16, by = 14, E = Math.max(d.E, 1e-9);
+    rr(ctx, bx - 8, by - 6, bw + 16, 62, 10); ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.fill(); ctx.strokeStyle = '#b0bec5'; ctx.lineWidth = 1.5; ctx.stroke();
+    label(ctx, 'אנרגיה', bx + bw / 2, by + 5, { size: 14, rtl: true, color: '#455a64' });
+    const wk = clamp(d.Ek / E, 0, 1) * bw, wp = clamp(d.Ep / E, 0, 1) * bw;
+    ctx.fillStyle = '#f9a825'; ctx.fillRect(bx, by + 16, wk, 16);
+    ctx.fillStyle = '#78909c'; ctx.fillRect(bx + wk, by + 16, Math.min(wp, bw - wk), 16);
+    ctx.strokeStyle = '#37474f'; ctx.lineWidth = 1.5; ctx.strokeRect(bx, by + 16, bw, 16);
+    label(ctx, 'Ek', bx + 4, by + 43, { size: 14, align: 'left', color: '#b26a00', bold: true });
+    label(ctx, 'Ep', bx + bw - 4, by + 43, { size: 14, align: 'right', color: '#455a64', bold: true });
+    if (UI.quiz) label(ctx, 'אילו כוחות פועלים על הכדור? שרטטו במחברת', W / 2, 20, { size: 17, rtl: true, color: '#0d47a1' });
+  },
+  readouts() {
+    const d = this.d, track = this.o.mode === 'track', fk = track ? 'N' : 'T';
+    const rows = [['כוח הכובד', 'mg', fN(d.mg), 'mg'], [track ? 'כוח נורמלי' : 'מתיחות החוט', fk, fN(d.N), fk],
+      ['כוח שקול', 'ΣF', fN(d.free ? d.mg : this.p.m * d.a), 'sum'],
+      ['תאוצה רדיאלית', 'a<sub>R</sub>', d.free ? '—' : num(d.aR) + ' m/s²', 'aR'],
+      ['תאוצה משיקית', 'a<sub>τ</sub>', d.free ? '—' : num(d.at) + ' m/s²', 'at'],
+      ['תאוצה כוללת', 'a', num(d.a) + ' m/s²', 'a'],
+      ['מהירות', 'v', num(d.v) + ' m/s'], ['גובה', 'y', num(d.y) + ' m'],
+      ['זווית מהתחתית', 'φ', d.loop ? deg(((d.phi % TAU) + TAU) % TAU) : '—'],
+      ['אנרגיה קינטית', 'E<sub>k</sub>', num(d.Ek) + ' J'], ['אנרגיה פוטנציאלית', 'E<sub>p</sub>', num(d.Ep) + ' J'],
+      ['אנרגיה כוללת', 'E<sub>k</sub>+E<sub>p</sub>', num(d.Ek + d.Ep) + ' J'],
+      ['מהירות בתחתית', 'v<sub>0</sub>', num(d.vb) + ' m/s'],
+      ['מהירות קריטית בשיא', '√(gR)', num(d.vcrit) + ' m/s'], ['גובה מזערי', 'h<sub>min</sub>', num(d.hmin) + ' m']];
+    if (d.detach) rows.push(['זווית הניתוק', 'φ', deg(d.detach.phi)], ['גובה הניתוק', 'y', num(d.detach.y0) + ' m'], ['מהירות בניתוק', 'v', num(d.detach.vd) + ' m/s']);
+    return rows;
+  },
+  status() {
+    const d = this.d, p = this.p, track = this.o.mode === 'track', F = track ? 'N' : 'T';
+    if (this.phase === 'hold') return { lvl: 'info', html: 'גובה השחרור ' + ltr('h = ' + num(p.h) + ' m = ' + num(p.h / p.R) + '·R') + ' – שחררו את העכבר כדי לשחרר את הכדור' };
+    if (d.free) return { lvl: 'bad', html: (track ? 'ניתוק מהמסילה! ' : 'החוט התרופף! ') + ltr(F + ' = 0') + ' – על הכדור פועל רק כוח הכובד והוא נע במסלול פרבולי.' + (this.phase === 'done' ? ' (התנועה תתחיל מחדש)' : '') };
+    if (d.detach) return { lvl: 'info', html: (track ? '' : 'מהירות בתחתית ' + ltr('v<sub>0</sub> = √(2gh) = ' + num(d.vb) + ' m/s') + '. ') + ltr('R < h < 2.5R') + ': הכדור ' + (track ? 'יתנתק מהמסילה' : 'יצא ממסלול מעגלי') + ' בזווית ' + ltr('φ = ' + deg(d.detach.phi)) + ' מהתחתית, בגובה ' + ltr('y = ' + num(d.detach.y0) + ' m') };
+    if (p.h >= 2.5 * p.R - 1e-9) return { lvl: 'ok', html: ltr('h ≥ 2.5R') + ': הכדור משלים את המעגל. בשיא: ' + ltr('v = ' + num(d.topP.v) + ' m/s ≥ √(gR) = ' + num(d.vcrit) + ' m/s') };
+    return { lvl: 'info', html: ltr('h ≤ R') + ': הכדור אינו עובר את גובה המרכז – הוא מתנדנד הלוך ושוב ואינו מתנתק.' };
+  },
+  formulas() {
+    const F = this.o.mode === 'track' ? 'N' : 'T';
+    return '<p>' + ltr('φ') + ' – הזווית מתחתית המעגל; ' + ltr('y = R·(1 − cosφ)') + '</p>' +
+      '<h4>כיוון רדיאלי (אל המרכז)</h4>' + fm('ΣF<sub>R</sub> = ' + F + ' − mg·cosφ = m·v²/R') +
+      '<h4>כיוון משיקי</h4>' + fm('ΣF<sub>τ</sub> = −mg·sinφ = m·a<sub>τ</sub>') +
+      '<h4>שימור אנרגיה</h4>' + fm('m·g·h = ½·m·v² + m·g·y') +
+      '<h4>שלוש נקודות אופייניות</h4>' +
+      fm('<span dir="rtl">תחתית</span>: &nbsp;' + F + ' − mg = m·v²/R') +
+      fm('<span dir="rtl">צד</span>: &nbsp;' + F + ' = m·v²/R &nbsp;,&nbsp; a<sub>τ</sub> = −g') +
+      fm('<span dir="rtl">שיא</span>: &nbsp;' + F + ' + mg = m·v²/R') +
+      '<h4>מהירות קריטית בשיא</h4>' + fm(F + ' = 0 &nbsp;⟹&nbsp; mg = m·v²/R &nbsp;⟹&nbsp; v = ' + sq('g·R')) +
+      '<p class="note">מהירות קריטית (ניתוק) – הנורמל שווה לאפס, הכוח הצנטריפטלי – רק כוח הכובד</p>' +
+      '<h4>גובה מזערי</h4>' + fm('m·g·h<sub>min</sub> = ½·m·g·R + m·g·2R') + fm('h<sub>min</sub> = 2.5·R') +
+      '<h4>נקודת הניתוק (R &lt; h &lt; 2.5R)</h4>' + fm(F + ' = 0 &nbsp;⟹&nbsp; cosφ = −2·(h − R)/(3·R)') + fm('y = (R + 2h)/3') +
+      '<p>לאחר הניתוק הכדור נע כגוף בזריקה משופעת (פרבולה).</p>';
+  }
+};
+
+const SCENARIOS = [Disk, Pendulum, Bank, Turn, Loop];
+
+/* =====================================================================
+   5. UI WIRING
+   ===================================================================== */
+const cv = $('#cv'), ctx = cv.getContext('2d');
+let cssW = 800, cssH = 500, dpr = 1;
+const inputs = {};                 // slider elements of the active scenario, by key
+
+function fitCanvas() {
+  const r = $('#wrap').getBoundingClientRect();
+  cssW = Math.max(320, r.width); cssH = Math.max(300, r.height);
+  dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  cv.width = Math.round(cssW * dpr); cv.height = Math.round(cssH * dpr);
+}
+
+function buildTabs() {
+  const nav = $('#tabs');
+  SCENARIOS.forEach((sc, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('role', 'tab'); b.textContent = (i + 1) + '. ' + sc.title;
+    b.addEventListener('click', () => selectScenario(sc));
+    sc._tab = b; nav.appendChild(b);
+  });
+}
+function selectScenario(sc) {
+  UI.sc = sc;
+  SCENARIOS.forEach(s => s._tab.setAttribute('aria-selected', s === sc ? 'true' : 'false'));
+  UI.revealed.clear();
+  sc.reset(); buildControls(); updateQuizUI();
+  cv.style.touchAction = sc.pointer ? 'none' : 'auto'; cv.style.cursor = sc.pointer ? 'grab' : 'default';
+}
+
+/** sliders, options, display check boxes and formulas for the active scenario */
+function buildControls() {
+  const sc = UI.sc, box = $('#params'); box.innerHTML = '';
+  for (const k in inputs) delete inputs[k];
+  sc.options().forEach(o => {
+    const w = document.createElement('div'); w.className = 'opt';
+    if (o.type === 'actions') {
+      const cap = document.createElement('div'); cap.className = 'cap'; cap.textContent = o.he; w.appendChild(cap);
+      const row = document.createElement('div'); row.className = 'acts'; row.dir = 'ltr';
+      o.choices.forEach(([txt, val]) => {
+        const b = document.createElement('button'); b.type = 'button'; b.textContent = txt;
+        b.addEventListener('click', () => { o.run(val); syncControls(); });
+        row.appendChild(b);
+      });
+      w.appendChild(row);
+    } else if (o.type === 'seg') {
+      const cap = document.createElement('div'); cap.className = 'cap'; cap.textContent = o.he; w.appendChild(cap);
+      const seg = document.createElement('div'); seg.className = 'seg';
+      o.choices.forEach(([val, txt]) => {
+        const b = document.createElement('button'); b.type = 'button'; b.textContent = txt;
+        b.setAttribute('aria-pressed', sc.o[o.key] === val ? 'true' : 'false');
+        b.addEventListener('click', () => { if (sc.o[o.key] === val) return; sc.o[o.key] = val; optionChanged(); });
+        seg.appendChild(b);
+      });
+      w.appendChild(seg);
+    } else {
+      const l = document.createElement('label'); l.className = 'chk';
+      const c = document.createElement('input'); c.type = 'checkbox'; c.checked = !!sc.o[o.key];
+      c.addEventListener('change', () => { sc.o[o.key] = c.checked; optionChanged(); });
+      const t = document.createElement('span'); t.textContent = o.he;
+      l.appendChild(c); l.appendChild(t); w.appendChild(l);
+    }
+    box.appendChild(w);
+  });
+  sc.params().forEach(pd => {
+    const w = document.createElement('div'); w.className = 'prm';
+    const id = 'p_' + sc.id + '_' + pd.key;
+    w.innerHTML = '<div class="head"><label for="' + id + '">' + pd.he + ' ' + ltr('<i style="font-family:\'Cambria Math\',\'Times New Roman\',serif">' + pd.sym + '</i>') +
+      '</label><span class="val ltr"></span></div>';
+    const inp = document.createElement('input'); inp.type = 'range'; inp.id = id;
+    inp.min = pd.min; inp.max = pd.max; inp.step = pd.step; inp.value = sc.p[pd.key];
+    inp.addEventListener('input', () => {
+      sc.p[pd.key] = clamp(parseFloat(inp.value), pd.min, +inp.max);
+      if (sc.onParam) sc.onParam(pd.key);
+      sc.derive(); syncControls();
+    });
+    w.appendChild(inp); box.appendChild(w);
+    inputs[pd.key] = { inp, out: w.querySelector('.val'), pd };
+  });
+  syncControls(); buildShowList();
+  $('#formulas').innerHTML = sc.formulas();
+}
+/** refresh slider ranges / values / value labels (ranges may depend on other parameters) */
+function syncControls() {
+  const sc = UI.sc;
+  sc.params().forEach(pd => {
+    const e = inputs[pd.key]; if (!e) return;
+    if (+e.inp.max !== pd.max) e.inp.max = pd.max;
+    if (parseFloat(e.inp.value) !== sc.p[pd.key]) e.inp.value = sc.p[pd.key];
+    e.out.textContent = num(sc.p[pd.key], pd.dec) + (pd.unit ? ' ' + pd.unit : '');
+  });
+}
+function optionChanged() {
+  const sc = UI.sc;
+  if (sc.onOption) sc.onOption();
+  UI.revealed.clear(); sc.reset(); buildControls(); updateQuizUI();
+}
+function buildShowList() {
+  const sc = UI.sc, box = $('#showList'); box.innerHTML = '';
+  const add = (key, text, color, acc) => {
+    const l = document.createElement('label'); l.className = 'chk';
+    const c = document.createElement('input'); c.type = 'checkbox'; c.checked = UI.show[key] !== false;
+    c.addEventListener('change', () => { UI.show[key] = c.checked; });
+    l.appendChild(c);
+    if (color) { const s = document.createElement('span'); s.className = 'sw' + (acc ? ' acc' : ''); s.style.background = color; s.style.borderColor = color; l.appendChild(s); }
+    const t = document.createElement('span'); t.innerHTML = text; l.appendChild(t);
+    box.appendChild(l);
+  };
+  // single forces (and the extra accelerations of the loop); the common switches are the chips above the canvas
+  sc.forceKeys().concat(sc.extraKeys().filter(k => k === 'at' || k === 'a')).forEach(k => add(k, VEC[k].he + ' ' + ltr('<i>' + VEC[k].html + '</i>'), VEC[k].color, VEC[k].acc));
+}
+function buildLegend() {
+  const f = $('#legend'); f.innerHTML = '<span>מקרא:</span>';
+  Object.keys(VEC).forEach(k => {
+    const V = VEC[k], d = document.createElement('span'); d.className = 'it';
+    d.innerHTML = '<span class="sw' + (V.acc ? ' acc' : '') + '" style="background:' + V.color + ';border-color:' + V.color + '"></span>' +
+      '<span class="sy ltr" style="color:' + V.color + '">' + V.html + '</span><span>' + V.he + '</span>';
+    f.appendChild(d);
+  });
+  const n = document.createElement('span'); n.className = 'it'; n.style.color = '#5b6b78';
+  n.textContent = '(כוחות – חץ מלא; תאוצות – חץ מקווקו וחלול)'; f.appendChild(n);
+}
+
+/* live numbers */
+let roSig = '';
+function updateReadouts() {
+  const rows = UI.sc.readouts(), box = $('#readouts');
+  const sig = UI.sc.id + '|' + rows.map(r => r[0] + r[1]).join('|');
+  if (sig !== roSig) {
+    roSig = sig; box.innerHTML = '';
+    rows.forEach(r => {
+      const d = document.createElement('div'); d.className = 'row';
+      const col = r[3] ? VEC[r[3]].color : '#263238';
+      d.innerHTML = '<span class="he">' + r[0] + '</span><span class="sy ltr" style="color:' + col + '">' + r[1] + '</span><span class="vl ltr"></span>';
+      box.appendChild(d);
+    });
+  }
+  const els = box.querySelectorAll('.vl');
+  rows.forEach((r, i) => {
+    const txt = !UI.show.nums ? '•••' : (UI.quiz && r[3] && !UI.revealed.has(r[3])) ? '?' : r[2];
+    if (els[i].textContent !== txt) els[i].textContent = txt;
+  });
+}
+let stSig = '';
+function updateStatus() {
+  const st = UI.sc.status(), sig = st.lvl + st.html;
+  if (sig === stSig) return; stSig = sig;
+  const e = $('#status'); e.className = 'status' + (st.lvl === 'bad' ? ' bad' : st.lvl === 'info' ? ' info' : ''); e.innerHTML = st.html;
+}
+
+/* class-question mode */
+function quizKeys() { return UI.sc.forceKeys().concat(UI.sc.extraKeys()); }
+function updateQuizUI() {
+  $('#bQuiz').setAttribute('aria-pressed', UI.quiz ? 'true' : 'false');
+  $('#bQuiz').textContent = UI.quiz ? 'סיום – חזרה לתצוגה רגילה' : 'הסתר וקטורים – שרטטו בעצמכם';
+  const keys = quizKeys(), left = keys.filter(k => !UI.revealed.has(k));
+  $('#bNext').disabled = !UI.quiz || left.length === 0;
+  $('#bAll').disabled = !UI.quiz || left.length === 0;
+  $('#quizInfo').innerHTML = UI.quiz ? ('נחשפו ' + ltr(String(keys.length - left.length) + ' / ' + keys.length) +
+    (left.length ? '' : ' – כל הווקטורים מוצגים')) : '';
+}
+$('#bQuiz').addEventListener('click', () => { UI.quiz = !UI.quiz; UI.revealed.clear(); updateQuizUI(); });
+$('#bNext').addEventListener('click', () => { const k = quizKeys().find(x => !UI.revealed.has(x)); if (k) UI.revealed.add(k); updateQuizUI(); });
+$('#bAll').addEventListener('click', () => { quizKeys().forEach(k => UI.revealed.add(k)); updateQuizUI(); });
+
+/* display chips above the canvas */
+document.querySelectorAll('#chips .chip').forEach(b => {
+  const k = b.dataset.k;
+  b.setAttribute('aria-pressed', UI.show[k] !== false ? 'true' : 'false');
+  b.addEventListener('click', () => { UI.show[k] = !(UI.show[k] !== false); b.setAttribute('aria-pressed', UI.show[k] ? 'true' : 'false'); });
+});
+/* pointer: scenarios may react to dragging on the canvas (loop: release height) */
+function ptr(type, e) {
+  const sc = UI.sc; if (!sc.pointer) return;
+  const r = cv.getBoundingClientRect();
+  if (sc.pointer(type, e.clientX - r.left, e.clientY - r.top)) {
+    if (type === 'down' && cv.setPointerCapture) { try { cv.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } }
+    syncControls(); e.preventDefault();
+  }
+}
+cv.addEventListener('pointerdown', e => ptr('down', e));
+cv.addEventListener('pointermove', e => ptr('move', e));
+cv.addEventListener('pointerup', e => ptr('up', e));
+cv.addEventListener('pointercancel', e => ptr('up', e));
+/* space bar = play / pause */
+document.addEventListener('keydown', e => {
+  if (e.code !== 'Space' || /^(INPUT|BUTTON|SUMMARY|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
+  e.preventDefault(); setRunning(!UI.running);
+});
+
+/* transport */
+function setRunning(r) { UI.running = r; $('#bPlay').textContent = r ? '⏸ עצור' : '▶ הפעל'; }
+$('#bPlay').addEventListener('click', () => setRunning(!UI.running));
+$('#bStep').addEventListener('click', () => { setRunning(false); UI.sc.step(1 / 30, 1 / 30); });
+$('#bReset').addEventListener('click', () => { UI.sc.reset(); });
+$('#spd').addEventListener('input', e => { UI.speed = parseFloat(e.target.value) || 1; $('#spdVal').textContent = '×' + num(UI.speed); });
+$('#gSeg').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  UI.g = parseFloat(b.dataset.g);
+  $('#gSeg').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+  if (UI.sc.id === 'loop') UI.sc.reset(); else UI.sc.derive();
+}));
+
+/* main loop */
+let last = 0;
+function frame(now) {
+  const dtReal = clamp((now - last) / 1000, 0, 0.05); last = now;
+  const sc = UI.sc;
+  if (UI.running) sc.step(dtReal * UI.speed, dtReal); else sc.derive();
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+  sc.draw(ctx, cssW, cssH);
+  updateReadouts(); updateStatus();
+  requestAnimationFrame(frame);
+}
+
+/* start */
+buildTabs(); buildLegend(); fitCanvas();
+if (window.ResizeObserver) new ResizeObserver(fitCanvas).observe($('#wrap'));
+window.addEventListener('resize', fitCanvas);
+setRunning(true);
+selectScenario(Disk);
+requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
+</script>
+</body>
+</html>

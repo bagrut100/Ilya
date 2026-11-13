@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סימולציה: תנועת גוף בשדה הכובד</title>
+<style>
+  :root{
+    --bg:#f1f5f9; --card:#ffffff; --ink:#0f172a; --muted:#475569; --line:#cbd5e1;
+    --accent:#1d4ed8; --accent-soft:#dbeafe; --ok:#15803d; --warn:#b45309; --bad:#b91c1c;
+    --cv:#1d4ed8; --cvx:#047857; --cvy:#c2410c; --cg:#7c3aed; --body:#dc2626;
+  }
+  *{box-sizing:border-box}
+  html{font-size:clamp(15px,1.02vw,21px)}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:"Segoe UI","Arial Hebrew","Noto Sans Hebrew",Arial,sans-serif;line-height:1.4}
+  .ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+       padding:.6rem 1.1rem;background:#0f172a;color:#fff}
+  header.top h1{margin:0;font-size:1.45rem;font-weight:700}
+  header.top h1 small{font-size:.95rem;font-weight:400;opacity:.8}
+  .top-actions{display:flex;gap:.6rem;align-items:center}
+  .chip{background:#1e293b;border:1px solid #334155;border-radius:999px;padding:.35rem .8rem;cursor:pointer;
+        display:inline-flex;gap:.4rem;align-items:center;font-size:1rem}
+  .layout{display:grid;grid-template-columns:minmax(300px,23rem) minmax(0,1fr) minmax(280px,21rem);
+          gap:.8rem;padding:.8rem;align-items:start}
+  @media (max-width:1250px){ .layout{grid-template-columns:minmax(290px,21rem) minmax(0,1fr)} .results{grid-column:1 / -1} }
+  @media (max-width:820px){ .layout{grid-template-columns:1fr} }
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.8rem .9rem;
+         box-shadow:0 1px 3px rgba(15,23,42,.06)}
+  .panel h2{margin:.1rem 0 .5rem;font-size:1.1rem;color:var(--accent)}
+  .panel h2:not(:first-child){margin-top:.9rem;padding-top:.7rem;border-top:1px solid var(--line)}
+  select,input[type=number],button{font:inherit;color:inherit}
+  select{width:100%;padding:.4rem .5rem;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .quick{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;margin-top:.45rem}
+  .quick button{padding:.4rem .3rem;border:1px solid var(--line);background:#f8fafc;border-radius:8px;cursor:pointer;font-size:.92rem}
+  .quick button.on{background:var(--accent-soft);border-color:var(--accent);font-weight:700}
+  .quick button:last-child{grid-column:1 / -1}
+  .row{display:grid;grid-template-columns:1fr 5.2rem 2.6rem;gap:.25rem .5rem;align-items:center;margin:.5rem 0}
+  .row label{grid-column:1 / -1;font-weight:600}
+  .row input[type=range]{width:100%;accent-color:var(--accent);direction:ltr}
+  input[type=number]{width:100%;padding:.3rem .35rem;border:1px solid var(--line);border-radius:8px;
+        text-align:center;direction:ltr;font-weight:700;background:#fff}
+  .unit{color:var(--muted);font-size:.92rem}
+  .seg{display:flex;gap:.9rem;align-items:center;margin:.4rem 0;flex-wrap:wrap}
+  .btns{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+  .btn{padding:.5rem .6rem;border-radius:10px;border:1px solid var(--line);background:#f8fafc;cursor:pointer;font-weight:700}
+  .btn:hover{filter:brightness(.97)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.ghost{background:transparent;border-color:#64748b;color:#fff}
+  .checks{display:grid;gap:.3rem}
+  .checks label{display:flex;gap:.45rem;align-items:center;cursor:pointer}
+  .checks input,.chip input,.seg input{width:1.05rem;height:1.05rem;accent-color:var(--accent)}
+  .sw{display:inline-block;width:1.1rem;height:.3rem;border-radius:2px}
+  .center{display:flex;flex-direction:column;gap:.6rem;min-width:0}
+  .stage{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.5rem}
+  .caption{display:flex;justify-content:space-between;gap:.8rem;flex-wrap:wrap;color:var(--muted);font-size:.92rem;padding:.1rem .4rem .4rem}
+  canvas{display:block;width:100%;touch-action:none;border-radius:8px}
+  #scene{height:clamp(360px,54vh,780px);cursor:crosshair}
+  #graph{height:clamp(220px,27vh,360px)}
+  #msg{margin:.4rem .2rem 0;font-size:1rem}
+  #msg div{padding:.4rem .7rem;border-radius:8px;margin-top:.3rem}
+  #msg .info{background:#eff6ff;border:1px solid #bfdbfe}
+  #msg .warn{background:#fffbeb;border:1px solid #fcd34d}
+  .tabs{display:flex;gap:.35rem;padding:.1rem .2rem .45rem;flex-wrap:wrap;align-items:center}
+  .tabs button{padding:.3rem .9rem;border:1px solid var(--line);background:#f8fafc;border-radius:999px;cursor:pointer;font-weight:700;direction:ltr}
+  .tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:.28rem .3rem;border-bottom:1px solid #e2e8f0;text-align:start;vertical-align:middle}
+  th{font-weight:500}
+  td.val{direction:ltr;text-align:left;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .sym{color:var(--accent);font-weight:700}
+  #status{display:inline-block;padding:.15rem .7rem;border-radius:999px;background:var(--accent-soft);font-weight:700;font-size:.95rem}
+  .note{font-size:.9rem;color:var(--warn);margin:.3rem 0}
+  #guessBox{display:none}
+  #guessBox th,#guessBox td{font-size:.92rem;padding:.25rem .2rem}
+  #guessBox input{padding:.2rem}
+  .good{color:var(--ok)} .mid{color:var(--warn)} .bad{color:var(--bad)}
+  #legend{list-style:none;margin:.3rem 0 0;padding:0;display:grid;gap:.25rem;font-size:.95rem}
+  #legend li{display:flex;gap:.5rem;align-items:center}
+  #legend .sw{width:1.4rem;height:.35rem}
+  /* Formulas drawer on the right edge */
+  #drawer{position:fixed;top:0;bottom:0;right:0;width:min(30rem,94vw);background:#fff;border-left:2px solid var(--accent);
+          box-shadow:-8px 0 24px rgba(15,23,42,.2);transform:translateX(105%);transition:transform .25s;z-index:20;
+          overflow:auto;padding:1rem 1.1rem}
+  #drawer.open{transform:none}
+  #drawer h2{margin:0 0 .4rem;color:var(--accent);display:flex;justify-content:space-between;align-items:center}
+  #drawer h3{margin:.9rem 0 .25rem;font-size:1.02rem}
+  #drawer .math{direction:ltr;unicode-bidi:isolate;text-align:left;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;
+          padding:.35rem .6rem;margin:.25rem 0;font-family:"Cambria Math","Times New Roman",serif;font-size:1.08rem;overflow-x:auto;white-space:nowrap}
+  #drawer .math b{color:var(--accent)}
+  #drawer p{margin:.25rem 0;color:var(--muted);font-size:.95rem}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>תנועת גוף בשדה הכובד <small>(ללא התנגדות אוויר)</small></h1>
+  <div class="top-actions">
+    <label class="chip"><input type="checkbox" id="guessMode"> מצב "נחש קודם"</label>
+    <button class="btn ghost" id="btnFormulas">נוסחאות</button>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- ================= Controls (right column in RTL) ================= -->
+  <section class="panel controls">
+    <h2>תרחיש מוכן</h2>
+    <select id="scenario">
+      <option value="">— בחרו תרחיש —</option>
+      <option value="0">זריקה אנכית כלפי מעלה מהקרקע</option>
+      <option value="1">אבן נזרקת כלפי מטה מצוק</option>
+      <option value="2">זריקה אופקית משולחן / מצוק</option>
+      <option value="3">זריקה בזווית של 45 מעלות (טווח מקסימלי)</option>
+      <option value="4">שתי זוויות עם אותו טווח (30 ו-60 מעלות)</option>
+      <option value="5">זריקה משופעת כלפי מעלה מגג</option>
+      <option value="6">זריקה משופעת מתחת לאופק ממגדל</option>
+      <option value="7">זריקה אל גג הגבוה מנקודת הזריקה</option>
+    </select>
+
+    <h2>סוג הזריקה</h2>
+    <select id="throwType">
+      <option value="up">זריקה אנכית כלפי מעלה</option>
+      <option value="down">זריקה אנכית כלפי מטה</option>
+      <option value="horiz">זריקה אופקית</option>
+      <option value="above">זריקה משופעת מעל האופק</option>
+      <option value="below">זריקה משופעת מתחת לאופק</option>
+    </select>
+    <div class="quick" id="quick">
+      <button data-type="up">↑ אנכית מעלה</button>
+      <button data-type="down">↓ אנכית מטה</button>
+      <button data-type="above">↗ מעל האופק</button>
+      <button data-type="below">↘ מתחת לאופק</button>
+      <button data-type="horiz">→ אופקית</button>
+    </div>
+
+    <h2>נתוני הזריקה</h2>
+    <div class="row">
+      <label for="v0Num">מהירות התחלתית <span class="ltr sym">v₀</span></label>
+      <input type="range" id="v0Rng" min="0" max="50" step="0.5">
+      <input type="number" id="v0Num" min="0" max="50" step="0.1">
+      <span class="unit ltr">m/s</span>
+    </div>
+    <div class="row">
+      <label for="alphaNum">זווית ביחס לאופק <span class="ltr sym">α</span> <span class="unit">(שלילית = מתחת לאופק)</span></label>
+      <input type="range" id="alphaRng" min="-90" max="90" step="1">
+      <input type="number" id="alphaNum" min="-90" max="90" step="1">
+      <span class="unit ltr">°</span>
+    </div>
+    <div class="row">
+      <label for="h0Num">גובה נקודת הזריקה <span class="ltr sym">h₀</span></label>
+      <input type="range" id="h0Rng" min="0" max="100" step="0.5">
+      <input type="number" id="h0Num" min="0" max="100" step="0.1">
+      <span class="unit ltr">m</span>
+    </div>
+    <div class="row">
+      <label for="hEndNum">גובה משטח הנחיתה <span class="ltr sym">h<sub>end</sub></span></label>
+      <input type="range" id="hEndRng" min="0" max="100" step="0.5">
+      <input type="number" id="hEndNum" min="0" max="100" step="0.1">
+      <span class="unit ltr">m</span>
+    </div>
+    <div class="seg">
+      <b>תאוצת הכובד <span class="ltr sym">g</span>:</b>
+      <label><input type="radio" name="g" value="9.8"> <span class="ltr">9.8</span></label>
+      <label><input type="radio" name="g" value="10" checked> <span class="ltr">10</span></label>
+      <span class="unit ltr">m/s²</span>
+    </div>
+
+    <h2>הנפשה</h2>
+    <div class="btns">
+      <button class="btn primary" id="btnLaunch">שגר</button>
+      <button class="btn" id="btnPause">עצור</button>
+      <button class="btn" id="btnStep" title="התקדמות של 0.05 שניות">צעד</button>
+      <button class="btn" id="btnReset">איפוס</button>
+    </div>
+    <div class="row">
+      <label for="speedRng">מהירות ההקרנה (הילוך איטי)</label>
+      <input type="range" id="speedRng" min="0.1" max="2" step="0.1" value="1">
+      <span class="ltr" id="speedVal" style="font-weight:700;text-align:center">×1.0</span>
+      <span></span>
+    </div>
+
+    <h2>תצוגה</h2>
+    <div class="checks">
+      <label><input type="checkbox" id="chkV" checked> <span class="sw" style="background:var(--cv)"></span> וקטור המהירות <span class="ltr sym">v</span></label>
+      <label><input type="checkbox" id="chkComp" checked> <span class="sw" style="background:var(--cvx)"></span><span class="sw" style="background:var(--cvy)"></span> רכיבים <span class="ltr sym">v<sub>x</sub> , v<sub>y</sub></span></label>
+      <label><input type="checkbox" id="chkG"> <span class="sw" style="background:var(--cg)"></span> תאוצה <span class="ltr sym">g</span></label>
+      <label><input type="checkbox" id="chkProj"> היטלי הגוף על הצירים</label>
+      <label><input type="checkbox" id="chkPreview" checked> הצג מסלול צפוי (קו מקווקו)</label>
+      <label><input type="checkbox" id="chkStrobe"> מיקומים כל <span class="ltr">Δt =</span>
+        <select id="strobeDt" style="width:auto">
+          <option>0.1</option><option selected>0.2</option><option>0.25</option><option>0.5</option><option>1</option>
+        </select> <span class="ltr unit">s</span></label>
+    </div>
+
+    <h2>השוואה</h2>
+    <div class="btns">
+      <button class="btn" id="btnSave">שמור מסלול</button>
+      <button class="btn" id="btnClear">נקה שמורים</button>
+    </div>
+  </section>
+
+  <!-- ================= Stage + graphs ================= -->
+  <section class="center">
+    <div class="stage">
+      <div class="caption">
+        <span>ציר <span class="ltr">y</span> מכוון כלפי מעלה · ציר <span class="ltr">x</span> אופקי, בכיוון הזריקה · יחידות <span class="ltr">SI</span></span>
+        <span>גררו את קצה חץ המהירות לשינוי הזווית · "זונד": לחצו על נקודה במסלול</span>
+      </div>
+      <canvas id="scene" dir="ltr"></canvas>
+      <div id="msg"></div>
+      <ul id="legend"></ul>
+    </div>
+    <div class="stage">
+      <div class="tabs" id="tabs">
+        <span style="font-weight:700;margin-inline-end:.4rem">גרפים:</span>
+        <button data-g="y" class="on">y(t)</button>
+        <button data-g="x">x(t)</button>
+        <button data-g="vy">v<sub>y</sub>(t)</button>
+        <button data-g="vx">v<sub>x</sub>(t)</button>
+      </div>
+      <canvas id="graph" dir="ltr"></canvas>
+    </div>
+  </section>
+
+  <!-- ================= Results ================= -->
+  <section class="panel results">
+    <h2>מדידות <span id="status">מוכן לשיגור</span></h2>
+    <table id="tblLive"></table>
+    <h2>תוצאות המעוף</h2>
+    <table id="tblFlight"></table>
+    <div class="note" id="upNote"></div>
+
+    <div id="guessBox">
+      <h2>נחש קודם — הזינו תחזית ואז שגרו</h2>
+      <table>
+        <tr><th>גודל</th><th>הניחוש שלך</th><th>ערך נכון</th><th>סטייה</th></tr>
+        <tr><th><span class="ltr sym">H<sub>max</sub></span> <span class="ltr unit">(m)</span></th><td><input type="number" id="gHmax" step="0.1"></td><td class="val" id="gHmaxTrue">?</td><td class="val" id="gHmaxDev">?</td></tr>
+        <tr><th><span class="ltr sym">t<sub>up</sub></span> <span class="ltr unit">(s)</span></th><td><input type="number" id="gTup" step="0.01"></td><td class="val" id="gTupTrue">?</td><td class="val" id="gTupDev">?</td></tr>
+        <tr><th><span class="ltr sym">t<sub>down</sub></span> <span class="ltr unit">(s)</span></th><td><input type="number" id="gTdown" step="0.01"></td><td class="val" id="gTdownTrue">?</td><td class="val" id="gTdownDev">?</td></tr>
+        <tr><th>טווח <span class="ltr sym">R</span> <span class="ltr unit">(m)</span></th><td><input type="number" id="gR" step="0.1"></td><td class="val" id="gRTrue">?</td><td class="val" id="gRDev">?</td></tr>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- ================= Formulas drawer ================= -->
+<aside id="drawer" aria-label="נוסחאות">
+  <h2>נוסחאות <button class="btn" id="btnCloseDrawer">סגור ✕</button></h2>
+  <div id="formulas"></div>
+</aside>
+
+<script>
+'use strict';
+/* =====================================================================
+   Projectile motion simulator (no air resistance) - single file, offline.
+   Structure:
+     1. Physics (pure functions, analytic - no step accumulation)
+     2. App state
+     3. Helpers (formatting, canvas text, arrows)
+     4. Scene rendering
+     5. Graph rendering
+     6. Results / formulas / messages (DOM)
+     7. Simulation control + event wiring
+   ===================================================================== */
+
+/* ---------------------------- 1. Physics ---------------------------- */
+const DEG = Math.PI / 180;
+
+/** Velocity components; exact values at 0 and +-90 deg (no 6e-17 "jitter"). */
+function components(v0, alphaDeg) {
+  let c = Math.cos(alphaDeg * DEG), s = Math.sin(alphaDeg * DEG);
+  if (Math.abs(alphaDeg) === 90) { c = 0; s = alphaDeg > 0 ? 1 : -1; }
+  if (alphaDeg === 0) { c = 1; s = 0; }
+  return { vx: v0 * c, vy: v0 * s };
+}
+
+/**
+ * Full analytic solution for parameters p = {v0, alpha, h0, hEnd, g}.
+ * Landing time is the LARGER root of  h0 + vy0 t - g t^2/2 = landY
+ * (the moment the body meets the platform on its way down).
+ * If the platform is above the apex the body never reaches it:
+ * reachable=false and the motion is followed down to the ground (y=0).
+ */
+function solve(p) {
+  const c = components(p.v0, p.alpha), vx0 = c.vx, vy0 = c.vy, g = p.g;
+  const tUp = vy0 > 0 ? vy0 / g : 0;                       // rise time (0 if not thrown upward)
+  const Hmax = p.h0 + (vy0 > 0 ? vy0 * vy0 / (2 * g) : 0); // apex height above ground
+  let landY = p.hEnd, reachable = true;
+  if (p.hEnd > p.h0 && (vy0 <= 0 || Hmax < p.hEnd - 1e-9)) { reachable = false; landY = 0; }
+  const D = Math.max(vy0 * vy0 + 2 * g * (p.h0 - landY), 0); // discriminant
+  let tLand = (vy0 + Math.sqrt(D)) / g;
+  if (tLand < 1e-9) tLand = 0;
+  const tAsc = (landY > p.h0) ? Math.max((vy0 - Math.sqrt(D)) / g, 0) : 0; // upward crossing of platform level
+  const vyLand = vy0 - g * tLand;
+  const vLand = Math.hypot(vx0, vyLand);
+  return {
+    vx0, vy0, g, h0: p.h0, tUp, Hmax, landY, reachable, tLand,
+    tDown: Math.max(tLand - tUp, 0),
+    xLand: vx0 * tLand, xAsc: vx0 * tAsc, vyLand, vLand,
+    impactAngle: tLand > 0 && vLand > 1e-12 ? Math.atan2(Math.abs(vyLand), vx0) / DEG : NaN,
+    noFlight: tLand === 0
+  };
+}
+
+/** Body state at time t, computed directly from the formulas. */
+function stateAt(s, t) {
+  const y = (t >= s.tLand) ? s.landY : s.h0 + s.vy0 * t - 0.5 * s.g * t * t;
+  return { x: s.vx0 * t, y, vx: s.vx0, vy: s.vy0 - s.g * t };
+}
+
+if (typeof module !== 'undefined') module.exports = { solve, stateAt, components };
+
+/* ---------------------------- 2. App state -------------------------- */
+const P = { v0: 20, alpha: 45, h0: 0, hEnd: 0, g: 10 };          // current parameters
+const LIMITS = { v0: [0, 50], alpha: [-90, 90], h0: [0, 100], hEnd: [0, 100] };
+let sol = solve(P);
+const sim = { t: 0, state: 'ready' };                             // ready | running | paused | done
+const opts = { v: true, comp: true, g: false, proj: false, preview: true, strobe: false,
+               strobeDt: 0.2, speed: 1, guess: false, graph: 'y' };
+const saved = [];                                                 // [{p, s, color}], max 5
+const SAVE_COLORS = ['#0891b2', '#ca8a04', '#9333ea', '#16a34a', '#db2777'];
+const STEP_DT = 0.05;                                             // "step" button increment [s]
+let probe = null;                                                 // {t} or null
+let notice = '';                                                  // transient message (HTML)
+let view = null;                                                  // last scene transform
+let DPR = 1;
+let placedBoxes = [];                                             // label rectangles drawn this frame
+const scene = { cv: null, ctx: null, w: 0, h: 0 };
+const graph = { cv: null, ctx: null, w: 0, h: 0 };
+const FONT = '"Segoe UI","Arial Hebrew","Noto Sans Hebrew",Arial,sans-serif';
+const COL = { v: '#1d4ed8', vx: '#047857', vy: '#c2410c', g: '#7c3aed', body: '#dc2626' };
+const SCENARIOS = [
+  { v0: 20, alpha: 90,  h0: 0,  hEnd: 0 },
+  { v0: 10, alpha: -90, h0: 45, hEnd: 0 },
+  { v0: 15, alpha: 0,   h0: 20, hEnd: 0 },
+  { v0: 20, alpha: 45,  h0: 0,  hEnd: 0 },
+  { v0: 20, alpha: 30,  h0: 0,  hEnd: 0, compare: 60 },
+  { v0: 15, alpha: 40,  h0: 20, hEnd: 0 },
+  { v0: 12, alpha: -30, h0: 40, hEnd: 0 },
+  { v0: 25, alpha: 60,  h0: 0,  hEnd: 15 }
+];
+const TYPE_ANGLE = { up: 90, down: -90, horiz: 0, above: 45, below: -30 };
+
+/* ---------------------------- 3. Helpers ---------------------------- */
+const $ = id => document.getElementById(id);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+/** Number -> string with a real minus sign and no "-0.00". */
+function fmt(v, d) {
+  if (d === undefined) d = 2;
+  if (!isFinite(v)) return '—';
+  let s = v.toFixed(d);
+  if (parseFloat(s) === 0) s = (0).toFixed(d);
+  return s.replace('-', '−');
+}
+/** Trim trailing zeros for parameter display (20 instead of 20.00). */
+function fmtP(v) { return String(Math.round(v * 100) / 100).replace('-', '−'); }
+
+/** Round a raw step up to 1, 2, 5 x 10^n. */
+function niceStep(raw) {
+  const p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+  return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p;
+}
+const decFor = step => step >= 1 ? 0 : step >= 0.1 ? 1 : 2;
+
+/** Canvas text with subscripts: "H_{max} = 12 m". Returns width; dry=true only measures. */
+function rich(ctx, str, x, y, align, fs, dry, weight) {
+  const segs = []; const re = /_\{([^}]*)\}/g; let last = 0, m;
+  while ((m = re.exec(str))) {
+    if (m.index > last) segs.push({ t: str.slice(last, m.index), sub: false });
+    segs.push({ t: m[1], sub: true }); last = re.lastIndex;
+  }
+  if (last < str.length) segs.push({ t: str.slice(last), sub: false });
+  const wt = weight || 600;
+  const fN = wt + ' ' + fs + 'px ' + FONT, fS = wt + ' ' + Math.round(fs * 0.72) + 'px ' + FONT;
+  let w = 0;
+  for (const g of segs) { ctx.font = g.sub ? fS : fN; g.w = ctx.measureText(g.t).width; w += g.w; }
+  if (dry) return w;
+  let cx = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
+  ctx.textAlign = 'left';
+  for (const g of segs) { ctx.font = g.sub ? fS : fN; ctx.fillText(g.t, cx, y + (g.sub ? fs * 0.28 : 0)); cx += g.w; }
+  return w;
+}
+
+/** White rounded info box with several text lines, kept inside the canvas. */
+function labelBox(ctx, lines, x, y, dx, dy, fs, color, cw, ch) {
+  let bw = 0;
+  for (const l of lines) bw = Math.max(bw, rich(ctx, l, 0, 0, 'left', fs, true));
+  const pad = 6, lh = fs * 1.3; bw += pad * 2; const bh = lines.length * lh + pad * 2 - 2;
+  // try the preferred offset first, then alternatives, until the box overlaps no earlier box
+  const cands = [[dx, dy], [-dx, dy], [dx, -dy], [-dx, -dy], [dx * 2.2, dy], [-dx * 2.2, dy], [0, dy * 2.1]];
+  let bx = 0, by = 0;
+  for (const c of cands) {
+    bx = clamp(x + c[0] - bw / 2, 4, cw - bw - 4); by = clamp(y + c[1] - bh / 2, 4, ch - bh - 4);
+    if (!placedBoxes.some(r => bx < r.x + r.w + 4 && bx + bw + 4 > r.x && by < r.y + r.h + 4 && by + bh + 4 > r.y)) break;
+  }
+  placedBoxes.push({ x: bx, y: by, w: bw, h: bh });
+  ctx.save();
+  ctx.fillStyle = 'rgba(255,255,255,.94)'; ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, 6); else ctx.rect(bx, by, bw, bh);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#0f172a'; ctx.textBaseline = 'middle';
+  lines.forEach((l, i) => rich(ctx, l, bx + bw / 2, by + pad + lh * (i + 0.5) - 1, 'center', fs));
+  ctx.restore();
+}
+
+function line(ctx, x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+
+function arrow(ctx, x1, y1, x2, y2, color, lw, dashed) {
+  const L = Math.hypot(x2 - x1, y2 - y1); if (L < 1.5) return;
+  const a = Math.atan2(y2 - y1, x2 - x1), hl = Math.min(12, L * 0.6);
+  ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'round';
+  if (dashed) ctx.setLineDash([5, 4]);
+  line(ctx, x1, y1, x2 - Math.cos(a) * hl * 0.8, y2 - Math.sin(a) * hl * 0.8);
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - hl * Math.cos(a - 0.42), y2 - hl * Math.sin(a - 0.42));
+  ctx.lineTo(x2 - hl * Math.cos(a + 0.42), y2 - hl * Math.sin(a + 0.42));
+  ctx.closePath(); ctx.fill(); ctx.restore();
+}
+
+function fitCanvas(o) {
+  const r = o.cv.getBoundingClientRect();
+  DPR = window.devicePixelRatio || 1;
+  o.w = Math.max(240, r.width); o.h = Math.max(140, r.height);
+  o.cv.width = Math.round(o.w * DPR); o.cv.height = Math.round(o.h * DPR);
+}
+
+const previewVisible = () => opts.preview && !opts.guess;
+const hideAnswers = () => opts.guess && sim.state !== 'done';
+/** Latest time for which the trajectory is visible (used by the probe). */
+const availT = () => sim.state === 'ready' ? (previewVisible() ? sol.tLand : 0) : sim.t;
+
+/* ---------------------------- 4. Scene ------------------------------ */
+/** World->pixel transform. Equal scale on both axes, auto-fit to all trajectories. */
+function computeView(w, h) {
+  const padL = 62, padR = 16, padT = 16, padB = 46;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+  let xNeed = 2, yNeed = 2;
+  for (const e of [{ p: P, s: sol }].concat(saved)) {
+    xNeed = Math.max(xNeed, e.s.xLand);
+    yNeed = Math.max(yNeed, e.s.Hmax, e.p.hEnd, e.p.h0);
+  }
+  xNeed *= 1.12; yNeed *= 1.2;
+  const left = 0.10 * Math.max(xNeed, yNeed * 0.6);          // room for the tower left of x=0
+  const scale = Math.min(plotW / (xNeed + left), plotH / yNeed);
+  const worldW = plotW / scale, extra = worldW - (xNeed + left);
+  const xMin = -(left + extra * 0.3);
+  return { padL, padT, plotW, plotH, scale, xMin, xMax: xMin + worldW, yMax: plotH / scale,
+           X: x => padL + (x - xMin) * scale, Y: y => padT + plotH - y * scale };
+}
+
+function tracePath(ctx, V, s, t0, t1) {
+  if (t1 <= t0) return;
+  const n = Math.max(2, Math.ceil(160 * (t1 - t0) / Math.max(s.tLand, 1e-9)));
+  ctx.beginPath();
+  for (let i = 0; i <= n; i++) {
+    const q = stateAt(s, t0 + (t1 - t0) * i / n);
+    if (i === 0) ctx.moveTo(V.X(q.x), V.Y(q.y)); else ctx.lineTo(V.X(q.x), V.Y(q.y));
+  }
+  ctx.stroke();
+}
+
+/** Velocity / component / g vectors attached to pixel point (bx,by). */
+function drawVectors(ctx, q, bx, by, k, fs, showV, gLen) {
+  const ex = bx + q.vx * k, ey = by - q.vy * k;
+  ctx.textBaseline = 'middle';
+  if (opts.comp) {
+    ctx.save(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+    line(ctx, ex, by, ex, ey); line(ctx, bx, ey, ex, ey); ctx.restore();
+    arrow(ctx, bx, by, ex, by, COL.vx, 3);
+    arrow(ctx, bx, by, bx, ey, COL.vy, 3);
+    if (Math.abs(q.vx * k) > 14) { ctx.fillStyle = COL.vx; rich(ctx, 'v_{x}', bx + q.vx * k / 2, by + (q.vy >= 0 ? 1 : -1) * fs * 0.95, 'center', fs); }
+    if (Math.abs(q.vy * k) > 14) { ctx.fillStyle = COL.vy; rich(ctx, 'v_{y}', bx - 6, by - q.vy * k / 2, 'right', fs); }
+  }
+  if (showV) {
+    arrow(ctx, bx, by, ex, ey, COL.v, 3.5);
+    if (Math.hypot(ex - bx, ey - by) > 14) { ctx.fillStyle = COL.v; rich(ctx, 'v', ex + 8, ey - (q.vy >= 0 ? 8 : -8), 'left', fs * 1.05); }
+  }
+  if (opts.g) {
+    arrow(ctx, bx, by, bx, by + gLen, COL.g, 3);
+    ctx.fillStyle = COL.g; rich(ctx, 'g', bx + 8, by + gLen - 4, 'left', fs * 1.05);
+  }
+}
+
+/** Pixel position of the draggable handle at the tip of the launch arrow. */
+function handlePos(V, k) {
+  const lx = V.X(0), ly = V.Y(P.h0), L = Math.max(P.v0 * k, 36), a = P.alpha * DEG;
+  return { lx, ly, hx: lx + L * Math.cos(a), hy: ly - L * Math.sin(a) };
+}
+const vecScale = (w, h) => Math.min(w, h) * 0.17 / Math.max(P.v0, sol.vLand, 1);  // px per (m/s)
+
+function drawScene() {
+  const ctx = scene.ctx, w = scene.w, h = scene.h;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, w, h); ctx.direction = 'ltr';
+  const V = view = computeView(w, h);
+  placedBoxes = [];
+  const fs = clamp(w / 64, 13, 19);
+  const x0 = V.padL, y0 = V.padT, x1 = x0 + V.plotW, yB = y0 + V.plotH;
+  const k = vecScale(w, h), gLen = Math.min(w, h) * 0.1;
+
+  // background + grid (same metric step on both axes)
+  ctx.fillStyle = '#f8fbff'; ctx.fillRect(x0, y0, V.plotW, V.plotH);
+  const step = niceStep(74 / V.scale), dec = decFor(step);
+  ctx.lineWidth = 1; ctx.strokeStyle = '#dbe4ee'; ctx.fillStyle = '#334155';
+  ctx.font = '500 ' + Math.round(fs * 0.86) + 'px ' + FONT;
+  ctx.textBaseline = 'top'; ctx.textAlign = 'center';
+  for (let i = Math.ceil(V.xMin / step); i * step <= V.xMax + 1e-9; i++) {
+    const px = V.X(i * step); line(ctx, px, y0, px, yB);
+    if (i >= 0 && px < x1 - 30) ctx.fillText(fmt(i * step, dec), px, yB + 13);
+  }
+  ctx.textBaseline = 'middle'; ctx.textAlign = 'right';
+  for (let i = 0; i * step <= V.yMax + 1e-9; i++) {
+    const py = V.Y(i * step); line(ctx, x0, py, x1, py);
+    if (py > y0 + 22) ctx.fillText(fmt(i * step, dec), x0 - 8, py);
+  }
+
+  // ground, launch tower, landing platform
+  ctx.fillStyle = '#7f9c6b'; ctx.fillRect(x0, yB, V.plotW, 9);
+  if (P.h0 > 0) {
+    ctx.fillStyle = '#cbd5e1'; ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.5;
+    ctx.fillRect(x0, V.Y(P.h0), V.X(0) - x0, yB - V.Y(P.h0));
+    ctx.strokeRect(x0, V.Y(P.h0), V.X(0) - x0, yB - V.Y(P.h0));
+  }
+  if (P.hEnd > 0) {
+    const yp = V.Y(P.hEnd);
+    const solid = sol.reachable && !(P.hEnd > P.h0 && sol.vx0 < 1e-9);
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.font = '600 ' + Math.round(fs * 0.9) + 'px ' + FONT;
+    if (solid) {
+      const xs = V.X(P.hEnd > P.h0 ? sol.xAsc + 0.35 * (sol.xLand - sol.xAsc) : 0);
+      ctx.fillStyle = '#e7e5e4'; ctx.strokeStyle = '#78716c'; ctx.lineWidth = 1.5;
+      ctx.fillRect(xs, yp, x1 - xs, yB - yp); ctx.strokeRect(xs, yp, x1 - xs, yB - yp);
+      ctx.fillStyle = '#57534e';
+      ctx.fillText('משטח נחיתה', x1 - 8, (yB - yp > fs * 1.6) ? yB - fs * 0.9 : yp - fs * 0.8);
+    } else {
+      ctx.save(); ctx.strokeStyle = '#78716c'; ctx.lineWidth = 2; ctx.setLineDash([10, 6]);
+      line(ctx, x0, yp, x1, yp); ctx.restore();
+      ctx.fillStyle = '#57534e'; ctx.fillText('גובה משטח הנחיתה', x1 - 8, yp - fs * 0.8);
+    }
+  }
+
+  // axes
+  arrow(ctx, x0, yB, x0, y0 - 6, '#0f172a', 2);
+  arrow(ctx, x0, yB, x1 + 8, yB, '#0f172a', 2);
+  ctx.fillStyle = '#0f172a'; ctx.textBaseline = 'middle';
+  rich(ctx, 'y (m)', x0 + 10, y0 + 8, 'left', fs);
+  rich(ctx, 'x (m)', x1 - 4, yB + 30, 'right', fs);
+
+  // trajectories (clipped to the plot)
+  ctx.save(); ctx.beginPath(); ctx.rect(x0, y0 - 14, V.plotW + 14, V.plotH + 14); ctx.clip();
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  for (const e of saved) {                                   // saved (pale)
+    ctx.globalAlpha = 0.5; ctx.strokeStyle = e.color; ctx.lineWidth = 3;
+    tracePath(ctx, V, e.s, 0, e.s.tLand);
+    const q = stateAt(e.s, e.s.tLand);
+    ctx.fillStyle = e.color; ctx.beginPath(); ctx.arc(V.X(q.x), V.Y(q.y), 4.5, 0, 7); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  if (previewVisible()) {                                    // predicted path
+    ctx.save(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.6; ctx.setLineDash([6, 6]);
+    tracePath(ctx, V, sol, 0, sol.tLand); ctx.restore();
+  }
+  ctx.strokeStyle = COL.body; ctx.lineWidth = 3.2;          // trail, analytic up to current t
+  tracePath(ctx, V, sol, 0, sim.t);
+  ctx.restore();
+
+  const q = stateAt(sol, sim.t), bx = V.X(q.x), by = V.Y(q.y);
+
+  // stroboscope marks every dt (+ their projections on the axes)
+  if (opts.strobe) {
+    for (let i = 0; i * opts.strobeDt <= sim.t + 1e-9 && i < 2000; i++) {
+      const s = stateAt(sol, i * opts.strobeDt), px = V.X(s.x), py = V.Y(s.y);
+      ctx.fillStyle = '#fff'; ctx.strokeStyle = '#991b1b'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(px, py, 4.5, 0, 7); ctx.fill(); ctx.stroke();
+      if (opts.proj) {
+        ctx.fillStyle = COL.vx; ctx.beginPath(); ctx.arc(px, yB, 3.2, 0, 7); ctx.fill();
+        ctx.fillStyle = COL.vy; ctx.beginPath(); ctx.arc(x0, py, 3.2, 0, 7); ctx.fill();
+      }
+    }
+  }
+
+  // projections ("shadows") of the body on both axes
+  if (opts.proj) {
+    ctx.save(); ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.2; ctx.setLineDash([4, 4]);
+    line(ctx, bx, by, bx, yB); line(ctx, bx, by, x0, by); ctx.restore();
+    ctx.fillStyle = COL.vx; ctx.beginPath(); ctx.arc(bx, yB, 6.5, 0, 7); ctx.fill();
+    ctx.fillStyle = COL.vy; ctx.beginPath(); ctx.arc(x0, by, 6.5, 0, 7); ctx.fill();
+  }
+
+  // launch arrow with draggable handle (visible when not flying)
+  if (sim.state === 'ready' || sim.state === 'done') {
+    const hp = handlePos(V, k), pale = sim.state === 'done';
+    ctx.globalAlpha = pale ? 0.45 : 1;
+    if (P.v0 * k < 36) { ctx.save(); ctx.strokeStyle = COL.v; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.5; line(ctx, hp.lx, hp.ly, hp.hx, hp.hy); ctx.restore(); }
+    arrow(ctx, hp.lx, hp.ly, hp.lx + P.v0 * k * Math.cos(P.alpha * DEG), hp.ly - P.v0 * k * Math.sin(P.alpha * DEG), COL.v, 3.5, pale);
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = COL.v; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(hp.hx, hp.hy, 7, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = COL.v; ctx.textBaseline = 'middle';
+    rich(ctx, 'v_{0}', hp.hx + 12, hp.hy - 10, 'left', fs * 1.05);
+    ctx.globalAlpha = 1;
+  }
+
+  // vectors on the body, then the body itself
+  drawVectors(ctx, q, bx, by, k, fs, opts.v && sim.state !== 'ready', gLen);
+  ctx.fillStyle = COL.body; ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(bx, by, 8, 0, 7); ctx.fill(); ctx.stroke();
+
+  // apex and landing markers with values
+  if (sol.vy0 > 0 && sim.state !== 'ready' && sim.t >= sol.tUp - 1e-9 && !hideAnswers()) {
+    const a = stateAt(sol, sol.tUp), ax = V.X(a.x), ay = V.Y(a.y);
+    ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(ax, ay, 5, 0, 7); ctx.fill();
+    labelBox(ctx, ['שיא המסלול', 'H_{max} = ' + fmt(sol.Hmax) + ' m', 't = ' + fmt(sol.tUp) + ' s'],
+             ax, ay, fs * 0.01, -fs * 3.3, fs * 0.92, '#0f172a', w, h);
+  }
+  if (sim.state === 'done' && !sol.noFlight) {
+    const lx = V.X(sol.xLand), ly = V.Y(sol.landY);
+    ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(lx, ly, 5, 0, 7); ctx.fill();
+    labelBox(ctx, ['נחיתה', 'x = ' + fmt(sol.xLand) + ' m', 't = ' + fmt(sol.tLand) + ' s'],
+             lx, ly, -fs * 5.2, -fs * 3.6, fs * 0.92, '#0f172a', w, h);
+  }
+
+  // probe: values at a clicked trajectory point
+  if (probe && probe.t <= availT() + 1e-9) {
+    const s = stateAt(sol, probe.t), px = V.X(s.x), py = V.Y(s.y);
+    const keepComp = opts.comp, keepG = opts.g; opts.comp = true; opts.g = false;
+    drawVectors(ctx, s, px, py, k, fs, true, gLen);
+    opts.comp = keepComp; opts.g = keepG;
+    ctx.fillStyle = '#fbbf24'; ctx.strokeStyle = '#92400e'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(px, py, 6, 0, 7); ctx.fill(); ctx.stroke();
+    labelBox(ctx, ['t = ' + fmt(probe.t) + ' s',
+                   'x = ' + fmt(s.x) + ' m ,  y = ' + fmt(s.y) + ' m',
+                   'v_{x} = ' + fmt(s.vx) + ' ,  v_{y} = ' + fmt(s.vy) + ' m/s',
+                   'v = ' + fmt(Math.hypot(s.vx, s.vy)) + ' m/s'],
+             px, py, fs * 7, fs * 4.2, fs * 0.92, '#92400e', w, h);
+  }
+}
+
+/* ---------------------------- 5. Graph ------------------------------ */
+const GRAPHS = {
+  y:  { label: 'y (m)',         f: q => q.y },
+  x:  { label: 'x (m)',         f: q => q.x },
+  vy: { label: 'v_{y} (m/s)',   f: q => q.vy },
+  vx: { label: 'v_{x} (m/s)',   f: q => q.vx }
+};
+
+function drawGraph() {
+  const ctx = graph.ctx, w = graph.w, h = graph.h;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, w, h); ctx.direction = 'ltr';
+  const G = GRAPHS[opts.graph], fs = clamp(w / 64, 13, 18);
+  const padL = 70, padR = 22, padT = 26, padB = 42, pw = w - padL - padR, ph = h - padT - padB;
+  const list = [{ s: sol, color: COL.body }].concat(saved);
+
+  // ranges
+  let tMax = 0; for (const e of list) tMax = Math.max(tMax, e.s.tLand);
+  if (tMax <= 0) tMax = 1;
+  let lo = 0, hi = 0;
+  for (const e of list) for (let i = 0; i <= 40; i++) {
+    const v = G.f(stateAt(e.s, e.s.tLand * i / 40)); lo = Math.min(lo, v); hi = Math.max(hi, v);
+  }
+  if (hi - lo < 1e-9) hi = lo + 1;
+  const pad = (hi - lo) * 0.1; hi += pad; if (lo < 0) lo -= pad;
+  const TX = t => padL + t / tMax * pw, TY = v => padT + ph - (v - lo) / (hi - lo) * ph;
+
+  // grid + ticks
+  ctx.fillStyle = '#f8fbff'; ctx.fillRect(padL, padT, pw, ph);
+  ctx.lineWidth = 1; ctx.strokeStyle = '#dbe4ee'; ctx.fillStyle = '#334155';
+  ctx.font = '500 ' + Math.round(fs * 0.86) + 'px ' + FONT;
+  const st = niceStep(tMax / Math.max(pw / 85, 2)), sv = niceStep((hi - lo) / Math.max(ph / 38, 2));
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (let i = 0; i * st <= tMax + 1e-9; i++) { const px = TX(i * st); line(ctx, px, padT, px, padT + ph); ctx.fillText(fmt(i * st, decFor(st)), px, padT + ph + 6); }
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (let i = Math.ceil(lo / sv); i * sv <= hi + 1e-9; i++) { const py = TY(i * sv); line(ctx, padL, py, padL + pw, py); ctx.fillText(fmt(i * sv, decFor(sv)), padL - 8, py); }
+  ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.6;
+  line(ctx, padL, padT, padL, padT + ph); line(ctx, padL, TY(0), padL + pw, TY(0));
+  ctx.fillStyle = '#0f172a'; ctx.textBaseline = 'middle';
+  rich(ctx, G.label, padL + 8, padT - 12, 'left', fs);
+  rich(ctx, 't (s)', padL + pw, padT + ph + 30, 'right', fs);
+
+  const curve = (s, t1) => {
+    if (t1 <= 0) return;
+    ctx.beginPath();
+    for (let i = 0; i <= 80; i++) { const t = t1 * i / 80, v = G.f(stateAt(s, Math.min(t, s.tLand - 1e-12))); if (i) ctx.lineTo(TX(t), TY(v)); else ctx.moveTo(TX(t), TY(v)); }
+    ctx.stroke();
+  };
+  ctx.save(); ctx.beginPath(); ctx.rect(padL, padT - 2, pw + 2, ph + 4); ctx.clip();
+  ctx.lineJoin = 'round';
+  for (const e of saved) { ctx.globalAlpha = 0.5; ctx.strokeStyle = e.color; ctx.lineWidth = 2.5; curve(e.s, e.s.tLand); ctx.globalAlpha = 1; }
+  if (previewVisible()) { ctx.save(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 6]); curve(sol, sol.tLand); ctx.restore(); }
+  ctx.strokeStyle = COL.body; ctx.lineWidth = 3; curve(sol, sim.t);
+  ctx.restore();
+
+  // slope triangle on vy(t): slope = -g
+  if (opts.graph === 'vy' && sol.tLand > 0) {
+    const dt = sol.tLand >= 1.6 ? 1 : sol.tLand * 0.4, ta = sol.tLand * 0.22, tb = ta + dt;
+    if (sim.t >= tb || previewVisible()) {
+      const va = sol.vy0 - sol.g * ta, vb = sol.vy0 - sol.g * tb;
+      ctx.save(); ctx.strokeStyle = COL.g; ctx.fillStyle = COL.g; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
+      line(ctx, TX(ta), TY(va), TX(tb), TY(va)); line(ctx, TX(tb), TY(va), TX(tb), TY(vb)); ctx.setLineDash([]);
+      ctx.textBaseline = 'middle';
+      rich(ctx, 'Δt = ' + fmt(dt) + ' s', (TX(ta) + TX(tb)) / 2, TY(va) - fs * 0.8, 'center', fs * 0.9);
+      rich(ctx, 'Δv_{y} = ' + fmt(vb - va) + ' m/s', TX(tb) + 8, (TY(va) + TY(vb)) / 2, 'left', fs * 0.9);
+      const txt = 'Δv_{y} / Δt = −g = ' + fmt(-sol.g, 1) + ' m/s²';
+      const tw = rich(ctx, txt, 0, 0, 'left', fs, true);
+      rich(ctx, txt, padL + pw - 6, padT + fs * 0.9, 'right', fs);
+      ctx.font = '600 ' + fs + 'px ' + FONT; ctx.textAlign = 'right';
+      ctx.fillText('שיפוע הגרף:', padL + pw - 14 - tw, padT + fs * 0.9);
+      ctx.restore();
+    }
+  }
+
+  // cursor of the current moment
+  const cv = G.f(stateAt(sol, sim.t)), cx = TX(sim.t), cy = TY(cv);
+  ctx.save(); ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.2; ctx.setLineDash([4, 4]);
+  line(ctx, cx, padT, cx, padT + ph); ctx.restore();
+  ctx.fillStyle = COL.body; ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(cx, cy, 6, 0, 7); ctx.fill(); ctx.stroke();
+  if (probe && probe.t <= availT() + 1e-9) {
+    ctx.fillStyle = '#fbbf24'; ctx.strokeStyle = '#92400e';
+    ctx.beginPath(); ctx.arc(TX(probe.t), TY(G.f(stateAt(sol, probe.t))), 5, 0, 7); ctx.fill(); ctx.stroke();
+  }
+}
+
+/* ---------------------- 6. Results / formulas / messages ------------ */
+const LIVE_ROWS = [
+  ['t', 'זמן', 't', 's'], ['x', 'מיקום אופקי', 'x', 'm'], ['y', 'גובה מעל הקרקע', 'y', 'm'],
+  ['vx', 'מהירות אופקית', 'v<sub>x</sub>', 'm/s'], ['vy', 'מהירות אנכית', 'v<sub>y</sub>', 'm/s'],
+  ['v', 'גודל המהירות', 'v', 'm/s']
+];
+const FLIGHT_ROWS = [
+  ['Hmax', 'גובה מקסימלי (מעל הקרקע)', 'H<sub>max</sub>', 'm'],
+  ['tTop', 'רגע ההגעה לשיא', 't<sub>Hmax</sub>', 's'],
+  ['tUp', 'זמן עלייה', 't<sub>up</sub>', 's'],
+  ['tDown', 'זמן ירידה (מהשיא עד הנחיתה)', 't<sub>down</sub>', 's'],
+  ['tFl', 'זמן מעוף כולל', 't<sub>flight</sub>', 's'],
+  ['R', 'טווח אופקי', 'R', 'm'],
+  ['vL', 'גודל מהירות הפגיעה', 'v<sub>f</sub>', 'm/s'],
+  ['vxL', 'רכיב אופקי בפגיעה', 'v<sub>fx</sub>', 'm/s'],
+  ['vyL', 'רכיב אנכי בפגיעה', 'v<sub>fy</sub>', 'm/s'],
+  ['ang', 'זווית הפגיעה במשטח', 'θ', '°']
+];
+function buildTables() {
+  const mk = rows => rows.map(r => '<tr><th>' + r[1] + ' <span class="ltr sym">' + r[2] +
+    '</span></th><td class="val" id="r_' + r[0] + '"></td></tr>').join('');
+  $('tblLive').innerHTML = mk(LIVE_ROWS); $('tblFlight').innerHTML = mk(FLIGHT_ROWS);
+}
+
+/** Live values every frame; flight results grow in real time and freeze on landing. */
+function updateResults() {
+  const q = stateAt(sol, sim.t), t = sim.t, done = sim.state === 'done', hide = hideAnswers();
+  const set = (id, v, u, d) => { $('r_' + id).textContent = (typeof v === 'string') ? v : fmt(v, d) + (u === '°' ? '°' : ' ' + u); };
+  set('t', t, 's'); set('x', q.x, 'm'); set('y', q.y, 'm'); set('vx', q.vx, 'm/s'); set('vy', q.vy, 'm/s');
+  set('v', Math.hypot(q.vx, q.vy), 'm/s');
+  const tu = Math.min(t, sol.tUp);
+  set('Hmax', hide ? '?' : stateAt(sol, tu).y, 'm');
+  set('tTop', hide ? '?' : (sol.vy0 <= 0 || t >= sol.tUp - 1e-9) ? sol.tUp : '—', 's');
+  set('tUp', hide ? '?' : tu, 's');
+  set('tDown', hide ? '?' : Math.max(t - sol.tUp, 0), 's');
+  set('tFl', t, 's');
+  set('R', hide ? '?' : q.x, 'm');
+  set('vL', done ? sol.vLand : '—', 'm/s'); set('vxL', done ? sol.vx0 : '—', 'm/s');
+  set('vyL', done ? sol.vyLand : '—', 'm/s');
+  set('ang', done && isFinite(sol.impactAngle) ? sol.impactAngle : '—', '°', 1);
+  $('status').textContent = { ready: 'מוכן לשיגור', running: 'בתנועה', paused: 'מושהה', done: 'נחת — התוצאות קבועות' }[sim.state];
+}
+
+const L = html => '<span class="ltr">' + html + '</span>';
+
+function updateMessages() {
+  const m = [];
+  if (!sol.reachable) {
+    m.push(['warn', sol.vy0 <= 0
+      ? '⚠ משטח הנחיתה גבוה מנקודת הזריקה, ולגוף אין רכיב מהירות כלפי מעלה — הוא אינו יכול להגיע אל המשטח. מוצגת התנועה עד הקרקע ' + L('(y = 0)') + '.'
+      : '⚠ משטח הנחיתה ' + L('(h<sub>end</sub> = ' + fmtP(P.hEnd) + ' m)') + ' גבוה מהגובה המקסימלי של הגוף — הגוף אינו מגיע אליו. מוצגת התנועה עד הקרקע ' + L('(y = 0)') + '.']);
+  }
+  if (sol.noFlight) m.push(['warn', 'הגוף כבר מונח על המשטח ואין לו רכיב מהירות כלפי מעלה — אין מעוף ' + L('(t = 0)') + '. הגדילו את ' + L('h₀') + ' או שנו את הזווית.']);
+  else if (P.v0 === 0) m.push(['info', L('v₀ = 0') + ' — נפילה חופשית ממנוחה.']);
+  else if (sol.vy0 <= 0) m.push(['info', 'אין שלב עלייה: הגוף נזרק ' + (P.alpha === 0 ? 'אופקית' : 'כלפי מטה') + ', לכן ' + L('t<sub>up</sub> = 0') + ' והגובה המקסימלי הוא גובה הזריקה.']);
+  if (notice) m.push(['info', notice]);
+  $('msg').innerHTML = m.map(x => '<div class="' + x[0] + '">' + x[1] + '</div>').join('');
+  $('upNote').innerHTML = (sol.vy0 <= 0 && !sol.noFlight)
+    ? 'הגוף אינו עולה ⇐ ' + L('t<sub>up</sub> = 0') + ' , ' + L('t<sub>down</sub> = t<sub>flight</sub>') : '';
+}
+
+function updateFormulas() {
+  const s = sol, hide = hideAnswers(), g = P.g;
+  const R = v => hide ? '<b>?</b>' : '<b>' + v + '</b>';
+  const par = v => v < 0 ? '(' + fmt(v) + ')' : fmt(v);
+  const M = t => '<div class="math">' + t + '</div>';
+  const hE = s.landY;
+  let h = '';
+  h += '<p>הערכים המספריים מתעדכנים לפי הנתונים הנוכחיים. ציר ' + L('y') + ' כלפי מעלה, ' + L('g = ' + g + ' m/s²') + '.</p>';
+  h += '<h3>רכיבי המהירות ההתחלתית</h3>';
+  h += M('v<sub>0x</sub> = v₀·cos α = ' + fmtP(P.v0) + '·cos(' + fmtP(P.alpha) + '°) = <b>' + fmt(s.vx0) + '</b> m/s');
+  h += M('v<sub>0y</sub> = v₀·sin α = ' + fmtP(P.v0) + '·sin(' + fmtP(P.alpha) + '°) = <b>' + fmt(s.vy0) + '</b> m/s');
+  h += '<h3>משוואות התנועה</h3>';
+  h += '<p>בציר ' + L('x') + ' — תנועה קצובה; בציר ' + L('y') + ' — תנועה שוות־תאוצה.</p>';
+  h += M('x(t) = v₀·cos α·t = ' + fmt(s.vx0) + '·t');
+  h += M('y(t) = h₀ + v₀·sin α·t − ½·g·t² = ' + fmtP(P.h0) + ' + ' + par(s.vy0) + '·t − ' + fmtP(g / 2) + '·t²');
+  h += M('v<sub>x</sub>(t) = v₀·cos α = ' + fmt(s.vx0) + ' m/s');
+  h += M('v<sub>y</sub>(t) = v₀·sin α − g·t = ' + fmt(s.vy0) + ' − ' + g + '·t');
+  h += '<h3>זמן עלייה וגובה מקסימלי</h3>';
+  if (s.vy0 > 0) {
+    h += M('t<sub>up</sub> = v₀·sin α / g = ' + fmt(s.vy0) + ' / ' + g + ' = ' + R(fmt(s.tUp)) + ' s');
+    h += M('H<sub>max</sub> = h₀ + (v₀·sin α)² / (2g) = ' + fmtP(P.h0) + ' + ' + fmt(s.vy0) + '² / ' + fmtP(2 * g) + ' = ' + R(fmt(s.Hmax)) + ' m');
+  } else {
+    h += '<p>הגוף אינו נזרק כלפי מעלה ' + L('(v<sub>0y</sub> ≤ 0)') + ', לכן אין שלב עלייה:</p>';
+    h += M('t<sub>up</sub> = 0 ,&nbsp; H<sub>max</sub> = h₀ = ' + fmtP(P.h0) + ' m');
+  }
+  h += '<h3>זמן המעוף, זמן הירידה והטווח</h3>';
+  if (!s.reachable) h += '<p>המשטח אינו בהישג הגוף — החישוב נעשה עד הקרקע ' + L('(y = 0)') + '.</p>';
+  h += '<p>נחיתה: ' + L('y(t) = h<sub>end</sub>') + ' — משוואה ריבועית; בוחרים את השורש הגדול (הגוף פוגש את המשטח בדרכו למטה).</p>';
+  h += M('½·g·t² − v₀·sin α·t − (h₀ − h<sub>end</sub>) = 0');
+  h += M('t<sub>flight</sub> = [ v₀·sin α + √( (v₀·sin α)² + 2g·(h₀ − h<sub>end</sub>) ) ] / g');
+  h += M('t<sub>flight</sub> = [ ' + fmt(s.vy0) + ' + √( ' + fmt(s.vy0) + '² + ' + fmtP(2 * g) + '·' + par(P.h0 - hE) + ' ) ] / ' + g + ' = ' + R(fmt(s.tLand)) + ' s');
+  h += M('t<sub>down</sub> = t<sub>flight</sub> − t<sub>up</sub> = √( 2·(H<sub>max</sub> − h<sub>end</sub>) / g ) = ' + R(fmt(s.tDown)) + ' s');
+  h += M('R = v₀·cos α · t<sub>flight</sub> = ' + fmt(s.vx0) + ' · ' + (hide ? '?' : fmt(s.tLand)) + ' = ' + R(fmt(s.xLand)) + ' m');
+  h += '<h3>מהירות הפגיעה</h3>';
+  h += M('v<sub>fy</sub> = v₀·sin α − g·t<sub>flight</sub> = ' + R(fmt(s.vyLand)) + ' m/s');
+  h += M('v<sub>f</sub> = √( v<sub>x</sub>² + v<sub>fy</sub>² ) = ' + R(fmt(s.vLand)) + ' m/s');
+  h += M('tan θ = |v<sub>fy</sub>| / v<sub>x</sub> &nbsp;⇒&nbsp; θ = ' + R(isFinite(s.impactAngle) ? fmt(s.impactAngle, 1) + '°' : '—'));
+  $('formulas').innerHTML = h;
+}
+
+function updateLegend() {
+  const item = (c, p, txt) => '<li><span class="sw" style="background:' + c + '"></span>' +
+    L('v₀ = ' + fmtP(p.v0) + ' m/s ,&nbsp; α = ' + fmtP(p.alpha) + '° ,&nbsp; h₀ = ' + fmtP(p.h0) + ' m' +
+      (p.hEnd ? ' ,&nbsp; h<sub>end</sub> = ' + fmtP(p.hEnd) + ' m' : '')) + ' <span class="unit">' + txt + '</span></li>';
+  $('legend').innerHTML = saved.length
+    ? item(COL.body, P, '(נוכחי)') + saved.map(e => item(e.color, e.p, '(שמור)')).join('') : '';
+}
+
+function evalGuess() {
+  const items = [['gHmax', sol.Hmax, 'm'], ['gTup', sol.tUp, 's'], ['gTdown', sol.tDown, 's'], ['gR', sol.xLand, 'm']];
+  for (const it of items) {
+    const g = parseFloat($(it[0]).value), truth = it[1], dev = $(it[0] + 'Dev');
+    $(it[0] + 'True').textContent = fmt(truth) + ' ' + it[2];
+    dev.className = 'val';
+    if (!isFinite(g)) { dev.textContent = '—'; continue; }
+    if (Math.abs(truth) < 1e-9) {                       // percent undefined when the true value is 0
+      dev.textContent = Math.abs(g) < 1e-9 ? '0%' : 'Δ = ' + fmt(g - truth) + ' ' + it[2];
+      dev.classList.add(Math.abs(g) < 1e-9 ? 'good' : 'bad');
+    } else {
+      const pct = Math.abs(g - truth) / Math.abs(truth) * 100;
+      dev.textContent = fmt(pct, 1) + '%';
+      dev.classList.add(pct <= 5 ? 'good' : pct <= 15 ? 'mid' : 'bad');
+    }
+  }
+}
+function clearGuessAnswers() {
+  for (const id of ['gHmax', 'gTup', 'gTdown', 'gR']) {
+    $(id + 'True').textContent = '?'; $(id + 'Dev').textContent = '?'; $(id + 'Dev').className = 'val';
+    $(id).disabled = sim.state !== 'ready';
+  }
+}
+
+/* ---------------------- 7. Control + wiring ------------------------- */
+let rafId = null, lastNow = 0;
+
+function renderAll() { drawScene(); drawGraph(); updateResults(); }
+
+function updateButtons() {
+  $('btnPause').textContent = sim.state === 'paused' ? 'המשך' : 'עצור';
+  $('btnPause').disabled = !(sim.state === 'running' || sim.state === 'paused');
+  $('btnSave').disabled = hideAnswers();
+  for (const id of ['gHmax', 'gTup', 'gTdown', 'gR']) $(id).disabled = sim.state !== 'ready';
+}
+
+function finish() {
+  sim.t = sol.tLand; sim.state = 'done';
+  if (opts.guess) evalGuess();
+  updateFormulas(); updateButtons();
+}
+
+function tick(now) {
+  rafId = null;
+  if (sim.state !== 'running') return;
+  const dt = Math.min((now - lastNow) / 1000, 0.1); lastNow = now;   // real seconds, clamped
+  sim.t += dt * opts.speed;                                          // only t advances; positions are analytic
+  if (sim.t >= sol.tLand) finish();
+  renderAll();
+  if (sim.state === 'running') rafId = requestAnimationFrame(tick);
+}
+function startLoop() { lastNow = performance.now(); if (!rafId) rafId = requestAnimationFrame(tick); }
+
+function resetSim() {
+  sim.t = 0; sim.state = 'ready'; probe = null;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  clearGuessAnswers(); updateFormulas(); updateButtons();
+}
+
+function launch() {
+  resetSim();
+  if (sol.noFlight) finish(); else { sim.state = 'running'; startLoop(); }
+  updateButtons(); renderAll();
+}
+function togglePause() {
+  if (sim.state === 'running') sim.state = 'paused';
+  else if (sim.state === 'paused') { sim.state = 'running'; startLoop(); }
+  updateButtons(); renderAll();
+}
+function stepOnce() {
+  if (sim.state === 'ready' || sim.state === 'done') resetSim();
+  sim.state = 'paused'; sim.t += STEP_DT;
+  if (sim.t >= sol.tLand) finish();
+  updateButtons(); renderAll();
+}
+
+function typeFromAlpha(a) { return a === 90 ? 'up' : a === -90 ? 'down' : a === 0 ? 'horiz' : a > 0 ? 'above' : 'below'; }
+
+/** Push P into all inputs (sliders, number boxes, type selector). */
+function syncInputs(skipId) {
+  for (const k of ['v0', 'alpha', 'h0', 'hEnd']) {
+    $(k + 'Rng').value = P[k];
+    if (k + 'Num' !== skipId) $(k + 'Num').value = P[k];
+  }
+  const tp = typeFromAlpha(P.alpha);
+  $('throwType').value = tp;
+  document.querySelectorAll('#quick button').forEach(b => b.classList.toggle('on', b.dataset.type === tp));
+  document.querySelectorAll('input[name=g]').forEach(r => { r.checked = parseFloat(r.value) === P.g; });
+}
+
+/** Single entry point for any parameter change: clamp, re-solve, reset, redraw. */
+function setParams(obj, fromUser, skipId) {
+  for (const k in obj) {
+    if (k === 'g') { P.g = obj.g; continue; }
+    if (!isFinite(obj[k])) continue;
+    P[k] = clamp(Math.round(obj[k] * 100) / 100, LIMITS[k][0], LIMITS[k][1]);
+  }
+  if (fromUser) $('scenario').value = '';
+  notice = '';
+  sol = solve(P);
+  syncInputs(skipId); resetSim(); updateMessages(); updateLegend(); renderAll();
+}
+
+function applyType(tp) {
+  const o = { alpha: TYPE_ANGLE[tp] };
+  // downward / horizontal throws need a launch point above the landing level
+  if ((tp === 'down' || tp === 'horiz' || tp === 'below') && P.h0 <= P.hEnd) { o.hEnd = 0; if (P.h0 === 0) o.h0 = 20; }
+  setParams(o, true);
+}
+
+function applyScenario(i) {
+  const sc = SCENARIOS[i]; if (!sc) return;
+  if (sc.compare !== undefined) {                       // second angle with the same range, kept as a saved path
+    saved.length = 0;
+    const p2 = { v0: sc.v0, alpha: sc.compare, h0: sc.h0, hEnd: sc.hEnd, g: P.g };
+    saved.push({ p: p2, s: solve(p2), color: SAVE_COLORS[0] });
+  }
+  setParams({ v0: sc.v0, alpha: sc.alpha, h0: sc.h0, hEnd: sc.hEnd }, false);
+}
+
+function saveTrajectory() {
+  if (hideAnswers()) return;
+  if (saved.length >= 5) notice = 'ניתן לשמור עד 5 מסלולים. נקו את השמורים כדי להוסיף חדשים.';
+  else if (saved.some(e => e.p.v0 === P.v0 && e.p.alpha === P.alpha && e.p.h0 === P.h0 && e.p.hEnd === P.hEnd && e.p.g === P.g))
+    notice = 'המסלול הזה כבר שמור.';
+  else {
+    const color = SAVE_COLORS.find(c => !saved.some(e => e.color === c));
+    saved.push({ p: Object.assign({}, P), s: sol, color });
+    notice = 'המסלול נשמר. שנו את הנתונים ושגרו שוב כדי להשוות.';
+  }
+  updateMessages(); updateLegend(); renderAll();
+}
+
+/** Nearest visible trajectory point to a click (for the probe). */
+function pickProbe(px, py) {
+  const tA = availT(); if (tA <= 0 || !view) return null;
+  let best = 0, bd = 1e9;
+  for (let i = 0; i <= 600; i++) {
+    const t = tA * i / 600, q = stateAt(sol, t), d = Math.hypot(view.X(q.x) - px, view.Y(q.y) - py);
+    if (d < bd) { bd = d; best = t; }
+  }
+  return bd < 28 ? { t: best } : null;
+}
+
+function init() {
+  scene.cv = $('scene'); scene.ctx = scene.cv.getContext('2d');
+  graph.cv = $('graph'); graph.ctx = graph.cv.getContext('2d');
+  buildTables();
+
+  // sliders + number boxes
+  for (const k of ['v0', 'alpha', 'h0', 'hEnd']) {
+    $(k + 'Rng').addEventListener('input', e => setParams({ [k]: parseFloat(e.target.value) }, true));
+    $(k + 'Num').addEventListener('input', e => {       // apply while typing, do not rewrite the box
+      const v = parseFloat(e.target.value);
+      if (isFinite(v) && v >= LIMITS[k][0] && v <= LIMITS[k][1]) setParams({ [k]: v }, true, k + 'Num');
+    });
+    $(k + 'Num').addEventListener('change', e => {      // on commit: clamp and normalise
+      const v = parseFloat(e.target.value);
+      setParams({ [k]: isFinite(v) ? v : P[k] }, true);
+    });
+  }
+  document.querySelectorAll('input[name=g]').forEach(r =>
+    r.addEventListener('change', () => { if (r.checked) setParams({ g: parseFloat(r.value) }, true); }));
+  $('throwType').addEventListener('change', e => applyType(e.target.value));
+  document.querySelectorAll('#quick button').forEach(b => b.addEventListener('click', () => applyType(b.dataset.type)));
+  $('scenario').addEventListener('change', e => { if (e.target.value !== '') applyScenario(+e.target.value); });
+
+  // animation controls
+  $('btnLaunch').addEventListener('click', launch);
+  $('btnPause').addEventListener('click', togglePause);
+  $('btnStep').addEventListener('click', stepOnce);
+  $('btnReset').addEventListener('click', () => { resetSim(); renderAll(); });
+  $('speedRng').addEventListener('input', e => { opts.speed = parseFloat(e.target.value); $('speedVal').textContent = '×' + opts.speed.toFixed(1); });
+
+  // display options
+  const bind = (id, key) => $(id).addEventListener('change', e => { opts[key] = e.target.checked; renderAll(); });
+  bind('chkV', 'v'); bind('chkComp', 'comp'); bind('chkG', 'g'); bind('chkProj', 'proj');
+  bind('chkPreview', 'preview'); bind('chkStrobe', 'strobe');
+  $('strobeDt').addEventListener('change', e => { opts.strobeDt = parseFloat(e.target.value); renderAll(); });
+  document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => {
+    opts.graph = b.dataset.g;
+    document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+    drawGraph();
+  }));
+
+  // compare
+  $('btnSave').addEventListener('click', saveTrajectory);
+  $('btnClear').addEventListener('click', () => { saved.length = 0; notice = ''; updateMessages(); updateLegend(); renderAll(); });
+
+  // guess-first mode
+  $('guessMode').addEventListener('change', e => {
+    opts.guess = e.target.checked;
+    $('guessBox').style.display = opts.guess ? 'block' : 'none';
+    $('chkPreview').disabled = opts.guess;
+    resetSim(); renderAll();
+  });
+
+  // formulas drawer
+  $('btnFormulas').addEventListener('click', () => $('drawer').classList.toggle('open'));
+  $('btnCloseDrawer').addEventListener('click', () => $('drawer').classList.remove('open'));
+
+  // pointer interaction on the scene: drag the launch-arrow handle, or click to probe
+  let dragging = false;
+  const local = e => { const r = scene.cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  const nearHandle = pt => {
+    if (!view || !(sim.state === 'ready' || sim.state === 'done')) return false;
+    const hp = handlePos(view, vecScale(scene.w, scene.h));
+    return Math.hypot(pt.x - hp.hx, pt.y - hp.hy) < 20;
+  };
+  scene.cv.addEventListener('pointerdown', e => {
+    const pt = local(e);
+    if (nearHandle(pt)) { dragging = true; scene.cv.setPointerCapture(e.pointerId); e.preventDefault(); }
+    else { probe = pickProbe(pt.x, pt.y); renderAll(); }
+  });
+  scene.cv.addEventListener('pointermove', e => {
+    const pt = local(e);
+    if (!dragging) { scene.cv.style.cursor = nearHandle(pt) ? 'grab' : 'crosshair'; return; }
+    const dx = Math.max(pt.x - view.X(0), 0), dy = view.Y(P.h0) - pt.y;
+    if (dx === 0 && dy === 0) return;
+    const a = Math.round(Math.atan2(dy, dx) / DEG);     // always within [-90, 90] because dx >= 0
+    if (a !== P.alpha) setParams({ alpha: a }, true);
+  });
+  const endDrag = () => { dragging = false; };
+  scene.cv.addEventListener('pointerup', endDrag);
+  scene.cv.addEventListener('pointercancel', endDrag);
+
+  // resize handling
+  const refit = () => { fitCanvas(scene); fitCanvas(graph); renderAll(); };
+  window.addEventListener('resize', refit);
+
+  $('speedVal').textContent = '×1.0';
+  fitCanvas(scene); fitCanvas(graph);
+  setParams({}, false);
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+}
+</script>
+</body>
+</html>
