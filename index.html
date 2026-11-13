@@ -15,14 +15,12 @@
             --accent-green: #10b981;
             --accent-orange: #f59e0b;
         }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-
         body {
             background-color: var(--bg-color);
             color: #fff;
@@ -32,14 +30,11 @@
             align-items: center;
             padding-bottom: 50px;
         }
-
-        /* Шапка профиля */
         .header-profile {
             text-align: center;
             padding: 40px 20px 30px;
             max-width: 700px;
         }
-
         .avatar {
             width: 120px;
             height: 120px;
@@ -49,26 +44,21 @@
             margin-bottom: 15px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.5);
         }
-
         .header-profile h1 {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             margin-bottom: 8px;
             color: #fff;
         }
-
         .header-profile p {
             font-size: 1rem;
             color: #a0aec0;
         }
-
         .divider {
             width: 100%;
             height: 4px;
             background: linear-gradient(90deg, #0070f3, #7928ca, #f59e0b);
             margin-bottom: 30px;
         }
-
-        /* Сетка карточек */
         .cards-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -77,7 +67,6 @@
             max-width: 1100px;
             padding: 0 20px;
         }
-
         .card {
             background: var(--card-bg);
             color: var(--text-main);
@@ -91,29 +80,24 @@
             position: relative;
             overflow: hidden;
         }
-
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 35px rgba(0,0,0,0.25);
         }
-
         .card-icon {
             font-size: 2.5rem;
             margin-bottom: 15px;
         }
-
         .card h2 {
             font-size: 1.4rem;
             margin-bottom: 10px;
         }
-
         .card p {
             font-size: 0.95rem;
             color: var(--text-secondary);
             margin-bottom: 25px;
             line-height: 1.4;
         }
-
         .card-btn {
             display: inline-block;
             text-align: center;
@@ -124,20 +108,15 @@
             text-decoration: none;
             transition: opacity 0.2s;
         }
-
         .card-btn:hover {
             opacity: 0.9;
         }
-
-        /* Цвета кнопок по категориям */
         .btn-mechanics { background-color: var(--accent-blue); }
         .btn-klali { background-color: var(--accent-purple); }
         .btn-optic { background-color: var(--accent-green); }
         .btn-electricity { background-color: var(--accent-orange); }
         .btn-hativa { background-color: #06b6d4; }
         .btn-lab { background-color: #4b5563; }
-
-        /* Адаптивность для телефонов */
         @media (max-width: 600px) {
             .cards-container {
                 grid-template-columns: 1fr;
@@ -149,75 +128,61 @@
     </style>
 </head>
 <body>
-
     <div class="header-profile">
-        <img src="LOGO.png" alt="Илья Винокур" class="avatar">
-        <p>מאגר חומרי לימוד, תרגילים אינטראקטיביים והכנה לבגרות בפיזיקה 5 יח"ל</p>
+        <img src="LOGO.png" alt="איליה וינוקור" class="avatar">
+        <h1>איליה וינוקור | פיזיקה 5 יח"ל</h1>
+        <p>מאגר חומרי לימוד, תרגילים אינטראקטיביים והכנה לבגרות בפיזיקה</p>
     </div>
-
     <div class="divider"></div>
-
     <div class="cards-container">
-        <!-- Механика -->
         <div class="card">
             <div class="card-icon">🚗</div>
             <div>
                 <h2>מכניקה</h2>
                 <p>קינמטיקה, דינמיקה, חוקי ניוטון, עבודה ואנרגיה.</p>
             </div>
-            <a href="01_mechanics/index.html" class="card-btn btn-mechanics">כנסו לפרק</a>
+            <a href="01_Mechanics/index.html" class="card-btn btn-mechanics">כנסו לפרק</a>
         </div>
-
-        <!-- Общее -->
         <div class="card">
             <div class="card-icon">📄</div>
             <div>
                 <h2>כללי - דף נוסחאות</h2>
                 <p>דפי נוסחאות, קבועים פיזיקליים, נספחים וחומרי עזר לבגרות.</p>
             </div>
-            <a href="00_KLALI/index.html" class="card-btn btn-klali">כנסו לפרק</a>
+            <a href="00_General/index.html" class="card-btn btn-klali">כנסו לפרק</a>
         </div>
-
-        <!-- Излучение и вещество -->
         <div class="card">
             <div class="card-icon">🔬</div>
             <div>
                 <h2>קרינה וחומר</h2>
                 <p>אופטיקה גיאומטרית, המודל החלקיקי ומבנה האטום.</p>
             </div>
-            <a href="03_optic/index.html" class="card-btn btn-optic">כנסו לפרק</a>
+            <a href="03_Optic/index.html" class="card-btn btn-optic">כנסו לפרק</a>
         </div>
-
-        <!-- Электричество и магнетизм -->
         <div class="card">
             <div class="card-icon">⚡</div>
             <div>
                 <h2>חשמל ומגנטיות</h2>
                 <p>שדה חשמלי, מעגלי זרם, שדה מגנטי והשרה אלקטרומגנטית.</p>
             </div>
-            <a href="02_electricity/index.html" class="card-btn btn-electricity">כנסו לפרק</a>
+            <a href="02_Electricity/index.html" class="card-btn btn-electricity">כנסו לפרק</a>
         </div>
-
-        <!-- Средняя школа -->
         <div class="card">
             <div class="card-icon">📚</div>
             <div>
                 <h2>חטיבת ביניים</h2>
                 <p>אנרגיה מכנית, תרמית, חשמלית ומבוא לפיזיקה.</p>
             </div>
-            <a href="05_Hativa/index.html" class="card-btn btn-hativa">כנסו לפרק</a>
+            <a href="05_Middle_school/index.html" class="card-btn btn-hativa">כנסו לפרק</a>
         </div>
-
-        <!-- Лаборатории -->
         <div class="card">
             <div class="card-icon">📊</div>
             <div>
                 <h2>מעבדות וסימולציות</h2>
                 <p>הדמיות אינטראקטיביות, סימולציות 3D והנחיות לכתיבת דוחות.</p>
             </div>
-            <a href="04_lab/index.html" class="card-btn btn-lab">כנסו למעבדה</a>
+            <a href="04_Lab/index.html" class="card-btn btn-lab">כנסו למעבדה</a>
         </div>
     </div>
-
 </body>
 </html>
