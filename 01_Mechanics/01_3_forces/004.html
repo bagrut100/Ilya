@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>בונה הפתרון - מישור משופע עם חיכוך (5 יח"ל)</title>
+  <style>
+    :root {
+      --primary: #1d4ed8;
+      --primary-light: #eff6ff;
+      --success: #15803d;
+      --success-bg: #f0fdf4;
+      --error: #b91c1c;
+      --error-bg: #fef2f2;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .header-card, .step-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 1.45rem;
+      color: var(--primary);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .problem-text {
+      font-size: 1.05rem;
+      margin-bottom: 14px;
+    }
+
+    .givens-box {
+      background: #f1f5f9;
+      border-right: 4px solid var(--primary);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+      direction: ltr;
+      text-align: right;
+    }
+
+    .svg-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .toggle-btn {
+      margin-top: 10px;
+      background: #e2e8f0;
+      color: var(--text);
+      border: none;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .toggle-btn:hover {
+      background: #cbd5e1;
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 8px;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary);
+    }
+
+    .step-status {
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .status-pending { background: #f1f5f9; color: var(--muted); }
+    .status-done { background: var(--success-bg); color: var(--success); }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 14px;
+      background: #fff;
+    }
+
+    .formula-select {
+      direction: ltr;
+      text-align: left;
+      font-family: "Cambria Math", "Times New Roman", serif;
+      font-size: 1.05rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .input-row input {
+      margin-bottom: 0;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .unit-tag {
+      background: #e2e8f0;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      direction: ltr;
+      min-width: 65px;
+      text-align: center;
+    }
+
+    .check-btn {
+      margin-top: 14px;
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .check-btn:hover {
+      background: #1e40af;
+    }
+
+    .feedback {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      display: none;
+    }
+
+    .feedback.success {
+      display: block;
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid #bbf7d0;
+    }
+
+    .feedback.error {
+      display: block;
+      background: var(--error-bg);
+      color: var(--error);
+      border: 1px solid #fecaca;
+    }
+
+    .locked {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .math-ltr {
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-weight: 600;
+    }
+
+    .summary-banner {
+      display: none;
+      background: var(--success-bg);
+      border: 2px solid #22c55e;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Карточка условия и диаграммы сил -->
+    <div class="header-card">
+      <span class="badge">פיזיקה 5 יח"ל • מכניקה • דף נוסחאות 2027</span>
+      <h1>בונה הפתרון: תנועה במישור משופע עם חיכוך</h1>
+      <p class="problem-text">
+        גוף שמסתו <span class="math-ltr">m = 4 kg</span> משוחרר ממנוחה מראש מישור משופע שזווית נטייתו
+        <span class="math-ltr">α = 37°</span> ביחס לאופק. אורך המישור המשופע הוא <span class="math-ltr">L = 5 m</span>.
+        מקדם החיכוך הקינטי בין הגוף למשטח הוא <span class="math-ltr">μ<sub>k</sub> = 0.25</span>.
+      </p>
+      <div class="givens-box">
+        נתונים: m = 4 kg | α = 37° | L = 5 m | μ<sub>k</sub> = 0.25 | g = 10 m/s² | sin(37°) = 0.6 | cos(37°) = 0.8
+      </div>
+
+      <!-- SVG: Все силы выходят строго из центра масс тела -->
+      <div class="svg-wrapper">
+        <svg viewBox="0 0 420 260" width="100%" style="max-width: 460px;">
+          <defs>
+            <marker id="arrow-red" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#dc2626"/>
+            </marker>
+            <marker id="arrow-blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb"/>
+            </marker>
+            <marker id="arrow-green" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a"/>
+            </marker>
+            <marker id="arrow-purple" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#9333ea"/>
+            </marker>
+            <marker id="arrow-axis" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M 0 2 L 10 5 L 0 8 z" fill="#64748b"/>
+            </marker>
+          </defs>
+
+          <!-- Наклонная плоскость -->
+          <polygon points="40,220 340,220 340,40" fill="#e2e8f0" stroke="#475569" stroke-width="2"/>
+          <path d="M 90,220 A 50,50 0 0,0 80,190" fill="none" stroke="#475569" stroke-width="1.5"/>
+          <text x="98" y="210" font-size="13" fill="#334155">α = 37°</text>
+
+          <!-- Повернутая система координат и тело (центр в 210, 118) -->
+          <g transform="translate(210, 118) rotate(-31)">
+            <!-- Оси координат -->
+            <line x1="-115" y1="0" x2="95" y2="0" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4,3" marker-start="url(#arrow-axis)"/>
+            <text x="-126" y="4" font-size="12" font-weight="bold" fill="#64748b">+x</text>
+            
+            <line x1="0" y1="85" x2="0" y2="-95" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-axis)"/>
+            <text x="-16" y="-88" font-size="12" font-weight="bold" fill="#64748b">+y</text>
+
+            <!-- Тело -->
+            <rect x="-25" y="-20" width="50" height="40" rx="4" fill="#93c5fd" fill-opacity="0.65" stroke="#1d4ed8" stroke-width="2"/>
+
+            <!-- Проекции mg (скрыты по умолчанию, включаются кнопкой подсказки) -->
+            <g id="mg-components" style="display: none;">
+              <line x1="0" y1="0" x2="-48" y2="0" stroke="#9333ea" stroke-width="2" stroke-dasharray="3,2" marker-end="url(#arrow-purple)"/>
+              <text x="-85" y="-8" font-size="12" font-weight="bold" fill="#9333ea">mg·sinα</text>
+
+              <line x1="0" y1="0" x2="0" y2="78" stroke="#9333ea" stroke-width="2" stroke-dasharray="3,2" marker-end="url(#arrow-purple)"/>
+              <text x="8" y="75" font-size="12" font-weight="bold" fill="#9333ea">mg·cosα</text>
+            </g>
+
+            <!-- Вектор N (строго из центра 0,0) -->
+            <line x1="0" y1="0" x2="0" y2="-75" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+            <text x="8" y="-65" font-size="14" font-weight="bold" fill="#2563eb">N</text>
+
+            <!-- Вектор fk (строго из центра 0,0 параллельно поверхности) -->
+            <line x1="0" y1="0" x2="68" y2="0" stroke="#16a34a" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+            <text x="56" y="-8" font-size="14" font-weight="bold" fill="#16a34a">fₖ</text>
+
+            <!-- Точка центра масс -->
+            <circle cx="0" cy="0" r="3.5" fill="#0f172a"/>
+          </g>
+
+          <!-- Вектор mg (строго вертикально вниз из центра 210, 118) -->
+          <line x1="210" y1="118" x2="210" y2="210" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arrow-red)"/>
+          <text x="218" y="205" font-size="14" font-weight="bold" fill="#dc2626">mg</text>
+
+          <path d="M 210,155 A 37,37 0 0,0 229,149" fill="none" stroke="#dc2626" stroke-width="1.2"/>
+          <text x="215" y="168" font-size="12" fill="#dc2626">α</text>
+        </svg>
+        <button type="button" class="toggle-btn" onclick="toggleComponents()">👁️ הצג / הסתר רכיבי כוח הכובד (mg·sinα, mg·cosα)</button>
+      </div>
+    </div>
+
+    <!-- Шаг 1: Нормальная реакция -->
+    <div class="step-card" id="card-step-1">
+      <div class="step-header">
+        <span class="step-title">שלב 1: חישוב הכוח הנורמלי (N)</span>
+        <span class="step-status status-pending" id="status-1">ממתין לפתרון</span>
+      </div>
+      <label for="formula-1">1. בחרו את המשוואה המתאימה לציר y (אין תנועה בניצב למישור):</label>
+      <select id="formula-1" class="formula-select">
+        <option value="">-- בחרו נוסחה מדף הנוסחאות --</option>
+        <option value="wrong1">ΣFy = m·a  ⇒  N - mg = m·a</option>
+        <option value="correct">ΣFy = 0  ⇒  N - mg·cos(α) = 0</option>
+        <option value="wrong2">ΣFy = 0  ⇒  N - mg·sin(α) = 0</option>
+      </select>
+
+      <label for="val-1">2. הזינו את גודל הכוח הנורמלי (N):</label>
+      <div class="input-row">
+        <input type="number" id="val-1" step="0.1" placeholder="הכניסו ערך מספרי..." />
+        <span class="unit-tag">N</span>
+      </div>
+      <button type="button" class="check-btn" onclick="checkStep1()">בדיקת שלב 1</button>
+      <div class="feedback" id="fb-1"></div>
+    </div>
+
+    <!-- Шаг 2: Сила кинетического трения -->
+    <div class="step-card locked" id="card-step-2">
+      <div class="step-header">
+        <span class="step-title">שלב 2: חישוב כוח החיכוך הקינטי (fₖ)</span>
+        <span class="step-status status-pending" id="status-2">נעול</span>
+      </div>
+      <label for="formula-2">1. בחרו את הנוסחה לכוח חיכוך קינטי מדף הנוסחאות (2027):</label>
+      <select id="formula-2" class="formula-select">
+        <option value="">-- בחרו נוסחה מדף הנוסחאות --</option>
+        <option value="wrong1">fs ≤ μs · N</option>
+        <option value="correct">fk = μk · N</option>
+        <option value="wrong2">fk = μk · m · g</option>
+      </select>
+
+      <label for="val-2">2. הזינו את גודל כוח החיכוך הקינטי (fₖ):</label>
+      <div class="input-row">
+        <input type="number" id="val-2" step="0.1" placeholder="הכניסו ערך מספרי..." />
+        <span class="unit-tag">N</span>
+      </div>
+      <button type="button" class="check-btn" onclick="checkStep2()">בדיקת שלב 2</button>
+      <div class="feedback" id="fb-2"></div>
+    </div>
+
+    <!-- Шаг 3: Ускорение тела -->
+    <div class="step-card locked" id="card-step-3">
+      <div class="step-header">
+        <span class="step-title">שלב 3: חישוב תאוצת הגוף במורד המישור (a)</span>
+        <span class="step-status status-pending" id="status-3">נעול</span>
+      </div>
+      <label for="formula-3">1. בחרו את משוואת החוק השני של ניוטון בציר x (במורד המישור):</label>
+      <select id="formula-3" class="formula-select">
+        <option value="">-- בחרו נוסחה מדף הנוסחאות --</option>
+        <option value="wrong1">ΣFx = m·a  ⇒  mg·cos(α) - fk = m·a</option>
+        <option value="wrong2">ΣFx = m·a  ⇒  mg·sin(α) + fk = m·a</option>
+        <option value="correct">ΣFx = m·a  ⇒  mg·sin(α) - fk = m·a</option>
+      </select>
+
+      <label for="val-3">2. הזינו את תאוצת הגוף (a):</label>
+      <div class="input-row">
+        <input type="number" id="val-3" step="0.1" placeholder="הכניסו ערך מספרי..." />
+        <span class="unit-tag">m/s²</span>
+      </div>
+      <button type="button" class="check-btn" onclick="checkStep3()">בדיקת שלב 3</button>
+      <div class="feedback" id="fb-3"></div>
+    </div>
+
+    <!-- Шаг 4: Скорость у основания плоскости -->
+    <div class="step-card locked" id="card-step-4">
+      <div class="step-header">
+        <span class="step-title">שלב 4: חישוב מהירות הגוף בתחתית המישור (v)</span>
+        <span class="step-status status-pending" id="status-4">נעול</span>
+      </div>
+      <label for="formula-4">1. בחרו נוסחת קינמטיקה מתאימה מדף הנוסחאות (ללא תלות בזמן):</label>
+      <select id="formula-4" class="formula-select">
+        <option value="">-- בחרו נוסחה מדף הנוסחאות --</option>
+        <option value="wrong1">v = v₀ + a·t</option>
+        <option value="correct">v² = v₀² + 2·a·(x - x₀)</option>
+        <option value="wrong2">x = x₀ + v₀·t + ½·a·t²</option>
+      </select>
+
+      <label for="val-4">2. הזינו את המהירות בהגיעו לתחתית המישור (v):</label>
+      <div class="input-row">
+        <input type="number" id="val-4" step="0.01" placeholder="הכניסו ערך מספרי (עד 2 ספרות אחרי הנקודה)..." />
+        <span class="unit-tag">m/s</span>
+      </div>
+      <button type="button" class="check-btn" onclick="checkStep4()">בדיקת שלב 4</button>
+      <div class="feedback" id="fb-4"></div>
+    </div>
+
+    <!-- Финальное поздравление -->
+    <div class="summary-banner" id="final-banner">
+      <h2 style="color: var(--success); margin-top: 0;">כל הכבוד! פתרתם את השאלה במלואה! 🎉</h2>
+      <p>השלמתם בהצלחה את ניתוח הכוחות, חישוב התאוצה והקינמטיקה ברמת 5 יחידות לימוד.</p>
+    </div>
+  </div>
+
+  <script>
+    function toggleComponents() {
+      const g = document.getElementById("mg-components");
+      g.style.display = g.style.display === "none" ? "inline" : "none";
+    }
+
+    function showFeedback(step, isOk, htmlMsg) {
+      const fb = document.getElementById(`fb-${step}`);
+      fb.className = "feedback " + (isOk ? "success" : "error");
+      fb.innerHTML = htmlMsg;
+
+      if (isOk) {
+        const status = document.getElementById(`status-${step}`);
+        status.textContent = "הושלם ✓";
+        status.className = "step-status status-done";
+
+        const nextCard = document.getElementById(`card-step-${step + 1}`);
+        if (nextCard) {
+          nextCard.classList.remove("locked");
+          const nextStatus = document.getElementById(`status-${step + 1}`);
+          nextStatus.textContent = "פתוח לפתרון";
+        } else {
+          document.getElementById("final-banner").style.display = "block";
+        }
+      }
+    }
+
+    function checkStep1() {
+      const f = document.getElementById("formula-1").value;
+      const v = parseFloat(document.getElementById("val-1").value);
+
+      if (f !== "correct") {
+        showFeedback(1, false, "<strong>טעות בבחירת המשוואה:</strong> בציר y (המאונך למישור) הגוף אינו מאיץ, לכן שקול הכוחות שווה לאפס. הרכיב המאונך של כוח הכובד הוא <span class='math-ltr'>mg·cos(α)</span>.");
+        return;
+      }
+      if (isNaN(v) || Math.abs(v - 32) > 0.2) {
+        showFeedback(1, false, "<strong>טעות בחישוב:</strong> הציבו <span class='math-ltr'>N = 4 · 10 · cos(37°) = 40 · 0.8</span>.");
+        return;
+      }
+      showFeedback(1, true, "<strong>מצוין!</strong> <span class='math-ltr'>N = 32 N</span>. כעת ניתן לעבור לחישוב כוח החיכוך.");
+    }
+
+    function checkStep2() {
+      const f = document.getElementById("formula-2").value;
+      const v = parseFloat(document.getElementById("val-2").value);
+
+      if (f !== "correct") {
+        showFeedback(2, false, "<strong>טעות בבחירת הנוסחה:</strong> הגוף מחליק לאורך המישור, לכן פועל עליו חיכוך קינטי: <span class='math-ltr'>fk = μk · N</span>.");
+        return;
+      }
+      if (isNaN(v) || Math.abs(v - 8) > 0.1) {
+        showFeedback(2, false, "<strong>טעות בחישוב:</strong> כפלו את מקדם החיכוך בכוח הנורמלי שמצאתם בשלב הקודם: <span class='math-ltr'>fk = 0.25 · 32</span>.");
+        return;
+      }
+      showFeedback(2, true, "<strong>נכון מאוד!</strong> <span class='math-ltr'>fk = 8 N</span> (כיוונו במעלה המישור, ממרכז הגוף ובמקביל למשטח).");
+    }
+
+    function checkStep3() {
+      const f = document.getElementById("formula-3").value;
+      const v = parseFloat(document.getElementById("val-3").value);
+
+      if (f !== "correct") {
+        showFeedback(3, false, "<strong>טעות במשוואת התנועה:</strong> רכיב כוח הכובד המושך במורד המישור הוא <span class='math-ltr'>mg·sin(α)</span>, וכוח החיכוך <span class='math-ltr'>fk</span> מתנגד לתנועה.");
+        return;
+      }
+      if (isNaN(v) || Math.abs(v - 4) > 0.1) {
+        showFeedback(3, false, "<strong>טעות בחישוב:</strong> <span class='math-ltr'>4·10·0.6 - 8 = 4·a  ⇒  24 - 8 = 4a</span>.");
+        return;
+      }
+      showFeedback(3, true, "<strong>מדויק!</strong> תאוצת הגוף במורד המישור היא <span class='math-ltr'>a = 4 m/s²</span>.");
+    }
+
+    function checkStep4() {
+      const f = document.getElementById("formula-4").value;
+      const v = parseFloat(document.getElementById("val-4").value);
+
+      if (f !== "correct") {
+        showFeedback(4, false, "<strong>בחירה לא מתאימה:</strong> זמן התנועה אינו נתון, ולכן הנוסחה היעילה ביותר מדף הנוסחאות היא <span class='math-ltr'>v² = v₀² + 2·a·(x - x₀)</span>.");
+        return;
+      }
+      // sqrt(40) ≈ 6.3245
+      if (isNaN(v) || Math.abs(v - 6.32) > 0.08) {
+        showFeedback(4, false, "<strong>טעות בחישוב:</strong> <span class='math-ltr'>v² = 0 + 2 · 4 · 5 = 40  ⇒  v = √40</span>.");
+        return;
+      }
+      showFeedback(4, true, "<strong>מושלם!</strong> מהירות הגוף בתחתית המישור היא <span class='math-ltr'>v = √40 ≈ 6.32 m/s</span>.");
+    }
+  </script>
+</body>
+</html>

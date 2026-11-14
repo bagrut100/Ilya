@@ -8,166 +8,52 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #0b0e14;
-            --card-bg: #ffffff;
-            --text-main: #111827;
-            --text-secondary: #4b5563;
-            --accent-blue: #0070f3;
-            --accent-orange: #f59e0b;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Heebo', system-ui, -apple-system, sans-serif;
-        }
-        body {
-            background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 0%, #172033 0%, #0b0e14 60%);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 25px 20px 60px;
-        }
-        .container {
-            width: 100%;
-            max-width: 960px;
-        }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 24px;
-            color: #60a5fa;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.95rem;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
-        .header-section {
-            text-align: center;
-            padding: 10px 0 36px;
-        }
-        .header-section h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-        .header-section p {
-            color: #94a3b8;
-            font-size: 1.05rem;
-        }
-        .cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-        }
-        .card {
-            background: var(--card-bg);
-            color: var(--text-main);
-            border-radius: 16px;
-            padding: 28px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            border-top: 5px solid var(--accent-blue);
-        }
-        .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-        .card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 18px;
-        }
-        .icon-box {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            background: #eff6ff;
-            color: var(--accent-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .icon-box svg {
-            width: 26px;
-            height: 26px;
-            stroke-width: 2;
-        }
-        .badge {
-            font-size: 0.78rem;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 999px;
-            background: #eff6ff;
-            color: #1d4ed8;
-        }
-        .card h2 {
-            font-size: 1.35rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .card p {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
-        .card-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 20px;
-            border-radius: 10px;
-            background-color: var(--accent-blue);
-            color: #fff;
-            font-weight: 700;
-            text-decoration: none;
-            transition: filter 0.2s;
-        }
-        .card-btn:hover {
-            filter: brightness(1.08);
-        }
-        .theme-orange {
-            border-top-color: var(--accent-orange);
-        }
-        .theme-orange .icon-box {
-            background: #fffbeb;
-            color: var(--accent-orange);
-        }
-        .theme-orange .card-btn {
-            background-color: var(--accent-orange);
-        }
+        :root { --bg-color: #0b0e14; --card-bg: #ffffff; --text-main: #111827; --text-secondary: #4b5563; --accent-blue: #0070f3; --accent-orange: #f59e0b; --accent-green: #10b981; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); background-image: radial-gradient(circle at 50% 0%, #172033 0%, #0b0e14 60%); color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 25px 20px 60px; }
+        .container { width: 100%; max-width: 1060px; }
+        .top-nav { display: flex; justify-content: space-between; margin-bottom: 24px; }
+        .back-link { color: #60a5fa; text-decoration: none; font-weight: 700; }
+        .breadcrumbs { color: #94a3b8; font-size: 0.9rem; }
+        .header-section { text-align: center; padding: 10px 0 36px; }
+        .header-section h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+        .header-section p { color: #94a3b8; font-size: 1.05rem; }
+        .cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .card { background: var(--card-bg); color: var(--text-main); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 12px 30px rgba(0,0,0,0.25); transition: transform 0.25s; border-top: 5px solid var(--accent-blue); }
+        .card:hover { transform: translateY(-6px); }
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+        .icon-box { width: 52px; height: 52px; border-radius: 14px; background: #eff6ff; color: var(--accent-blue); display: flex; align-items: center; justify-content: center; }
+        .icon-box svg { width: 26px; height: 26px; stroke-width: 2; }
+        .badge { font-size: 0.78rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; }
+        .card h2 { font-size: 1.35rem; margin-bottom: 8px; }
+        .card p { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
+        .card-btn { display: flex; align-items: center; justify-content: center; padding: 12px 20px; border-radius: 10px; background-color: var(--accent-blue); color: #fff; font-weight: 700; text-decoration: none; }
+        .theme-orange { border-top-color: var(--accent-orange); }
+        .theme-orange .icon-box { background: #fffbeb; color: var(--accent-orange); }
+        .theme-orange .badge { background: #fffbeb; color: #b45309; }
+        .theme-orange .card-btn { background-color: var(--accent-orange); }
+        .theme-green { border-top-color: var(--accent-green); }
+        .theme-green .icon-box { background: #ecfdf5; color: var(--accent-green); }
+        .theme-green .badge { background: #ecfdf5; color: #047857; }
+        .theme-green .card-btn { background-color: var(--accent-green); }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="../index.html" class="back-link">← חזרה למכניקה</a>
-
+        <div class="top-nav">
+            <a href="../index.html" class="back-link">← חזרה למכניקה</a>
+            <span class="breadcrumbs">ראשי / מכניקה / עבודה ואנרגיה</span>
+        </div>
         <div class="header-section">
             <h1>עבודה ואנרגיה</h1>
-            <p>סימולציות אינטראקטיביות לחקר חוק שימור האנרגיה, עבודה ותנועה במסילה</p>
+            <p>סימולציות אינטראקטיביות ותרגול בנושא שימור אנרגיה ועבודת כוח</p>
         </div>
-
         <div class="cards-container">
-            <!-- סימולציית עבודה ואנרגיה -->
             <div class="card">
                 <div>
                     <div class="card-top">
                         <div class="icon-box">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                         </div>
                         <span class="badge">סימולציה</span>
                     </div>
@@ -176,22 +62,31 @@
                 </div>
                 <a href="work_energy_simulation.html" class="card-btn">הפעל סימולציה ←</a>
             </div>
-
-            <!-- תנועה בלולאה -->
             <div class="card theme-orange">
                 <div>
                     <div class="card-top">
                         <div class="icon-box">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M2 18h10a6 6 0 1 0-6-6v6h16"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h10a6 6 0 1 0-6-6v6h16"/></svg>
                         </div>
-                        <span class="badge" style="background:#fffbeb;color:#b45309;">סימולציה</span>
+                        <span class="badge">סימולציה</span>
                     </div>
                     <h2>תנועה בלולאה (Loop)</h2>
                     <p>שימור אנרגיה ותנועה מעגלית אנכית — תנאי השלמת סיבוב וכוח נורמלי.</p>
                 </div>
                 <a href="loop.html" class="card-btn">הפעל סימולציה ←</a>
+            </div>
+            <div class="card theme-green">
+                <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        </div>
+                        <span class="badge">תרגיל אינטראקטיבי</span>
+                    </div>
+                    <h2>תרגיל עבודה ואנרגיה (001)</h2>
+                    <p>פתרון מודרך צעד-אחר-צעד לחישוב עבודה ושינוי באנרגיה קינטית.</p>
+                </div>
+                <a href="001_work.html" class="card-btn">כנסו לתרגיל ←</a>
             </div>
         </div>
     </div>

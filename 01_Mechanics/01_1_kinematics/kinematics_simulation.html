@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סימולציית קינמטיקה – תנועה בקו ישר</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#1d2433;--mute:#5b6478;--line:#e3e6ee;--x:#2563eb;--v:#16a34a;--a:#dc2626;--avg:#7c3aed}
+*{box-sizing:border-box}
+body{margin:0;font-family:Heebo,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+header{padding:12px 18px;background:#1d2433;color:#fff;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+h1{font-size:20px;margin:0;font-weight:800}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:0;padding:8px 14px;border-radius:999px;background:#2f3950;color:#cfd6e6;font:inherit;font-weight:500;cursor:pointer}
+.tab.on{background:#fff;color:#1d2433;font-weight:700}
+main{max-width:1450px;margin:0 auto;padding:12px;display:grid;grid-template-columns:350px 1fr;gap:12px}
+@media(max-width:1000px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+h2{font-size:16px;margin:0 0 8px}
+h3{font-size:15px;margin:0 0 6px}
+.row{margin:8px 0}
+.row label{display:flex;justify-content:space-between;font-weight:500}
+.row input[type=range]{width:100%}
+.val{direction:ltr;font-weight:700;unicode-bidi:isolate}
+.note{color:var(--mute);font-size:13px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.b{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;font:inherit;cursor:pointer;font-weight:500}
+button.b.main{background:#1d2433;color:#fff;border-color:#1d2433}
+.checks{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px}
+.checks label{display:flex;gap:5px;align-items:center;cursor:pointer}
+canvas{width:100%;display:block;direction:ltr}
+#track{height:190px}
+.read{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px}
+@media(max-width:700px){.read{grid-template-columns:repeat(3,1fr)}}
+.read div{background:#f6f7fb;border-radius:10px;padding:6px;text-align:center}
+.read b{display:block;direction:ltr;font-size:16px}
+.read span{font-size:12px;color:var(--mute)}
+.g{display:grid;grid-template-columns:330px 1fr;gap:12px;align-items:stretch}
+@media(max-width:800px){.g{grid-template-columns:1fr}}
+.g canvas{height:220px;cursor:crosshair}
+.mean{font-size:14px;line-height:1.5}
+.mean ul{margin:0;padding-inline-start:18px}
+.mean li{margin:3px 0}
+.tag{display:inline-block;padding:1px 8px;border-radius:6px;color:#fff;font-weight:700;font-size:13px}
+.eq{direction:ltr;unicode-bidi:isolate;font-family:"Cambria Math","Times New Roman",serif;font-size:16px;white-space:nowrap}
+.fbox{background:#f6f7fb;border-radius:10px;padding:8px 10px;margin:6px 0}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+td,th{border-bottom:1px solid var(--line);padding:5px 4px;text-align:right;vertical-align:top}
+th{color:var(--mute);font-weight:500}
+.warn{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:7px 10px;font-size:13.5px;margin-top:6px}
+.res{background:#eef4ff;border-radius:10px;padding:8px 10px;margin-top:6px;font-size:14px}
+.legend{font-size:12.5px;color:var(--mute);margin-top:4px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-inline-end:3px}
+</style>
+</head>
+<body>
+<header>
+  <h1>קינמטיקה – תנועה בקו ישר</h1>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+<main>
+  <section class="col">
+    <div class="card">
+      <h2>פרמטרים</h2>
+      <div class="row" id="r-x0"><label><span id="l-x0">מיקום התחלתי x₀ (m)</span><span class="val" id="v-x0"></span></label><input type="range" id="s-x0"></div>
+      <div class="row" id="r-v0"><label><span>מהירות התחלתית v₀ (m/s)</span><span class="val" id="v-v0"></span></label><input type="range" id="s-v0"></div>
+      <div class="row" id="r-a"><label><span>תאוצה a (m/s²)</span><span class="val" id="v-a"></span></label><input type="range" id="s-a"></div>
+      <div class="row" id="r-T"><label><span>משך התנועה (s)</span><span class="val" id="v-T"></span></label><input type="range" id="s-T" min="2" max="15" step="0.5"></div>
+      <div id="lockNote" class="note"></div>
+      <div class="checks">
+        <label><input type="checkbox" id="c-tan" checked>משיק</label>
+        <label><input type="checkbox" id="c-area" checked>שטח</label>
+        <label><input type="checkbox" id="c-avg">מהירות ממוצעת</label>
+        <label><input type="checkbox" id="c-str" checked>עקבות (סטרובוסקופ)</label>
+      </div>
+      <div id="avgBox" style="display:none">
+        <div class="row"><label><span>t₁ (s)</span><span class="val" id="v-t1"></span></label><input type="range" id="s-t1" step="0.1" min="0"></div>
+        <div class="row"><label><span>t₂ (s)</span><span class="val" id="v-t2"></span></label><input type="range" id="s-t2" step="0.1" min="0"></div>
+      </div>
+      <div class="note">כיוון חיובי: ימינה (תנועה אופקית) / למעלה (תנועה אנכית). g = 10 m/s².</div>
+    </div>
+    <div class="card" id="formulas"></div>
+  </section>
+
+  <section class="col">
+    <div class="card">
+      <canvas id="track"></canvas>
+      <div class="btns" style="margin-top:6px">
+        <button class="b main" id="play">▶ הפעל</button>
+        <button class="b" id="reset">⟲ התחלה</button>
+        <label>מהירות הדמיה
+          <select id="speed"><option value="0.25">×0.25</option><option value="0.5">×0.5</option><option value="1" selected>×1</option><option value="2">×2</option></select>
+        </label>
+        <input type="range" id="s-t" min="0" step="0.01" style="flex:1;min-width:140px">
+      </div>
+      <div class="read" id="read"></div>
+    </div>
+
+    <div class="card g">
+      <div class="mean" id="m-x"></div>
+      <div><canvas id="gx"></canvas><div class="legend" id="lg-x"></div></div>
+    </div>
+    <div class="card g">
+      <div class="mean" id="m-v"></div>
+      <div><canvas id="gv"></canvas><div class="legend" id="lg-v"></div></div>
+    </div>
+    <div class="card g">
+      <div class="mean" id="m-a"></div>
+      <div><canvas id="ga"></canvas><div class="legend" id="lg-a"></div></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const g=10;
+const MODES={
+  uniform:{lbl:'מהירות קבועה',vert:false,x0:-20,v0:8,a:0,T:6,lockA:true,x0r:[-50,50,1],v0r:[-15,15,0.5],ar:[-6,6,0.5]},
+  accel:{lbl:'תאוצה קבועה',vert:false,x0:0,v0:-6,a:3,T:8,x0r:[-50,50,1],v0r:[-15,15,0.5],ar:[-6,6,0.5]},
+  avg:{lbl:'מהירות ממוצעת',vert:false,x0:0,v0:-6,a:3,T:8,avg:true,x0r:[-50,50,1],v0r:[-15,15,0.5],ar:[-6,6,0.5]},
+  free:{lbl:'נפילה חופשית',vert:true,x0:45,v0:0,a:-g,lockA:true,lockV:true,x0r:[5,100,1],v0r:[0,0,1],ar:[-g,-g,1]},
+  throw:{lbl:'זריקה אנכית',vert:true,x0:0,v0:20,a:-g,lockA:true,x0r:[0,60,1],v0r:[-20,30,1],ar:[-g,-g,1]}
+};
+const S={mode:'accel',x0:0,v0:-6,a:3,T:8,t:0,play:false,speed:1,tan:true,area:true,avg:false,str:true,t1:1,t2:5};
+const $=id=>document.getElementById(id);
+const pos=t=>S.x0+S.v0*t+0.5*S.a*t*t, vel=t=>S.v0+S.a*t;
+const M=()=>MODES[S.mode];
+const sym=()=>M().vert?'y':'x';
+function fmt(n,d=2){if(!isFinite(n))return '—';let s=(Math.abs(n)<1e-9?0:n).toFixed(d);if(s.includes('.'))s=s.replace(/0+$/,'').replace(/\.$/,'');return s==='-0'?'0':s}
+function eq(s){return '<span class="eq">'+s+'</span>'}
+function nice(r){if(r<=0)return 1;const e=Math.pow(10,Math.floor(Math.log10(r))),f=r/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+
+/* ---------- physics helpers ---------- */
+function computeT(){if(M().vert){const d=S.v0*S.v0+2*g*S.x0;S.T=Math.max(0.05,(S.v0+Math.sqrt(Math.max(0,d)))/g);}}
+function turnT(){if(S.a===0)return null;const tt=-S.v0/S.a;return (tt>1e-6&&tt<S.T-1e-6)?tt:null}
+function rootsX(){const r=[];const A=0.5*S.a,B=S.v0,C=S.x0;
+  if(Math.abs(A)<1e-12){if(B!==0)r.push(-C/B)}else{const D=B*B-4*A*C;if(D>=0){r.push((-B+Math.sqrt(D))/(2*A),(-B-Math.sqrt(D))/(2*A))}}
+  return [...new Set(r.map(x=>+x.toFixed(6)))].filter(t=>t>1e-6&&t<=S.T+1e-6).sort((a,b)=>a-b)}
+function pathLen(t){const tt=S.a!==0?-S.v0/S.a:null;if(tt!==null&&tt>0&&tt<t)return Math.abs(pos(tt)-S.x0)+Math.abs(pos(t)-pos(tt));return Math.abs(pos(t)-S.x0)}
+function rangeOf(fn,inc0=true){let mn=inc0?0:Infinity,mx=inc0?0:-Infinity;for(let i=0;i<=200;i++){const v=fn(S.T*i/200);mn=Math.min(mn,v);mx=Math.max(mx,v)}let p=(mx-mn)*0.12;if(p<1e-9){p=1}return[mn-p,mx+p]}
+
+/* ---------- UI build ---------- */
+const tabs=$('tabs');
+for(const k in MODES){const b=document.createElement('button');b.className='tab';b.textContent=MODES[k].lbl;b.dataset.k=k;b.onclick=()=>setMode(k);tabs.appendChild(b)}
+function setSlider(id,[mn,mx,st],val){const s=$('s-'+id);s.min=mn;s.max=mx;s.step=st;s.value=val}
+function setMode(k){
+  S.mode=k;const m=M();S.x0=m.x0;S.v0=m.v0;S.a=m.a;if(!m.vert)S.T=m.T;S.avg=!!m.avg;$('c-avg').checked=S.avg;
+  computeT();S.t=0;S.play=false;
+  setSlider('x0',m.x0r,S.x0);setSlider('v0',m.v0r,S.v0);setSlider('a',m.ar,S.a);$('s-T').value=S.T;
+  $('r-a').style.display=m.lockA?'none':'';$('r-v0').style.display=m.lockV?'none':'';$('r-T').style.display=m.vert?'none':'';
+  $('l-x0').textContent=m.vert?'גובה התחלתי h₀ (m)':'מיקום התחלתי x₀ (m)';
+  let n=[];if(k==='uniform')n.push('a = 0 (מהירות קבועה)');if(m.vert)n.push('a = −g = −10 m/s² (קבוע)');if(k==='free')n.push('v₀ = 0 (משחררים ממנוחה)');if(m.vert)n.push('התנועה נמשכת עד הפגיעה בקרקע');
+  $('lockNote').innerHTML=n.join(' · ');
+  S.t1=+(S.T*0.15).toFixed(1);S.t2=+(S.T*0.7).toFixed(1);
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+  syncAvg();buildFormulas();render();
+}
+function syncAvg(){$('avgBox').style.display=S.avg?'':'none';for(const id of['t1','t2']){const s=$('s-'+id);s.max=S.T;S[id]=Math.min(S[id],S.T);s.value=S[id]}$('s-t').max=S.T;}
+['x0','v0','a'].forEach(id=>$('s-'+id).addEventListener('input',e=>{S[id]=+e.target.value;
+  if(S.mode==='throw'&&S.x0===0&&S.v0<1){S.v0=1;$('s-v0').value=1}
+  const oldT=S.T;computeT();if(S.T!==oldT)syncAvg();S.t=Math.min(S.t,S.T);buildFormulas();render()}));
+$('s-T').addEventListener('input',e=>{S.T=+e.target.value;S.t=Math.min(S.t,S.T);syncAvg();buildFormulas();render()});
+['t1','t2'].forEach(id=>$('s-'+id).addEventListener('input',e=>{S[id]=+e.target.value;buildFormulas();render()}));
+$('c-tan').onchange=e=>{S.tan=e.target.checked;render()};
+$('c-area').onchange=e=>{S.area=e.target.checked;render()};
+$('c-str').onchange=e=>{S.str=e.target.checked;render()};
+$('c-avg').onchange=e=>{S.avg=e.target.checked;syncAvg();buildFormulas();render()};
+$('s-t').addEventListener('input',e=>{S.t=+e.target.value;S.play=false;updPlay();render()});
+$('speed').onchange=e=>S.speed=+e.target.value;
+$('play').onclick=()=>{if(S.t>=S.T-1e-6)S.t=0;S.play=!S.play;updPlay();last=performance.now();if(S.play)requestAnimationFrame(loop)};
+$('reset').onclick=()=>{S.t=0;S.play=false;updPlay();render()};
+function updPlay(){$('play').textContent=S.play?'⏸ עצור':'▶ הפעל'}
+let last=0;
+function loop(now){if(!S.play)return;const dt=Math.min(0.05,(now-last)/1000);last=now;S.t+=dt*S.speed;if(S.t>=S.T){S.t=S.T;S.play=false;updPlay()}render();if(S.play)requestAnimationFrame(loop)}
+
+/* ---------- canvas helpers ---------- */
+function setup(cv){const d=window.devicePixelRatio||1,r=cv.getBoundingClientRect();const W=Math.max(10,Math.round(r.width*d)),H=Math.max(10,Math.round(r.height*d));if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}const ctx=cv.getContext('2d');ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,r.width,r.height);return{ctx,w:r.width,h:r.height}}
+const PAD={L:54,R:18,T:16,B:30};
+const GM={};
+function axes(cv,ymin,ymax,ylab,col){
+  const {ctx,w,h}=setup(cv);const L=PAD.L,R=PAD.R,Tp=PAD.T,B=PAD.B;
+  const X=t=>L+(t/S.T)*(w-L-R),Y=y=>Tp+(ymax-y)/(ymax-ymin)*(h-Tp-B);
+  ctx.font='12px Heebo, sans-serif';ctx.lineWidth=1;ctx.strokeStyle='#eceff5';ctx.fillStyle='#5b6478';
+  const ys=nice((ymax-ymin)/5);ctx.textAlign='right';ctx.textBaseline='middle';
+  for(let y=Math.ceil(ymin/ys)*ys;y<=ymax+1e-9;y+=ys){ctx.beginPath();ctx.moveTo(L,Y(y));ctx.lineTo(w-R,Y(y));ctx.stroke();ctx.fillText(fmt(y,2),L-6,Y(y))}
+  const ts=nice(S.T/8);ctx.textAlign='center';ctx.textBaseline='top';
+  for(let t=0;t<=S.T+1e-9;t+=ts){ctx.beginPath();ctx.moveTo(X(t),Tp);ctx.lineTo(X(t),h-B);ctx.stroke();ctx.fillText(fmt(t,2),X(t),h-B+5)}
+  ctx.strokeStyle='#1d2433';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(L,Y(0));ctx.lineTo(w-R,Y(0));ctx.moveTo(L,Tp);ctx.lineTo(L,h-B);ctx.stroke();
+  ctx.font='bold 13px Heebo, sans-serif';ctx.fillStyle=col;ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText(ylab,L+6,2);
+  ctx.fillStyle='#1d2433';ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText('t (s)',w-R,Y(0)-3);
+  const G={ctx,w,h,X,Y,L,R,Tp,B};GM[cv.id]=G;return G}
+function clipPlot(G){const c=G.ctx;c.save();c.beginPath();c.rect(G.L,G.Tp,G.w-G.L-G.R,G.h-G.Tp-G.B);c.clip()}
+function curve(G,fn,col,ta=0,tb=S.T,lw=3,dash=[]){const c=G.ctx;c.save();c.strokeStyle=col;c.lineWidth=lw;c.setLineDash(dash);c.beginPath();for(let i=0;i<=200;i++){const t=ta+(tb-ta)*i/200;const p=[G.X(t),G.Y(fn(t))];i?c.lineTo(...p):c.moveTo(...p)}c.stroke();c.restore()}
+function fillArea(G,fn,ta,tb,cp,cn){if(tb-ta<1e-6)return;const c=G.ctx;c.save();c.beginPath();c.moveTo(G.X(ta),G.Y(0));for(let i=0;i<=80;i++){const t=ta+(tb-ta)*i/80;c.lineTo(G.X(t),G.Y(fn(t)))}c.lineTo(G.X(tb),G.Y(0));c.closePath();c.clip();c.fillStyle=cp;c.fillRect(0,0,G.w,G.Y(0));c.fillStyle=cn;c.fillRect(0,G.Y(0),G.w,G.h);c.restore()}
+function mark(G,t,y,txt,col,up=true){const c=G.ctx,px=G.X(t),py=G.Y(y);c.save();c.fillStyle=col;c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.arc(px,py,5.5,0,7);c.fill();c.stroke();
+  if(txt){c.font='bold 12px Heebo, sans-serif';const tw=c.measureText(txt).width+10;let bx=px+8;if(bx+tw>G.w-2)bx=px-8-tw;if(bx<2)bx=2;let by=up?py-24:py+6;if(by<PAD.T+4)by=py+6;if(by+18>G.h)by=py-24;
+    c.fillStyle='rgba(255,255,255,.92)';c.strokeStyle=col;c.lineWidth=1;c.beginPath();c.roundRect?c.roundRect(bx,by,tw,18,5):c.rect(bx,by,tw,18);c.fill();c.stroke();c.fillStyle=col;c.textAlign='left';c.textBaseline='middle';c.fillText(txt,bx+5,by+9.5)}c.restore()}
+function cursor(G,t){const c=G.ctx;c.save();c.strokeStyle='#94a3b8';c.setLineDash([4,4]);c.lineWidth=1;c.beginPath();c.moveTo(G.X(t),G.Tp);c.lineTo(G.X(t),G.h-G.B);c.stroke();c.restore()}
+function arrow(c,x1,y1,x2,y2,col,lbl){const L=Math.hypot(x2-x1,y2-y1);if(L<3)return;const an=Math.atan2(y2-y1,x2-x1);c.save();c.strokeStyle=c.fillStyle=col;c.lineWidth=3.5;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2-9*Math.cos(an),y2-9*Math.sin(an));c.stroke();c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-12*Math.cos(an-0.45),y2-12*Math.sin(an-0.45));c.lineTo(x2-12*Math.cos(an+0.45),y2-12*Math.sin(an+0.45));c.fill();
+  if(lbl){c.font='bold 14px Heebo, sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(lbl,x2+14*Math.cos(an)+(Math.abs(Math.cos(an))<0.3?14:0),y2+14*Math.sin(an))}c.restore()}
+
+/* ---------- track ---------- */
+function drawTrack(){
+  const cv=$('track'),m=M();cv.style.height=(m.vert?330:190)+'px';const {ctx:c,w,h}=setup(cv);
+  const [mn,mx]=rangeOf(pos);const vmax=Math.max(1,...[0,S.T,S.T/2].map(t=>Math.abs(vel(t))));
+  const dts=S.T<=4?0.25:S.T<=8?0.5:1;
+  c.font='12px Heebo, sans-serif';
+  if(!m.vert){
+    const P=x=>40+(x-mn)/(mx-mn)*(w-80),ry=h*0.7;
+    c.fillStyle='#e8ebf2';c.fillRect(20,ry,w-40,10);
+    const st=nice((mx-mn)/10);c.fillStyle='#5b6478';c.strokeStyle='#5b6478';c.textAlign='center';c.textBaseline='top';
+    for(let x=Math.ceil(mn/st)*st;x<=mx;x+=st){c.beginPath();c.moveTo(P(x),ry+10);c.lineTo(P(x),ry+16);c.stroke();c.fillText(fmt(x,1),P(x),ry+18)}
+    c.fillStyle='#1d2433';c.font='bold 12px Heebo';c.fillText('x (m)',w-30,ry+34);
+    c.strokeStyle='#1d2433';c.lineWidth=2;c.beginPath();c.moveTo(P(0),ry-30);c.lineTo(P(0),ry+10);c.stroke();
+    c.strokeStyle='#64748b';c.setLineDash([3,3]);c.beginPath();c.moveTo(P(S.x0),ry-36);c.lineTo(P(S.x0),ry);c.stroke();c.setLineDash([]);c.fillStyle='#64748b';c.font='12px Heebo';c.textBaseline='bottom';c.fillText('x₀',P(S.x0),ry-38);
+    if(S.str){for(let k=0;k*dts<=S.t+1e-9;k++){c.fillStyle='rgba(37,99,235,.18)';c.beginPath();c.arc(P(pos(k*dts)),ry-14,7,0,7);c.fill()}}
+    const bx=P(pos(S.t)),by=ry-16;c.fillStyle='#2563eb';c.beginPath();c.arc(bx,by,13,0,7);c.fill();
+    arrow(c,bx,by-30,bx+vel(S.t)/vmax*110,by-30,'#16a34a','v');
+    if(S.a!==0)arrow(c,bx,by-58,bx+S.a/6*70,by-58,'#dc2626','a');
+    if(S.str){c.fillStyle='#5b6478';c.textAlign='right';c.textBaseline='top';c.font='12px Heebo';c.fillText('עקבות כל '+dts+' s',w-8,6)}
+  }else{
+    const top=mx,P=y=>h-34-(y)/(top)*(h-60),cx=w*0.5;
+    c.fillStyle='#a16207';c.fillRect(0,h-34,w,6);c.fillStyle='#d9f99d';c.fillRect(0,h-28,w,28);
+    const st=nice(top/8);c.strokeStyle='#5b6478';c.fillStyle='#5b6478';c.textAlign='right';c.textBaseline='middle';
+    c.beginPath();c.moveTo(cx-90,P(0));c.lineTo(cx-90,P(top));c.stroke();
+    for(let y=0;y<=top;y+=st){c.beginPath();c.moveTo(cx-96,P(y));c.lineTo(cx-90,P(y));c.stroke();c.fillText(fmt(y,1),cx-100,P(y))}
+    c.font='bold 12px Heebo';c.fillStyle='#1d2433';c.fillText('y (m)',cx-100,P(top)-4>10?P(top)-14:12);
+    if(S.x0>0){c.fillStyle='#94a3b8';c.fillRect(cx-60,P(S.x0)+14,40,6);c.fillRect(cx-60,P(S.x0)+14,6,P(0)-P(S.x0)-14)}
+    if(S.mode==='throw'&&S.v0>0){const H=S.x0+S.v0*S.v0/(2*g);c.strokeStyle='#7c3aed';c.setLineDash([5,4]);c.beginPath();c.moveTo(cx-80,P(H));c.lineTo(cx+120,P(H));c.stroke();c.setLineDash([]);c.fillStyle='#7c3aed';c.textAlign='left';c.font='bold 12px Heebo';c.fillText('H = '+fmt(H,2)+' m',cx+60,P(H)-10)}
+    if(S.str){for(let k=0;k*dts<=S.t+1e-9;k++){const tk=k*dts;c.fillStyle='rgba(37,99,235,.2)';c.beginPath();c.arc(cx+(vel(tk)<0?10:-10),P(pos(tk)),7,0,7);c.fill()}}
+    const by=P(pos(S.t));c.fillStyle='#2563eb';c.beginPath();c.arc(cx,by,12,0,7);c.fill();
+    arrow(c,cx+34,by,cx+34,by-vel(S.t)/vmax*90,'#16a34a','v');
+    arrow(c,cx-34,by,cx-34,by+55,'#dc2626','g');
+    if(S.str){c.fillStyle='#5b6478';c.textAlign='right';c.textBaseline='top';c.font='12px Heebo';c.fillText('עקבות כל '+dts+' s (עלייה משמאל, ירידה מימין)',w-8,6)}
+  }
+}
+
+/* ---------- graphs ---------- */
+function drawGraphs(){
+  const s=sym(),t=S.t,tt=turnT(),roots=rootsX(),m=M();
+  // x-t
+  let [a0,a1]=rangeOf(pos);let G=axes($('gx'),a0,a1,s+' (m)','#2563eb');
+  clipPlot(G);
+  curve(G,pos,'rgba(37,99,235,.25)',0,S.T,3);curve(G,pos,'#2563eb',0,t,3);
+  if(S.avg&&S.t2!==S.t1){const sl=(pos(S.t2)-pos(S.t1))/(S.t2-S.t1);curve(G,q=>pos(S.t1)+sl*(q-S.t1),'#7c3aed',0,S.T,2,[6,4]);}
+  if(S.tan){const v=vel(t),d=S.T*0.2;curve(G,q=>pos(t)+v*(q-t),'#16a34a',Math.max(0,t-d),Math.min(S.T,t+d),2.5,[7,4])}
+  cursor(G,t);G.ctx.restore();
+  mark(G,0,S.x0,s+'₀ = '+fmt(S.x0),'#1d2433',true);
+  roots.forEach(r=>mark(G,r,0,'t = '+fmt(r)+' s','#0f766e',false));
+  if(tt!==null)mark(G,tt,pos(tt),'v = 0 , '+s+' = '+fmt(pos(tt)),'#7c3aed',S.a<0);
+  if(S.avg){mark(G,S.t1,pos(S.t1),'','#7c3aed');mark(G,S.t2,pos(S.t2),'','#7c3aed')}
+  mark(G,t,pos(t),'','#2563eb');
+  // v-t
+  [a0,a1]=rangeOf(vel);G=axes($('gv'),a0,a1,'v (m/s)','#16a34a');
+  if(S.area)fillArea(G,vel,0,t,'rgba(37,99,235,.22)','rgba(249,115,22,.30)');
+  if(S.avg&&S.t2>S.t1){fillArea(G,vel,S.t1,S.t2,'rgba(124,58,237,.18)','rgba(124,58,237,.18)');const va=(pos(S.t2)-pos(S.t1))/(S.t2-S.t1);clipPlot(G);curve(G,()=>va,'#7c3aed',S.t1,S.t2,2.5,[6,4]);G.ctx.restore()}
+  clipPlot(G);curve(G,vel,'rgba(22,163,74,.25)');curve(G,vel,'#16a34a',0,t);cursor(G,t);G.ctx.restore();
+  mark(G,0,S.v0,'v₀ = '+fmt(S.v0),'#1d2433',S.v0>=0);
+  if(tt!==null)mark(G,tt,0,'t = '+fmt(tt)+' s','#7c3aed',S.a<0);
+  mark(G,t,vel(t),'','#16a34a');
+  // a-t
+  const pa=Math.max(1,Math.abs(S.a)*0.3);G=axes($('ga'),Math.min(0,S.a)-pa,Math.max(0,S.a)+pa,'a (m/s²)','#dc2626');
+  if(S.area)fillArea(G,()=>S.a,0,t,'rgba(22,163,74,.22)','rgba(22,163,74,.22)');
+  clipPlot(G);curve(G,()=>S.a,'rgba(220,38,38,.25)');curve(G,()=>S.a,'#dc2626',0,t);cursor(G,t);G.ctx.restore();
+  mark(G,0,S.a,'a = '+fmt(S.a),'#1d2433',S.a>=0);
+  $('lg-x').innerHTML='<span class="sw" style="background:#16a34a"></span>משיק (שיפוע = v) '+(S.avg?'· <span class="sw" style="background:#7c3aed"></span>מיתר (שיפוע = מהירות ממוצעת) ':'')+'· לחצו/גררו על גרף כדי לבחור זמן';
+  $('lg-v').innerHTML='<span class="sw" style="background:rgba(37,99,235,.35)"></span>שטח חיובי &nbsp;<span class="sw" style="background:rgba(249,115,22,.45)"></span>שטח שלילי (= העתק Δ'+s+')'+(S.avg?' · <span class="sw" style="background:#7c3aed"></span>קו המהירות הממוצעת':'');
+  $('lg-a').innerHTML='<span class="sw" style="background:rgba(22,163,74,.35)"></span>שטח = שינוי מהירות Δv';
+}
+['gx','gv','ga'].forEach(id=>{const cv=$(id);const f=e=>{if(e.type==='pointermove'&&!e.buttons)return;const G=GM[id];if(!G)return;const r=cv.getBoundingClientRect();let t=(e.clientX-r.left-G.L)/(G.w-G.L-G.R)*S.T;S.t=Math.max(0,Math.min(S.T,t));S.play=false;updPlay();render()};cv.addEventListener('pointerdown',f);cv.addEventListener('pointermove',f)});
+
+/* ---------- texts ---------- */
+function meaning(){
+  const s=sym(),t=S.t,tt=turnT(),roots=rootsX(),m=M(),v=vel(t),dx=pos(t)-S.x0;
+  const shape=S.a===0?'קו ישר → שיפוע קבוע → מהירות קבועה.':(S.a>0?'פרבולה "מחייכת" (a>0): השיפוע גדל.':'פרבולה "עצובה" (a<0): השיפוע קטן.');
+  let x='<h3><span class="tag" style="background:#2563eb">'+s+'–t</span> גרף מקום–זמן</h3><ul>';
+  x+='<li><b>שיפוע</b> (של המשיק) = <b>מהירות רגעית</b>. עכשיו: '+eq('v = '+fmt(v)+' m/s')+'. '+shape+'</li>';
+  x+='<li><b>שטח</b> מתחת לגרף – <b>אין</b> משמעות פיזיקלית.</li>';
+  x+='<li><b>חיתוך עם ציר '+s+'</b> (t = 0): '+(m.vert?'גובה':'מיקום')+' התחלתי '+eq(s+'₀ = '+fmt(S.x0)+' m')+'.</li>';
+  x+='<li><b>חיתוך עם ציר t</b> ('+s+' = 0): '+(roots.length?(m.vert?'הגוף פוגע בקרקע ב-':'הגוף עובר בראשית ב-')+roots.map(r=>eq('t = '+fmt(r)+' s')).join(', '):'אין – הגוף לא עובר בראשית בזמן התנועה')+'.</li>';
+  if(S.a!==0)x+='<li><b>קודקוד</b> (שיפוע 0): '+(tt!==null?'v = 0 – '+(S.mode==='throw'?'<b>גובה מקסימלי</b> ':'הגוף נעצר רגעית ו<b>מחליף כיוון</b> ')+'ב-'+eq('t = '+fmt(tt)+' s')+', '+eq(s+' = '+fmt(pos(tt))+' m'):'לא בתחום הזמן – אין החלפת כיוון')+'.</li>';
+  if(S.avg&&S.t2!==S.t1)x+='<li style="color:#7c3aed"><b>שיפוע המיתר</b> בין t₁ ל-t₂ = <b>מהירות ממוצעת</b> = '+eq(fmt((pos(S.t2)-pos(S.t1))/(S.t2-S.t1))+' m/s')+'.</li>';
+  x+='</ul>';
+  let vv='<h3><span class="tag" style="background:#16a34a">v–t</span> גרף מהירות–זמן</h3><ul>';
+  vv+='<li><b>שיפוע</b> = <b>תאוצה</b>: '+eq('a = Δv/Δt = '+fmt(S.a)+' m/s²')+'. '+(S.a===0?'קו אופקי → a = 0.':'קו ישר → תאוצה קבועה.')+'</li>';
+  vv+='<li><b>שטח</b> בין הגרף לציר t = <b>העתק</b>. מעל הציר – חיובי, מתחת – שלילי. מ-0 עד t: '+eq('Δ'+s+' = '+fmt(dx)+' m')+'; דרך (סכום שטחים בערך מוחלט) = '+eq(fmt(pathLen(t))+' m')+'.</li>';
+  vv+='<li><b>חיתוך עם ציר v</b>: מהירות התחלתית '+eq('v₀ = '+fmt(S.v0)+' m/s')+'.</li>';
+  vv+='<li><b>חיתוך עם ציר t</b> (v = 0): '+(tt!==null?'עצירה רגעית ו<b>החלפת כיוון</b> ב-'+eq('t = '+fmt(tt)+' s')+(S.mode==='throw'?' – זו נקודת השיא':''):'אין – המהירות לא מחליפה סימן, הגוף לא משנה כיוון')+'.</li>';
+  vv+='<li><b>גרף מעל/מתחת לציר</b>: סימן v = כיוון התנועה. '+(S.a!==0?'|v| גדל כש-v ו-a באותו סימן (האצה), קטן כשהם בסימנים הפוכים (האטה).':'')+'</li>';
+  if(S.avg&&S.t2>S.t1)vv+='<li style="color:#7c3aed">מהירות ממוצעת = גובה המלבן ששטחו שווה לשטח מתחת לגרף בין t₁ ל-t₂.</li>';
+  vv+='</ul>';
+  let a='<h3><span class="tag" style="background:#dc2626">a–t</span> גרף תאוצה–זמן</h3><ul>';
+  a+='<li><b>שיפוע</b> = קצב שינוי התאוצה. כאן 0 – תאוצה קבועה (כל התנועות בתוכנית).</li>';
+  a+='<li><b>שטח</b> = <b>שינוי מהירות</b>: '+eq('Δv = a·t = '+fmt(S.a*t)+' m/s')+' (בדיקה: '+eq(fmt(vel(t))+' − '+fmt(S.v0)+' = '+fmt(vel(t)-S.v0))+').</li>';
+  a+='<li><b>חיתוך עם ציר a</b>: '+eq('a = '+fmt(S.a)+' m/s²')+'.</li>';
+  if(m.vert)a+='<li><b>שימו לב:</b> התאוצה −g גם בעלייה, גם בירידה וגם <b>בשיא</b> (שם v = 0 אבל a ≠ 0!).</li>';
+  a+='</ul>';
+  $('m-x').innerHTML=x;$('m-v').innerHTML=vv;$('m-a').innerHTML=a;
+}
+function readouts(){
+  const s=sym(),t=S.t;
+  const it=[['t',fmt(t)+' s','זמן'],[s,fmt(pos(t))+' m',M().vert?'גובה':'מקום'],['v',fmt(vel(t))+' m/s','מהירות'],['a',fmt(S.a)+' m/s²','תאוצה'],['Δ'+s,fmt(pos(t)-S.x0)+' m','העתק'],['d',fmt(pathLen(t))+' m','דרך']];
+  $('read').innerHTML=it.map(([k,v,l])=>'<div><span>'+l+'</span><b>'+v+'</b></div>').join('');
+  $('s-t').value=t;['x0','v0','a'].forEach(id=>$('v-'+id).textContent=fmt(S[id]));$('v-T').textContent=fmt(S.T)+' s';$('v-t1').textContent=fmt(S.t1);$('v-t2').textContent=fmt(S.t2);
+}
+function buildFormulas(){
+  const k=S.mode,f=$('formulas');let h='<h2>נוסחאות – ומתי משתמשים</h2>';
+  if(k==='uniform'){
+    h+='<div class="fbox">'+eq('x = x₀ + v·t')+'<br>'+eq('Δx = v·Δt')+' &nbsp; '+eq('v = const ,  a = 0')+'</div>';
+    h+='<p>משתמשים כשהמהירות <b>לא משתנה</b> – לא בגודל ולא בכיוון. סימן v קובע את כיוון התנועה.</p>';
+    h+='<div class="res">גרפים: '+eq('x–t')+' קו ישר, '+eq('v–t')+' קו אופקי, '+eq('a–t')+' על הציר.<br>בעקבות – מרווחים שווים בזמנים שווים.</div>';
+    h+='<div class="warn">שני גופים: נקודת החיתוך של גרפי x–t = <b>מפגש</b> (אותו מקום באותו זמן). חיתוך גרפי v–t = רק <b>אותה מהירות</b>, לא מפגש!</div>';
+  }else if(k==='accel'||k==='avg'){
+    h+='<table><tr><th>נוסחה</th><th>חסר בה</th><th>מתי</th></tr>'+
+      '<tr><td>'+eq('v = v₀ + a·t')+'</td><td>Δx</td><td>אין נתון/שאלה על מקום</td></tr>'+
+      '<tr><td>'+eq('x = x₀ + v₀t + ½at²')+'</td><td>v</td><td>לא יודעים/לא צריכים מהירות סופית</td></tr>'+
+      '<tr><td>'+eq('v² = v₀² + 2a·Δx')+'</td><td>t</td><td>אין זמן בנתונים ובשאלה</td></tr>'+
+      '<tr><td>'+eq('Δx = ½(v₀+v)·t')+'</td><td>a</td><td>אין תאוצה</td></tr></table>';
+    h+='<p class="note">כלל: רושמים נתונים ונעלם, ובוחרים את הנוסחה שחסר בה הגודל שאינו ידוע ואינו נשאל.</p>';
+    const tt=turnT();
+    h+='<div class="res">עכשיו: '+eq('v₀ = '+fmt(S.v0)+' , a = '+fmt(S.a))+'<br>'+(tt!==null?'הגוף נעצר ומחליף כיוון ב-'+eq('t = −v₀/a = '+fmt(tt)+' s'):'אין החלפת כיוון בזמן התנועה')+'</div>';
+    h+='<div class="warn">a < 0 <b>לא</b> אומר "האטה"! מאטים כש-v ו-a בסימנים הפוכים.</div>';
+  }
+  if(k==='avg'||(S.avg&&(k==='accel'||k==='uniform'||k==='free'||k==='throw'))){
+    const s=sym(),d=S.t2-S.t1;const va=d?(pos(S.t2)-pos(S.t1))/d:NaN;let dist=Math.abs(pos(S.t2)-pos(S.t1));const tc=S.a?-S.v0/S.a:null;if(tc!==null&&tc>S.t1&&tc<S.t2)dist=Math.abs(pos(tc)-pos(S.t1))+Math.abs(pos(S.t2)-pos(tc));
+    h+='<h3 style="margin-top:10px;color:#7c3aed">מהירות ממוצעת</h3><div class="fbox">'+eq('v̄ = Δ'+s+' / Δt')+' – תמיד<br>'+eq('v̄ = (v₁ + v₂)/2')+' – רק בתאוצה קבועה</div>';
+    h+='<div class="res">בין '+eq('t₁ = '+fmt(S.t1))+' ל-'+eq('t₂ = '+fmt(S.t2))+':<br>'+eq('v̄ = ('+fmt(pos(S.t2))+' − '+fmt(pos(S.t1))+')/'+fmt(d)+' = '+fmt(va)+' m/s')+'<br>בדיקה: '+eq('(v₁+v₂)/2 = ('+fmt(vel(S.t1))+' + '+fmt(vel(S.t2))+')/2 = '+fmt((vel(S.t1)+vel(S.t2))/2))+'<br>= המהירות הרגעית באמצע: '+eq('v('+fmt((S.t1+S.t2)/2)+') = '+fmt(vel((S.t1+S.t2)/2)))+'<br>גודל מהירות ממוצע (דרך/זמן): '+eq(fmt(d?dist/d:NaN)+' m/s')+'</div>';
+    h+='<div class="warn">אם הגוף החליף כיוון – דרך/זמן ≠ |Δx|/זמן. הזיזו t₁, t₂ סביב נקודת העצירה וראו.</div>';
+  }
+  if(k==='free'){
+    const T=Math.sqrt(2*S.x0/g);
+    h+='<div class="fbox">ציר y כלפי מעלה, '+eq('a = −g')+'<br>'+eq('y = h − ½g t²')+'<br>'+eq('v = −g t')+'<br>'+eq('v² = 2g(h − y)')+'</div>';
+    h+='<div class="res">'+eq('h = '+fmt(S.x0)+' m')+'<br>זמן נפילה '+eq('t = √(2h/g) = '+fmt(T)+' s')+'<br>מהירות פגיעה '+eq('|v| = √(2gh) = '+fmt(Math.sqrt(2*g*S.x0))+' m/s')+'</div>';
+    h+='<div class="warn">המסה לא משפיעה (בהזנחת התנגדות האוויר). המרחקים בכל שנייה גדלים ביחס 1:3:5:7 – רואים בעקבות.</div>';
+  }
+  if(k==='throw'){
+    h+='<div class="fbox">'+eq('y = h₀ + v₀t − ½g t²')+'<br>'+eq('v = v₀ − g t')+'<br>'+eq('v² = v₀² − 2g(y − h₀)')+'</div>';
+    if(S.v0>0){const tu=S.v0/g,H=S.x0+S.v0*S.v0/(2*g);
+      h+='<div class="res">בשיא: '+eq('v = 0')+'<br>זמן עלייה '+eq('t = v₀/g = '+fmt(tu)+' s')+'<br>גובה מקסימלי '+eq('H = h₀ + v₀²/2g = '+fmt(H)+' m')+'<br>זמן כולל עד הקרקע '+eq(fmt(S.T)+' s')+'<br>מהירות פגיעה '+eq(fmt(vel(S.T))+' m/s')+'</div>';}
+    else h+='<div class="res">זריקה כלפי מטה (v₀ < 0): אין שיא, '+eq('|v|')+' רק גדל.</div>';
+    h+='<div class="warn">סימטריה (כש-h₀ = 0): זמן עלייה = זמן ירידה, ובחזרה לגובה הזריקה המהירות שווה בגודל והפוכה בכיוון. בשיא v = 0 אבל a = −g!</div>';
+  }
+  f.innerHTML=h;
+}
+function render(){readouts();drawTrack();drawGraphs();meaning()}
+window.addEventListener('resize',render);
+setMode('accel');
+</script>
+</body>
+</html>

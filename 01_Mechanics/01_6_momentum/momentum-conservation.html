@@ -120,9 +120,8 @@ td small { display: block; color: var(--muted); font-weight: 500; font-size: 13p
   <h1>שימור תנע <small>התנגשויות על מסילה אופקית ללא חיכוך</small></h1>
   <nav class="tabs" role="tablist" aria-label="סוג ההתנגשות">
     <button role="tab" data-mode="elastic">התנגשות אלסטית לחלוטין</button>
-    <button role="tab" data-mode="inelastic">התנגשות לא אלסטית</button>
+    <button role="tab" data-mode="bullet">התנגשות לא אלסטית: קליע חודר גוש עץ</button>
     <button role="tab" data-mode="plastic">התנגשות פלסטית לחלוטין</button>
-    <button role="tab" data-mode="bullet">קליע חודר גוש עץ</button>
   </nav>
 </header>
 
@@ -154,7 +153,7 @@ td small { display: block; color: var(--muted); font-weight: 500; font-size: 13p
           <input type="range" id="slow" min="0" max="2" step="0.01" value="0" dir="ltr">
           <output id="slowOut" for="slow" dir="ltr">×1.00</output>
         </label>
-        <label class="switch" id="autoWrap"><input type="checkbox" id="auto" checked> האטה אוטומטית ברגע ההתנגשות</label>
+        <label class="switch" id="autoWrap"><input type="checkbox" id="auto"> הילוך איטי ברגע ההתנגשות (כ־3 שניות)</label>
       </div>
       <div id="status" class="status" role="status" aria-live="polite"></div>
     </section>
@@ -199,7 +198,7 @@ td small { display: block; color: var(--muted); font-weight: 500; font-size: 13p
   </div>
 </div>
 
-<p class="note">איך זה מחושב: התנועה מחושבת צעד אחר צעד מתוך הכוחות בלבד (שיטת Verlet, <span dir="ltr">dt ≤ 0.05 ms</span>). במצבים 1–3 המגע הוא פגוש־קפיץ קשיח, <span dir="ltr">k = 20,000 N/m</span>. כאשר <span dir="ltr">e &lt; 1</span> הקפיץ מחזיר רק חלק <span dir="ltr">e²</span> מהאנרגיה שנאגרה בו, והיתר הופך לחום. הנוסחאות המוכרות משמשות רק להשוואה בלוח הבדיקות.</p>
+<p class="note">איך זה מחושב: התנועה מחושבת צעד אחר צעד מתוך הכוחות בלבד (שיטת Verlet, <span dir="ltr">dt ≤ 0.05 ms</span>). בהתנגשויות בין העגלות המגע הוא פגוש־קפיץ קשיח, <span dir="ltr">k = 20,000 N/m</span>; בהתנגשות הפלסטית הכוח נפסק ברגע שהמהירויות משתוות. על הקליע פועל בתוך הגוש כוח התנגדות קבוע. הנוסחאות המוכרות משמשות רק להשוואה בלוח הבדיקות.</p>
 <script>
 /* ======================================================================
  * PHYSICS CORE  (no DOM, no drawing — can be run and tested in Node)
@@ -575,13 +574,12 @@ const Physics = (() => {
   const FONT = 'system-ui, "Segoe UI", Arial, "Noto Sans Hebrew", sans-serif';
 
   /* ---------------- controls definition ---------------- */
-  const CART = ['elastic', 'inelastic', 'plastic'];
+  const CART = ['elastic', 'plastic'];
   const CTRL = [
     { id: 'm1', sym: 'm₁', name: 'מסת גוף 1', unit: 'kg', min: 0.1, max: 10, step: 0.1, modes: CART, body: 1 },
     { id: 'v1', sym: 'v₁', name: 'מהירות גוף 1', unit: 'm/s', min: -5, max: 5, step: 0.1, modes: CART, body: 1 },
     { id: 'm2', sym: 'm₂', name: 'מסת גוף 2', unit: 'kg', min: 0.1, max: 10, step: 0.1, modes: CART, body: 2 },
     { id: 'v2', sym: 'v₂', name: 'מהירות גוף 2', unit: 'm/s', min: -5, max: 5, step: 0.1, modes: CART, body: 2 },
-    { id: 'e', sym: 'e', name: 'מקדם התקומה', unit: '', min: 0, max: 1, step: 0.01, modes: ['inelastic'] },
     { id: 'bm', sym: 'm₁', name: 'מסת הקליע', unit: 'g', min: 1, max: 50, step: 1, modes: ['bullet'], body: 1 },
     { id: 'bv', sym: 'v₁', name: 'מהירות הקליע', unit: 'm/s', min: 50, max: 1000, step: 10, modes: ['bullet'], body: 1 },
     { id: 'bM', sym: 'M', name: 'מסת הגוש', unit: 'kg', min: 0.05, max: 10, step: 0.05, modes: ['bullet'], body: 2 },
@@ -594,16 +592,16 @@ const Physics = (() => {
     { name: 'גוף כבד פוגע בגוף קל', set: { m1: 5, m2: 0.5, v1: 2, v2: 0 } },
     { name: 'תנועה זה לקראת זה', set: { m1: 2, m2: 1, v1: 2, v2: -3 } },
     { name: 'גוף מהיר משיג גוף איטי', set: { m1: 1, m2: 2, v1: 4, v2: 1 } },
-    { name: 'קליע בגוש כבד (נתקע)', mode: 'bullet', set: { bm: 10, bv: 400, bM: 2, bL: 20, bF: 6000 } },
-    { name: 'קליע בגוש קל (חודר)', mode: 'bullet', set: { bm: 10, bv: 400, bM: 0.2, bL: 8, bF: 6000 } },
+    { name: 'קליע חודר גוש כבד', mode: 'bullet', set: { bm: 10, bv: 400, bM: 2, bL: 8, bF: 6000 } },
+    { name: 'קליע חודר גוש קל', mode: 'bullet', set: { bm: 10, bv: 400, bM: 0.2, bL: 8, bF: 6000 } },
   ];
 
   /* ---------------- application state ---------------- */
   const st = {
     mode: 'elastic',
-    par: { m1: 1, m2: 1, v1: 3, v2: 0, e: 0.5, bm: 10, bv: 400, bM: 2, bL: 20, bF: 6000 },
+    par: { m1: 1, m2: 1, v1: 3, v2: 0, e: 0.5, bm: 10, bv: 400, bM: 2, bL: 8, bF: 6000 },
     rec: null, sum: null, D: null, plan: [], vmax: 1, v2max: 1,
-    t: 0, playing: false, slow: 1, auto: true, zoom: true, showE: false,
+    t: 0, playing: false, slow: 1, auto: false, zoom: true, showE: false,
     predict: false, revealed: false, guess: null,
   };
   const isBullet = () => st.mode === 'bullet';

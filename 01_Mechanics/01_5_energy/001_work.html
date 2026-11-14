@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>בונה הפתרון - עבודה ואנרגיה במישור משופע (שאלה 7)</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --accent: #0284c7;
+      --success: #15803d;
+      --success-bg: #dcfce7;
+      --error: #b91c1c;
+      --error-bg: #fee2e2;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --muted: #475569;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .math-var {
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-style: italic;
+      direction: ltr;
+      display: inline-block;
+      unicode-bidi: isolate;
+    }
+
+    .ltr-inline {
+      direction: ltr;
+      display: inline-block;
+      unicode-bidi: isolate;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+      color: #fff;
+      padding: 14px 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .btn-new-params {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      color: #fff;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-new-params:active {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    main {
+      max-width: 960px;
+      margin: 14px auto 40px;
+      padding: 0 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    @media (min-width: 740px) {
+      .problem-grid {
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+    }
+
+    .problem-text {
+      font-size: 1.03rem;
+    }
+
+    .problem-text h2 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      color: var(--primary);
+    }
+
+    .diagram-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .diagram-box svg {
+      width: 100%;
+      max-width: 420px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .diagram-caption {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+    }
+
+    .tab-btn {
+      flex: 1 0 auto;
+      min-width: 74px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+
+    .tab-btn.active {
+      border-color: var(--primary);
+      background: #eff6ff;
+      color: var(--primary);
+    }
+
+    .tab-btn.done {
+      border-color: var(--success);
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .tab-btn.locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    /* Step sections */
+    .step-box {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 14px;
+      background: #fafcff;
+    }
+
+    .step-box.completed {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+
+    .step-box.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--primary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-badge {
+      background: var(--primary);
+      color: #fff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .step-box.completed .step-badge {
+      background: var(--success);
+    }
+
+    /* Formula choices */
+    .formula-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    @media (min-width: 600px) {
+      .formula-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .formula-opt {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 12px;
+      text-align: right;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      min-height: 48px;
+    }
+
+    .formula-opt:hover {
+      border-color: var(--primary-light);
+    }
+
+    .formula-opt.selected-wrong {
+      border-color: var(--error);
+      background: var(--error-bg);
+    }
+
+    .formula-opt.selected-right {
+      border-color: var(--success);
+      background: var(--success-bg);
+      font-weight: 700;
+    }
+
+    .formula-math {
+      font-family: "Times New Roman", serif;
+      font-size: 1.05rem;
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-weight: 600;
+    }
+
+    /* Expression Builder */
+    .expr-display-wrap {
+      background: #fff;
+      border: 2px solid #94a3b8;
+      border-radius: 10px;
+      padding: 12px 14px;
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .expr-display {
+      font-family: "Times New Roman", serif;
+      font-size: 1.25rem;
+      direction: ltr;
+      unicode-bidi: isolate;
+      word-break: break-word;
+      flex: 1;
+      color: #0f172a;
+      min-height: 28px;
+    }
+
+    .token-pad {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 10px;
+      direction: ltr;
+    }
+
+    .tok-btn {
+      background: #fff;
+      border: 1.5px solid #94a3b8;
+      border-radius: 8px;
+      padding: 9px 13px;
+      font-family: "Times New Roman", serif;
+      font-size: 1.08rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-width: 44px;
+      min-height: 44px;
+      color: #0f172a;
+    }
+
+    .tok-btn:active {
+      background: #e2e8f0;
+      transform: scale(0.97);
+    }
+
+    .tok-btn.op {
+      background: #eff6ff;
+      border-color: #93c5fd;
+      color: #1e40af;
+    }
+
+    .tok-btn.ctrl {
+      font-family: system-ui, sans-serif;
+      font-size: 0.88rem;
+      background: #f8fafc;
+      color: #334155;
+    }
+
+    /* Numerical & Unit Input */
+    .num-unit-panel {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .num-unit-panel {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .sub-panel {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .sub-panel-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .num-readout {
+      background: #f8fafc;
+      border: 1.5px solid #94a3b8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: "Times New Roman", serif;
+      font-size: 1.3rem;
+      direction: ltr;
+      text-align: center;
+      margin-bottom: 8px;
+      min-height: 46px;
+      font-weight: 700;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      direction: ltr;
+    }
+
+    .key-btn {
+      padding: 10px 6px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      min-height: 44px;
+    }
+
+    .key-btn:active {
+      background: #e2e8f0;
+    }
+
+    .key-btn.sci {
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 0.95rem;
+    }
+
+    .unit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+      direction: ltr;
+    }
+
+    .unit-btn {
+      padding: 10px 8px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      font-family: "Times New Roman", serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+    }
+
+    .unit-btn.selected {
+      border-color: var(--primary);
+      background: #dbeafe;
+      color: var(--primary);
+    }
+
+    /* Qualitative choice for part E */
+    .qual-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .qual-btn {
+      text-align: right;
+      padding: 12px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 9px;
+      background: #fff;
+      font-size: 0.96rem;
+      cursor: pointer;
+      line-height: 1.45;
+    }
+
+    .qual-btn.selected {
+      border-color: var(--primary);
+      background: #eff6ff;
+      font-weight: 600;
+    }
+
+    .action-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: 11px 18px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 46px;
+      margin-top: 8px;
+    }
+
+    .action-btn:active {
+      opacity: 0.9;
+    }
+
+    .feedback {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.94rem;
+      display: none;
+    }
+
+    .feedback.err {
+      display: block;
+      background: var(--error-bg);
+      color: var(--error);
+      border: 1px solid #fca5a5;
+    }
+
+    .feedback.ok {
+      display: block;
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid #86efac;
+    }
+
+    /* Formal Grid-Paper Notebook Layout (עיצוב חובה של פתרון) */
+    .notebook-sheet {
+      margin-top: 16px;
+      border: 2px solid #3b82f6;
+      border-radius: 10px;
+      background-color: #ffffff;
+      background-image:
+        linear-gradient(to right, rgba(147, 197, 253, 0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(147, 197, 253, 0.35) 1px, transparent 1px);
+      background-size: 20px 20px;
+      padding: 14px;
+      box-shadow: 0 3px 10px rgba(30, 58, 138, 0.08);
+    }
+
+    .notebook-header {
+      text-align: center;
+      color: #b91c1c;
+      font-weight: 800;
+      font-size: 1.08rem;
+      margin-bottom: 10px;
+      text-decoration: underline;
+    }
+
+    .notebook-cols {
+      display: grid;
+      grid-template-columns: 1fr;
+      border-top: 2px solid #1d4ed8;
+    }
+
+    @media (min-width: 640px) {
+      .notebook-cols {
+        grid-template-columns: 36% 64%;
+      }
+    }
+
+    .nb-right-col {
+      padding: 10px 12px;
+      border-bottom: 2px solid #1d4ed8;
+    }
+
+    @media (min-width: 640px) {
+      .nb-right-col {
+        border-bottom: none;
+        border-left: 2px solid #1d4ed8;
+      }
+    }
+
+    .nb-given-box {
+      padding-bottom: 12px;
+      border-bottom: 2px solid #1d4ed8;
+      margin-bottom: 12px;
+    }
+
+    .nb-section-label {
+      color: #1e40af;
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .nb-left-col {
+      padding: 10px 14px;
+    }
+
+    .nb-stage {
+      margin-bottom: 12px;
+    }
+
+    .nb-stage-title {
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 3px;
+    }
+
+    .nb-math-line {
+      font-family: "Times New Roman", serif;
+      font-size: 1.1rem;
+      direction: ltr;
+      text-align: left;
+      unicode-bidi: isolate;
+      padding: 2px 6px;
+    }
+
+    .nb-final-highlight {
+      display: inline-block;
+      background: #fef08a;
+      border: 1.5px solid #ca8a04;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-weight: 700;
+    }
+
+    .next-part-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    /* Summary Card */
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.92rem;
+      white-space: pre-wrap;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <h1>בונה הפתרון — עבודה ואנרגיה במישור משופע (שאלה 7)</h1>
+      <button class="btn-new-params" id="btnRandomize" type="button">נתונים חדשים ↻</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Problem Statement + Free Body Diagram -->
+    <section class="card">
+      <div class="problem-grid">
+        <div class="problem-text">
+          <h2>שאלה 7 — עבודה של כוחות ושינוי באנרגיה</h2>
+          <p id="problemStatement"></p>
+          <p style="margin-bottom:4px;font-weight:700;">מצא:</p>
+          <ol style="margin-top:0;padding-right:20px;" type="א">
+            <li>את עבודת הכוח <span class="math-var">F</span>.</li>
+            <li>את עבודת כוח החיכוך.</li>
+            <li>את השינוי באנרגיה הפוטנציאלית.</li>
+            <li>את השינוי באנרגיה הקינטית.</li>
+            <li>האם העבודה של כוח <span class="math-var">F</span> שווה לשינוי באנרגיה הקינטית במקרה זה? (הסבר!)</li>
+          </ol>
+        </div>
+
+        <div class="diagram-box">
+          <svg id="fbdSvg" viewBox="0 0 420 310" xmlns="http://www.w3.org/2000/svg" aria-label="תרשים כוחות על גוף במישור משופע">
+            <defs>
+              <marker id="arrowBlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1.2 L 9.5 5 L 0 8.8 z" fill="#1d4ed8" />
+              </marker>
+              <marker id="arrowRed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1.2 L 9.5 5 L 0 8.8 z" fill="#dc2626" />
+              </marker>
+              <marker id="arrowGreen" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1.2 L 9.5 5 L 0 8.8 z" fill="#15803d" />
+              </marker>
+              <marker id="arrowPurple" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1.2 L 9.5 5 L 0 8.8 z" fill="#7e22ce" />
+              </marker>
+              <marker id="arrowGray" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#64748b" />
+              </marker>
+            </defs>
+            <g id="geometry-layer"></g>
+            <g id="forces-layer"></g>
+            <g id="labels-layer"></g>
+          </svg>
+          <div class="diagram-caption">תרשים כוחות (כל הכוחות יוצאים ממרכז המסה של הגוף)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sub-question Tabs -->
+    <div class="tabs" id="tabsBar"></div>
+
+    <!-- Active Sub-question Workspace -->
+    <section class="card" id="workspaceCard"></section>
+
+    <!-- Final Progress Summary -->
+    <section class="card" id="summaryCard" style="display:none;">
+      <h2 style="margin-top:0;color:var(--primary);font-size:1.1rem;">סיכום התקדמות התלמיד/ה</h2>
+      <div class="summary-box" id="summaryText"></div>
+      <button class="action-btn" id="btnCopySummary" type="button">העתק סיכום ללוח 📋</button>
+      <span id="copyConfirm" style="margin-right:10px;color:var(--success);font-weight:700;display:none;">הועתק!</span>
+    </section>
+  </main>
+
+  <script>
+    // Official Bagrut Formula Bank (from PHYSIC-Formula_2027)
+    const FORMULA_BANK = [
+      { id: "work_const", name: "עבודה של כוח קבוע", math: "W = F_x Δx = F cosθ Δs" },
+      { id: "friction_k", name: "גודל כוח חיכוך קינטי", math: "f_k = μ_k N" },
+      { id: "newton2", name: "החוק השני של ניוטון", math: "ΣF⃗ = ma⃗" },
+      { id: "gravity_force", name: "גודל כוח הכבידה", math: "F = mg" },
+      { id: "pot_grav", name: "אנרגיה פוטנציאלית כובדית", math: "U_G = mgh" },
+      { id: "work_cons", name: "עבודה של כוח משמר", math: "W_משמר = -ΔU" },
+      { id: "work_kinetic", name: "משפט עבודה–אנרגיה", math: "W_כוללת = ΔE_k" },
+      { id: "work_noncons", name: "עבודת שקול הכוחות הלא-משמרים", math: "W_לא משמרים = ΔE" },
+      { id: "kinetic_e", name: "אנרגיה קינטית", math: "E_k = ½mv²" }
+    ];
+
+    const ALL_UNITS = [
+      "J", "N", "W", "m/s", "m/s²", "kg", "m", "N·s"
+    ];
+
+    // Problem State
+    let params = {
+      F: 200,
+      m: 15,
+      alpha: 30,
+      ds: 7,
+      muk: 0.15,
+      g: 10
+    };
+
+    const PARTS_META = [
+      { key: "a", title: "סעיף א׳", prompt: "מצא את עבודת הכוח F לאורך המסלול." },
+      { key: "b", title: "סעיף ב׳", prompt: "מצא את עבודת כוח החיכוך הקינטי לאורך המסלול." },
+      { key: "c", title: "סעיף ג׳", prompt: "מצא את השינוי באנרגיה הפוטנציאלית הכובדית (ΔU_G)." },
+      { key: "d", title: "סעיף ד׳", prompt: "מצא את השינוי באנרגיה הקינטית (ΔE_k)." },
+      { key: "e", title: "סעיף ה׳", prompt: "האם העבודה של כוח F שווה לשינוי באנרגיה הקינטית במקרה זה? (הסבר!)" }
+    ];
+
+    let state = {};
+
+    function initState() {
+      state = {
+        activePart: 0,
+        mistakes: { a: 0, b: 0, c: 0, d: 0, e: 0 },
+        parts: {
+          a: { step1: false, step2: false, step3: false, exprTokens: [], numStr: "", unit: "", chosenFormula: "" },
+          b: { step1: false, step2: false, step3: false, exprTokens: [], numStr: "", unit: "", chosenFormula: "" },
+          c: { step1: false, step2: false, step3: false, exprTokens: [], numStr: "", unit: "", chosenFormula: "" },
+          d: { step1: false, step2: false, step3: false, exprTokens: [], numStr: "", unit: "", chosenFormula: "" },
+          e: { step1: false, chosenQual: null }
+        }
+      };
+    }
+
+    function randomizeParams(useDefault = false) {
+      if (useDefault) {
+        params = { F: 200, m: 15, alpha: 30, ds: 7, muk: 0.15, g: 10 };
+      } else {
+        const F_opts = [150, 180, 200, 220, 250, 300];
+        const m_opts = [10, 12, 15, 18, 20];
+        const a_opts = [25, 30, 35, 37];
+        const s_opts = [5, 6, 7, 8, 10];
+        const mu_opts = [0.1, 0.15, 0.2, 0.25];
+        params = {
+          F: F_opts[Math.floor(Math.random() * F_opts.length)],
+          m: m_opts[Math.floor(Math.random() * m_opts.length)],
+          alpha: a_opts[Math.floor(Math.random() * a_opts.length)],
+          ds: s_opts[Math.floor(Math.random() * s_opts.length)],
+          muk: mu_opts[Math.floor(Math.random() * mu_opts.length)],
+          g: 10
+        };
+      }
+      initState();
+      renderProblemText();
+      renderDiagram();
+      renderTabs();
+      renderWorkspace();
+      document.getElementById("summaryCard").style.display = "none";
+    }
+
+    function computeValues() {
+      const rad = (params.alpha * Math.PI) / 180;
+      const WF = params.F * params.ds;
+      const N = params.m * params.g * Math.cos(rad);
+      const fk = params.muk * N;
+      const Wfk = -fk * params.ds;
+      const dh = params.ds * Math.sin(rad);
+      const dUG = params.m * params.g * dh;
+      const Wg = -dUG;
+      const dEk = WF + Wfk + Wg;
+      return { rad, WF, N, fk, Wfk, dh, dUG, Wg, dEk };
+    }
+
+    function renderProblemText() {
+      const el = document.getElementById("problemStatement");
+      el.innerHTML = `כוח של <span class="ltr-inline"><b>${params.F}</b></span> ניוטון פועל במקביל למשטח משופע ומעלה גוף שמסתו <span class="ltr-inline"><b>${params.m}</b></span> ק״ג במישור משופע ששיפועו <span class="ltr-inline"><b>${params.alpha}°</b></span>, לאורך דרך של <span class="ltr-inline"><b>${params.ds} m</b></span>. מקדם החיכוך הקינטי בין הגוף למשטח הוא <span class="ltr-inline"><b>${params.muk}</b></span>. (קח <span class="math-var">g = 10 m/s²</span>).`;
+    }
+
+    // =========================================================
+    // ZERO-OVERLAP COLLISION-FREE SVG DIAGRAM & OVER-ARROW SYSTEM
+    // =========================================================
+    function createVectorLabelSVG(id, type, mainChar, subChar, x, y, color) {
+      const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      g.setAttribute("id", id);
+      g.setAttribute("class", "vec-label");
+      g.setAttribute("transform", `translate(${x.toFixed(1)}, ${y.toFixed(1)})`);
+      g.dataset.lx = x;
+      g.dataset.ly = y;
+
+      // Opaque halo pill behind text & over-arrow so no line can ever visually slice through
+      const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      bg.setAttribute("class", "label-bg");
+      bg.setAttribute("fill", "rgba(255, 255, 255, 0.96)");
+      bg.setAttribute("stroke", "rgba(226, 232, 240, 0.85)");
+      bg.setAttribute("stroke-width", "1");
+      bg.setAttribute("rx", "4");
+      g.appendChild(bg);
+
+      if (type === "single") {
+        // Main force letter centered strictly at x=0, y=0
+        const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txt.setAttribute("x", "0");
+        txt.setAttribute("y", "0");
+        txt.setAttribute("text-anchor", "middle");
+        txt.setAttribute("font-family", "'Times New Roman', Georgia, serif");
+        txt.setAttribute("font-style", "italic");
+        txt.setAttribute("font-weight", "700");
+        txt.setAttribute("font-size", "17");
+        txt.setAttribute("fill", color);
+        txt.setAttribute("dir", "ltr");
+        txt.style.direction = "ltr";
+        txt.style.unicodeBidi = "isolate";
+        txt.textContent = mainChar;
+
+        if (subChar) {
+          const tspan = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+          tspan.setAttribute("dy", "4");
+          tspan.setAttribute("font-size", "11.5");
+          tspan.setAttribute("font-style", "italic");
+          tspan.textContent = subChar;
+          txt.appendChild(tspan);
+        }
+        g.appendChild(txt);
+
+        // Vector over-arrow centered strictly above x=0 (the force glyph itself)
+        const arrowLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        arrowLine.setAttribute("d", "M -6 -15.5 L 6.5 -15.5 M 3.5 -18 L 7 -15.5 L 3.5 -13");
+        arrowLine.setAttribute("stroke", color);
+        arrowLine.setAttribute("stroke-width", "1.45");
+        arrowLine.setAttribute("fill", "none");
+        arrowLine.setAttribute("stroke-linecap", "round");
+        arrowLine.setAttribute("stroke-linejoin", "round");
+        g.appendChild(arrowLine);
+      } else if (type === "mg") {
+        // Scalar m at x=-8, vector g at x=+5; arrow ONLY above g
+        const txtM = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txtM.setAttribute("x", "-8");
+        txtM.setAttribute("y", "0");
+        txtM.setAttribute("text-anchor", "middle");
+        txtM.setAttribute("font-family", "'Times New Roman', Georgia, serif");
+        txtM.setAttribute("font-style", "italic");
+        txtM.setAttribute("font-weight", "700");
+        txtM.setAttribute("font-size", "17");
+        txtM.setAttribute("fill", color);
+        txtM.setAttribute("dir", "ltr");
+        txtM.style.direction = "ltr";
+        txtM.style.unicodeBidi = "isolate";
+        txtM.textContent = "m";
+        g.appendChild(txtM);
+
+        const txtG = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txtG.setAttribute("x", "5.5");
+        txtG.setAttribute("y", "0");
+        txtG.setAttribute("text-anchor", "middle");
+        txtG.setAttribute("font-family", "'Times New Roman', Georgia, serif");
+        txtG.setAttribute("font-style", "italic");
+        txtG.setAttribute("font-weight", "700");
+        txtG.setAttribute("font-size", "17");
+        txtG.setAttribute("fill", color);
+        txtG.setAttribute("dir", "ltr");
+        txtG.style.direction = "ltr";
+        txtG.style.unicodeBidi = "isolate";
+        txtG.textContent = "g";
+        g.appendChild(txtG);
+
+        // Vector over-arrow strictly over 'g' (x=0.5 to x=11)
+        const arrowG = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        arrowG.setAttribute("d", "M 0.5 -13.5 L 11 -13.5 M 8.2 -15.8 L 11.4 -13.5 L 8.2 -11.2");
+        arrowG.setAttribute("stroke", color);
+        arrowG.setAttribute("stroke-width", "1.45");
+        arrowG.setAttribute("fill", "none");
+        arrowG.setAttribute("stroke-linecap", "round");
+        arrowG.setAttribute("stroke-linejoin", "round");
+        g.appendChild(arrowG);
+      }
+
+      return g;
+    }
+
+    function segDistToBox(x1, y1, x2, y2, box) {
+      // Sample 25 points along segment + endpoints and compute minimum distance to inflated rect
+      let minD = Infinity;
+      const steps = 25;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const px = x1 + (x2 - x1) * t;
+        const py = y1 + (y2 - y1) * t;
+        const dx = Math.max(box.x - px, 0, px - (box.x + box.w));
+        const dy = Math.max(box.y - py, 0, py - (box.y + box.h));
+        const d = Math.hypot(dx, dy);
+        if (d < minD) minD = d;
+      }
+      return minD;
+    }
+
+    function boxesOverlap(b1, b2, pad = 6) {
+      return !(
+        b1.x + b1.w + pad < b2.x ||
+        b2.x + b2.w + pad < b1.x ||
+        b1.y + b1.h + pad < b2.y ||
+        b2.y + b2.h + pad < b1.y
+      );
+    }
+
+    function renderDiagram() {
+      const geomLayer = document.getElementById("geometry-layer");
+      const forcesLayer = document.getElementById("forces-layer");
+      const labelsLayer = document.getElementById("labels-layer");
+      geomLayer.innerHTML = "";
+      forcesLayer.innerHTML = "";
+      labelsLayer.innerHTML = "";
+
+      const rad = (params.alpha * Math.PI) / 180;
+      const cosA = Math.cos(rad);
+      const sinA = Math.sin(rad);
+
+      // Incline geometry (sloping upward from bottom-left to top-right)
+      const baseLeftX = 55;
+      const baseLeftY = 255;
+      const inclineLen = 300;
+      const topRightX = baseLeftX + inclineLen * cosA;
+      const topRightY = baseLeftY - inclineLen * sinA;
+      const baseRightX = topRightX;
+      const baseRightY = baseLeftY;
+
+      const ns = "http://www.w3.org/2000/svg";
+
+      // Ramp triangle
+      const ramp = document.createElementNS(ns, "polygon");
+      ramp.setAttribute("points", `${baseLeftX},${baseLeftY} ${baseRightX},${baseRightY} ${topRightX},${topRightY}`);
+      ramp.setAttribute("fill", "#f1f5f9");
+      ramp.setAttribute("stroke", "#475569");
+      ramp.setAttribute("stroke-width", "2");
+      geomLayer.appendChild(ramp);
+
+      // Ground extension
+      const ground = document.createElementNS(ns, "line");
+      ground.setAttribute("x1", "30");
+      ground.setAttribute("y1", baseLeftY);
+      ground.setAttribute("x2", "390");
+      ground.setAttribute("y2", baseLeftY);
+      ground.setAttribute("stroke", "#334155");
+      ground.setAttribute("stroke-width", "2.5");
+      geomLayer.appendChild(ground);
+
+      // Angle arc at bottom-left
+      const arcR = 42;
+      const arcEndX = baseLeftX + arcR * cosA;
+      const arcEndY = baseLeftY - arcR * sinA;
+      const arc = document.createElementNS(ns, "path");
+      arc.setAttribute("d", `M ${baseLeftX + arcR} ${baseLeftY} A ${arcR} ${arcR} 0 0 0 ${arcEndX} ${arcEndY}`);
+      arc.setAttribute("fill", "none");
+      arc.setAttribute("stroke", "#1e3a8a");
+      arc.setAttribute("stroke-width", "1.6");
+      geomLayer.appendChild(arc);
+
+      const angleTxt = document.createElementNS(ns, "text");
+      const midAngle = rad / 2;
+      angleTxt.setAttribute("x", (baseLeftX + (arcR + 18) * Math.cos(midAngle)).toFixed(1));
+      angleTxt.setAttribute("y", (baseLeftY - (arcR + 14) * Math.sin(midAngle) + 4).toFixed(1));
+      angleTxt.setAttribute("font-size", "13");
+      angleTxt.setAttribute("font-weight", "700");
+      angleTxt.setAttribute("fill", "#1e3a8a");
+      angleTxt.setAttribute("dir", "ltr");
+      angleTxt.textContent = `${params.alpha}°`;
+      geomLayer.appendChild(angleTxt);
+
+      // Block placed midway along the incline
+      const distAlong = 145;
+      const surfX = baseLeftX + distAlong * cosA;
+      const surfY = baseLeftY - distAlong * sinA;
+      const blockW = 54;
+      const blockH = 36;
+
+      // Center of mass (strict origin for ALL force vectors)
+      // Normal outward unit vector: (-sinA, -cosA) in SVG coords (y grows downward)
+      const nx = -sinA;
+      const ny = -cosA;
+      // Tangent upward-along-slope unit vector: (cosA, -sinA)
+      const tx = cosA;
+      const ty = -sinA;
+
+      const cmX = surfX + nx * (blockH / 2);
+      const cmY = surfY + ny * (blockH / 2);
+
+      // Draw rotated block around CM
+      const blockRect = document.createElementNS(ns, "rect");
+      blockRect.setAttribute("x", (-blockW / 2).toFixed(1));
+      blockRect.setAttribute("y", (-blockH / 2).toFixed(1));
+      blockRect.setAttribute("width", blockW);
+      blockRect.setAttribute("height", blockH);
+      blockRect.setAttribute("rx", "4");
+      blockRect.setAttribute("fill", "#dbeafe");
+      blockRect.setAttribute("stroke", "#1e40af");
+      blockRect.setAttribute("stroke-width", "2");
+      blockRect.setAttribute("transform", `translate(${cmX.toFixed(1)}, ${cmY.toFixed(1)}) rotate(${-params.alpha})`);
+      geomLayer.appendChild(blockRect);
+
+      // Center of mass dot
+      const cmDot = document.createElementNS(ns, "circle");
+      cmDot.setAttribute("cx", cmX.toFixed(1));
+      cmDot.setAttribute("cy", cmY.toFixed(1));
+      cmDot.setAttribute("r", "3.5");
+      cmDot.setAttribute("fill", "#0f172a");
+      forcesLayer.appendChild(cmDot);
+
+      // Motion direction indicator above block
+      const motStartX = cmX + nx * 46 - tx * 22;
+      const motStartY = cmY + ny * 46 - ty * 22;
+      const motEndX = motStartX + tx * 48;
+      const motEndY = motStartY + ty * 48;
+      const motLine = document.createElementNS(ns, "line");
+      motLine.setAttribute("x1", motStartX.toFixed(1));
+      motLine.setAttribute("y1", motStartY.toFixed(1));
+      motLine.setAttribute("x2", motEndX.toFixed(1));
+      motLine.setAttribute("y2", motEndY.toFixed(1));
+      motLine.setAttribute("stroke", "#64748b");
+      motLine.setAttribute("stroke-width", "1.6");
+      motLine.setAttribute("stroke-dasharray", "4,3");
+      motLine.setAttribute("marker-end", "url(#arrowGray)");
+      geomLayer.appendChild(motLine);
+
+      const motText = document.createElementNS(ns, "text");
+      motText.setAttribute("x", (motEndX + nx * 12).toFixed(1));
+      motText.setAttribute("y", (motEndY + ny * 12).toFixed(1));
+      motText.setAttribute("font-size", "11.5");
+      motText.setAttribute("fill", "#475569");
+      motText.setAttribute("text-anchor", "middle");
+      motText.textContent = "כיוון תנועה";
+      geomLayer.appendChild(motText);
+
+      // Define the 4 force vectors originating strictly from (cmX, cmY)
+      const vectors = [
+        {
+          id: "lbl-F",
+          type: "single",
+          main: "F",
+          sub: "",
+          dx: tx,
+          dy: ty,
+          len: 96,
+          color: "#1d4ed8",
+          marker: "url(#arrowBlue)",
+          // Candidate label positions (beyond tip + perpendicular offsets)
+          candidates: [
+            { r: 118, p: -14 },
+            { r: 120, p: 14 },
+            { r: 85, p: -26 },
+            { r: 126, p: 0 }
+          ]
+        },
+        {
+          id: "lbl-N",
+          type: "single",
+          main: "N",
+          sub: "",
+          dx: nx,
+          dy: ny,
+          len: 84,
+          color: "#15803d",
+          marker: "url(#arrowGreen)",
+          candidates: [
+            { r: 104, p: -16 },
+            { r: 106, p: 16 },
+            { r: 78, p: -28 },
+            { r: 112, p: 0 }
+          ]
+        },
+        {
+          id: "lbl-fk",
+          type: "single",
+          main: "f",
+          sub: "k",
+          dx: -tx,
+          dy: -ty,
+          len: 74,
+          color: "#7e22ce",
+          marker: "url(#arrowPurple)",
+          candidates: [
+            { r: 94, p: -16 },
+            { r: 96, p: 18 },
+            { r: 70, p: -26 },
+            { r: 102, p: 0 }
+          ]
+        },
+        {
+          id: "lbl-mg",
+          type: "mg",
+          main: "mg",
+          sub: "",
+          dx: 0,
+          dy: 1,
+          len: 92,
+          color: "#dc2626",
+          marker: "url(#arrowRed)",
+          candidates: [
+            { r: 112, p: 20 },
+            { r: 112, p: -20 },
+            { r: 86, p: 28 },
+            { r: 118, p: 0 }
+          ]
+        }
+      ];
+
+      const segments = [
+        // Ramp hypotenuse and base
+        { x1: baseLeftX, y1: baseLeftY, x2: topRightX, y2: topRightY },
+        { x1: baseLeftX, y1: baseLeftY, x2: baseRightX, y2: baseRightY },
+        { x1: topRightX, y1: topRightY, x2: baseRightX, y2: baseRightY },
+        // Motion indicator
+        { x1: motStartX, y1: motStartY, x2: motEndX, y2: motEndY }
+      ];
+
+      // Draw force arrows & initial labels
+      vectors.forEach((v) => {
+        const x2 = cmX + v.dx * v.len;
+        const y2 = cmY + v.dy * v.len;
+        v.x1 = cmX;
+        v.y1 = cmY;
+        v.x2 = x2;
+        v.y2 = y2;
+        segments.push({ x1: cmX, y1: cmY, x2: x2, y2: y2 });
+
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", cmX.toFixed(1));
+        line.setAttribute("y1", cmY.toFixed(1));
+        line.setAttribute("x2", x2.toFixed(1));
+        line.setAttribute("y2", y2.toFixed(1));
+        line.setAttribute("stroke", v.color);
+        line.setAttribute("stroke-width", "2.6");
+        line.setAttribute("marker-end", v.marker);
+        forcesLayer.appendChild(line);
+
+        // Initial placement using first candidate
+        const perpX = -v.dy;
+        const perpY = v.dx;
+        const c0 = v.candidates[0];
+        const lx = cmX + v.dx * c0.r + perpX * c0.p;
+        const ly = cmY + v.dy * c0.r + perpY * c0.p;
+
+        const lblGroup = createVectorLabelSVG(v.id, v.type, v.main, v.sub, lx, ly, v.color);
+        labelsLayer.appendChild(lblGroup);
+      });
+
+      // Runtime Bounding-Box Collision Resolver & Pill Sizer
+      const placedBoxes = [];
+      vectors.forEach((v) => {
+        const g = document.getElementById(v.id);
+        const bg = g.querySelector(".label-bg");
+        // Temporarily hide bg to measure exact ink bbox of text + over-arrow
+        bg.setAttribute("width", "0");
+        bg.setAttribute("height", "0");
+        const rawBox = g.getBBox();
+        const padX = 4;
+        const padY = 3;
+        const pillX = rawBox.x - padX;
+        const pillY = rawBox.y - padY;
+        const pillW = rawBox.width + padX * 2;
+        const pillH = rawBox.height + padY * 2;
+
+        bg.setAttribute("x", pillX.toFixed(1));
+        bg.setAttribute("y", pillY.toFixed(1));
+        bg.setAttribute("width", pillW.toFixed(1));
+        bg.setAttribute("height", pillH.toFixed(1));
+
+        const perpX = -v.dy;
+        const perpY = v.dx;
+
+        // Test candidates + radial/angular sweep until >= 14px away from all force arrows & lines
+        let bestPos = null;
+        let bestScore = -Infinity;
+
+        const allCandidates = [...v.candidates];
+        for (let r = 104; r <= 136; r += 10) {
+          for (let p = -32; p <= 32; p += 16) {
+            allCandidates.push({ r, p });
+          }
+        }
+
+        for (const cand of allCandidates) {
+          const cx = cmX + v.dx * cand.r + perpX * cand.p;
+          const cy = cmY + v.dy * cand.r + perpY * cand.p;
+          const worldBox = {
+            x: cx + pillX,
+            y: cy + pillY,
+            w: pillW,
+            h: pillH
+          };
+
+          // Keep inside SVG viewBox margins
+          if (worldBox.x < 6 || worldBox.x + worldBox.w > 414 || worldBox.y < 6 || worldBox.y + worldBox.h > 302) {
+            continue;
+          }
+
+          let minSegDist = Infinity;
+          for (const seg of segments) {
+            const d = segDistToBox(seg.x1, seg.y1, seg.x2, seg.y2, worldBox);
+            if (d < minSegDist) minSegDist = d;
+          }
+
+          let overlapsOther = false;
+          for (const ob of placedBoxes) {
+            if (boxesOverlap(worldBox, ob, 8)) {
+              overlapsOther = true;
+              break;
+            }
+          }
+
+          if (!overlapsOther && minSegDist >= 14) {
+            bestPos = { cx, cy, worldBox };
+            break;
+          }
+
+          const score = (overlapsOther ? -1000 : 0) + minSegDist;
+          if (score > bestScore) {
+            bestScore = score;
+            bestPos = { cx, cy, worldBox };
+          }
+        }
+
+        if (bestPos) {
+          g.setAttribute("transform", `translate(${bestPos.cx.toFixed(1)}, ${bestPos.cy.toFixed(1)})`);
+          placedBoxes.push(bestPos.worldBox);
+        }
+      });
+    }
+
+    // =========================================================
+    // EXPRESSION EVALUATOR (Mathematical Equivalence)
+    // =========================================================
+    function evalUserExpression(exprStr, scope) {
+      let cleaned = exprStr
+        .replace(/×/g, "*")
+        .replace(/÷/g, "/")
+        .replace(/−/g, "-")
+        .replace(/²/g, "**2")
+        .replace(/\^/g, "**")
+        .replace(/cos\(/g, "Math.cos((Math.PI/180)*")
+        .replace(/sin\(/g, "Math.sin((Math.PI/180)*")
+        .replace(/μ_k/g, "muk")
+        .replace(/Δs/g, "ds")
+        .replace(/ΔU_G/g, "dUG")
+        .replace(/W_F/g, "WF")
+        .replace(/W_fk/g, "Wfk")
+        .replace(/W_g/g, "Wg");
+
+      // Insert implicit multiplication between numbers/closing parens/vars and vars/opening parens
+      cleaned = cleaned
+        .replace(/(\d)([a-zA-Z(])/g, "$1*$2")
+        .replace(/(\))([a-zA-Z0-9(])/g, "$1*$2")
+        .replace(/\b(F|m|g|ds|muk|WF|Wfk|Wg|dUG)\s+(F|m|g|ds|muk|WF|Wfk|Wg|dUG|Math)/g, "$1*$2");
+
+      // Safe evaluation via Function with restricted scope
+      const keys = Object.keys(scope);
+      const vals = Object.values(scope);
+      const fn = new Function(...keys, `"use strict"; return (${cleaned});`);
+      return fn(...vals);
+    }
+
+    // =========================================================
+    // RENDER TABS & WORKSPACE
+    // =========================================================
+    function renderTabs() {
+      const bar = document.getElementById("tabsBar");
+      bar.innerHTML = "";
+      PARTS_META.forEach((pm, idx) => {
+        const pState = state.parts[pm.key];
+        const isDone = pm.key === "e" ? pState.step1 : pState.step3;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "tab-btn" + (state.activePart === idx ? " active" : "") + (isDone ? " done" : "");
+        btn.innerHTML = `${pm.title} ${isDone ? "✓" : ""}`;
+        btn.onclick = () => {
+          state.activePart = idx;
+          renderTabs();
+          renderWorkspace();
+        };
+        bar.appendChild(btn);
+      });
+    }
+
+    function getPartConfig(key) {
+      const vals = computeValues();
+      if (key === "a") {
+        return {
+          targetVar: "W_F = ?",
+          givenList: [
+            `F = ${params.F} N`,
+            `Δs = ${params.ds} m`,
+            `θ = 0° (הכוח מקביל למשטח)`
+          ],
+          correctFormulas: ["work_const"],
+          formulaFeedbackWrong: "בחר בנוסחה לחישוב עבודה של כוח הקבוע בגודלו ובכיוונו מתוך דף הנוסחאות.",
+          tokens: ["F", "Δs", "cos(0)", "cos(30)", "sin(30)", "m", "g", "μ_k", "*", "+", "-", "(", ")"],
+          expectedVal: vals.WF,
+          expectedUnit: "J",
+          notebook: {
+            origFormula: "W = F·Δs·cosθ",
+            derivation: "θ = 0°  ⇒  cos(0°) = 1  ⇒  W_F = F·Δs",
+            substitution: `W_F = ${params.F} · ${params.ds} · cos(0°)`,
+            finalAns: `W_F = ${vals.WF.toFixed(1)} J`
+          }
+        };
+      }
+      if (key === "b") {
+        return {
+          targetVar: "W_{fk} = ?",
+          givenList: [
+            `m = ${params.m} kg`,
+            `α = ${params.alpha}°`,
+            `μ_k = ${params.muk}`,
+            `Δs = ${params.ds} m`,
+            `g = 10 m/s²`
+          ],
+          correctFormulas: ["work_const", "friction_k"],
+          formulaFeedbackWrong: "כדי למצוא את עבודת החיכוך נזדקק לנוסחת עבודה של כוח קבוע ולנוסחת כוח חיכוך קינטי (f_k = μ_k·N).",
+          tokens: ["-1", "μ_k", "m", "g", "cos(α)", "sin(α)", "Δs", "*", "+", "-", "(", ")"],
+          expectedVal: vals.Wfk,
+          expectedUnit: "J",
+          notebook: {
+            origFormula: "W = F·Δs·cosθ  ;  f_k = μ_k·N",
+            derivation: "ΣF_y = 0 ⇒ N = mg·cosα ; θ = 180° ⇒ W_{fk} = -μ_k·m·g·cosα·Δs",
+            substitution: `W_{fk} = -${params.muk} · ${params.m} · 10 · cos(${params.alpha}°) · ${params.ds}`,
+            finalAns: `W_{fk} = ${vals.Wfk.toFixed(1)} J`
+          }
+        };
+      }
+      if (key === "c") {
+        return {
+          targetVar: "ΔU_G = ?",
+          givenList: [
+            `m = ${params.m} kg`,
+            `α = ${params.alpha}°`,
+            `Δs = ${params.ds} m`,
+            `g = 10 m/s²`
+          ],
+          correctFormulas: ["pot_grav"],
+          formulaFeedbackWrong: "בחר בנוסחה של אנרגיה פוטנציאלית כובדית (U_G = mgh).",
+          tokens: ["m", "g", "Δs", "sin(α)", "cos(α)", "*", "+", "-", "(", ")"],
+          expectedVal: vals.dUG,
+          expectedUnit: "J",
+          notebook: {
+            origFormula: "U_G = m·g·h",
+            derivation: "h_0 = 0 , h = Δs·sinα  ⇒  ΔU_G = m·g·Δs·sinα",
+            substitution: `ΔU_G = ${params.m} · 10 · ${params.ds} · sin(${params.alpha}°)`,
+            finalAns: `ΔU_G = ${vals.dUG.toFixed(1)} J`
+          }
+        };
+      }
+      if (key === "d") {
+        return {
+          targetVar: "ΔE_k = ?",
+          givenList: [
+            `W_F = ${vals.WF.toFixed(1)} J`,
+            `W_{fk} = ${vals.Wfk.toFixed(1)} J`,
+            `ΔU_G = ${vals.dUG.toFixed(1)} J`
+          ],
+          correctFormulas: ["work_kinetic", "work_noncons"],
+          formulaFeedbackWrong: "השתמש במשפט עבודה–אנרגיה (W_כוללת = ΔE_k) או בעבודת הכוחות הלא-משמרים (W_לא משמרים = ΔE).",
+          tokens: ["W_F", "W_fk", "ΔU_G", "W_g", "+", "-", "*", "(", ")"],
+          expectedVal: vals.dEk,
+          expectedUnit: "J",
+          notebook: {
+            origFormula: "W_כוללת = ΔE_k  ;  W_משמר = -ΔU_G",
+            derivation: "ΔE_k = W_F + W_{fk} + W_g = W_F + W_{fk} - ΔU_G",
+            substitution: `ΔE_k = ${vals.WF.toFixed(1)} + (${vals.Wfk.toFixed(1)}) - ${vals.dUG.toFixed(1)}`,
+            finalAns: `ΔE_k = ${vals.dEk.toFixed(1)} J`
+          }
+        };
+      }
+      return null;
+    }
+
+    function renderWorkspace() {
+      const ws = document.getElementById("workspaceCard");
+      const meta = PARTS_META[state.activePart];
+      const key = meta.key;
+      const pState = state.parts[key];
+
+      if (key === "e") {
+        renderPartE(ws, meta, pState);
+        return;
+      }
+
+      const cfg = getPartConfig(key);
+      const tokenChoices = cfg.tokens.map((t) =>
+        t.replace("cos(α)", `cos(${params.alpha})`).replace("sin(α)", `sin(${params.alpha})`)
+      );
+
+      ws.innerHTML = `
+        <h2 style="margin:0 0 6px;color:var(--primary);font-size:1.12rem;">${meta.title}: ${meta.prompt}</h2>
+
+        <!-- Step 1: Formula Selection -->
+        <div class="step-box ${pState.step1 ? "completed" : ""}" id="step1Box">
+          <div class="step-title">
+            <span class="step-badge">1</span>
+            <span>בחירת נוסחה מקורית מדף הנוסחאות</span>
+          </div>
+          <div class="formula-grid" id="formulaGrid"></div>
+          <div class="feedback" id="fb1"></div>
+        </div>
+
+        <!-- Step 2: Algebraic Expression Builder -->
+        <div class="step-box ${pState.step2 ? "completed" : (!pState.step1 ? "disabled" : "")}" id="step2Box">
+          <div class="step-title">
+            <span class="step-badge">2</span>
+            <span>בניית ביטוי אלגברי לחישוב המבוקש</span>
+          </div>
+          <div class="expr-display-wrap">
+            <div class="expr-display" id="exprDisplay">${pState.exprTokens.join(" ") || "<span style='color:#94a3b8;font-family:system-ui;font-size:0.95rem;'>לחץ על המשתנים והפעולות לבניית הביטוי...</span>"}</div>
+          </div>
+          <div class="token-pad" id="tokenPad"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="tok-btn ctrl" id="btnBackspace">⌫ מחק אחרון</button>
+            <button type="button" class="tok-btn ctrl" id="btnClearExpr">נקה הכל</button>
+            <button type="button" class="action-btn" style="margin-top:0;" id="btnCheckExpr">בדיקת ביטוי ✓</button>
+          </div>
+          <div class="feedback" id="fb2"></div>
+        </div>
+
+        <!-- Step 3: Numerical Value + Active Unit Selection -->
+        <div class="step-box ${pState.step3 ? "completed" : (!pState.step2 ? "disabled" : "")}" id="step3Box">
+          <div class="step-title">
+            <span class="step-badge">3</span>
+            <span>חישוב מספרי ובחירת יחידת מידה מתאימה</span>
+          </div>
+          <div class="num-unit-panel">
+            <div class="sub-panel">
+              <div class="sub-panel-title">הזנת ערך מספרי:</div>
+              <div class="num-readout" id="numReadout">${pState.numStr || "0"}</div>
+              <div class="keypad" id="numKeypad"></div>
+            </div>
+            <div class="sub-panel">
+              <div class="sub-panel-title">בחר את יחידת המידה הנכונה:</div>
+              <div class="unit-grid" id="unitGrid"></div>
+            </div>
+          </div>
+          <button type="button" class="action-btn" id="btnCheckNum">בדיקת תשובה סופית ויחידות ✓</button>
+          <div class="feedback" id="fb3"></div>
+        </div>
+
+        <!-- Notebook Solution Reveal upon completion -->
+        ${pState.step3 ? renderNotebookHTML(cfg) : ""}
+      `;
+
+      // Populate Step 1 Formulas
+      const fGrid = document.getElementById("formulaGrid");
+      FORMULA_BANK.forEach((f) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "formula-opt" + (pState.step1 && cfg.correctFormulas.includes(f.id) ? " selected-right" : "");
+        b.innerHTML = `<span>${f.name}</span><span class="formula-math">${f.math}</span>`;
+        b.onclick = () => {
+          if (pState.step1) return;
+          const fb1 = document.getElementById("fb1");
+          if (cfg.correctFormulas.includes(f.id)) {
+            pState.step1 = true;
+            pState.chosenFormula = f.math;
+            renderWorkspace();
+            const fbAfter = document.getElementById("fb1");
+            fbAfter.className = "feedback ok";
+            fbAfter.textContent = "נכון! הנוסחה מתאימה לשלב זה. המשך לבניית הביטוי.";
+          } else {
+            state.mistakes[key]++;
+            b.classList.add("selected-wrong");
+            fb1.className = "feedback err";
+            fb1.textContent = cfg.formulaFeedbackWrong;
+          }
+        };
+        fGrid.appendChild(b);
+      });
+
+      // Populate Step 2 Tokens
+      const pad = document.getElementById("tokenPad");
+      tokenChoices.forEach((tok) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        const isOp = ["*", "+", "-", "(", ")"].includes(tok);
+        b.className = "tok-btn" + (isOp ? " op" : "");
+        b.textContent = tok === "*" ? "×" : tok;
+        b.onclick = () => {
+          if (!pState.step1 || pState.step2) return;
+          pState.exprTokens.push(tok === "*" ? "×" : tok);
+          document.getElementById("exprDisplay").textContent = pState.exprTokens.join(" ");
+        };
+        pad.appendChild(b);
+      });
+
+      document.getElementById("btnBackspace").onclick = () => {
+        if (!pState.step1 || pState.step2) return;
+        pState.exprTokens.pop();
+        document.getElementById("exprDisplay").textContent = pState.exprTokens.join(" ") || "";
+      };
+
+      document.getElementById("btnClearExpr").onclick = () => {
+        if (!pState.step1 || pState.step2) return;
+        pState.exprTokens = [];
+        document.getElementById("exprDisplay").textContent = "";
+      };
+
+      document.getElementById("btnCheckExpr").onclick = () => {
+        if (!pState.step1 || pState.step2) return;
+        const fb2 = document.getElementById("fb2");
+        const raw = pState.exprTokens.join(" ");
+        if (!raw.trim()) {
+          fb2.className = "feedback err";
+          fb2.textContent = "יש לבנות ביטוי לפני הבדיקה.";
+          return;
+        }
+        try {
+          const vals = computeValues();
+          const scope = {
+            F: params.F,
+            m: params.m,
+            g: params.g,
+            ds: params.ds,
+            muk: params.muk,
+            WF: vals.WF,
+            Wfk: vals.Wfk,
+            Wg: vals.Wg,
+            dUG: vals.dUG
+          };
+          const userVal = evalUserExpression(raw, scope);
+          if (typeof userVal === "number" && !Number.isNaN(userVal) && Math.abs(userVal - cfg.expectedVal) <= Math.max(0.5, Math.abs(cfg.expectedVal) * 0.02)) {
+            pState.step2 = true;
+            renderWorkspace();
+            const fbAfter = document.getElementById("fb2");
+            fbAfter.className = "feedback ok";
+            fbAfter.textContent = "מצוין! הביטוי האלגברי שקול מתמטית ונכון. עבור לחישוב המספרי ובחירת היחידות.";
+          } else {
+            state.mistakes[key]++;
+            fb2.className = "feedback err";
+            fb2.textContent = "הביטוי אינו מניב את הערך הנכון. בדוק סימנים (+ / −), רכיבים טריגונומטריים (sin / cos) או כפל בדרך Δs.";
+          }
+        } catch (e) {
+          state.mistakes[key]++;
+          fb2.className = "feedback err";
+          fb2.textContent = "שגיאת תחביר בביטוי. ודא שכל הסוגריים סגורים ויש אופרטור כפל בין משתנים.";
+        }
+      };
+
+      // Populate Step 3 Keypad & Units
+      const keys = ["7", "8", "9", "⌫", "4", "5", "6", "-", "1", "2", "3", "×10^", "0", ".", "C"];
+      const kp = document.getElementById("numKeypad");
+      keys.forEach((k) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "key-btn" + (k === "×10^" ? " sci" : "");
+        b.textContent = k;
+        b.onclick = () => {
+          if (!pState.step2 || pState.step3) return;
+          if (k === "C") pState.numStr = "";
+          else if (k === "⌫") pState.numStr = pState.numStr.slice(0, -1);
+          else if (k === "×10^") pState.numStr += "e";
+          else pState.numStr += k;
+          document.getElementById("numReadout").textContent = pState.numStr || "0";
+        };
+        kp.appendChild(b);
+      });
+
+      const uGrid = document.getElementById("unitGrid");
+      ALL_UNITS.forEach((u) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "unit-btn" + (pState.unit === u ? " selected" : "");
+        b.textContent = u;
+        b.onclick = () => {
+          if (!pState.step2 || pState.step3) return;
+          pState.unit = u;
+          renderWorkspace();
+        };
+        uGrid.appendChild(b);
+      });
+
+      document.getElementById("btnCheckNum").onclick = () => {
+        if (!pState.step2 || pState.step3) return;
+        const fb3 = document.getElementById("fb3");
+        const parsed = Number(pState.numStr);
+        if (!pState.numStr || Number.isNaN(parsed)) {
+          fb3.className = "feedback err";
+          fb3.textContent = "הזן מספר תקין.";
+          return;
+        }
+        if (!pState.unit) {
+          fb3.className = "feedback err";
+          fb3.textContent = "חובה לבחור יחידת מידה מתאימה לפני הבדיקה.";
+          return;
+        }
+        const numOk = Math.abs(parsed - cfg.expectedVal) <= Math.max(0.5, Math.abs(cfg.expectedVal) * 0.02);
+        const unitOk = pState.unit === cfg.expectedUnit;
+
+        if (numOk && unitOk) {
+          pState.step3 = true;
+          renderTabs();
+          renderWorkspace();
+          checkAllCompleted();
+        } else {
+          state.mistakes[key]++;
+          fb3.className = "feedback err";
+          if (!numOk && !unitOk) {
+            fb3.textContent = "גם הערך המספרי וגם יחידת המידה אינם נכונים. בדוק את החישוב (כולל סימן) ואת יחידת האנרגיה/עבודה.";
+          } else if (!numOk) {
+            fb3.textContent = "יחידת המידה נכונה, אך הערך המספרי שגוי (שים לב לסימן חיובי/שלילי ולחישוב הטריגונומטרי).";
+          } else {
+            fb3.textContent = "הערך המספרי נכון, אך יחידת המידה שנבחרה שגויה! באיזו יחידה מודדים עבודה ואנרגיה?";
+          }
+        }
+      };
+
+      const nextBtn = document.getElementById("btnNextPart");
+      if (nextBtn) {
+        nextBtn.onclick = () => {
+          if (state.activePart < PARTS_META.length - 1) {
+            state.activePart++;
+            renderTabs();
+            renderWorkspace();
+          }
+        };
+      }
+    }
+
+    function renderPartE(ws, meta, pState) {
+      const options = [
+        {
+          id: 0,
+          text: "כן, כי לפי משפט עבודה–אנרגיה העבודה של הכוח החיצוני תמיד שווה לשינוי באנרגיה הקינטית.",
+          correct: false,
+          fb: "לא מדויק — משפט עבודה–אנרגיה קובע שעבודת שקול הכוחות (W_כוללת) שווה ל-ΔE_k, ולא עבודת כוח בודד."
+        },
+        {
+          id: 1,
+          text: "לא. לפי משפט עבודה–אנרגיה (W_כוללת = ΔE_k), השינוי באנרגיה הקינטית שווה לסכום העבודות של כל הכוחות הפועלים על הגוף (כולל כוח הכובד וכוח החיכוך), ולא רק לעבודת הכוח F.",
+          correct: true,
+          fb: "תשובה מלאה ומדויקת!"
+        },
+        {
+          id: 2,
+          text: "לא, כי כוח הנורמל N מבצע עבודה שלילית שמקטינה את האנרגיה הקינטית.",
+          correct: false,
+          fb: "לא נכון — כוח הנורמל ניצב לכיוון התנועה (θ = 90°) ולכן עבודתו שווה לאפס."
+        }
+      ];
+
+      const vals = computeValues();
+      const cfgE = {
+        targetVar: "השוואת W_F ל-ΔE_k",
+        givenList: [
+          `W_F = ${vals.WF.toFixed(1)} J`,
+          `ΔE_k = ${vals.dEk.toFixed(1)} J`,
+          `W_{fk} = ${vals.Wfk.toFixed(1)} J`,
+          `W_g = ${vals.Wg.toFixed(1)} J`
+        ],
+        notebook: {
+          origFormula: "W_כוללת = ΔE_k",
+          derivation: "W_כוללת = W_F + W_{fk} + W_g + W_N = W_F + W_{fk} - ΔU_G ≠ W_F",
+          substitution: `W_F = ${vals.WF.toFixed(1)} J  ≠  ΔE_k = ${vals.dEk.toFixed(1)} J`,
+          finalAns: "לא — השינוי באנרגיה הקינטית שווה לעבודה הכוללת של כלל הכוחות (כולל כובד וחיכוך)."
+        }
+      };
+
+      ws.innerHTML = `
+        <h2 style="margin:0 0 8px;color:var(--primary);font-size:1.12rem;">${meta.title}: ${meta.prompt}</h2>
+        <div class="step-box ${pState.step1 ? "completed" : ""}">
+          <div class="step-title">
+            <span class="step-badge">1</span>
+            <span>בחר את ההסבר הפיזיקלי הנכון</span>
+          </div>
+          <div class="qual-grid" id="qualGrid"></div>
+          <div class="feedback" id="fbE"></div>
+        </div>
+        ${pState.step1 ? renderNotebookHTML(cfgE) : ""}
+      `;
+
+      const qGrid = document.getElementById("qualGrid");
+      options.forEach((opt) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "qual-btn" + (pState.chosenQual === opt.id ? " selected" : "");
+        b.textContent = opt.text;
+        b.onclick = () => {
+          if (pState.step1) return;
+          pState.chosenQual = opt.id;
+          const fbE = document.getElementById("fbE");
+          if (opt.correct) {
+            pState.step1 = true;
+            renderTabs();
+            renderWorkspace();
+            checkAllCompleted();
+          } else {
+            state.mistakes.e++;
+            fbE.className = "feedback err";
+            fbE.textContent = opt.fb;
+          }
+        };
+        qGrid.appendChild(b);
+      });
+    }
+
+    function renderNotebookHTML(cfg) {
+      const hasNext = state.activePart < PARTS_META.length - 1;
+      return `
+        <div class="notebook-sheet">
+          <div class="notebook-header">עיצוב חובה של פתרון במחברת (${PARTS_META[state.activePart].title})</div>
+          <div class="notebook-cols">
+            <div class="nb-right-col">
+              <div class="nb-given-box">
+                <div class="nb-section-label">נתונים</div>
+                ${cfg.givenList.map((g) => `<div class="nb-math-line">${g}</div>`).join("")}
+              </div>
+              <div>
+                <div class="nb-section-label">צריך למצוא</div>
+                <div class="nb-math-line"><b>${cfg.targetVar}</b></div>
+              </div>
+            </div>
+            <div class="nb-left-col">
+              <div class="nb-stage">
+                <div class="nb-stage-title">1. נוסחה מקורית מדף נוסחאות</div>
+                <div class="nb-math-line">${cfg.notebook.origFormula}</div>
+              </div>
+              <div class="nb-stage">
+                <div class="nb-stage-title">2. פיתוח ביטוי הנדרש</div>
+                <div class="nb-math-line">${cfg.notebook.derivation}</div>
+              </div>
+              <div class="nb-stage">
+                <div class="nb-stage-title">3. הצבת מספרים וחישוב</div>
+                <div class="nb-math-line">${cfg.notebook.substitution}</div>
+              </div>
+              <div class="nb-stage" style="margin-bottom:0;">
+                <div class="nb-stage-title">4. כתיבת תשובה כולל יחידות</div>
+                <div class="nb-math-line"><span class="nb-final-highlight">${cfg.notebook.finalAns}</span></div>
+              </div>
+            </div>
+          </div>
+          ${hasNext ? `<div class="next-part-bar"><button type="button" class="action-btn" id="btnNextPart">המשך לסעיף הבא ←</button></div>` : ""}
+        </div>
+      `;
+    }
+
+    function checkAllCompleted() {
+      const allDone =
+        state.parts.a.step3 &&
+        state.parts.b.step3 &&
+        state.parts.c.step3 &&
+        state.parts.d.step3 &&
+        state.parts.e.step1;
+
+      if (!allDone) return;
+
+      const vals = computeValues();
+      const totalMistakes = Object.values(state.mistakes).reduce((a, b) => a + b, 0);
+      const summary = [
+        `סיכום פתרון — שאלה 7 (עבודה ואנרגיה במישור משופע)`,
+        `נתוני השאלה: F = ${params.F} N, m = ${params.m} kg, α = ${params.alpha}°, Δs = ${params.ds} m, μ_k = ${params.muk}`,
+        `תוצאות שהתקבלו:`,
+        `• סעיף א׳: W_F = ${vals.WF.toFixed(1)} J (שגיאות: ${state.mistakes.a})`,
+        `• סעיף ב׳: W_fk = ${vals.Wfk.toFixed(1)} J (שגיאות: ${state.mistakes.b})`,
+        `• סעיף ג׳: ΔU_G = ${vals.dUG.toFixed(1)} J (שגיאות: ${state.mistakes.c})`,
+        `• סעיף ד׳: ΔE_k = ${vals.dEk.toFixed(1)} J (שגיאות: ${state.mistakes.d})`,
+        `• סעיף ה׳: הסבר משפט עבודה–אנרגיה הושלם (שגיאות: ${state.mistakes.e})`,
+        `סה״כ ניסיונות שגויים: ${totalMistakes}`
+      ].join("\n");
+
+      document.getElementById("summaryText").textContent = summary;
+      document.getElementById("summaryCard").style.display = "block";
+    }
+
+    document.getElementById("btnRandomize").onclick = () => randomizeParams(false);
+    document.getElementById("btnCopySummary").onclick = () => {
+      const txt = document.getElementById("summaryText").textContent;
+      navigator.clipboard.writeText(txt).then(() => {
+        const c = document.getElementById("copyConfirm");
+        c.style.display = "inline";
+        setTimeout(() => { c.style.display = "none"; }, 2200);
+      });
+    };
+
+    // Start with the exact numbers from the uploaded image (F=200N, m=15kg, 30°, 7m, μk=0.15)
+    randomizeParams(true);
+  </script>
+</body>
+</html>

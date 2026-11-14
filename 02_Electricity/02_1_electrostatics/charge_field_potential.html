@@ -1,0 +1,926 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>מטען, שדה ופוטנציאל (Copy)</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700;800&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+<style>
+/* layout: a bench electroscope page. sticky bar, one reading column, the live field canvas at the centre of each topic. red = positive, blue = negative, copper = equipotential and UI accent. */
+:root{
+  --bg:#f2f4f7; --paper:#ffffff; --soft:#eef1f5; --ink:#17202c; --mut:#5a6576; --line:#d8dee7; --grid:#e9edf3;
+  --pos:#cf3328; --neg:#2860c4; --acc:#a85a14; --acc-ink:#ffffff; --fieldln:#3a4557;
+  --ok:#14713f; --ok-bg:#e2f3e9; --no:#b3261e; --no-bg:#fbe7e5; --warn:#7a4a00; --warn-bg:#fff2d6;
+  --shadow:0 1px 2px rgba(23,32,44,.05),0 8px 24px rgba(23,32,44,.07);
+  --fd:"Secular One","Assistant",system-ui,sans-serif;
+  --fb:"Assistant","Arial Hebrew",system-ui,sans-serif;
+  --fm:"STIX Two Text","Cambria Math","Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0d1117; --paper:#151b24; --soft:#1b2330; --ink:#e6ebf2; --mut:#9aa5b6; --line:#2a3342; --grid:#1c2431;
+  --pos:#ff6a5c; --neg:#6aa1ff; --acc:#f0a14a; --acc-ink:#1a1206; --fieldln:#b7c2d4;
+  --ok:#5fd394; --ok-bg:#122b1d; --no:#ff8b80; --no-bg:#371816; --warn:#f2c46e; --warn-bg:#2e240f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0d1117; --paper:#151b24; --soft:#1b2330; --ink:#e6ebf2; --mut:#9aa5b6; --line:#2a3342; --grid:#1c2431;
+  --pos:#ff6a5c; --neg:#6aa1ff; --acc:#f0a14a; --acc-ink:#1a1206; --fieldln:#b7c2d4;
+  --ok:#5fd394; --ok-bg:#122b1d; --no:#ff8b80; --no-bg:#371816; --warn:#f2c46e; --warn-bg:#2e240f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.7 var(--fb);-webkit-text-size-adjust:100%;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1040px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--fd);font-weight:400;line-height:1.2;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px;border-radius:6px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--paper);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:8px;min-height:56px}
+.brand{text-decoration:none;margin-inline-end:auto;display:flex;align-items:center;gap:10px;font:400 1.3rem/1 var(--fd)}
+.brand i{display:inline-flex;gap:3px}
+.brand i b{width:12px;height:12px;border-radius:50%;display:block}
+.nl{font-weight:700;font-size:.95rem;text-decoration:none;padding:8px 12px;border-radius:999px}
+.nl:hover,.nl[aria-current]{background:var(--soft)}
+.btn{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 16px;font-weight:700;font-size:.95rem;line-height:1.3;display:inline-flex;align-items:center;gap:6px;min-height:40px;text-decoration:none}
+.btn:hover{border-color:var(--mut)}
+.btn.pri{background:var(--acc);border-color:transparent;color:var(--acc-ink)}
+.btn.sm{min-height:34px;padding:5px 12px;font-size:.88rem}
+.btn.pos{color:var(--pos)} .btn.neg{color:var(--neg)}
+
+/* home */
+.hero{display:grid;grid-template-columns:1fr 1.05fr;gap:32px;align-items:center;padding-block:34px 20px}
+.eyebrow{font-size:.85rem;font-weight:700;letter-spacing:.04em;color:var(--acc)}
+.hero h1{font-size:clamp(2.3rem,6vw,3.6rem);margin-block:6px 12px}
+.hero h1 .p{color:var(--pos)} .hero h1 .n{color:var(--neg)}
+.lead{font-size:1.1rem;color:var(--mut);max-width:32em}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.hfig{margin:0;min-width:0}
+.hfig .stage canvas{height:300px}
+.hfig figcaption{font-size:.86rem;color:var(--mut);margin-top:8px}
+.secth{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-top:22px;flex-wrap:wrap}
+.secth h2{font-size:1.6rem}
+.secth span{color:var(--mut);font-size:.92rem}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:14px}
+.tc{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-content:start;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0;transition:border-color .15s,transform .15s}
+.tc:hover{border-color:var(--acc);transform:translateY(-2px)}
+.tn{font:400 1.5rem/1.1 var(--fd);color:var(--acc);font-variant-numeric:tabular-nums}
+.tc b{font-size:1.08rem;line-height:1.35}
+.tc .ts{grid-column:2;color:var(--mut);font-size:.9rem;line-height:1.45}
+.tc .pg{grid-column:2;margin-top:8px;font-size:.8rem;color:var(--mut);display:flex;gap:10px;flex-wrap:wrap}
+.pg em{font-style:normal;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* topic */
+.th{padding-block:24px 12px}
+.crumb{font-size:.88rem;font-weight:700;color:var(--acc);text-decoration:none}
+.th h1{font-size:clamp(1.9rem,5vw,2.7rem);margin-block:4px 4px}
+.th p{color:var(--mut);font-size:1.05rem}
+.tabs{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:5;background:var(--bg);display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:12px 16px;font-weight:700;color:var(--mut);border-bottom:3px solid transparent;white-space:nowrap;flex:1 0 auto;min-height:46px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--acc)}
+.panel{padding-block:22px 8px;display:grid;gap:22px;min-width:0}
+.prose{max-width:66ch;display:grid;gap:12px;font-size:1.05rem}
+.prose p,.ex p,.q p,.sol p,.trap p{min-width:0;overflow-wrap:anywhere}
+.panel h2{font-size:1.3rem}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:10px}
+.fc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 10px 10px;text-align:center;min-width:0;display:grid;gap:4px;align-content:center}
+.fc small{color:var(--mut);font-size:.86rem;line-height:1.45}
+.trap{background:var(--warn-bg);border-radius:14px;padding:16px 18px;max-width:72ch;display:grid;gap:6px}
+.trap h2{font-size:1.1rem;color:var(--warn)}
+.tips{background:var(--paper);border:1px solid var(--line);border-inline-start:4px solid var(--acc);border-radius:14px;padding:16px 18px;max-width:72ch;display:grid;gap:8px}
+.tips h2{font-size:1.1rem;color:var(--acc)}
+.tips ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.tips li{position:relative;padding-inline-start:22px;min-width:0;overflow-wrap:anywhere}
+.tips li::before{content:"";position:absolute;inset-inline-start:2px;top:.62em;width:9px;height:9px;border-radius:50%;border:2px solid var(--acc)}
+
+/* lab */
+.stage{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow)}
+.stage canvas{display:block;width:100%;height:380px;touch-action:none;cursor:grab}
+.stage canvas.g{height:190px;cursor:default;border-top:1px solid var(--line)}
+.hint{position:absolute;inset-inline-end:10px;top:8px;font-size:.78rem;color:var(--mut);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:1px 10px;pointer-events:none;max-width:calc(100% - 20px)}
+.simbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.simbar .lab{font-size:.88rem;color:var(--mut);font-weight:600}
+.tgl{display:inline-flex;align-items:center;gap:6px;font-size:.92rem;font-weight:600;border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--paper);cursor:pointer}
+.tgl input{accent-color:var(--acc);margin:0}
+.ctls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 26px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:baseline;min-width:0}
+.ctl .cl{font-size:.95rem;font-weight:600}
+.ctl output{font-weight:700;font-variant-numeric:tabular-nums;color:var(--acc);direction:ltr;unicode-bidi:isolate}
+.ctl input{grid-column:1/-1;width:100%;accent-color:var(--acc);height:30px;margin:0}
+.outs{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.outs div{background:var(--soft);border-radius:10px;padding:8px 12px;min-width:0}
+.outs dt{font-size:.82rem;color:var(--mut);line-height:1.4}
+.outs dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums;font-size:1.02rem;direction:ltr;text-align:right;font-family:var(--fm)}
+.note{font-size:.9rem;color:var(--mut);max-width:72ch}
+
+/* example */
+.ex{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;max-width:80ch}
+.ex h3,.qn{font:700 .82rem/1.3 var(--fb);letter-spacing:.06em;color:var(--acc)}
+.gf{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gf>div{background:var(--soft);border-radius:10px;padding:10px 14px;min-width:0;display:grid;gap:4px}
+.steps{margin:0;padding-inline-start:1.4em;display:grid;gap:12px}
+.steps li{min-width:0}
+.steps li::marker{font-family:var(--fd);color:var(--acc)}
+.chk{background:var(--ok-bg);border-radius:10px;padding:10px 14px;display:grid;gap:4px}
+.chk h3{color:var(--ok)}
+
+/* practice */
+.lvl{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:6px}
+.lvl h2{font-size:1.25rem}
+.lvl span{color:var(--mut);font-size:.9rem}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:12px;max-width:80ch}
+.q.adv{border-inline-start:4px solid var(--acc)}
+.qn{display:flex;justify-content:space-between;gap:8px}
+.qn .st{letter-spacing:0;font-weight:700}
+.qn .st.ok{color:var(--ok)}
+.opts{display:grid;gap:8px}
+.opt{display:block;width:100%;text-align:start;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);line-height:1.5}
+.opt:hover:not([disabled]){border-color:var(--acc)}
+.opt[disabled]{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg);font-weight:700}
+.opt.no{border-color:var(--no);background:var(--no-bg);color:var(--mut)}
+.fb{font-size:.97rem;padding:10px 14px;border-radius:10px;background:var(--soft)}
+.fb.ok{background:var(--ok-bg)} .fb.no{background:var(--no-bg)}
+.ansrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ansrow input{width:10em;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);font-variant-numeric:tabular-nums;font-size:1rem;direction:ltr;text-align:left}
+.ansrow .u{color:var(--mut);font-weight:600;direction:ltr;unicode-bidi:isolate}
+.tip{font-size:.84rem;color:var(--mut)}
+.sol{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:.98rem;display:grid;gap:8px}
+.fig{max-width:360px;width:100%;overflow-x:auto}
+.fig svg{display:block;width:100%;height:auto}
+.score{font-weight:700;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pn{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-block:18px;margin-top:10px}
+
+/* formulas */
+.ftab{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ftab td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.ftab td.fx{text-align:center;width:46%}
+.ftab small{display:block;color:var(--mut);font-size:.85rem}
+.ftab a{font-size:.84rem;font-weight:700;color:var(--acc);text-decoration:none}
+.tscroll{overflow-x:auto}
+.foot{color:var(--mut);font-size:.86rem;padding-block:24px 34px;border-top:1px solid var(--line);margin-top:30px}
+
+/* math */
+.mx{font-family:var(--fm);font-size:1.08em;direction:ltr;unicode-bidi:isolate;display:inline-block;line-height:1.3;white-space:nowrap}
+.mx i{font-style:italic}
+.mx.fx{display:block;text-align:center;font-size:1.3rem;overflow-x:auto;overflow-y:hidden;padding:6px 2px;max-width:100%}
+.mx sup,.mx sub{font-size:.68em;line-height:0}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;font-size:.95em}
+.fr>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .25em .08em}
+.fr>span:last-child{padding:.08em .25em 0}
+.pq{color:var(--pos);font-weight:700} .nq{color:var(--neg);font-weight:700}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr;gap:18px;padding-block:22px 10px}
+  .gf{grid-template-columns:1fr}
+  .stage canvas{height:320px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div dir="rtl" lang="he">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="#"><i aria-hidden="true"><b style="background:var(--pos)"></b><b style="background:var(--neg)"></b></i>מטען, שדה ופוטנציאל</a>
+  <a class="nl" href="#" id="nav-home">נושאים</a>
+  <a class="nl" href="#formulas" id="nav-f">נוסחאות</a>
+</div></header>
+<main id="app"></main>
+<footer class="wrap foot">יחידת לימוד באלקטרוסטטיקה, פיזיקה 5 יח״ל. הסימונים לפי דף הנוסחאות של התלמיד. בחישובים: <span class="mx"><i>k</i> = 9·10<sup>9</sup> N·m<sup>2</sup>/C<sup>2</sup></span>, <span class="mx"><i>e</i> = 1.6·10<sup>−19</sup> C</span>, <span class="mx"><i>g</i> = 10 m/s<sup>2</sup></span>.</footer>
+</div>
+
+<script>
+document.documentElement.lang='he';document.documentElement.dir='rtl';
+const K=9e9, MU=1e-6, E0=8.85e-12;
+const m=s=>`<span class="mx">${s}</span>`;
+const M=s=>`<div class="mx fx">${s}</div>`;
+const fr=(a,b)=>`<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const sc=(a,e)=>`${a}·10<sup>${String(e).replace('-','−')}</sup>`;
+const q1='<i>q</i><sub>1</sub>', q2='<i>q</i><sub>2</sub>';
+
+/* ---------- number formatting ---------- */
+function fmt(x,d=3){
+  if(!isFinite(x))return '—'; if(Math.abs(x)<1e-30)return '0';
+  const a=Math.abs(x);
+  if(a>=1e4||a<1e-2){let e=Math.floor(Math.log10(a));let mn=+(x/10**e).toPrecision(d);if(Math.abs(mn)>=10){mn=+(mn/10).toPrecision(d);e++}return (String(mn)+'·10<sup>'+e+'</sup>').replace(/-/g,'−')}
+  return String(+x.toPrecision(d)).replace('-','−');
+}
+function parseNum(s){
+  if(!s)return NaN; s=s.trim().replace(/[−–]/g,'-').replace(/\s/g,'').replace(/,/g,'.');
+  s=s.replace(/(?:\*|x|×|·)10\^?\(?(-?\d+)\)?/i,'e$1').replace(/^10\^?(-?\d+)$/,'1e$1');
+  return /^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)?parseFloat(s):NaN;
+}
+
+/* ---------- storage ---------- */
+let solved={};
+try{solved=JSON.parse(localStorage.getItem('es-solved')||'{}')||{}}catch(e){solved={}}
+function markSolved(id){solved[id]=1;try{localStorage.setItem('es-solved',JSON.stringify(solved))}catch(e){}}
+
+/* ---------- physics ---------- */
+function Ef(ch,x,y){let ex=0,ey=0;for(const c of ch){const dx=x-c.x,dy=y-c.y;let r2=dx*dx+dy*dy;if(r2<1e-7)r2=1e-7;const r=Math.sqrt(r2),e=K*c.q*MU/r2;ex+=e*dx/r;ey+=e*dy/r}return[ex,ey]}
+function Vf(ch,x,y){let v=0;for(const c of ch){let r=Math.hypot(x-c.x,y-c.y);if(r<1e-4)r=1e-4;v+=K*c.q*MU/r}return v}
+
+/* ---------- canvas helpers ---------- */
+function tok(){const cs=getComputedStyle(document.documentElement);const g=n=>cs.getPropertyValue(n).trim();return{paper:g('--paper'),ink:g('--ink'),mut:g('--mut'),line:g('--line'),grid:g('--grid'),pos:g('--pos'),neg:g('--neg'),acc:g('--acc'),fl:g('--fieldln'),ok:g('--ok'),soft:g('--soft')}}
+function hexRgb(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return[(n>>16)&255,(n>>8)&255,n&255]}
+function arrow(ctx,x1,y1,x2,y2,col,w=2,head=8){const a=Math.atan2(y2-y1,x2-x1),L=Math.hypot(x2-x1,y2-y1);if(L<2)return;ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2-Math.cos(a)*head*.6,y2-Math.sin(a)*head*.6);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-head*Math.cos(a-.42),y2-head*Math.sin(a-.42));ctx.lineTo(x2-head*Math.cos(a+.42),y2-head*Math.sin(a+.42));ctx.closePath();ctx.fill()}
+const lenE=E=>Math.min(130,Math.max(10,14+26*Math.log10(Math.max(E,1e3)/1e3)));
+const lenF=F=>Math.min(130,Math.max(10,14+28*Math.log10(Math.max(F,1e-3)/1e-3)));
+function font(ctx,sz,w=700){ctx.font=`${w} ${sz}px Assistant, system-ui, sans-serif`}
+
+let scenes=[];
+function killScenes(){scenes.forEach(s=>s.ro&&s.ro.disconnect());scenes=[]}
+const themeMQ=matchMedia('(prefers-color-scheme: dark)');
+const redrawAll=()=>scenes.forEach(s=>s.draw());
+themeMQ.addEventListener&&themeMQ.addEventListener('change',redrawAll);
+new MutationObserver(redrawAll).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* generic canvas wrapper */
+function Canvas(cv,drawFn){
+  const o={cv,ctx:cv.getContext('2d'),W:0,H:0,draw(){if(!o.W)return;const c=o.ctx;c.setTransform(o.dpr,0,0,o.dpr,0,0);const t=tok();c.fillStyle=t.paper;c.fillRect(0,0,o.W,o.H);drawFn(c,t,o)}};
+  o.resize=()=>{const r=cv.getBoundingClientRect();if(!r.width)return;o.dpr=Math.min(2,devicePixelRatio||1);o.W=r.width;o.H=r.height;cv.width=Math.round(r.width*o.dpr);cv.height=Math.round(r.height*o.dpr);o.onResize&&o.onResize();o.draw()};
+  o.ro=new ResizeObserver(o.resize);o.ro.observe(cv);scenes.push(o);return o;
+}
+
+/* charge scene */
+function Scene(cv,opt){
+  const S=Object.assign({width:1.1,lines:false,equip:false,heat:false,vstep:2e4,charges:[],probes:[],sel:null,selectable:false},opt);
+  const base=Canvas(cv,(ctx,t,o)=>render(ctx,t));
+  Object.assign(base,S);const sc=base;
+  sc.onResize=()=>{sc.s=sc.W/sc.width;sc.cx=sc.W/2;sc.cy=sc.H/2};
+  sc.px=(x,y)=>[sc.cx+x*sc.s,sc.cy-y*sc.s];
+  sc.w=(X,Y)=>[(X-sc.cx)/sc.s,(sc.cy-Y)/sc.s];
+  function render(ctx,t){
+    // grid every 0.1 m
+    ctx.strokeStyle=t.grid;ctx.lineWidth=1;ctx.beginPath();
+    for(let x=0;x<=sc.width/2+.001;x+=.1){for(const sg of[1,-1]){const X=sc.cx+sg*x*sc.s;ctx.moveTo(X,0);ctx.lineTo(X,sc.H)}}
+    const hh=sc.H/2/sc.s;for(let y=0;y<=hh;y+=.1){for(const sg of[1,-1]){const Y=sc.cy+sg*y*sc.s;ctx.moveTo(0,Y);ctx.lineTo(sc.W,Y)}}
+    ctx.stroke();
+    // scale bar
+    font(ctx,11,600);ctx.fillStyle=t.mut;ctx.strokeStyle=t.mut;ctx.lineWidth=1.5;const sb=.1*sc.s;ctx.beginPath();ctx.moveTo(12,sc.H-14);ctx.lineTo(12+sb,sc.H-14);ctx.moveTo(12,sc.H-18);ctx.lineTo(12,sc.H-10);ctx.moveTo(12+sb,sc.H-18);ctx.lineTo(12+sb,sc.H-10);ctx.stroke();ctx.textAlign='center';ctx.fillText('10 cm',12+sb/2,sc.H-20);
+    const ch=sc.charges.filter(c=>c.q!==0);
+    if(sc.heat&&ch.length)drawHeat(ctx,t,ch);
+    if(sc.equip&&ch.length)drawEquip(ctx,t,ch);
+    if(sc.lines&&ch.length)drawLines(ctx,t,ch);
+    sc.under&&sc.under(ctx,t,sc);
+    for(const c of sc.charges)drawCharge(ctx,t,c,c===sc.sel);
+    for(const p of sc.probes)drawProbe(ctx,t,p);
+    sc.over&&sc.over(ctx,t,sc);
+    sc.onChange&&sc.onChange(sc);
+  }
+  function drawCharge(ctx,t,c,sel){const[X,Y]=sc.px(c.x,c.y);const col=c.q>0?t.pos:c.q<0?t.neg:t.mut;
+    if(sel){ctx.strokeStyle=t.acc;ctx.lineWidth=3;ctx.beginPath();ctx.arc(X,Y,19,0,7);ctx.stroke()}
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(X,Y,14,0,7);ctx.fill();
+    ctx.fillStyle='#fff';font(ctx,c.q%1?10:12,800);ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText((c.q>0?'+':c.q<0?'−':'')+Math.abs(c.q),X,Y+.5);ctx.textBaseline='alphabetic';
+    if(c.label){font(ctx,12,700);ctx.fillStyle=t.ink;ctx.fillText(c.label,X,Y+30)}}
+  function drawProbe(ctx,t,p){const[X,Y]=sc.px(p.x,p.y);ctx.fillStyle=t.paper;ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Y,7,0,7);ctx.fill();ctx.stroke();ctx.fillStyle=t.ink;ctx.beginPath();ctx.arc(X,Y,2.2,0,7);ctx.fill();font(ctx,13,800);ctx.textAlign='left';ctx.fillText(p.label,X+10,Y-8)}
+  function drawHeat(ctx,t,ch){const g=4,cols=Math.ceil(sc.W/g),rows=Math.ceil(sc.H/g);const off=sc._off||(sc._off=document.createElement('canvas'));off.width=cols;off.height=rows;const oc=off.getContext('2d');const img=oc.createImageData(cols,rows);const P=hexRgb(t.pos),N=hexRgb(t.neg);
+    for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const[x,y]=sc.w(i*g+g/2,j*g+g/2);const v=Vf(ch,x,y);const a=Math.tanh(v/1.2e5);const c=a>0?P:N;const k=(j*cols+i)*4;img.data[k]=c[0];img.data[k+1]=c[1];img.data[k+2]=c[2];img.data[k+3]=Math.abs(a)*120}
+    oc.putImageData(img,0,0);ctx.imageSmoothingEnabled=true;ctx.drawImage(off,0,0,cols*g,rows*g)}
+  function drawEquip(ctx,t,ch){const g=6,cols=Math.ceil(sc.W/g)+1,rows=Math.ceil(sc.H/g)+1;const V=new Float64Array(cols*rows);for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const[x,y]=sc.w(i*g,j*g);V[j*cols+i]=Vf(ch,x,y)}
+    const N=12,step=sc.vstep,cap=step*N*1.15;const hasPos=ch.some(c=>c.q>0),hasNeg=ch.some(c=>c.q<0);
+    for(let k=-N;k<=N;k++){if(k===0&&!(hasPos&&hasNeg))continue;const L=k*step;ctx.strokeStyle=t.acc;ctx.lineWidth=k===0?2.2:1.3;ctx.setLineDash(k===0?[]:[5,4]);ctx.beginPath();
+      for(let j=0;j<rows-1;j++)for(let i=0;i<cols-1;i++){const a=V[j*cols+i],b=V[j*cols+i+1],c=V[(j+1)*cols+i+1],d=V[(j+1)*cols+i];if(Math.abs(a)>cap||Math.abs(b)>cap||Math.abs(c)>cap||Math.abs(d)>cap)continue;
+        const pts=[];const X=i*g,Y=j*g;
+        if((a-L)*(b-L)<0)pts.push([X+g*(L-a)/(b-a),Y]);
+        if((b-L)*(c-L)<0)pts.push([X+g,Y+g*(L-b)/(c-b)]);
+        if((d-L)*(c-L)<0)pts.push([X+g*(L-d)/(c-d),Y+g]);
+        if((a-L)*(d-L)<0)pts.push([X,Y+g*(L-a)/(d-a)]);
+        if(pts.length>=2){ctx.moveTo(pts[0][0],pts[0][1]);ctx.lineTo(pts[1][0],pts[1][1])}
+        if(pts.length===4){ctx.moveTo(pts[2][0],pts[2][1]);ctx.lineTo(pts[3][0],pts[3][1])}}
+      ctx.stroke()}ctx.setLineDash([])}
+  function drawLines(ctx,t,ch){const tot=ch.reduce((s,c)=>s+c.q,0);const sg=tot>=0?1:-1;const src=ch.filter(c=>sg>0?c.q>0:c.q<0);const h=3/sc.s;const M=50;
+    const dir=(x,y)=>{const[ex,ey]=Ef(ch,x,y);const mm=Math.hypot(ex,ey);return mm?[sg*ex/mm,sg*ey/mm]:null};
+    ctx.lineWidth=1.3;
+    for(const c of src){const n=Math.max(4,Math.round(Math.abs(c.q)*4));for(let i=0;i<n;i++){const an=2*Math.PI*i/n+.13;let x=c.x+Math.cos(an)*13/sc.s,y=c.y+Math.sin(an)*13/sc.s;const pts=[[x,y]];
+        for(let s=0;s<1600;s++){const k1=dir(x,y);if(!k1)break;const k2=dir(x+k1[0]*h/2,y+k1[1]*h/2);if(!k2)break;x+=k2[0]*h;y+=k2[1]*h;pts.push([x,y]);const[X,Y]=sc.px(x,y);if(X<-M||X>sc.W+M||Y<-M||Y>sc.H+M)break;let hit=false;for(const o of ch){if(o!==c&&Math.hypot(o.x-x,o.y-y)*sc.s<11){hit=true;break}}if(hit)break}
+        ctx.strokeStyle=t.fl;ctx.beginPath();pts.forEach((p,k)=>{const[X,Y]=sc.px(p[0],p[1]);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)});ctx.stroke();
+        const j=Math.min(pts.length-2,Math.max(1,Math.round(Math.min(pts.length*.45,22+pts.length*.15))));if(pts.length>8){const A=sc.px(...pts[sg>0?j:j+1]),B=sc.px(...pts[sg>0?j+1:j]);const a=Math.atan2(B[1]-A[1],B[0]-A[0]);ctx.fillStyle=t.fl;ctx.beginPath();ctx.moveTo(B[0]+Math.cos(a)*4,B[1]+Math.sin(a)*4);ctx.lineTo(B[0]-6*Math.cos(a-.5),B[1]-6*Math.sin(a-.5));ctx.lineTo(B[0]-6*Math.cos(a+.5),B[1]-6*Math.sin(a+.5));ctx.fill()}}}}
+  // pointer
+  let drag=null;
+  const hit=(X,Y)=>{let best=null,bd=24;for(const p of sc.probes){const[a,b]=sc.px(p.x,p.y);const d=Math.hypot(a-X,b-Y);if(d<bd){bd=d;best=p}}for(const c of sc.charges){const[a,b]=sc.px(c.x,c.y);const d=Math.hypot(a-X,b-Y);if(d<bd){bd=d;best=c}}return best};
+  const pos=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+  cv.addEventListener('pointerdown',e=>{const[X,Y]=pos(e);const h=hit(X,Y);if(!h)return;drag=h;cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing';if(sc.selectable&&sc.charges.includes(h)){sc.sel=h;sc.onSelect&&sc.onSelect(h)}sc.draw();e.preventDefault()});
+  cv.addEventListener('pointermove',e=>{if(!drag)return;const[X,Y]=pos(e);let[x,y]=sc.w(X,Y);const mx=sc.width/2-16/sc.s,my=sc.H/2/sc.s-16/sc.s;x=Math.max(-mx,Math.min(mx,x));y=Math.max(-my,Math.min(my,y));if(drag.lockY===undefined||drag.lockY===null)drag.y=+y.toFixed(3);if(!drag.lockX)drag.x=+x.toFixed(3);if(drag.limit)drag.limit(drag);sc.draw()});
+  const up=()=>{drag=null;cv.style.cursor=''};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  return sc;
+}
+
+/* ---------- DOM builders ---------- */
+const el=(h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild};
+let uid=0;
+function slider(host,label,min,max,step,val,show,on){const id='s'+(++uid);const n=el(`<div class="ctl"><label class="cl" for="${id}">${label}</label><output for="${id}"></output><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"></div>`);const inp=n.querySelector('input'),out=n.querySelector('output');const f=()=>{out.innerHTML=show(+inp.value);on(+inp.value)};inp.addEventListener('input',f);out.innerHTML=show(val);host.appendChild(n);return{set(v){inp.value=v;out.innerHTML=show(v)},el:inp}}
+function outs(host,items){const dl=el(`<dl class="outs"></dl>`);const ref={};for(const[k,lab]of items){const d=el(`<div><dt>${lab}</dt><dd>—</dd></div>`);dl.appendChild(d);ref[k]=d.querySelector('dd')}host.appendChild(dl);return(k,v)=>{ref[k].innerHTML=v}}
+function toggle(host,label,val,on){const id='t'+(++uid);const n=el(`<label class="tgl" for="${id}"><input type="checkbox" id="${id}" ${val?'checked':''}>${label}</label>`);n.querySelector('input').addEventListener('change',e=>on(e.target.checked));host.appendChild(n);return n.querySelector('input')}
+const qs=v=>(v>0?'+':v<0?'−':'')+Math.abs(v)+' μC';
+const dirTxt=(x,y)=>{const a=Math.atan2(y,x)*180/Math.PI;return `${fmt(((a%360)+360)%360,3)}°`};
+
+/* ---------- simulations ---------- */
+const SIMS={
+coulomb(host,preset){
+  host.innerHTML=`<div class="stage"><canvas aria-label="סימולציית חוק קולון: שני מטענים על ציר"></canvas><span class="hint">גררו את המטענים · אורך החצים בסולם לוגריתמי</span></div><div class="ctls"></div><div class="simbar"><button class="btn sm" data-p="ex">טעינת הדוגמה: ‎+4 μC ו־‎+1 μC במרחק 30 cm</button></div>`;
+  const ctls=host.querySelector('.ctls');
+  const A={x:-.2,y:0,q:3,lockY:0,label:'q₁'},B={x:.2,y:0,q:-2,lockY:0,label:'q₂'};
+  const set=outs(host,[['r','מרחק r'],['F','גודל הכוח F'],['t','סוג האינטראקציה'],['f2','F אם r יוכפל פי 2']]);
+  const sc=Scene(host.querySelector('canvas'),{width:1.1,charges:[A,B],
+    under(ctx,t){},
+    over(ctx,t){const r=Math.abs(B.x-A.x);if(r<1e-3)return;const F=K*Math.abs(A.q*B.q)*MU*MU/(r*r);if(!F)return;const L=lenF(F);const att=A.q*B.q<0;const s=Math.sign(B.x-A.x);
+      const[ax,ay]=sc.px(A.x,0),[bx,by]=sc.px(B.x,0);const da=att?s:-s;arrow(ctx,ax+da*16,ay-24,ax+da*(16+L),ay-24,t.ink,2.5);arrow(ctx,bx-da*16,by-24,bx-da*(16+L),by-24,t.ink,2.5);font(ctx,12,700);ctx.fillStyle=t.mut;ctx.textAlign='center';ctx.fillText('F₂₁',ax+da*(16+L/2),ay-32);ctx.fillText('F₁₂',bx-da*(16+L/2),by-32)},
+    onChange(){const r=Math.abs(B.x-A.x);const F=K*Math.abs(A.q*B.q)*MU*MU/(r*r);set('r',fmt(r)+' m');set('F',A.q*B.q?fmt(F)+' N':'0');set('t',A.q*B.q>0?'דחייה':A.q*B.q<0?'משיכה':'אין כוח');set('f2',A.q*B.q?fmt(F/4)+' N':'0')}});
+  const s1=slider(ctls,'מטען q₁',-5,5,.5,A.q,qs,v=>{A.q=v;sc.draw()});
+  const s2=slider(ctls,'מטען q₂',-5,5,.5,B.q,qs,v=>{B.q=v;sc.draw()});
+  const ex=()=>{A.q=4;B.q=1;A.x=-.15;B.x=.15;s1.set(4);s2.set(1);sc.draw()};
+  host.querySelector('[data-p="ex"]').onclick=ex;if(preset)ex();
+},
+field(host,preset){
+  host.innerHTML=`<div class="stage"><canvas aria-label="סימולציית שדה חשמלי של שני מטענים בנקודה P"></canvas><span class="hint">גררו את המטענים ואת P · אורך החצים בסולם לוגריתמי</span></div><div class="simbar"></div><div class="ctls"></div><div class="simbar"><button class="btn sm" data-p="ex">טעינת הדוגמה: ‎+4 μC ו־‎−1 μC, ו־P באמצע</button></div>`;
+  const bar=host.querySelector('.simbar'),ctls=host.querySelector('.ctls');
+  const A={x:-.15,y:0,q:4,label:'q₁'},B={x:.15,y:0,q:-1,label:'q₂'},P={x:0,y:.15,label:'P'};
+  const set=outs(host,[['e1','|E₁| ב־P'],['e2','|E₂| ב־P'],['e','|E| שקול'],['d','כיוון E (מציר x)'],['f','כוח על אלקטרון ב־P']]);
+  let comps=true;
+  const sc=Scene(host.querySelector('canvas'),{width:1.1,charges:[A,B],probes:[P],lines:false,
+    over(ctx,t){const[X,Y]=sc.px(P.x,P.y);const parts=[A,B].map(c=>Ef([c],P.x,P.y));const[ex,ey]=Ef([A,B],P.x,P.y);
+      if(comps)parts.forEach((p,i)=>{const m=Math.hypot(...p);if(!m||![A,B][i].q)return;const L=lenE(m);arrow(ctx,X,Y,X+p[0]/m*L,Y-p[1]/m*L,i?t.neg:t.pos,1.6,7)});
+      const mm=Math.hypot(ex,ey);if(mm){const L=lenE(mm);arrow(ctx,X,Y,X+ex/mm*L,Y-ey/mm*L,t.ink,3,10)}},
+    onChange(){const e1=Math.hypot(...Ef([A],P.x,P.y)),e2=Math.hypot(...Ef([B],P.x,P.y));const[ex,ey]=Ef([A,B],P.x,P.y);const e=Math.hypot(ex,ey);set('e1',A.q?fmt(e1)+' N/C':'0');set('e2',B.q?fmt(e2)+' N/C':'0');set('e',fmt(e)+' N/C');set('d',e?dirTxt(ex,ey):'—');set('f',fmt(1.6e-19*e)+' N, נגד E')}});
+  toggle(bar,'רכיבי השדה E₁ ו־E₂',true,v=>{comps=v;sc.draw()});
+  toggle(bar,'קווי שדה ברקע',false,v=>{sc.lines=v;sc.draw()});
+  const s1=slider(ctls,'מטען q₁',-5,5,.5,A.q,qs,v=>{A.q=v;sc.draw()});
+  const s2=slider(ctls,'מטען q₂',-5,5,.5,B.q,qs,v=>{B.q=v;sc.draw()});
+  const ex=()=>{A.q=4;B.q=-1;A.x=-.15;A.y=0;B.x=.15;B.y=0;P.x=0;P.y=0;s1.set(4);s2.set(-1);sc.draw()};
+  host.querySelector('[data-p="ex"]').onclick=ex;if(preset)ex();
+},
+energy(host,preset){
+  host.innerHTML=`<div class="stage"><canvas aria-label="שני מטענים: גררו את q₂"></canvas><canvas class="g" aria-label="גרף האנרגיה הפוטנציאלית כפונקציה של המרחק"></canvas><span class="hint">גררו את q₂ לאורך הציר</span></div><div class="ctls"></div>`;
+  const ctls=host.querySelector('.ctls');
+  const A={x:-.35,y:0,q:2,lockY:0,lockX:true,label:'q₁'},B={x:-.05,y:0,q:3,lockY:0,label:'q₂',limit:b=>{if(b.x<A.x+.05)b.x=A.x+.05}};
+  const set=outs(host,[['r','מרחק r'],['u','אנרגיה U'],['m','משמעות']]);
+  let g;
+  const sc=Scene(host.querySelector('canvas'),{width:1.1,charges:[A,B],onChange(){const r=B.x-A.x;const U=K*A.q*B.q*MU*MU/r;set('r',fmt(r)+' m');set('u',fmt(U)+' J');set('m',U>0?'כדי לקרב עוד צריך להשקיע עבודה':U<0?'כדי להפריד לאינסוף צריך להשקיע '+fmt(-U)+' J':'—');g&&g.draw()}});
+  g=Canvas(host.querySelector('canvas.g'),(ctx,t,o)=>{const W=o.W,H=o.H,l=46,r0=.05,r1=.8;const Umax=Math.max(.2,K*Math.abs(A.q*B.q)*MU*MU/r0);const y0=H/2;const X=r=>l+(r-r0)/(r1-r0)*(W-l-14),Y=u=>y0-u/Umax*(H/2-16);
+    ctx.strokeStyle=t.line;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(l,8);ctx.lineTo(l,H-8);ctx.moveTo(l,y0);ctx.lineTo(W-8,y0);ctx.stroke();font(ctx,12,700);ctx.fillStyle=t.mut;ctx.textAlign='left';ctx.fillText('U (J)',6,16);ctx.textAlign='right';ctx.fillText('r (m)',W-8,y0-6);ctx.textAlign='center';[.2,.4,.6,.8].forEach(v=>{if(X(v)<W-20)ctx.fillText(v,X(v),y0+15)});
+    ctx.strokeStyle=t.acc;ctx.lineWidth=2.2;ctx.beginPath();for(let i=0;i<=200;i++){const r=r0+(r1-r0)*i/200;const u=K*A.q*B.q*MU*MU/r;const py=Y(u);i?ctx.lineTo(X(r),py):ctx.moveTo(X(r),py)}ctx.stroke();
+    const r=B.x-A.x;if(r<=r1){const u=K*A.q*B.q*MU*MU/r;ctx.fillStyle=t.ink;ctx.beginPath();ctx.arc(X(r),Y(u),5,0,7);ctx.fill()}});
+  slider(ctls,'מטען q₁',-5,5,.5,A.q,qs,v=>{A.q=v;sc.draw()});
+  slider(ctls,'מטען q₂',-5,5,.5,B.q,qs,v=>{B.q=v;sc.draw()});
+},
+potential(host,preset){
+  host.innerHTML=`<div class="stage"><canvas aria-label="מפת פוטנציאל עם נקודות A ו־B"></canvas><span class="hint">גררו מטענים ואת A ו־B · אדום: פוטנציאל חיובי, כחול: שלילי</span></div><div class="simbar"></div><div class="ctls"></div><div class="simbar"><button class="btn sm" data-p="ex">טעינת הדוגמה</button></div>`;
+  const bar=host.querySelector('.simbar'),ctls=host.querySelector('.ctls');
+  const A1={x:-.2,y:0,q:4,label:'q₁'},B1={x:.2,y:0,q:-2,label:'q₂'},PA={x:0,y:0,label:'A'},PB={x:-.2,y:.3,label:'B'};let qt=5;
+  const set=outs(host,[['va','V_A'],['vb','V_B'],['vab','V_AB = V_A − V_B'],['w','W_A→B (כוח חשמלי)']]);
+  const sc=Scene(host.querySelector('canvas'),{width:1.1,charges:[A1,B1],probes:[PA,PB],heat:true,vstep:3e4,
+    under(ctx,t){const[a,b]=sc.px(PA.x,PA.y),[c,d]=sc.px(PB.x,PB.y);ctx.setLineDash([3,4]);ctx.strokeStyle=t.mut;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(a,b);ctx.lineTo(c,d);ctx.stroke();ctx.setLineDash([])},
+    onChange(){const ch=[A1,B1];const va=Vf(ch,PA.x,PA.y),vb=Vf(ch,PB.x,PB.y);set('va',fmt(va)+' V');set('vb',fmt(vb)+' V');set('vab',fmt(va-vb)+' V');set('w',fmt(qt*1e-9*(va-vb))+' J')}});
+  toggle(bar,'מפת צבע של V',true,v=>{sc.heat=v;sc.draw()});
+  toggle(bar,'קווים שווי פוטנציאל',false,v=>{sc.equip=v;sc.draw()});
+  const s1=slider(ctls,'מטען q₁',-5,5,.5,A1.q,qs,v=>{A1.q=v;sc.draw()});
+  const s2=slider(ctls,'מטען q₂',-5,5,.5,B1.q,qs,v=>{B1.q=v;sc.draw()});
+  const s3=slider(ctls,'מטען מועבר q',-10,10,1,qt,v=>(v>0?'+':v<0?'−':'')+Math.abs(v)+' nC',v=>{qt=v;sc.draw()});
+  const ex=()=>{A1.q=4;A1.x=-.2;A1.y=0;B1.q=-2;B1.x=.2;B1.y=0;PA.x=0;PA.y=0;PB.x=-.2;PB.y=.3;qt=5;s1.set(4);s2.set(-2);s3.set(5);sc.draw()};
+  host.querySelector('[data-p="ex"]').onclick=ex;if(preset)ex();
+},
+relation(host,preset){
+  host.innerHTML=`<div class="stage"><canvas aria-label="שני לוחות מקבילים ונקודה P ביניהם"></canvas><canvas class="g" aria-label="גרף הפוטנציאל כפונקציה של x"></canvas><span class="hint">גררו את P בין הלוחות</span></div><div class="ctls"></div><div class="simbar"><button class="btn sm" data-p="ex">טעינת הדוגמה: 1000 V ו־5 cm</button></div>`;
+  const ctls=host.querySelector('.ctls');
+  const st={vl:1000,vr:0,d:.05,px:.01};
+  const set=outs(host,[['dv','ΔV = V_ימין − V_שמאל'],['e','E = −ΔV/Δx'],['vp','V בנקודה P'],['xp','מרחק P מהלוח השמאלי']]);
+  let geo={};let g;
+  const top=Canvas(host.querySelector('canvas'),(ctx,t,o)=>{const W=o.W,H=o.H;const L=W*.18,span=W*.64;const sx=span/.1;const R=L+st.d*sx;geo={L,R,sx};
+    const E=-(st.vr-st.vl)/st.d;
+    // arrows
+    const n=6;for(let i=0;i<n;i++){const y=40+(H-80)*i/(n-1);if(E!==0){const s=Math.sign(E);const a=s>0?L+12:R-12,b=s>0?R-12:L+12;arrow(ctx,a,y,b,y,t.fl,1.4,7)}}
+    // plates
+    const pc=v=>v>0?t.pos:v<0?t.neg:t.mut;ctx.fillStyle=pc(st.vl);ctx.fillRect(L-8,20,8,H-40);ctx.fillStyle=pc(st.vr);ctx.fillRect(R,20,8,H-40);
+    font(ctx,13,800);ctx.fillStyle=t.ink;ctx.textAlign='center';ctx.fillText(st.vl+' V',L-4,15);ctx.fillText(st.vr+' V',R+4,15);
+    font(ctx,12,600);ctx.fillStyle=t.mut;ctx.fillText('d = '+Math.round(st.d*100)+' cm',(L+R)/2,H-6);
+    const X=L+st.px*sx,Y=H/2;ctx.fillStyle=t.paper;ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Y,8,0,7);ctx.fill();ctx.stroke();font(ctx,13,800);ctx.fillStyle=t.ink;ctx.textAlign='left';ctx.fillText('P',X+10,Y-10);
+    const vp=st.vl+(st.vr-st.vl)*st.px/st.d;set('dv',fmt(st.vr-st.vl)+' V');set('e',fmt(Math.abs(E))+' N/C'+(E>0?' ימינה':E<0?' שמאלה':''));set('vp',fmt(vp)+' V');set('xp',fmt(st.px*100)+' cm');g&&g.draw()});
+  g=Canvas(host.querySelector('canvas.g'),(ctx,t,o)=>{const{L,R,sx}=geo;if(!sx)return;const H=o.H;const vmin=-500,vmax=1000;const Y=v=>H-22-(v-vmin)/(vmax-vmin)*(H-40);
+    ctx.strokeStyle=t.line;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(L,8);ctx.lineTo(L,H-14);ctx.moveTo(L,Y(0));ctx.lineTo(o.W-10,Y(0));ctx.stroke();font(ctx,12,700);ctx.fillStyle=t.mut;ctx.textAlign='right';[1000,500,0,-500].forEach(v=>ctx.fillText(v,L-6,Y(v)+4));ctx.textAlign='left';ctx.fillText('V (V)',6,14);ctx.textAlign='right';ctx.fillText('x',o.W-8,Y(0)-6);
+    ctx.strokeStyle=t.acc;ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(L,Y(st.vl));ctx.lineTo(R,Y(st.vr));ctx.stroke();const X=L+st.px*sx,vp=st.vl+(st.vr-st.vl)*st.px/st.d;ctx.fillStyle=t.ink;ctx.beginPath();ctx.arc(X,Y(vp),5,0,7);ctx.fill();ctx.setLineDash([3,3]);ctx.strokeStyle=t.mut;ctx.beginPath();ctx.moveTo(X,Y(vp));ctx.lineTo(X,Y(0));ctx.stroke();ctx.setLineDash([])});
+  const cv=host.querySelector('canvas');let dr=false;const mv=e=>{const r=cv.getBoundingClientRect();const x=(e.clientX-r.left-geo.L)/geo.sx;st.px=Math.max(0,Math.min(st.d,+x.toFixed(4)));top.draw()};
+  cv.addEventListener('pointerdown',e=>{dr=true;cv.setPointerCapture(e.pointerId);mv(e)});cv.addEventListener('pointermove',e=>dr&&mv(e));cv.addEventListener('pointerup',()=>dr=false);
+  const a=slider(ctls,'פוטנציאל הלוח השמאלי',-500,1000,50,st.vl,v=>v+' V',v=>{st.vl=v;top.draw()});
+  const b=slider(ctls,'פוטנציאל הלוח הימני',-500,1000,50,st.vr,v=>v+' V',v=>{st.vr=v;top.draw()});
+  const c=slider(ctls,'מרחק בין הלוחות d',2,10,.5,st.d*100,v=>v+' cm',v=>{st.d=v/100;st.px=Math.min(st.px,st.d);top.draw()});
+  const ex=()=>{st.vl=1000;st.vr=0;st.d=.05;st.px=.01;a.set(1000);b.set(0);c.set(5);top.draw()};
+  host.querySelector('[data-p="ex"]').onclick=ex;if(preset)ex();
+},
+plates(host,preset){
+  host.innerHTML=`<div class="stage"><canvas aria-label="לוחות טעונים והשדה החשמלי סביבם"></canvas><canvas class="g" aria-label="גרף הפוטנציאל לאורך ציר x"></canvas><span class="hint">גררו את P · אורך החצים יחסי לגודל השדה</span></div><div class="simbar"></div><div class="ctls"></div><div class="simbar"><button class="btn sm" data-p="ex">טעינת הדוגמה: ‎+5 nC ו־‎−5 nC על 0.01 m², ‏d = 2 cm</button></div>`;
+  const[bar,,]=host.querySelectorAll('.simbar'),ctls=host.querySelector('.ctls');
+  const st={two:true,s1:2,s2:-2,d:.06,px:.11};const VW=.3,EREF=10*MU/(2*E0);
+  const set=outs(host,[['l','E משמאל ללוחות'],['m','E בין הלוחות'],['r','E מימין ללוחות'],['dv','מתח בין הלוחות'],['p','E ב־P'],['vp','V ב־P (V = 0 על הלוח השמאלי)']]);
+  const PL=()=>st.two?[[-st.d/2,st.s1],[st.d/2,st.s2]]:[[0,st.s1]];
+  const Ex=x=>PL().reduce((s,[xp,sg])=>s+sg*MU/(2*E0)*Math.sign(x-xp),0);
+  const Vx=x=>{const ps=PL(),x0=ps[0][0];return -ps.reduce((s,[xp,sg])=>s+sg*MU/(2*E0)*(Math.abs(x-xp)-Math.abs(x0-xp)),0)};
+  const ed=e=>Math.abs(e)<1e-9?'0':fmt(Math.abs(e))+' N/C '+(e>0?'ימינה':'שמאלה');
+  let geo={},g;
+  const top=Canvas(host.querySelector('canvas'),(ctx,t,o)=>{const W=o.W,H=o.H,sx=W/VW,cx=W/2;geo={sx,cx};const X=x=>cx+x*sx;const ps=PL();
+    const cols=12;for(let c=0;c<cols;c++){const x=-VW/2+VW*(c+.5)/cols;if(ps.some(([xp])=>Math.abs(X(x)-X(xp))<14))continue;const e=Ex(x);const L=e/EREF*(W/cols*1.6);if(Math.abs(L)<3)continue;for(let r=0;r<5;r++){const y=34+(H-68)*r/4;if(Math.abs(y-H/2)<14)continue;arrow(ctx,X(x)-L/2,y,X(x)+L/2,y,t.fl,1.5,7)}}
+    ps.forEach(([xp,sg],i)=>{ctx.fillStyle=sg>0?t.pos:sg<0?t.neg:t.mut;ctx.fillRect(X(xp)-4,22,8,H-44);font(ctx,12,800);ctx.fillStyle=t.ink;ctx.textAlign='center';ctx.fillText((st.two?['σ₁','σ₂'][i]:'σ')+' = '+(sg>0?'+':sg<0?'−':'')+Math.abs(sg),X(xp),16)});
+    if(st.two){font(ctx,12,600);ctx.fillStyle=t.mut;ctx.textAlign='center';ctx.fillText('d = '+Math.round(st.d*100)+' cm',cx,H-6)}
+    const PX=X(st.px),PY=H/2;const e=Ex(st.px);if(Math.abs(e)>1){const L=Math.sign(e)*Math.max(16,Math.abs(e)/EREF*90);arrow(ctx,PX,PY,PX+L,PY,t.ink,3,10)}
+    ctx.fillStyle=t.paper;ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.beginPath();ctx.arc(PX,PY,7,0,7);ctx.fill();ctx.stroke();font(ctx,13,800);ctx.fillStyle=t.ink;ctx.textAlign='left';ctx.fillText('P',PX+9,PY-10);
+    const eps=1e-4;if(st.two){set('l',ed(Ex(-st.d/2-eps)));set('m',ed(Ex(0)));set('r',ed(Ex(st.d/2+eps)));set('dv',fmt(Math.abs(Vx(st.d/2)))+' V')}else{set('l',ed(Ex(-eps)));set('m','— (לוח אחד)');set('r',ed(Ex(eps)));set('dv','—')}
+    set('p',ed(e));set('vp',fmt(Vx(st.px))+' V');g&&g.draw()});
+  g=Canvas(host.querySelector('canvas.g'),(ctx,t,o)=>{const{sx,cx}=geo;if(!sx)return;const W=o.W,H=o.H,X=x=>cx+x*sx;let vm=100;for(let i=0;i<=60;i++)vm=Math.max(vm,Math.abs(Vx(-VW/2+VW*i/60)));const Y=v=>H/2-v/vm*(H/2-18);
+    ctx.strokeStyle=t.line;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,Y(0));ctx.lineTo(W,Y(0));ctx.stroke();ctx.setLineDash([3,4]);PL().forEach(([xp])=>{ctx.beginPath();ctx.moveTo(X(xp),6);ctx.lineTo(X(xp),H-6);ctx.stroke()});ctx.setLineDash([]);
+    font(ctx,12,700);ctx.fillStyle=t.mut;ctx.textAlign='left';ctx.fillText('V (V)',8,16);ctx.fillText('±'+Math.round(vm)+' V',8,30);
+    ctx.strokeStyle=t.acc;ctx.lineWidth=2.4;ctx.beginPath();for(let i=0;i<=240;i++){const x=-VW/2+VW*i/240;i?ctx.lineTo(X(x),Y(Vx(x))):ctx.moveTo(X(x),Y(Vx(x)))}ctx.stroke();
+    ctx.fillStyle=t.ink;ctx.beginPath();ctx.arc(X(st.px),Y(Vx(st.px)),5,0,7);ctx.fill()});
+  const cv=host.querySelector('canvas');let dr=false;const mv=e=>{const r=cv.getBoundingClientRect();st.px=Math.max(-VW/2+.005,Math.min(VW/2-.005,(e.clientX-r.left-geo.cx)/geo.sx));top.draw()};
+  cv.addEventListener('pointerdown',e=>{dr=true;cv.setPointerCapture(e.pointerId);mv(e)});cv.addEventListener('pointermove',e=>dr&&mv(e));cv.addEventListener('pointerup',()=>dr=false);
+  const su=v=>(v>0?'+':v<0?'−':'')+Math.abs(v)+' μC/m²';
+  toggle(bar,'שני לוחות',true,v=>{st.two=v;top.draw()});
+  const a=slider(ctls,'צפיפות מטען σ₁ (הלוח השמאלי)',-5,5,.5,st.s1,su,v=>{st.s1=v;top.draw()});
+  const b=slider(ctls,'צפיפות מטען σ₂ (הלוח הימני)',-5,5,.5,st.s2,su,v=>{st.s2=v;top.draw()});
+  const c=slider(ctls,'מרחק בין הלוחות d',2,12,1,st.d*100,v=>v+' cm',v=>{st.d=v/100;top.draw()});
+  const pres=[['‎+σ ו־‎−σ (קבל)',[2,-2]],['‎+σ ו־‎+σ',[2,2]],['‎+3 ו־‎+1',[3,1]]];
+  pres.forEach(([n,[x,y]])=>{const bt=el(`<button class="btn sm">${n}</button>`);bt.onclick=()=>{st.two=true;bar.querySelector('input').checked=true;st.s1=x;st.s2=y;a.set(x);b.set(y);top.draw()};bar.appendChild(bt)});
+  const ex=()=>{st.two=true;bar.querySelector('input').checked=true;st.s1=.5;st.s2=-.5;st.d=.02;st.px=0;a.set(.5);b.set(-.5);c.set(2);top.draw()};
+  host.querySelector('[data-p="ex"]').onclick=ex;if(preset)ex();
+  host.appendChild(el(`<p class="note">הלוחות נחשבים גדולים מאוד ביחס למרחקים בציור, ולכן השדה של כל לוח אחיד ולא תלוי במרחק. <span class="mx">0.5 μC/m<sup>2</sup> = 5·10<sup>−7</sup> C/m<sup>2</sup></span>.</p>`));
+},
+sphere(host,preset){
+  host.innerHTML=`<div class="stage"><canvas aria-label="כדור מוליך טעון ונקודה P"></canvas><canvas class="g" aria-label="גרפים של השדה והפוטנציאל כפונקציה של המרחק מהמרכז"></canvas><span class="hint">גררו את P פנימה והחוצה</span></div><div class="simbar"></div><div class="ctls"></div><div class="simbar"><button class="btn sm" data-p="ex">טעינת הדוגמה: ‎+2 μC ו־R = 10 cm</button></div>`;
+  const[bar]=host.querySelectorAll('.simbar'),ctls=host.querySelector('.ctls');
+  const st={Q:2,R:.1,cmp:false};const P={x:.25,y:.12,label:'P'};
+  const Er=r=>r<st.R?0:K*st.Q*MU/(r*r),Vr=r=>K*st.Q*MU/Math.max(r,st.R);
+  const set=outs(host,[['r','מרחק P מהמרכז'],['w','מיקום'],['e','E ב־P'],['v','V ב־P']]);
+  let g;
+  const sc=Scene(host.querySelector('canvas'),{width:1.0,probes:[P],
+    under(ctx,t){const[X,Y]=sc.px(0,0),Rp=st.R*sc.s;const col=st.Q>0?t.pos:st.Q<0?t.neg:t.mut;const n=Math.round(Math.abs(st.Q)*4);ctx.lineWidth=1.3;
+      for(let i=0;i<n;i++){const a=2*Math.PI*i/n+.2,c=Math.cos(a),s=Math.sin(a);ctx.strokeStyle=t.fl;ctx.beginPath();ctx.moveTo(X+c*(Rp+3),Y+s*(Rp+3));ctx.lineTo(X+c*2000,Y+s*2000);ctx.stroke();const r1=Rp+38;if(st.Q>0)arrow(ctx,X+c*r1,Y+s*r1,X+c*(r1+12),Y+s*(r1+12),t.fl,1.3,7);else arrow(ctx,X+c*(r1+12),Y+s*(r1+12),X+c*r1,Y+s*r1,t.fl,1.3,7)}
+      ctx.fillStyle=t.soft;ctx.beginPath();ctx.arc(X,Y,Rp,0,7);ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=4;ctx.beginPath();ctx.arc(X,Y,Rp,0,7);ctx.stroke();
+      if(st.Q){font(ctx,11,800);ctx.fillStyle=col;ctx.textAlign='center';ctx.textBaseline='middle';const ms=Math.max(6,Math.round(Rp/6));for(let i=0;i<ms;i++){const a=2*Math.PI*i/ms;ctx.fillText(st.Q>0?'+':'−',X+Math.cos(a)*(Rp-9),Y+Math.sin(a)*(Rp-9))}ctx.textBaseline='alphabetic'}
+      font(ctx,13,700);ctx.fillStyle=t.mut;ctx.textAlign='center';ctx.fillText('E = 0',X,Y+5)},
+    over(ctx,t){const r=Math.hypot(P.x,P.y),e=Er(r);if(!e||!r)return;const[X,Y]=sc.px(P.x,P.y);const L=lenE(Math.abs(e))*Math.sign(e);arrow(ctx,X,Y,X+P.x/r*L,Y-P.y/r*L,t.ink,3,10)},
+    onChange(){const r=Math.hypot(P.x,P.y);set('r',fmt(r)+' m');set('w',r<st.R?'בתוך הכדור':'מחוץ לכדור');set('e',r<st.R?'0':fmt(Math.abs(Er(r)))+' N/C');set('v',fmt(Vr(r))+' V');g&&g.draw()}});
+  g=Canvas(host.querySelector('canvas.g'),(ctx,t,o)=>{const W=o.W,H=o.H,gap=24,pw=(W-gap)/2,R0=.5;const sg=Math.sign(st.Q)||1;const top=22,bot=H-22;const r=Math.hypot(P.x,P.y);
+    const panel=(x0,name,f,fp,vmax)=>{const X=rr=>x0+30+rr/R0*(pw-40);const Y=v=>sg>0?bot-v/vmax*(bot-top):top+(-v)/vmax*(bot-top);const base=sg>0?bot:top;
+      ctx.strokeStyle=t.line;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(X(0),top-6);ctx.lineTo(X(0),bot+4);ctx.moveTo(X(0),base);ctx.lineTo(x0+pw,base);ctx.stroke();
+      ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(X(st.R),top-6);ctx.lineTo(X(st.R),bot+4);ctx.stroke();ctx.setLineDash([]);
+      font(ctx,12,700);ctx.fillStyle=t.ink;ctx.textAlign='left';ctx.fillText(name,x0+34,14);ctx.fillStyle=t.mut;ctx.textAlign='center';ctx.fillText('R',X(st.R),H-6);ctx.textAlign='right';ctx.fillText('r',x0+pw,sg>0?bot+16:top-8);
+      if(st.cmp){ctx.strokeStyle=t.mut;ctx.lineWidth=1.4;ctx.setLineDash([4,4]);ctx.beginPath();let s=false;for(let i=1;i<=100;i++){const rr=st.R*i/100;const v=fp(rr);if(Math.abs(v)>vmax*1.05){s=false;continue}s?ctx.lineTo(X(rr),Y(v)):ctx.moveTo(X(rr),Y(v));s=true}ctx.stroke();ctx.setLineDash([])}
+      ctx.strokeStyle=t.acc;ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(X(0),Y(f(0)));for(let i=1;i<=300;i++){const rr=R0*i/300;if(Math.abs(rr-st.R)<R0/300){ctx.lineTo(X(st.R),Y(f(st.R*.9999)));ctx.lineTo(X(st.R),Y(f(st.R)))}ctx.lineTo(X(rr),Y(f(rr)))}ctx.stroke();
+      if(r<=R0){ctx.fillStyle=t.ink;ctx.beginPath();ctx.arc(X(r),Y(f(r)),5,0,7);ctx.fill()}};
+    if(!st.Q){font(ctx,13,600);ctx.fillStyle=t.mut;ctx.textAlign='center';ctx.fillText('הכדור לא טעון: E = 0 ו־V = 0 בכל מקום',W/2,H/2);return}
+    panel(0,'E (N/C)',Er,rr=>K*st.Q*MU/(rr*rr),Math.abs(K*st.Q*MU/(st.R*st.R))*1.1);
+    panel(pw+gap,'V (V)',Vr,rr=>K*st.Q*MU/rr,Math.abs(K*st.Q*MU/st.R)*1.1)});
+  toggle(bar,'השוואה למטען נקודתי (קו מקווקו)',false,v=>{st.cmp=v;g.draw()});
+  const a=slider(ctls,'מטען הכדור Q',-5,5,.5,st.Q,qs,v=>{st.Q=v;sc.draw()});
+  const b=slider(ctls,'רדיוס הכדור R',5,20,1,st.R*100,v=>v+' cm',v=>{st.R=v/100;sc.draw()});
+  const ex=()=>{st.Q=2;st.R=.1;P.x=.3;P.y=0;a.set(2);b.set(10);sc.draw()};
+  host.querySelector('[data-p="ex"]').onclick=ex;if(preset)ex();
+  host.appendChild(el(`<p class="note">אותה תמונה מתאימה לכדור מוליך מלא ולקליפה כדורית דקה: בשניהם המטען יושב על פני השטח. בגרפים הקו המקווקו האנכי מסמן את פני הכדור.</p>`));
+},
+connect(host,preset){
+  host.innerHTML=`<div class="stage"><canvas aria-label="שני כדורים מוליכים שאפשר לחבר בתיל"></canvas><canvas class="g" aria-label="הפוטנציאל של כל כדור"></canvas><span class="hint">הכדורים רחוקים זה מזה, וכל אחד מושפע רק מהמטען שלו</span></div><div class="simbar"></div><div class="ctls"></div><div class="simbar"><button class="btn sm" data-p="ex">טעינת הדוגמה: ‎+6 μC ב־10 cm, ו־0 ב־20 cm</button></div>`;
+  const[bar]=host.querySelectorAll('.simbar'),ctls=host.querySelector('.ctls');
+  const st={Q1:6,R1:.1,Q2:-2,R2:.2,q1:6,q2:-2,mode:0,s1:6,s2:-2};let raf=0;
+  const set=outs(host,[['q1','Q₁'],['q2','Q₂'],['v1','V₁'],['v2','V₂'],['t','מטען שעבר בתיל'],['e','E על פני כדור 1 / כדור 2']]);
+  const V=(q,R)=>K*q*MU/R;
+  const fin=()=>st.mode===1?(()=>{const tot=st.s1+st.s2,a=tot*st.R1/(st.R1+st.R2);return[a,tot-a]})():st.mode===2?[0,st.s2]:[st.s1,st.s2];
+  let g;
+  const top=Canvas(host.querySelector('canvas'),(ctx,t,o)=>{const W=o.W,H=o.H,s=W/1.2,cy=H/2-6;const c1=W/2-.3*s,c2=W/2+.3*s,r1=st.R1*s,r2=st.R2*s;
+    const flow=st.q1-fin()[0];
+    if(st.mode===1){ctx.strokeStyle=t.ink;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(c1+r1,cy);ctx.lineTo(c2-r2,cy);ctx.stroke();
+      if(Math.abs(flow)>.01){const mid=(c1+r1+c2-r2)/2,dir=flow>0?-1:1;arrow(ctx,mid-dir*22,cy-14,mid+dir*22,cy-14,t.neg,2,8);font(ctx,12,700);ctx.fillStyle=t.neg;ctx.textAlign='center';ctx.fillText('אלקטרונים',mid,cy-24)}}
+    if(st.mode===2){const gy=H-18;ctx.strokeStyle=t.ink;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(c1,cy+r1);ctx.lineTo(c1,gy);ctx.stroke();ctx.lineWidth=2;[[16,0],[10,5],[4,10]].forEach(([w,d])=>{ctx.beginPath();ctx.moveTo(c1-w,gy+d);ctx.lineTo(c1+w,gy+d);ctx.stroke()});
+      if(Math.abs(flow)>.01){const dir=flow>0?-1:1;arrow(ctx,c1+16,cy+r1+20+(dir>0?0:24),c1+16,cy+r1+20+(dir>0?24:0),t.neg,2,8);font(ctx,12,700);ctx.fillStyle=t.neg;ctx.textAlign='left';ctx.fillText('אלקטרונים',c1+24,cy+r1+36)}}
+    [[c1,r1,st.q1,'1',st.R1],[c2,r2,st.q2,'2',st.R2]].forEach(([cx,r,q,n,R])=>{const col=q>.005?t.pos:q<-.005?t.neg:t.mut;ctx.fillStyle=t.soft;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke();
+      const ns=Math.round(Math.abs(q)*3);font(ctx,11,800);ctx.fillStyle=col;ctx.textAlign='center';ctx.textBaseline='middle';for(let i=0;i<ns;i++){const a=2*Math.PI*i/ns;ctx.fillText(q>0?'+':'−',cx+Math.cos(a)*(r-8),cy+Math.sin(a)*(r-8))}ctx.textBaseline='alphabetic';
+      font(ctx,13,800);ctx.fillStyle=t.ink;ctx.fillText('כדור '+n,cx,cy-r-10);font(ctx,12,600);ctx.fillStyle=t.mut;ctx.fillText('R = '+Math.round(R*100)+' cm',cx,cy+r+18)});
+    const tr=Math.abs(st.s1-st.q1);set('q1',fmt(st.q1)+' μC');set('q2',fmt(st.q2)+' μC');set('v1',fmt(V(st.q1,st.R1))+' V');set('v2',fmt(V(st.q2,st.R2))+' V');set('t',tr<.005?'0':fmt(tr)+' μC');set('e',fmt(Math.abs(V(st.q1,st.R1)/st.R1))+' / '+fmt(Math.abs(V(st.q2,st.R2)/st.R2))+' N/C');g&&g.draw()});
+  g=Canvas(host.querySelector('canvas.g'),(ctx,t,o)=>{const W=o.W,H=o.H;const vals=[V(st.s1,st.R1),V(st.s2,st.R2),V(st.q1,st.R1),V(st.q2,st.R2),V(fin()[0],st.R1)];const vm=Math.max(1e4,...vals.map(Math.abs))*1.1;const y0=H/2,Y=v=>y0-v/vm*(H/2-16);
+    ctx.strokeStyle=t.line;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(30,y0);ctx.lineTo(W-10,y0);ctx.stroke();font(ctx,12,700);ctx.fillStyle=t.mut;ctx.textAlign='left';ctx.fillText('V',8,y0+4);
+    const bw=Math.min(70,W/6);[[W/2-W*.18,V(st.q1,st.R1),'V₁'],[W/2+W*.18,V(st.q2,st.R2),'V₂']].forEach(([x,v,l])=>{ctx.fillStyle=v>=0?t.pos:t.neg;ctx.globalAlpha=.8;ctx.fillRect(x-bw/2,Math.min(Y(v),y0),bw,Math.abs(Y(v)-y0));ctx.globalAlpha=1;font(ctx,12,800);ctx.fillStyle=t.ink;ctx.textAlign='center';ctx.fillText(l,x,v>=0?Y(v)-6:Y(v)+14)});
+    if(st.mode){const vf=st.mode===1?V(fin()[0],st.R1):0;ctx.setLineDash([5,4]);ctx.strokeStyle=t.acc;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(30,Y(vf));ctx.lineTo(W-10,Y(vf));ctx.stroke();ctx.setLineDash([]);font(ctx,12,700);ctx.fillStyle=t.acc;ctx.textAlign='right';ctx.fillText(st.mode===1?'פוטנציאל משותף':'V של כדור הארץ = 0',W-12,Y(vf)-6)}});
+  const run=()=>{cancelAnimationFrame(raf);const[f1,f2]=fin();const a1=st.q1,a2=st.q2;if(matchMedia('(prefers-reduced-motion: reduce)').matches){st.q1=f1;st.q2=f2;top.draw();return}const t0=performance.now();const step=now=>{if(!document.body.contains(top.cv))return;const k=Math.exp(-(now-t0)/450);st.q1=f1+(a1-f1)*k;st.q2=f2+(a2-f2)*k;top.draw();if(k>.002)raf=requestAnimationFrame(step);else{st.q1=f1;st.q2=f2;top.draw()}};raf=requestAnimationFrame(step)};
+  const reset=()=>{cancelAnimationFrame(raf);st.mode=0;st.s1=st.Q1;st.s2=st.Q2;st.q1=st.Q1;st.q2=st.Q2;top.draw()};
+  const b1=el(`<button class="btn sm pri">חיבור הכדורים בתיל</button>`);b1.onclick=()=>{reset();st.mode=1;run()};
+  const b2=el(`<button class="btn sm">הארקת כדור 1</button>`);b2.onclick=()=>{reset();st.mode=2;run()};
+  const b3=el(`<button class="btn sm">ניתוק והתחלה מחדש</button>`);b3.onclick=reset;bar.append(b1,b2,b3);
+  const a=slider(ctls,'מטען התחלתי Q₁',-6,6,.5,st.Q1,qs,v=>{st.Q1=v;reset()});
+  const b=slider(ctls,'רדיוס R₁',5,25,1,st.R1*100,v=>v+' cm',v=>{st.R1=v/100;reset()});
+  const c=slider(ctls,'מטען התחלתי Q₂',-6,6,.5,st.Q2,qs,v=>{st.Q2=v;reset()});
+  const d=slider(ctls,'רדיוס R₂',5,25,1,st.R2*100,v=>v+' cm',v=>{st.R2=v/100;reset()});
+  const ex=()=>{st.Q1=6;st.R1=.1;st.Q2=0;st.R2=.2;a.set(6);b.set(10);c.set(0);d.set(20);reset()};
+  host.querySelector('[data-p="ex"]').onclick=ex;if(preset)ex();
+  host.appendChild(el(`<p class="note">החץ הכחול מראה לאן נעים האלקטרונים בתיל. מבחינת החשבון זה שקול למעבר מטען חיובי בכיוון ההפוך, מהפוטנציאל הגבוה לנמוך.</p>`));
+},
+lines(host,preset){builder(host,preset,{lines:true,equip:false,name:'lines'})},
+equipotential(host,preset){builder(host,preset,{lines:true,equip:true,name:'equipotential'})}
+};
+
+function builder(host,preset,o){
+  host.innerHTML=`<div class="stage"><canvas aria-label="בניית מערכת מטענים עם קווי שדה וקווים שווי פוטנציאל"></canvas><span class="hint">גררו מטענים · לחיצה על מטען בוחרת אותו</span></div>
+  <div class="simbar"><span class="lab">מוכנים:</span></div><div class="simbar"></div><div class="ctls"></div>`;
+  const [pre,bar]=host.querySelectorAll('.simbar'),ctls=host.querySelector('.ctls');
+  const sc=Scene(host.querySelector('canvas'),{width:1.1,charges:[],lines:o.lines,equip:o.equip,vstep:3e4,selectable:true,
+    onSelect(c){sl.set(c.q)}});
+  const presets={'דיפול':[[-.18,0,2],[.18,0,-2]],'שני מטענים חיוביים':[[-.18,0,2],[.18,0,2]],'‎+2q ו־‎−q':[[-.15,0,2],[.15,0,-1]],'מטען יחיד':[[0,0,2]],'"לוחות"':[...[-4,-3,-2,-1,0,1,2,3,4].map(i=>[-.14,i*.045,.5]),...[-4,-3,-2,-1,0,1,2,3,4].map(i=>[.14,i*.045,-.5])]};
+  const load=k=>{sc.charges.length=0;presets[k].forEach(([x,y,q])=>sc.charges.push({x,y,q}));sc.sel=sc.charges[0];sl.set(sc.sel.q);sc.draw()};
+  Object.keys(presets).forEach(k=>{const b=el(`<button class="btn sm">${k}</button>`);b.onclick=()=>load(k);pre.appendChild(b)});
+  const add=q=>{const c={x:+(Math.random()*.5-.25).toFixed(3),y:+(Math.random()*.3-.15).toFixed(3),q};sc.charges.push(c);sc.sel=c;sl.set(q);sc.draw()};
+  const bp=el(`<button class="btn sm pos">+ מטען חיובי</button>`);bp.onclick=()=>add(1);bar.appendChild(bp);
+  const bn=el(`<button class="btn sm neg">+ מטען שלילי</button>`);bn.onclick=()=>add(-1);bar.appendChild(bn);
+  const bd=el(`<button class="btn sm">מחיקת הנבחר</button>`);bd.onclick=()=>{const i=sc.charges.indexOf(sc.sel);if(i>=0)sc.charges.splice(i,1);sc.sel=sc.charges[0]||null;sc.sel&&sl.set(sc.sel.q);sc.draw()};bar.appendChild(bd);
+  toggle(bar,'קווי שדה',o.lines,v=>{sc.lines=v;sc.draw()});
+  toggle(bar,'קווים שווי פוטנציאל',o.equip,v=>{sc.equip=v;sc.draw()});
+  toggle(bar,'מפת צבע של V',false,v=>{sc.heat=v;sc.draw()});
+  const sl=slider(ctls,'מטען נבחר',-5,5,.5,2,qs,v=>{if(sc.sel){sc.sel.q=v;sc.draw()}});
+  host.appendChild(el(`<p class="note">מספר הקווים שיוצאים מכל מטען יחסי לגודלו (4 קווים לכל μC). הקווים שווי הפוטנציאל מצוירים בהפרשים שווים של 30 kV, והקו המודגש הוא <span class="mx"><i>V</i> = 0</span>.</p>`));
+  load(o.name==='equipotential'&&!preset?'דיפול':preset?(o.name==='lines'?'‎+2q ו־‎−q':'מטען יחיד'):'דיפול');
+}
+
+/* ---------- content ---------- */
+const T=[
+{id:'coulomb',title:'חוק קולון',sub:'הכוח בין שני מטענים נקודתיים',
+ intro:[
+ `שני גופים טעונים מפעילים זה על זה כוח חשמלי. כשהגופים קטנים ביחס למרחק ביניהם, מתייחסים אליהם כאל <b>מטענים נקודתיים</b>, וחוק קולון מתאר את הכוח ביניהם.`,
+ `הכוח פועל לאורך הקו שמחבר את המטענים. מטענים בעלי סימן זהה דוחים זה את זה, ומטענים בעלי סימנים הפוכים מושכים זה את זה.`,
+ `גודל הכוח יחסי למכפלת המטענים ויחסי הפוך לריבוע המרחק. הגדלת המרחק פי 2 מקטינה את הכוח פי 4, והגדלתו פי 3 מקטינה אותו פי 9.`,
+ `לפי החוק השלישי של ניוטון, הכוחות ששני המטענים מפעילים זה על זה שווים בגודלם והפוכים בכיוונם, גם כשהמטענים שונים מאוד בגודלם.`,
+ `כשיש כמה מטענים, הכוח השקול על מטען מסוים הוא <b>הסכום הווקטורי</b> של הכוחות שכל אחד מהמטענים האחרים מפעיל עליו. זה עקרון הסופרפוזיציה.`],
+ formulas:[[`<i>F</i> = <i>k</i> ${fr(q1+q2,'<i>r</i><sup>2</sup>')}`,'גודל הכוח. מציבים את גודלי המטענים, והכיוון נקבע לפי הסימנים'],[`<i>k</i> = 9·10<sup>9</sup> ${fr('N·m<sup>2</sup>','C<sup>2</sup>')}`,'קבוע קולון'],[`<i>e</i> = 1.6·10<sup>−19</sup> C`,'המטען היסודי (גודל המטען של אלקטרון ושל פרוטון)']],
+ trap:[`המטען הגדול "חזק יותר"?`,`תלמידים רבים חושבים שמטען של ${m('6 μC')} מפעיל על מטען של ${m('1 μC')} כוח גדול יותר מזה שהוא מקבל ממנו. זה לא נכון: לפי החוק השלישי של ניוטון שני הכוחות שווים בגודלם. התאוצות יכולות להיות שונות, כי הן תלויות גם במסות.`],
+ ex:{given:[`${m(q1+' = +4 μC')} בנקודה ${m('<i>x</i> = 0')}`,`${m(q2+' = +1 μC')} בנקודה ${m('<i>x</i> = 0.3 m')}`],ask:[`א. מה גודל הכוח בין המטענים?`,`ב. היכן על ציר x צריך להציב מטען שלישי ${m('<i>q</i><sub>3</sub>')} כך שהכוח השקול עליו יהיה אפס?`,`ג. האם התשובה לסעיף ב תלויה בסימן של ${m('<i>q</i><sub>3</sub>')}?`],
+  steps:[
+  `<b>סעיף א.</b> מציבים בחוק קולון: ${M(`<i>F</i> = 9·10<sup>9</sup> · ${fr('4·10<sup>−6</sup> · 1·10<sup>−6</sup>','0.3<sup>2</sup>')} = ${fr('0.036','0.09')} = 0.4 N`)} שני המטענים חיוביים, ולכן הכוח הוא כוח דחייה.`,
+  `<b>סעיף ב, איפה לחפש.</b> מחוץ לקטע שבין המטענים, שני הכוחות על ${m('<i>q</i><sub>3</sub>')} פועלים באותו כיוון ולא יכולים להתבטל. לכן הנקודה נמצאת בין המטענים, ${m('0 &lt; <i>x</i> &lt; 0.3 m')}.`,
+  `<b>שוויון הכוחות.</b> ${M(`<i>k</i>${fr(`4<i>q</i><sub>3</sub>`,`<i>x</i><sup>2</sup>`)} = <i>k</i>${fr(`1<i>q</i><sub>3</sub>`,`(0.3 − <i>x</i>)<sup>2</sup>`)}`)} ${m('<i>q</i><sub>3</sub>')} ו־${m('<i>k</i>')} מצטמצמים. מוציאים שורש: ${m(`${fr('2','<i>x</i>')} = ${fr('1','0.3 − <i>x</i>')}`)}, ולכן ${m('0.6 − 2<i>x</i> = <i>x</i>')}, כלומר ${m('<i>x</i> = 0.2 m')}.`,
+  `<b>סעיף ג.</b> ${m('<i>q</i><sub>3</sub>')} הצטמצם, ולכן מיקום שיווי המשקל לא תלוי בגודלו או בסימנו. (היציבות כן תלויה בסימן. זו שאלה מתקדמת בתרגול.)`],
+  check:`הנקודה קרובה יותר למטען הקטן, כצפוי. בדיקה: ${m(`${fr('4','0.2<sup>2</sup>')} = 100 = ${fr('1','0.1<sup>2</sup>')}`)}.`},
+ qs:[
+ {l:'b',t:'mc',q:`המרחק בין שני מטענים נקודתיים גדל פי 3. מה קורה לגודל הכוח ביניהם?`,o:['גדל פי 3','קטן פי 3','קטן פי 9','גדל פי 9'],a:2,s:`הכוח יחסי הפוך לריבוע המרחק: ${m('1/3<sup>2</sup> = 1/9')}.`},
+ {l:'b',t:'mc',q:`${m(q1+' = +6 μC')} ו־${m(q2+' = +2 μC')}. איך גודל הכוח ש־${m('<i>q</i><sub>1</sub>')} מפעיל על ${m('<i>q</i><sub>2</sub>')} משתווה לגודל הכוח ש־${m('<i>q</i><sub>2</sub>')} מפעיל על ${m('<i>q</i><sub>1</sub>')}?`,o:['גדול פי 3','קטן פי 3','שווה','גדול פי 9'],a:2,s:`זה זוג כוחות של החוק השלישי של ניוטון. בנוסחה מופיעה המכפלה ${m(q1+q2)}, שהיא זהה לשני הכוחות.`},
+ {l:'b',t:'num',q:`מטען של ${m('+3 μC')} ומטען של ${m('−5 μC')} נמצאים במרחק ${m('0.5 m')} זה מזה. מה גודל הכוח ביניהם?`,a:.54,u:'N',s:`${M(`<i>F</i> = 9·10<sup>9</sup>·${fr('3·10<sup>−6</sup>·5·10<sup>−6</sup>','0.5<sup>2</sup>')} = ${fr('0.135','0.25')} = 0.54 N`)} הסימנים הפוכים, ולכן זה כוח משיכה.`},
+ {l:'b',t:'mc',q:`שני כדורים מוליכים קטנים וזהים טעונים ב־${m('+6 μC')} וב־${m('−2 μC')}. נוגעים בהם זה בזה ומחזירים אותם למרחק המקורי. מה קרה לכוח?`,o:['אותו גודל, עדיין משיכה','שליש מהגודל המקורי, ועכשיו דחייה','שליש מהגודל המקורי, עדיין משיכה','פי 3 מהגודל המקורי, ועכשיו דחייה'],a:1,s:`במגע המטען הכולל ${m('+4 μC')} מתחלק שווה בשווה: ${m('+2 μC')} לכל כדור. לפני המגע המכפלה הייתה ${m('6·2 = 12')}, ואחריו ${m('2·2 = 4')}. הכוח קטן פי 3, ושני המטענים חיוביים, לכן זו דחייה.`},
+ {l:'a',t:'num',q:`${m('<i>q</i><sub>A</sub> = +3 μC')} נמצא בראשית ${m('(0, 0)')}, ${m('<i>q</i><sub>B</sub> = −4 μC')} נמצא בנקודה ${m('(0.3, 0) m')}, ו־${m('<i>q</i><sub>C</sub> = +2 μC')} נמצא בנקודה ${m('(0, 0.4) m')}. מה גודל הכוח השקול על ${m('<i>q</i><sub>C</sub>')}?`,a:.2033,u:'N',s:`<b>כוח מ־A:</b> ${m(`<i>F</i><sub>AC</sub> = 9·10<sup>9</sup>·${fr('3·10<sup>−6</sup>·2·10<sup>−6</sup>','0.4<sup>2</sup>')} = 0.3375 N`)}, דחייה, כלפי מעלה (${m('+<i>y</i>')}).<br><b>כוח מ־B:</b> המרחק BC הוא ${m('0.5 m')}, ולכן ${m(`<i>F</i><sub>BC</sub> = 9·10<sup>9</sup>·${fr('4·10<sup>−6</sup>·2·10<sup>−6</sup>','0.5<sup>2</sup>')} = 0.288 N`)}, משיכה, בכיוון מ־C ל־B, כלומר ${m('(0.6, −0.8)')}.<br>רכיבים: ${m('<i>F</i><sub>x</sub> = 0.288·0.6 = 0.173 N')}, ${m('<i>F</i><sub>y</sub> = 0.3375 − 0.288·0.8 = 0.107 N')}.<br>${m('<i>F</i> = √(0.173<sup>2</sup> + 0.107<sup>2</sup>) ≈ 0.20 N')}.`},
+ {l:'a',t:'num',q:`שני כדורים קטנים וזהים, כל אחד במסה ${m('1 g')}, תלויים מאותה נקודה על חוטים באורך ${m('0.2 m')}. הם טעונים במטענים זהים, ובשיווי משקל כל חוט יוצר זווית של ${m('45°')} עם האנך. מה המטען של כל כדור? (תשובה ב־μC)`,a:.298,u:'μC',s:`על כל כדור פועלים כוח הכובד, המתיחות וכוח החשמל האופקי. בזווית ${m('45°')}: ${m('<i>F</i> = <i>mg</i> tan45° = 10<sup>−3</sup>·10 = 0.01 N')}.<br>המרחק בין הכדורים: ${m('<i>r</i> = 2<i>L</i> sin45° = 2·0.2·0.707 = 0.283 m')}.<br>${M(`<i>q</i> = <i>r</i>√(<i>F</i>/<i>k</i>) = 0.283·√(${fr('0.01','9·10<sup>9</sup>')}) ≈ 2.98·10<sup>−7</sup> C ≈ 0.30 μC`)}`},
+ {l:'a',t:'mc',q:`בדוגמה הפתורה מצאנו ש־${m('<i>q</i><sub>3</sub>')} בנקודה ${m('<i>x</i> = 0.2 m')} נמצא בשיווי משקל. מזיזים אותו מעט לאורך הציר, לכיוון ${m('<i>q</i><sub>2</sub>')}. מה יקרה?`,o:['תמיד יחזור לנקודת שיווי המשקל','תמיד יתרחק ממנה','אם q₃ חיובי יחזור, ואם שלילי יתרחק','לא יפעל עליו כוח'],a:2,s:`כשמקרבים את המטען ל־${m('<i>q</i><sub>2</sub>')}, הכוח ממנו גדל והכוח מ־${m('<i>q</i><sub>1</sub>')} קטן. אם ${m('<i>q</i><sub>3</sub>')} חיובי, ${m('<i>q</i><sub>2</sub>')} דוחה אותו חזרה, וזה שיווי משקל יציב לאורך הציר. אם הוא שלילי, ${m('<i>q</i><sub>2</sub>')} מושך אותו עוד יותר, וזה שיווי משקל לא יציב.`}
+ ]},
+{id:'field',title:'שדה חשמלי',sub:'כוח ליחידת מטען, ושדה של מטען נקודתי ושל לוח',
+ intro:[
+ `מטען יוצר סביבו <b>שדה חשמלי</b>. כל מטען אחר שנמצא בשדה מרגיש כוח.`,
+ `השדה בנקודה הוא הכוח שפועל על מטען בוחן חיובי, מחולק בגודל המטען. לכן הכוח על מטען ${m('<i>q</i>')} הוא ${m('<i>F</i> = <i>qE</i>')}. על מטען חיובי הכוח בכיוון השדה, ועל מטען שלילי הוא בכיוון ההפוך.`,
+ `שדה של מטען נקודתי מצביע החוצה ממטען חיובי ופנימה אל מטען שלילי, וגודלו ${m(`<i>k</i>${fr('<i>q</i>','<i>r</i><sup>2</sup>')}`)}.`,
+ `השדה תלוי רק במטענים שיוצרים אותו ובמיקום הנקודה. הוא לא תלוי במטען הבוחן שמכניסים כדי למדוד אותו.`,
+ `השדה של כמה מטענים הוא הסכום הווקטורי של השדות של כל מטען.`,
+ `לוח גדול (אינסופי) עם צפיפות מטען משטחית ${m('<i>σ</i>')} יוצר שדה אחיד, ניצב ללוח, שאינו תלוי במרחק מהלוח. בין שני לוחות מקבילים בעלי מטענים הפוכים השדות מתחברים, ${m('<i>E</i> = <i>σ</i>/<i>ε</i><sub>0</sub>')}, ומחוץ ללוחות הם מבטלים זה את זה. בהרחבה בנושא "לוחות טעונים".`],
+ formulas:[[`<i>F</i> = <i>qE</i>`,'כוח על מטען בשדה חשמלי (וקטורי)'],[`<i>E</i> = <i>k</i>${fr('<i>q</i>','<i>r</i><sup>2</sup>')}`,'גודל השדה סביב מטען נקודתי'],[`<i>E</i> = 2π<i>kσ</i> = ${fr('<i>σ</i>','2<i>ε</i><sub>0</sub>')}`,`שדה של לוח טעון, ${m(`<i>σ</i> = ${fr('<i>Q</i>','<i>A</i>')}`)}`]],
+ trap:[`איפה השדה מתאפס?`,`בין שני מטענים <b>בעלי סימן זהה</b> השדות מנוגדים, ונקודת האפס נמצאת בין המטענים, קרוב יותר למטען הקטן. כשהסימנים <b>הפוכים</b>, בין המטענים השדות באותו כיוון ולא מתבטלים. נקודת האפס נמצאת מחוץ לקטע, מאחורי המטען שגודלו קטן יותר.`],
+ ex:{given:[`${m(q1+' = +4 μC')} בנקודה ${m('<i>x</i> = 0')}`,`${m(q2+' = −1 μC')} בנקודה ${m('<i>x</i> = 0.3 m')}`],ask:[`א. מה השדה (גודל וכיוון) בנקודה האמצעית ${m('<i>x</i> = 0.15 m')}?`,`ב. מה הכוח על אלקטרון שמונח שם?`,`ג. באיזו נקודה על ציר x השדה מתאפס?`],
+  steps:[
+  `<b>שדה של q₁:</b> ${M(`<i>E</i><sub>1</sub> = 9·10<sup>9</sup>·${fr('4·10<sup>−6</sup>','0.15<sup>2</sup>')} = 1.6·10<sup>6</sup> N/C`)} המטען חיובי, ולכן השדה מצביע ממנו והלאה, בכיוון ${m('+<i>x</i>')}.`,
+  `<b>שדה של q₂:</b> ${m(`<i>E</i><sub>2</sub> = 9·10<sup>9</sup>·${fr('1·10<sup>−6</sup>','0.15<sup>2</sup>')} = 4·10<sup>5</sup> N/C`)}. המטען שלילי, ולכן השדה מצביע אליו, שוב בכיוון ${m('+<i>x</i>')}.`,
+  `<b>סכום:</b> שני השדות באותו כיוון, לכן ${m('<i>E</i> = 2.0·10<sup>6</sup> N/C')} בכיוון ${m('+<i>x</i>')}.`,
+  `<b>סעיף ב.</b> ${m('<i>F</i> = <i>eE</i> = 1.6·10<sup>−19</sup>·2·10<sup>6</sup> = 3.2·10<sup>−13</sup> N')}. האלקטרון שלילי, ולכן הכוח בכיוון ${m('−<i>x</i>')}, נגד השדה.`,
+  `<b>סעיף ג.</b> הסימנים הפוכים, ולכן נקודת האפס נמצאת מחוץ לקטע, מאחורי המטען הקטן, כלומר ב־${m('<i>x</i> &gt; 0.3 m')}. ${M(`${fr('4','<i>x</i><sup>2</sup>')} = ${fr('1','(<i>x</i> − 0.3)<sup>2</sup>')} ⇒ 2(<i>x</i> − 0.3) = <i>x</i> ⇒ <i>x</i> = 0.6 m`)}`],
+  check:`ב־${m('<i>x</i> = 0.6 m')}: ${m('<i>E</i><sub>1</sub> = 9·10<sup>9</sup>·4·10<sup>−6</sup>/0.36 = 10<sup>5</sup> N/C')} ו־${m('<i>E</i><sub>2</sub> = 9·10<sup>9</sup>·10<sup>−6</sup>/0.09 = 10<sup>5</sup> N/C')}, בכיוונים הפוכים.`},
+ qs:[
+ {l:'b',t:'num',q:`מה גודל השדה החשמלי במרחק ${m('0.2 m')} ממטען נקודתי של ${m('+2 μC')}?`,a:4.5e5,u:'N/C',s:`${m(`<i>E</i> = 9·10<sup>9</sup>·${fr('2·10<sup>−6</sup>','0.2<sup>2</sup>')} = 4.5·10<sup>5</sup> N/C`)}`},
+ {l:'b',t:'mc',q:`בנקודה P השדה החשמלי הוא ${m('3000 N/C')} מזרחה. מניחים בה אלקטרון. מה הכוח עליו?`,o:['4.8·10⁻¹⁶ N מזרחה','4.8·10⁻¹⁶ N מערבה','3000 N מערבה','1.9·10²² N מזרחה'],a:1,s:`${m('<i>F</i> = <i>eE</i> = 1.6·10<sup>−19</sup>·3000 = 4.8·10<sup>−16</sup> N')}. מטען שלילי מרגיש כוח נגד כיוון השדה, כלומר מערבה.`},
+ {l:'b',t:'mc',q:`מכפילים את המטען הבוחן שמניחים בנקודה P. מה קורה לשדה החשמלי ב־P?`,o:['גדל פי 2','קטן פי 2','לא משתנה','גדל פי 4'],a:2,s:`השדה נוצר על ידי המטענים האחרים ולא תלוי במטען הבוחן. הכוח על הבוחן אכן גדל פי 2, אבל ${m('<i>E</i> = <i>F</i>/<i>q</i>')} נשאר זהה.`},
+ {l:'b',t:'mc',q:`לוח גדול טעון במטען אחיד. נקודה A נמצאת במרחק ${m('1 cm')} מהלוח, ונקודה B במרחק ${m('2 cm')} ממנו. מה היחס ${m('<i>E</i><sub>A</sub>/<i>E</i><sub>B</sub>')}?`,o:['4','2','1','½'],a:2,s:`שדה של לוח גדול הוא ${m('<i>E</i> = 2π<i>kσ</i>')}, ואין בו תלות במרחק. בקרבת הלוח השדה אחיד.`},
+ {l:'a',t:'num',q:`שני מטענים של ${m('+5 μC')} נמצאים בנקודות ${m('(−0.3, 0) m')} ו־${m('(0.3, 0) m')}. מה גודל השדה בנקודה ${m('(0, 0.4) m')}?`,a:2.88e5,u:'N/C',s:`המרחק מכל מטען לנקודה הוא ${m('0.5 m')}, ולכן ${m(`<i>E</i><sub>1</sub> = <i>E</i><sub>2</sub> = 9·10<sup>9</sup>·${fr('5·10<sup>−6</sup>','0.25')} = 1.8·10<sup>5</sup> N/C`)}.<br>הרכיבים האופקיים מתבטלים מסיבות סימטריה. הרכיבים האנכיים: ${m('1.8·10<sup>5</sup>·(0.4/0.5) = 1.44·10<sup>5</sup>')} כל אחד.<br>${m('<i>E</i> = 2·1.44·10<sup>5</sup> = 2.88·10<sup>5</sup> N/C')}, כלפי מעלה.`},
+ {l:'a',t:'num',q:`טיפת שמן במסה ${m('4.8·10<sup>−15</sup> kg')} מרחפת במנוחה בשדה חשמלי אחיד ואנכי של ${m('1.5·10<sup>5</sup> N/C')}. לטיפה עודף אלקטרונים. כמה אלקטרונים עודפים יש לה?`,a:2,u:'אלקטרונים',s:`בשיווי משקל ${m('<i>qE</i> = <i>mg</i>')}, ולכן ${m(`<i>q</i> = ${fr('4.8·10<sup>−15</sup>·10','1.5·10<sup>5</sup>')} = 3.2·10<sup>−19</sup> C`)}.<br>${m('<i>n</i> = 3.2·10<sup>−19</sup>/1.6·10<sup>−19</sup> = 2')}. הטיפה שלילית והכוח החשמלי עליה כלפי מעלה, ולכן השדה מצביע כלפי מטה.`},
+ {l:'a',t:'num',q:`${m(q1+' = +1 μC')} נמצא בנקודה ${m('<i>x</i> = 0')}, ו־${m(q2+' = +9 μC')} בנקודה ${m('<i>x</i> = 0.4 m')}. באיזו נקודה על ציר x השדה מתאפס? (תשובה ב־m)`,a:.1,u:'m',s:`הסימנים זהים, ולכן הנקודה נמצאת בין המטענים, קרוב יותר למטען הקטן. ${M(`${fr('1','<i>x</i><sup>2</sup>')} = ${fr('9','(0.4 − <i>x</i>)<sup>2</sup>')} ⇒ 0.4 − <i>x</i> = 3<i>x</i> ⇒ <i>x</i> = 0.1 m`)}`}
+ ]},
+{id:'energy',title:'אנרגיה פוטנציאלית חשמלית',sub:'אנרגיה של מערכת שני מטענים',
+ intro:[
+ `למערכת של שני מטענים נקודתיים יש אנרגיה פוטנציאלית חשמלית ${m(`<i>U</i><sub>E</sub> = <i>k</i>${fr(q1+q2,'<i>r</i>')}`)}. נקודת האפס נקבעת כשהמטענים רחוקים מאוד זה מזה: ${m('<i>U</i><sub>E</sub>(<i>r</i>→∞) = 0')}.`,
+ `האנרגיה היא סקלר עם סימן. היא <b>חיובית</b> למטענים בעלי סימן זהה, כי צריך להשקיע עבודה כדי לקרב אותם. היא <b>שלילית</b> למטענים בעלי סימנים הפוכים, כי צריך להשקיע עבודה כדי להפריד אותם.`,
+ `כשרק כוחות חשמליים עושים עבודה, האנרגיה המכנית נשמרת: ${m('Δ<i>E</i><sub>k</sub> = −Δ<i>U</i><sub>E</sub>')}. מטענים דוחים שמתרחקים צוברים אנרגיה קינטית.`,
+ `האנרגיה של מטען ${m('<i>q</i>')} בנקודה שבה הפוטנציאל הוא ${m('<i>V</i>')}: ${m('<i>U</i><sub>E</sub> = <i>qV</i>')}.`],
+ formulas:[[`<i>U</i><sub>E</sub> = <i>k</i>${fr(q1+q2,'<i>r</i>')}`,'מערכת שני מטענים, אפס באינסוף'],[`<i>U</i><sub>E</sub> = <i>qV</i>`,'מטען בנקודה שבה הפוטנציאל V'],[`<i>W</i><sub>חשמלי</sub> = −Δ<i>U</i><sub>E</sub>`,'עבודת הכוח החשמלי']],
+ trap:[`סימנים באנרגיה`,`בחישוב <b>כוח</b> מציבים גודלי מטענים וקובעים את הכיוון לפי ההיגיון. בחישוב <b>אנרגיה</b> מציבים את המטענים עם הסימנים שלהם, והסימן של התוצאה הוא חלק מהתשובה.`],
+ ex:{given:[`${m(q1+' = +2 μC')} מקובע במקומו`,`${m(q2+' = +3 μC')}, מסה ${m('2 g')}, משוחרר ממנוחה במרחק ${m('0.1 m')}`],ask:[`מה תהיה מהירות ${m('<i>q</i><sub>2</sub>')} כשיהיה רחוק מאוד מ־${m('<i>q</i><sub>1</sub>')}?`],
+  steps:[
+  `<b>אנרגיה בהתחלה:</b> ${M(`<i>U</i> = 9·10<sup>9</sup>·${fr('2·10<sup>−6</sup>·3·10<sup>−6</sup>','0.1')} = 0.54 J`)}`,
+  `<b>שימור אנרגיה:</b> באינסוף ${m('<i>U</i> = 0')}, ולכן כל 0.54 J הופכים לאנרגיה קינטית: ${m(`${fr('1','2')}<i>mv</i><sup>2</sup> = 0.54`)}.`,
+  `${M(`<i>v</i> = √(${fr('2·0.54','0.002')}) = √540 ≈ 23.2 m/s`)}`],
+  check:`התשובה סבירה: מטענים של כמה מיקרו־קולון במרחק של 10 cm מפעילים כוח של כמה ניוטונים על מסה של 2 גרם.`},
+ qs:[
+ {l:'b',t:'num',q:`מה האנרגיה הפוטנציאלית של מערכת ${m('+4 μC')} ו־${m('−2 μC')} שנמצאים במרחק ${m('0.3 m')} זה מזה?`,a:-.24,u:'J',s:`${m(`<i>U</i> = 9·10<sup>9</sup>·${fr('(4·10<sup>−6</sup>)(−2·10<sup>−6</sup>)','0.3')} = −0.24 J`)}. הסימן השלילי הוא חלק מהתשובה.`},
+ {l:'b',t:'mc',q:`האנרגיה הפוטנציאלית של מערכת שני מטענים היא ${m('−0.5 J')}. מה המשמעות?`,o:['המטענים דוחים זה את זה','צריך להשקיע 0.5 J כדי להפריד אותם למרחק אינסופי','המערכת תשחרר 0.5 J אם נפריד אותם','זה לא אפשרי, אנרגיה לא יכולה להיות שלילית'],a:1,s:`אנרגיה שלילית אומרת שהמטענים מושכים זה את זה. כדי להגיע ל־${m('<i>U</i> = 0')} (אינסוף) צריך להוסיף למערכת 0.5 J.`},
+ {l:'a',t:'num',q:`בהמשך לדוגמה הפתורה: מה מהירות ${m('<i>q</i><sub>2</sub>')} כשהוא נמצא במרחק ${m('0.3 m')} מ־${m('<i>q</i><sub>1</sub>')}?`,a:18.97,u:'m/s',s:`ב־${m('0.3 m')}: ${m('<i>U</i> = 0.054/0.3 = 0.18 J')}. האנרגיה הקינטית: ${m('0.54 − 0.18 = 0.36 J')}.<br>${m('<i>v</i> = √(2·0.36/0.002) = √360 ≈ 19.0 m/s')}`},
+ {l:'a',t:'num',q:`כמה עבודה צריך להשקיע כדי להביא שלושה מטענים של ${m('+1 μC')} מאינסוף לקודקודי משולש שווה צלעות שאורך צלעו ${m('0.1 m')}?`,a:.27,u:'J',s:`האנרגיה של מערכת כמה מטענים היא סכום האנרגיות של כל הזוגות. יש כאן 3 זוגות, וכולם במרחק ${m('0.1 m')}:<br>${m(`<i>U</i> = 3·9·10<sup>9</sup>·${fr('10<sup>−6</sup>·10<sup>−6</sup>','0.1')} = 3·0.09 = 0.27 J`)}`}
+ ]},
+{id:'potential',title:'פוטנציאל חשמלי',sub:'אנרגיה ליחידת מטען, מתח ועבודה',
+ intro:[
+ `<b>פוטנציאל חשמלי</b> בנקודה הוא האנרגיה הפוטנציאלית ליחידת מטען: ${m('<i>V</i> = <i>U</i><sub>E</sub>/<i>q</i>')}. היחידה היא וולט, ${m('1 V = 1 J/C')}.`,
+ `הפוטנציאל סביב מטען נקודתי: ${m(`<i>V</i> = <i>k</i>${fr('<i>q</i>','<i>r</i>')}`)}, כש־${m('<i>V</i>(∞) = 0')}. הסימן של V הוא הסימן של המטען שיוצר אותו.`,
+ `פוטנציאל הוא <b>סקלר</b>. הפוטנציאל של כמה מטענים הוא הסכום האלגברי (עם סימנים) של הפוטנציאלים של כל מטען, בלי פירוק לרכיבים.`,
+ `<b>מתח</b> בין A ל־B: ${m('<i>V</i><sub>AB</sub> = <i>V</i><sub>A</sub> − <i>V</i><sub>B</sub>')}. העבודה של הכוח החשמלי בהעברת מטען q מ־A ל־B היא ${m('<i>W</i><sub>A→B</sub> = <i>qV</i><sub>AB</sub>')}, והיא לא תלויה במסלול.`,
+ `מטען חיובי שמשחררים ממנוחה נע מפוטנציאל גבוה לנמוך. מטען שלילי נע מפוטנציאל נמוך לגבוה.`],
+ formulas:[[`<i>V</i> = <i>k</i>${fr('<i>q</i>','<i>r</i>')}`,'פוטנציאל סביב מטען נקודתי'],[`<i>V</i><sub>AB</sub> = <i>V</i><sub>A</sub> − <i>V</i><sub>B</sub>`,'מתח בין A ל־B'],[`Δ<i>V</i> = <i>V</i><sub>B</sub> − <i>V</i><sub>A</sub>`,'שינוי בפוטנציאל מ־A ל־B'],[`<i>W</i><sub>A→B</sub> = <i>qV</i><sub>AB</sub>`,'עבודת הכוח החשמלי']],
+ trap:[`שני סימונים שמבלבלים`,`${m('<i>V</i><sub>AB</sub>')} ו־${m('Δ<i>V</i>')} הם אותו גודל עם סימן הפוך: ${m('Δ<i>V</i> = −<i>V</i><sub>AB</sub>')}. בנוסף, ${m('<i>V</i> = 0')} בנקודה לא אומר ש־${m('<i>E</i> = 0')} שם. באמצע בין ${m('+<i>q</i>')} ל־${m('−<i>q</i>')} הפוטנציאל אפס, אבל השדה חזק.`],
+ ex:{given:[`${m(q1+' = +4 μC')} בנקודה ${m('(−0.2, 0) m')}, ${m(q2+' = −2 μC')} בנקודה ${m('(0.2, 0) m')}`,`A בראשית ${m('(0, 0)')}, B בנקודה ${m('(−0.2, 0.3) m')}`],ask:[`א. מה הפוטנציאל ב־A וב־B?`,`ב. כמה עבודה עושה הכוח החשמלי כשמעבירים מטען ${m('<i>q</i> = +5 nC')} מ־A ל־B?`],
+  steps:[
+  `<b>פוטנציאל ב־A:</b> A במרחק ${m('0.2 m')} משני המטענים. ${M(`<i>V</i><sub>A</sub> = 9·10<sup>9</sup>(${fr('4·10<sup>−6</sup>','0.2')} + ${fr('−2·10<sup>−6</sup>','0.2')}) = 9·10<sup>4</sup> V`)}`,
+  `<b>פוטנציאל ב־B:</b> B נמצא ${m('0.3 m')} מעל ${m('<i>q</i><sub>1</sub>')}. המרחק שלו מ־${m('<i>q</i><sub>2</sub>')} הוא ${m('√(0.4<sup>2</sup> + 0.3<sup>2</sup>) = 0.5 m')}. ${M(`<i>V</i><sub>B</sub> = 9·10<sup>9</sup>(${fr('4·10<sup>−6</sup>','0.3')} + ${fr('−2·10<sup>−6</sup>','0.5')}) = 1.2·10<sup>5</sup> − 3.6·10<sup>4</sup> = 8.4·10<sup>4</sup> V`)}`,
+  `<b>מתח:</b> ${m('<i>V</i><sub>AB</sub> = 9·10<sup>4</sup> − 8.4·10<sup>4</sup> = 6000 V')}.`,
+  `<b>עבודה:</b> ${m('<i>W</i><sub>A→B</sub> = <i>qV</i><sub>AB</sub> = 5·10<sup>−9</sup>·6000 = 3·10<sup>−5</sup> J')}. העבודה חיובית: מטען חיובי שעובר לפוטנציאל נמוך יותר.`],
+  check:`פתחו את הסימולציה עם הדוגמה, וגררו את B במסלולים שונים. הערכים ב־A וב־B תלויים רק במיקום, ולכן העבודה לא תלויה במסלול.`},
+ qs:[
+ {l:'b',t:'num',q:`מה הפוטנציאל במרחק ${m('0.3 m')} ממטען נקודתי של ${m('−6 μC')}?`,a:-1.8e5,u:'V',s:`${m(`<i>V</i> = 9·10<sup>9</sup>·${fr('−6·10<sup>−6</sup>','0.3')} = −1.8·10<sup>5</sup> V`)}`},
+ {l:'b',t:'mc',q:`מטענים ${m('+<i>q</i>')} ו־${m('−<i>q</i>')} נמצאים במרחק d זה מזה. מה נכון לגבי הנקודה שבאמצע ביניהם?`,o:['V = 0 ו־E = 0','V = 0 ו־E ≠ 0','V ≠ 0 ו־E = 0','V ≠ 0 ו־E ≠ 0'],a:1,s:`הפוטנציאלים שווים בגודלם והפוכים בסימנם, ולכן מתבטלים: ${m('<i>V</i> = 0')}. השדות של שני המטענים מצביעים לאותו כיוון (לעבר ${m('−<i>q</i>')}), ולכן הם מתחברים.`},
+ {l:'b',t:'num',q:`${m('<i>V</i><sub>A</sub> = 200 V')} ו־${m('<i>V</i><sub>B</sub> = −100 V')}. מה העבודה של הכוח החשמלי כשאלקטרון עובר מ־A ל־B?`,a:-4.8e-17,u:'J',s:`${m('<i>V</i><sub>AB</sub> = 200 − (−100) = 300 V')}. ${m('<i>W</i> = <i>qV</i><sub>AB</sub> = (−1.6·10<sup>−19</sup>)(300) = −4.8·10<sup>−17</sup> J')}. העבודה שלילית: אלקטרון "לא רוצה" לעבור לפוטנציאל נמוך יותר.`},
+ {l:'a',t:'num',q:`ארבעה מטענים נמצאים בקודקודי ריבוע שאורך צלעו ${m('0.2 m')}: ${m('+2 μC')}, ${m('+2 μC')}, ${m('−2 μC')} ו־${m('+2 μC')}. מה הפוטנציאל במרכז הריבוע?`,a:2.546e5,u:'V',s:`כל המטענים באותו מרחק מהמרכז: ${m('0.2/√2 = 0.1414 m')}. הפוטנציאל הוא סכום אלגברי, וסכום המטענים הוא ${m('+4 μC')}:<br>${m(`<i>V</i> = 9·10<sup>9</sup>·${fr('4·10<sup>−6</sup>','0.1414')} ≈ 2.55·10<sup>5</sup> V`)}`},
+ {l:'a',t:'num',q:`אלקטרון מואץ ממנוחה דרך הפרש פוטנציאלים של ${m('500 V')}. מה מהירותו הסופית? (מסת האלקטרון ${m('9.1·10<sup>−31</sup> kg')})`,a:1.326e7,u:'m/s',s:`${m('<i>E</i><sub>k</sub> = <i>e</i>·500 = 8·10<sup>−17</sup> J')}.<br>${m(`<i>v</i> = √(${fr('2·8·10<sup>−17</sup>','9.1·10<sup>−31</sup>')}) ≈ 1.33·10<sup>7</sup> m/s`)}`},
+ {l:'a',t:'mc',q:`לנקודות A ו־B אותו פוטנציאל. מעבירים מטען מ־A ל־B במסלול מעוקל וארוך. מה העבודה של הכוח החשמלי?`,o:['חיובית','שלילית','אפס','תלויה באורך המסלול'],a:2,s:`${m('<i>W</i> = <i>qV</i><sub>AB</sub>')}, ו־${m('<i>V</i><sub>AB</sub> = 0')}. בחלקים מסוימים של המסלול הכוח עושה עבודה חיובית ובאחרים שלילית, וסך הכול אפס.`}
+ ]},
+{id:'relation',title:'הקשר בין שדה לפוטנציאל',sub:'השדה הוא מינוס השיפוע של הפוטנציאל',
+ intro:[
+ `השדה החשמלי מצביע תמיד <b>בכיוון שבו הפוטנציאל יורד</b>.`,
+ `בשדה אחיד: ${m(`<i>E</i> = −${fr('Δ<i>V</i>','Δ<i>x</i>')}`)}. בגרף של ${m('<i>V</i>(<i>x</i>)')}, השדה הוא מינוס השיפוע.`,
+ `היחידה ${m('V/m')} שקולה ל־${m('N/C')}.`,
+ `בין שני לוחות מקבילים השדה אחיד, הפוטנציאל משתנה בקו ישר, והמתח בין הלוחות הוא ${m('<i>V</i> = <i>Ed</i>')}.`,
+ `כשהגרף לא ישר, השדה בנקודה הוא מינוס שיפוע המשיק. איפה שהגרף אופקי, השדה (בכיוון x) הוא אפס.`],
+ formulas:[[`<i>E</i> = −${fr('Δ<i>V</i>','Δ<i>x</i>')}`,'קשר בין שדה אחיד להפרש פוטנציאלים'],[`<i>V</i> = <i>Ed</i>`,'מתח בין לוחות מקבילים (גודל)'],[`1 ${fr('V','m')} = 1 ${fr('N','C')}`,'שתי יחידות לאותו גודל']],
+ trap:[`פוטנציאל גבוה, שדה חזק?`,`לא בהכרח. השדה תלוי ב<b>קצב השינוי</b> של הפוטנציאל, לא בערך שלו. באזור שבו ${m('<i>V</i> = 1000 V')} קבוע השדה הוא אפס, ובאזור שבו V משתנה מ־0 ל־10 וולט על פני מילימטר השדה הוא ${m('10<sup>4</sup> V/m')}.`],
+ ex:{given:[`לוח שמאלי: ${m('1000 V')}, לוח ימני: ${m('0 V')}`,`מרחק בין הלוחות: ${m('<i>d</i> = 5 cm')}, מסת פרוטון ${m('1.67·10<sup>−27</sup> kg')}`],ask:[`א. מה השדה בין הלוחות?`,`ב. מה הפוטנציאל בנקודה P שנמצאת ${m('1 cm')} מהלוח השמאלי?`,`ג. פרוטון משתחרר ממנוחה ליד הלוח השמאלי. מה מהירותו כשהוא מגיע ללוח הימני?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`<i>E</i> = −${fr('0 − 1000','0.05')} = 2·10<sup>4</sup> N/C`)} השדה מצביע ימינה, מהפוטנציאל הגבוה לנמוך.`,
+  `<b>סעיף ב.</b> הפוטנציאל יורד בקצב קבוע של ${m('2·10<sup>4</sup> V/m')}: ${m('<i>V</i><sub>P</sub> = 1000 − 2·10<sup>4</sup>·0.01 = 800 V')}.`,
+  `<b>סעיף ג.</b> ${m('<i>W</i> = <i>qV</i><sub>AB</sub> = 1.6·10<sup>−19</sup>·1000 = 1.6·10<sup>−16</sup> J')}, וכל העבודה הופכת לאנרגיה קינטית: ${M(`<i>v</i> = √(${fr('2·1.6·10<sup>−16</sup>','1.67·10<sup>−27</sup>')}) ≈ 4.4·10<sup>5</sup> m/s`)}`],
+  check:`פתחו את הסימולציה עם הדוגמה וגררו את P לנקודה ${m('1 cm')}. הפוטנציאל שמוצג הוא 800 V, וגרף V(x) הוא קו ישר שיורד.`},
+ qs:[
+ {l:'b',t:'mc',q:`לאורך ציר x הפוטנציאל יורד בקו ישר מ־${m('300 V')} ב־${m('<i>x</i> = 0')} ל־${m('100 V')} ב־${m('<i>x</i> = 0.1 m')}. מה השדה?`,o:['2000 N/C בכיוון +x','2000 N/C בכיוון −x','200 N/C בכיוון +x','3000 N/C בכיוון −x'],a:0,s:`${m(`<i>E</i> = −${fr('100 − 300','0.1')} = +2000 N/C`)}. הסימן החיובי אומר שהשדה בכיוון ${m('+<i>x</i>')}, לכיוון שבו הפוטנציאל יורד.`},
+ {l:'b',t:'mc',q:`מטען חיובי משתחרר ממנוחה בשדה חשמלי. לאן הוא ינוע?`,o:['לפוטנציאל גבוה יותר','לפוטנציאל נמוך יותר','לאורך קו שווה פוטנציאל','תלוי במסה שלו'],a:1,s:`הכוח על מטען חיובי הוא בכיוון השדה, והשדה מצביע לכיוון שבו הפוטנציאל יורד.`},
+ {l:'b',t:'mc',q:`בנקודה מסוימת ${m('<i>V</i> = 0')}. מה אפשר לומר על השדה בה?`,o:['E = 0 בהכרח','E ≠ 0 בהכרח','אי אפשר לדעת מהנתון הזה','השדה מצביע לכיוון הנקודה'],a:2,s:`השדה תלוי בשינוי של V סביב הנקודה ולא בערך שלו בנקודה עצמה. באמצע דיפול ${m('<i>V</i> = 0')} והשדה חזק, ובמקומות אחרים אפשר שגם V וגם E יהיו אפס.`},
+ {l:'a',t:'num',q:`בדוגמה הפתורה (${m('<i>E</i> = 2·10<sup>4</sup> N/C')} בין שני לוחות מקבילים בעלי מטענים הפוכים), מה צפיפות המטען המשטחית ${m('<i>σ</i>')} על כל לוח? (${m('<i>ε</i><sub>0</sub> = 8.85·10<sup>−12</sup>')})`,a:1.77e-7,u:'C/m²',s:`כל לוח יוצר ${m('<i>σ</i>/2<i>ε</i><sub>0</sub>')}. בין הלוחות שני השדות באותו כיוון, ולכן ${m('<i>E</i> = <i>σ</i>/<i>ε</i><sub>0</sub>')}.<br>${m('<i>σ</i> = <i>ε</i><sub>0</sub><i>E</i> = 8.85·10<sup>−12</sup>·2·10<sup>4</sup> ≈ 1.77·10<sup>−7</sup> C/m<sup>2</sup>')}`},
+ {l:'a',t:'mc',fig:'vx',q:`הגרף מתאר את הפוטנציאל לאורך ציר x (הקטעים ישרים). באיזה קטע גודל השדה הוא הגדול ביותר, ומה כיוונו?`,o:['0–2 cm, בכיוון +x','0–2 cm, בכיוון −x','2–5 cm, אין כיוון','5–8 cm, בכיוון +x'],a:3,s:`0–2 cm: ${m('<i>E</i> = −40/0.02 = −2000 V/m')}, כלומר 2000 בכיוון ${m('−<i>x</i>')}.<br>2–5 cm: V קבוע, ${m('<i>E</i> = 0')}.<br>5–8 cm: ${m('<i>E</i> = −(−50 − 40)/0.03 = +3000 V/m')}, כלומר 3000 בכיוון ${m('+<i>x</i>')}. זה הגדול ביותר.`},
+ {l:'a',t:'num',q:`אלקטרון משתחרר ממנוחה ליד הלוח השלילי בדוגמה הפתורה (${m('1000 V')} בין הלוחות). מה מהירותו כשהוא מגיע ללוח החיובי?`,a:1.875e7,u:'m/s',s:`האלקטרון עובר מפוטנציאל 0 ל־1000 V, והכוח החשמלי עושה עליו עבודה ${m('<i>W</i> = (−<i>e</i>)(0 − 1000) = 1.6·10<sup>−16</sup> J')}.<br>${m(`<i>v</i> = √(${fr('2·1.6·10<sup>−16</sup>','9.1·10<sup>−31</sup>')}) ≈ 1.9·10<sup>7</sup> m/s`)}. אותה אנרגיה כמו לפרוטון, אבל המסה קטנה פי 1800 בערך.`}
+ ]},
+{id:'plates',title:'לוחות טעונים',sub:'לוח אחד, שני לוחות, ושדה אחיד',
+ intro:[
+ `לוח שגודלו גדול מאוד ביחס למרחקים שמעניינים אותנו נחשב <b>לוח אינסופי</b>. אם המטען ${m('<i>Q</i>')} מפוזר באופן אחיד על שטח ${m('<i>A</i>')}, צפיפות המטען המשטחית היא ${m(`<i>σ</i> = ${fr('<i>Q</i>','<i>A</i>')}`)}.`,
+ `<b>לוח אחד</b> יוצר שדה אחיד שגודלו ${m(`<i>E</i> = 2π<i>kσ</i> = ${fr('<i>σ</i>','2<i>ε</i><sub>0</sub>')}`)}. השדה ניצב ללוח, שווה בגודלו משני הצדדים, ולא תלוי במרחק מהלוח. הוא מתרחק מלוח חיובי ומצביע אל לוח שלילי.`,
+ `<b>שני לוחות מקבילים</b>: השדה בכל נקודה הוא סכום וקטורי של השדות של שני הלוחות (סופרפוזיציה).`,
+ `לוחות עם מטענים שווים והפוכים (${m('+<i>σ</i>')} ו־${m('−<i>σ</i>')}): בין הלוחות שני השדות באותו כיוון, ${m(`<i>E</i> = ${fr('<i>σ</i>','<i>ε</i><sub>0</sub>')} = 4π<i>kσ</i>`)}, מהלוח החיובי לשלילי. מחוץ ללוחות השדות מבטלים זה את זה, ${m('<i>E</i> = 0')}. זה המבנה של קבל.`,
+ `לוחות עם מטענים זהים (${m('+<i>σ</i>')} ו־${m('+<i>σ</i>')}): בין הלוחות השדות מתבטלים, ומחוץ ללוחות ${m('<i>E</i> = <i>σ</i>/<i>ε</i><sub>0</sub>')} כלפי חוץ.`,
+ `בין הלוחות השדה אחיד, ולכן הפוטנציאל יורד בקו ישר בכיוון השדה, והמתח בין הלוחות הוא ${m('<i>V</i> = <i>Ed</i>')}.`],
+ formulas:[[`<i>E</i> = 2π<i>kσ</i> = ${fr('<i>σ</i>','2<i>ε</i><sub>0</sub>')}`,'השדה של לוח אחד'],[`<i>σ</i> = ${fr('<i>Q</i>','<i>A</i>')}`,'צפיפות מטען משטחית'],[`<i>E</i> = ${fr('<i>σ</i>','<i>ε</i><sub>0</sub>')} = 4π<i>kσ</i>`,`בין לוחות ${m('+<i>σ</i>')} ו־${m('−<i>σ</i>')} (סכום שני הלוחות)`],[`<i>V</i> = <i>Ed</i>`,'המתח בין הלוחות']],
+ trap:[`"השדה בין הלוחות הוא השדה של הלוח החיובי"`,`טעות נפוצה היא להציב ${m('<i>σ</i>/2<i>ε</i><sub>0</sub>')} בין לוחות של קבל. כל לוח תורם ${m('<i>σ</i>/2<i>ε</i><sub>0</sub>')}, ובין הלוחות שתי התרומות באותו כיוון, ולכן ${m('<i>E</i> = <i>σ</i>/<i>ε</i><sub>0</sub>')}. מחוץ ללוחות אותן תרומות מנוגדות ומתבטלות.`],
+ ex:{given:[`שני לוחות מקבילים, שטח כל לוח ${m('<i>A</i> = 0.01 m<sup>2</sup>')}`,`מטענים ${m('+5 nC')} ו־${m('−5 nC')}, מרחק ${m('<i>d</i> = 2 cm')}`],ask:[`א. מה צפיפות המטען על כל לוח?`,`ב. מה השדה שיוצר כל לוח לבדו?`,`ג. מה השדה בין הלוחות ומחוץ להם?`,`ד. מה המתח בין הלוחות?`],
+  steps:[
+  `<b>סעיף א.</b> ${m(`<i>σ</i> = ${fr('5·10<sup>−9</sup>','0.01')} = 5·10<sup>−7</sup> C/m<sup>2</sup>`)}.`,
+  `<b>סעיף ב.</b> ${M(`<i>E</i><sub>1</sub> = 2π<i>kσ</i> = 2π·9·10<sup>9</sup>·5·10<sup>−7</sup> ≈ 2.83·10<sup>4</sup> N/C`)} זה גודל השדה של כל אחד מהלוחות, משני צידיו.`,
+  `<b>סעיף ג.</b> בין הלוחות שני השדות מצביעים מהלוח החיובי לשלילי, ולכן ${m('<i>E</i> = 2·2.83·10<sup>4</sup> ≈ 5.65·10<sup>4</sup> N/C')}. מחוץ ללוחות השדות מנוגדים ושווים, ולכן ${m('<i>E</i> = 0')}.`,
+  `<b>סעיף ד.</b> ${m('<i>V</i> = <i>Ed</i> = 5.65·10<sup>4</sup>·0.02 ≈ 1.13·10<sup>3</sup> V')}.`],
+  check:`אותה תוצאה מתקבלת מ־${m('<i>E</i> = <i>σ</i>/<i>ε</i><sub>0</sub> = 5·10<sup>−7</sup>/8.85·10<sup>−12</sup> ≈ 5.65·10<sup>4</sup> N/C')}. בסימולציה עם הדוגמה, גררו את P בין הלוחות ומחוצה להם.`},
+ qs:[
+ {l:'b',t:'mc',q:`לוח גדול טעון במטען אחיד. נקודה A נמצאת ${m('1 cm')} מהלוח, ונקודה B נמצאת ${m('10 cm')} ממנו (באותו צד). מה נכון?`,o:['E_A = 10 E_B','E_A = 100 E_B','E_A = E_B','E_B > E_A'],a:2,s:`השדה של לוח אינסופי, ${m('2π<i>kσ</i>')}, לא תלוי במרחק מהלוח.`},
+ {l:'b',t:'num',q:`לוח גדול טעון בצפיפות מטען ${m('2 μC/m<sup>2</sup>')}. מה גודל השדה לידו?`,a:1.131e5,u:'N/C',s:`${m('<i>E</i> = 2π<i>kσ</i> = 2π·9·10<sup>9</sup>·2·10<sup>−6</sup> ≈ 1.13·10<sup>5</sup> N/C')}`},
+ {l:'b',t:'mc',q:`שני לוחות מקבילים טעונים ב־${m('+<i>σ</i>')} וב־${m('−<i>σ</i>')}. מה השדה מחוץ ללוחות?`,o:['σ/2ε₀','σ/ε₀','אפס','תלוי במרחק מהלוחות'],a:2,s:`מחוץ ללוחות השדה של הלוח החיובי מתרחק ממנו, והשדה של הלוח השלילי מצביע אליו. שני השדות שווים בגודלם ומנוגדים, ולכן מתבטלים.`},
+ {l:'b',t:'mc',q:`שני לוחות מקבילים טעונים שניהם ב־${m('+<i>σ</i>')}. מה השדה בין הלוחות?`,o:['σ/ε₀ מלוח ללוח','σ/2ε₀','אפס','2σ/ε₀'],a:2,s:`בין הלוחות כל לוח "דוחף" את השדה הרחק ממנו, כלומר לכיוונים הפוכים, בגדלים שווים. מחוץ ללוחות השדות מתחברים ל־${m('<i>σ</i>/<i>ε</i><sub>0</sub>')} כלפי חוץ.`},
+ {l:'a',t:'num',q:`בין שני לוחות מקבילים, טעונים ב־${m('+<i>σ</i>')} וב־${m('−<i>σ</i>')}, המתח ${m('2000 V')} והמרחק ${m('4 cm')}. מה ${m('<i>σ</i>')}? (${m('<i>ε</i><sub>0</sub> = 8.85·10<sup>−12</sup>')})`,a:4.425e-7,u:'C/m²',s:`${m('<i>E</i> = <i>V</i>/<i>d</i> = 2000/0.04 = 5·10<sup>4</sup> N/C')}. בין הלוחות ${m('<i>E</i> = <i>σ</i>/<i>ε</i><sub>0</sub>')}, ולכן ${m('<i>σ</i> = 8.85·10<sup>−12</sup>·5·10<sup>4</sup> ≈ 4.43·10<sup>−7</sup> C/m<sup>2</sup>')}.`},
+ {l:'a',t:'num',q:`אלקטרון נכנס באמצע בין שני לוחות אופקיים במהירות אופקית ${m('2·10<sup>7</sup> m/s')}. השדה בין הלוחות אחיד, ${m('2·10<sup>4</sup> N/C')}, ואורך הלוחות ${m('5 cm')}. בכמה מתרחק האלקטרון מהקו האמצעי עד שהוא יוצא מהלוחות? (תשובה ב־cm, ${m('<i>m</i><sub>e</sub> = 9.1·10<sup>−31</sup> kg')}, הזניחו כובד)`,a:1.099,u:'cm',s:`זו "בליסטיקה" בשדה חשמלי. תאוצה אנכית: ${m(`<i>a</i> = ${fr('<i>eE</i>','<i>m</i>')} = ${fr('1.6·10<sup>−19</sup>·2·10<sup>4</sup>','9.1·10<sup>−31</sup>')} ≈ 3.52·10<sup>15</sup> m/s<sup>2</sup>`)}.<br>זמן המעבר: ${m('<i>t</i> = 0.05/2·10<sup>7</sup> = 2.5·10<sup>−9</sup> s')}.<br>${m(`<i>y</i> = ${fr('1','2')}<i>at</i><sup>2</sup> = 0.5·3.52·10<sup>15</sup>·(2.5·10<sup>−9</sup>)<sup>2</sup> ≈ 0.011 m = 1.1 cm`)}.`},
+ {l:'a',t:'num',q:`שני לוחות מקבילים: השמאלי טעון ב־${m('+3 μC/m<sup>2</sup>')} והימני ב־${m('+1 μC/m<sup>2</sup>')}. מה גודל השדה בין הלוחות?`,a:1.13e5,u:'N/C',s:`בין הלוחות השדה של הלוח השמאלי מצביע ימינה, ${m('3·10<sup>−6</sup>/2<i>ε</i><sub>0</sub>')}, והשדה של הלוח הימני מצביע שמאלה, ${m('1·10<sup>−6</sup>/2<i>ε</i><sub>0</sub>')}.<br>${m(`<i>E</i> = ${fr('(3 − 1)·10<sup>−6</sup>','2·8.85·10<sup>−12</sup>')} ≈ 1.13·10<sup>5</sup> N/C`)}, ימינה. אפשר לבדוק בסימולציה עם הכפתור "‎+3 ו־‎+1".`}
+ ]},
+{id:'sphere',title:'כדור וקליפה טעונים',sub:'בפנים השדה אפס, בחוץ כמו מטען נקודתי',
+ intro:[
+ `במוליך בשיווי משקל המטענים החופשיים נעים עד שהשדה בתוך החומר מתאפס. לכן כל המטען העודף יושב על <b>פני השטח</b>, ובכדור מוליך הוא מתפזר שם באופן אחיד. כדור מוליך מלא וקליפה כדורית דקה מתנהגים אותו דבר.`,
+ `<b>מחוץ לכדור</b> (${m('<i>r</i> ≥ <i>R</i>')}) השדה והפוטנציאל הם כאילו כל המטען מרוכז במרכז: ${m(`<i>E</i> = <i>k</i>${fr('<i>Q</i>','<i>r</i><sup>2</sup>')}`)}, ${m(`<i>V</i> = <i>k</i>${fr('<i>Q</i>','<i>r</i>')}`)}.`,
+ `<b>בתוך הכדור</b> (${m('<i>r</i> &lt; <i>R</i>')}) השדה הוא אפס. כשהשדה אפס הפוטנציאל לא משתנה, ולכן בכל נקודה בפנים ${m(`<i>V</i> = <i>k</i>${fr('<i>Q</i>','<i>R</i>')}`)}, בדיוק כמו על פני הכדור.`,
+ `על פני הכדור השדה "קופץ" מאפס ל־${m(`<i>k</i>${fr('<i>Q</i>','<i>R</i><sup>2</sup>')}`)}, אבל הפוטנציאל רציף ולא קופץ.`,
+ `הכדור כולו, פנים ופני שטח, הוא גוף שווה פוטנציאל. העבודה בהעברת מטען בתוכו היא אפס.`],
+ formulas:[[`<i>E</i> = <i>k</i>${fr('<i>Q</i>','<i>r</i><sup>2</sup>')} , <i>V</i> = <i>k</i>${fr('<i>Q</i>','<i>r</i>')}`,`מחוץ לכדור, ${m('<i>r</i> ≥ <i>R</i>')}`],[`<i>E</i> = 0 , <i>V</i> = <i>k</i>${fr('<i>Q</i>','<i>R</i>')}`,`בתוך הכדור, ${m('<i>r</i> &lt; <i>R</i>')}`],[`<i>E</i> = <i>k</i>${fr('<i>Q</i>','<i>R</i><sup>2</sup>')}`,'השדה ממש מחוץ לפני הכדור']],
+ trap:[`"בפנים השדה אפס, אז גם הפוטנציאל אפס"`,`זו הטעות הנפוצה ביותר בנושא. השדה הוא קצב השינוי של הפוטנציאל. אפס שדה אומר שהפוטנציאל <b>קבוע</b>, לא שהוא אפס. בתוך כדור טעון ב־${m('+<i>Q</i>')} הפוטנציאל הוא ${m('<i>kQ</i>/<i>R</i>')} בכל נקודה, כולל במרכז.`],
+ ex:{given:[`כדור מוליך שרדיוסו ${m('<i>R</i> = 0.1 m')} וטעון ב־${m('<i>Q</i> = +2 μC')}`,`מטען בוחן ${m('<i>q</i> = +1 nC')}`],ask:[`א. מה E ו־V ב־${m('<i>r</i> = 0.05 m')}?`,`ב. מה E ו־V ממש מחוץ לפני הכדור?`,`ג. מה E ו־V ב־${m('<i>r</i> = 0.3 m')}?`,`ד. כמה עבודה צריך להשקיע כדי להביא את q מ־${m('<i>r</i> = 0.3 m')} למרכז הכדור?`],
+  steps:[
+  `<b>סעיף א.</b> הנקודה בתוך הכדור: ${m('<i>E</i> = 0')}, ו־${m(`<i>V</i> = <i>k</i>${fr('<i>Q</i>','<i>R</i>')} = ${fr('9·10<sup>9</sup>·2·10<sup>−6</sup>','0.1')} = 1.8·10<sup>5</sup> V`)}.`,
+  `<b>סעיף ב.</b> ${m(`<i>E</i> = ${fr('9·10<sup>9</sup>·2·10<sup>−6</sup>','0.1<sup>2</sup>')} = 1.8·10<sup>6</sup> N/C`)}, ו־${m('<i>V</i> = 1.8·10<sup>5</sup> V')}, כמו בפנים.`,
+  `<b>סעיף ג.</b> ${m(`<i>E</i> = ${fr('1.8·10<sup>4</sup>','0.3<sup>2</sup>')} = 2·10<sup>5</sup> N/C`)}, ${m(`<i>V</i> = ${fr('1.8·10<sup>4</sup>','0.3')} = 6·10<sup>4</sup> V`)}.`,
+  `<b>סעיף ד.</b> העבודה החיצונית שווה לשינוי באנרגיה הפוטנציאלית: ${M(`<i>W</i><sub>חיצוני</sub> = <i>q</i>(<i>V</i><sub>מרכז</sub> − <i>V</i><sub>0.3</sub>) = 10<sup>−9</sup>(1.8·10<sup>5</sup> − 6·10<sup>4</sup>) = 1.2·10<sup>−4</sup> J`)} כל העבודה מושקעת בדרך עד פני הכדור. בתוך הכדור אין שדה, ולכן אין צורך בעבודה נוספת.`],
+  check:`בסימולציה עם הדוגמה, גררו את P מבחוץ פנימה: בגרף השדה קופץ לאפס על פני הכדור, וגרף הפוטנציאל נעשה אופקי.`},
+ qs:[
+ {l:'b',t:'mc',q:`כדור מוליך טעון במטען ${m('+<i>Q</i>')} ונמצא בשיווי משקל. מה נכון לגבי נקודה בתוכו?`,o:['E = 0 ו־V = 0','E = 0 ו־V = kQ/R','E = kQ/r² ו־V = kQ/r','E = kQ/R² ו־V = 0'],a:1,s:`בתוך מוליך בשיווי משקל ${m('<i>E</i> = 0')}, ולכן הפוטנציאל קבוע ושווה לפוטנציאל על פני הכדור.`},
+ {l:'b',t:'num',q:`קליפה כדורית דקה שרדיוסה ${m('0.2 m')} טעונה ב־${m('+4 μC')}. מה הפוטנציאל במרכזה?`,a:1.8e5,u:'V',s:`במרכז, כמו בכל נקודה בפנים: ${m(`<i>V</i> = ${fr('9·10<sup>9</sup>·4·10<sup>−6</sup>','0.2')} = 1.8·10<sup>5</sup> V`)}.`},
+ {l:'b',t:'num',q:`אותה קליפה (${m('<i>R</i> = 0.2 m')}, ${m('+4 μC')}). מה גודל השדה במרחק ${m('0.4 m')} מהמרכז?`,a:2.25e5,u:'N/C',s:`מחוץ לקליפה היא מתנהגת כמו מטען נקודתי: ${m(`<i>E</i> = ${fr('9·10<sup>9</sup>·4·10<sup>−6</sup>','0.4<sup>2</sup>')} = 2.25·10<sup>5</sup> N/C`)}.`},
+ {l:'b',t:'mc',q:`כדור מוליך טעון ב־${m('<i>Q</i>')}, ומטען נקודתי זהה ${m('<i>Q</i>')} נמצא במרכז של כדור דמיוני. מה נכון לגבי השדה ${m('0.5 m')} מהמרכז, מחוץ לכדור?`,o:['השדה של הכדור המוליך קטן יותר','השדות שווים','השדה של הכדור המוליך גדול יותר','תלוי ברדיוס הכדור המוליך'],a:1,s:`מחוץ לכדור טעון, השדה זהה לשדה של מטען נקודתי באותו גודל במרכז, ולא תלוי ברדיוס.`},
+ {l:'a',t:'num',q:`הפוטנציאל של כדור מוליך שרדיוסו ${m('15 cm')} הוא ${m('3000 V')}. מה המטען שלו? (תשובה ב־nC)`,a:50,u:'nC',s:`${m(`<i>Q</i> = ${fr('<i>VR</i>','<i>k</i>')} = ${fr('3000·0.15','9·10<sup>9</sup>')} = 5·10<sup>−8</sup> C = 50 nC`)}`},
+ {l:'a',t:'mc',q:`איזה תיאור מתאים לגרף של גודל השדה ${m('<i>E</i>(<i>r</i>)')} של כדור מוליך טעון?`,o:['עולה בקו ישר מהמרכז עד R, ואז יורד כמו 1/r²','אפס עד R, קפיצה ל־kQ/R², ואז יורד כמו 1/r²','קבוע ושווה kQ/R² עד R, ואז יורד כמו 1/r','יורד כמו 1/r² בכל מקום'],a:1,s:`בפנים השדה אפס. ממש מחוץ לפני הכדור ${m('<i>kQ</i>/<i>R</i><sup>2</sup>')}, ומשם הוא יורד כמו ${m('1/<i>r</i><sup>2</sup>')}. (גרף שעולה בקו ישר עד R מתאים לכדור <b>מבודד</b> שהמטען מפוזר בכל נפחו, שאינו בתוכנית.)`},
+ {l:'a',t:'num',q:`שתי קליפות כדוריות בעלות מרכז משותף: הפנימית, ברדיוס ${m('0.1 m')}, טעונה ב־${m('+2 μC')}, והחיצונית, ברדיוס ${m('0.3 m')}, טעונה ב־${m('−1 μC')}. מה הפוטנציאל במרכז?`,a:1.5e5,u:'V',s:`פוטנציאלים מתחברים כסקלרים. המרכז נמצא בתוך שתי הקליפות, ולכן כל אחת תורמת ${m('<i>kQ</i>/<i>R</i>')} שלה:<br>${m(`<i>V</i> = ${fr('9·10<sup>9</sup>·2·10<sup>−6</sup>','0.1')} + ${fr('9·10<sup>9</sup>·(−10<sup>−6</sup>)','0.3')} = 1.8·10<sup>5</sup> − 3·10<sup>4</sup> = 1.5·10<sup>5</sup> V`)}`},
+ {l:'a',t:'num',q:`פרוטון משתחרר ממנוחה ליד פני הכדור מהדוגמה הפתורה (${m('<i>V</i> = 1.8·10<sup>5</sup> V')}). מה תהיה מהירותו רחוק מאוד מהכדור? (${m('<i>m</i><sub>p</sub> = 1.67·10<sup>−27</sup> kg')})`,a:5.873e6,u:'m/s',s:`${m('<i>E</i><sub>k</sub> = <i>e</i>(<i>V</i><sub>R</sub> − 0) = 1.6·10<sup>−19</sup>·1.8·10<sup>5</sup> = 2.88·10<sup>−14</sup> J')}.<br>${m(`<i>v</i> = √(${fr('2·2.88·10<sup>−14</sup>','1.67·10<sup>−27</sup>')}) ≈ 5.9·10<sup>6</sup> m/s`)}`}
+ ]},
+{id:'connect',title:'חיבור מוליכים',sub:'מטען זורם עד שהפוטנציאלים משתווים',
+ intro:[
+ `כשמחברים שני מוליכים בתיל מוליך, הם הופכים למוליך אחד. במוליך בשיווי משקל הפוטנציאל זהה בכל נקודה, ולכן <b>מטען עובר בתיל עד שהפוטנציאלים משתווים</b>.`,
+ `בפועל נעים האלקטרונים, מהפוטנציאל הנמוך לגבוה. בחשבון זה שקול למעבר מטען חיובי מהפוטנציאל הגבוה לנמוך.`,
+ `המטען הכולל נשמר: מה שכדור אחד מאבד, הכדור השני מקבל.`,
+ `לשני כדורים רחוקים זה מזה, שוויון הפוטנציאלים נותן ${m(`${fr(`<i>kQ</i><sub>1</sub>'`,'<i>R</i><sub>1</sub>')} = ${fr(`<i>kQ</i><sub>2</sub>'`,'<i>R</i><sub>2</sub>')}`)}, כלומר ${m(`${fr(`<i>Q</i><sub>1</sub>'`,`<i>Q</i><sub>2</sub>'`)} = ${fr('<i>R</i><sub>1</sub>','<i>R</i><sub>2</sub>')}`)}. הכדור הגדול מקבל יותר מטען. כשהכדורים זהים, המטען מתחלק שווה בשווה.`,
+ `השדה על פני כדור הוא ${m(`<i>E</i> = <i>k</i>${fr('<i>Q</i>','<i>R</i><sup>2</sup>')} = ${fr('<i>V</i>','<i>R</i>')}`)}. אחרי החיבור הפוטנציאל משותף, ולכן על הכדור הקטן השדה חזק יותר. זה ההסבר לכך שהשדה חזק במיוחד ליד חודים של מוליך, ולפעולה של כליא ברק.`,
+ `<b>הארקה</b>: כדור הארץ הוא מוליך ענק שהפוטנציאל שלו נחשב אפס. כשמחברים אליו כדור מוליך מבודד, המטען עובר עד שגם הכדור מגיע לפוטנציאל אפס, כלומר הכדור מאבד את כל המטען שלו.`],
+ formulas:[[`<i>V</i><sub>1</sub>' = <i>V</i><sub>2</sub>'`,'תנאי הסיום: פוטנציאלים שווים'],[`<i>Q</i><sub>1</sub>' + <i>Q</i><sub>2</sub>' = <i>Q</i><sub>1</sub> + <i>Q</i><sub>2</sub>`,'שימור מטען'],[`${fr(`<i>Q</i><sub>1</sub>'`,`<i>Q</i><sub>2</sub>'`)} = ${fr('<i>R</i><sub>1</sub>','<i>R</i><sub>2</sub>')}`,'שני כדורים רחוקים זה מזה'],[`<i>E</i> = ${fr('<i>V</i>','<i>R</i>')}`,'השדה על פני כדור']],
+ trap:[`"המטען זורם עד שהמטענים שווים"`,`לא. מה שמשתווה הוא <b>הפוטנציאל</b>, לא המטען. המטענים יוצאים שווים רק כשהכדורים זהים. כדור ברדיוס כפול יקבל מטען כפול. ועוד טעות: מטען יכול לעבור גם מכדור עם פחות מטען לכדור עם יותר מטען, אם הפוטנציאל שלו גבוה יותר.`],
+ ex:{given:[`כדור 1: ${m('<i>R</i><sub>1</sub> = 0.1 m')}, ${m('<i>Q</i><sub>1</sub> = +6 μC')}`,`כדור 2: ${m('<i>R</i><sub>2</sub> = 0.2 m')}, לא טעון. הכדורים רחוקים זה מזה ומחברים אותם בתיל דק.`],ask:[`א. מה המטען על כל כדור אחרי החיבור?`,`ב. מה הפוטנציאל המשותף?`,`ג. כמה מטען עבר בתיל, ולאיזה כיוון נעו האלקטרונים?`,`ד. מה השדה על פני כל כדור?`],
+  steps:[
+  `<b>לפני החיבור:</b> ${m(`<i>V</i><sub>1</sub> = ${fr('9·10<sup>9</sup>·6·10<sup>−6</sup>','0.1')} = 5.4·10<sup>5</sup> V`)}, ${m('<i>V</i><sub>2</sub> = 0')}. הפוטנציאלים שונים, ולכן מטען יעבור.`,
+  `<b>סעיף א.</b> שימור מטען: ${m(`<i>Q</i><sub>1</sub>' + <i>Q</i><sub>2</sub>' = 6 μC`)}. שוויון פוטנציאלים: ${m(`<i>Q</i><sub>1</sub>'/<i>Q</i><sub>2</sub>' = 0.1/0.2 = 1/2`)}. לכן ${m(`<i>Q</i><sub>1</sub>' = 2 μC`)} ו־${m(`<i>Q</i><sub>2</sub>' = 4 μC`)}.`,
+  `<b>סעיף ב.</b> ${m(`<i>V</i> = ${fr('9·10<sup>9</sup>·2·10<sup>−6</sup>','0.1')} = 1.8·10<sup>5</sup> V`)}.`,
+  `<b>סעיף ג.</b> עברו ${m('4 μC')}: כדור 1 ירד מ־6 ל־2. בחשבון, מטען חיובי עבר מכדור 1 (פוטנציאל גבוה) לכדור 2. בפועל ${m('4·10<sup>−6</sup>/1.6·10<sup>−19</sup> = 2.5·10<sup>13</sup>')} אלקטרונים עברו מכדור 2 לכדור 1.`,
+  `<b>סעיף ד.</b> ${m('<i>E</i><sub>1</sub> = <i>V</i>/<i>R</i><sub>1</sub> = 1.8·10<sup>6</sup> N/C')}, ${m('<i>E</i><sub>2</sub> = <i>V</i>/<i>R</i><sub>2</sub> = 9·10<sup>5</sup> N/C')}. לכדור הקטן פחות מטען, אבל שדה חזק פי 2 על פניו.`],
+  check:`${m(`<i>V</i><sub>2</sub>' = 9·10<sup>9</sup>·4·10<sup>−6</sup>/0.2 = 1.8·10<sup>5</sup> V`)}, שווה ל־${m(`<i>V</i><sub>1</sub>'`)}. בסימולציה, טענו את הדוגמה ולחצו "חיבור הכדורים בתיל".`},
+ qs:[
+ {l:'b',t:'mc',q:`מחברים בתיל שני כדורים מוליכים טעונים. מתי מפסיק לעבור מטען בתיל?`,o:['כשהמטענים על הכדורים שווים','כשהפוטנציאלים של הכדורים שווים','כשאחד הכדורים מתרוקן ממטען','כשהשדות על פני הכדורים שווים'],a:1,s:`מטען עובר כל עוד יש מתח בין קצות התיל. בשיווי משקל כל המוליך, כולל התיל, נמצא באותו פוטנציאל.`},
+ {l:'b',t:'num',q:`שני כדורים מוליכים זהים טעונים ב־${m('+8 μC')} וב־${m('−2 μC')}. מחברים אותם בתיל. מה המטען על כל כדור אחרי החיבור? (תשובה ב־μC)`,a:3,u:'μC',s:`המטען הכולל ${m('+6 μC')}. הכדורים זהים, ולכן פוטנציאלים שווים פירושם מטענים שווים: ${m('+3 μC')} לכל כדור.`},
+ {l:'b',t:'mc',q:`כדור שרדיוסו R וכדור שרדיוסו 3R, רחוקים זה מזה, מחוברים בתיל. מה היחס בין המטען על הכדור הקטן למטען על הגדול?`,o:['1:1','1:3','3:1','1:9'],a:1,s:`${m(`<i>Q</i><sub>1</sub>'/<i>Q</i><sub>2</sub>' = <i>R</i><sub>1</sub>/<i>R</i><sub>2</sub> = 1/3`)}.`},
+ {l:'b',t:'mc',q:`אחרי החיבור של אותם שני כדורים (R ו־3R), על פני איזה כדור השדה חזק יותר?`,o:['על הכדור הקטן','על הכדור הגדול','השדות שווים','אין שדה כי הפוטנציאלים שווים'],a:0,s:`${m('<i>E</i> = <i>V</i>/<i>R</i>')} והפוטנציאל משותף, ולכן על הכדור הקטן השדה חזק פי 3.`},
+ {l:'a',t:'num',q:`כדור 1: ${m('<i>R</i> = 5 cm')}, ${m('+3 μC')}. כדור 2: ${m('<i>R</i> = 10 cm')}, ${m('−6 μC')}. הכדורים רחוקים זה מזה ומחברים אותם בתיל. מה הפוטנציאל המשותף?`,a:-1.8e5,u:'V',s:`המטען הכולל ${m('−3 μC')}, והיחס ${m(`<i>Q</i><sub>1</sub>'/<i>Q</i><sub>2</sub>' = 5/10`)}. לכן ${m(`<i>Q</i><sub>1</sub>' = −1 μC`)}, ${m(`<i>Q</i><sub>2</sub>' = −2 μC`)}.<br>${m(`<i>V</i> = ${fr('9·10<sup>9</sup>·(−10<sup>−6</sup>)','0.05')} = −1.8·10<sup>5</sup> V`)}`},
+ {l:'a',t:'num',q:`בהמשך לשאלה הקודמת: כמה אלקטרונים עברו בתיל?`,a:2.5e13,u:'אלקטרונים',s:`המטען של כדור 1 השתנה מ־${m('+3 μC')} ל־${m('−1 μC')}, שינוי של ${m('4 μC')}. ${m('<i>n</i> = 4·10<sup>−6</sup>/1.6·10<sup>−19</sup> = 2.5·10<sup>13</sup>')}. האלקטרונים עברו מכדור 2 (פוטנציאל התחלתי ${m('−5.4·10<sup>5</sup> V')}) לכדור 1 (${m('+5.4·10<sup>5</sup> V')}).`},
+ {l:'a',t:'mc',q:`כדור מוליך מבודד טעון ב־${m('+<i>Q</i>')}. מחברים אותו בתיל לאדמה. מה יקרה?`,o:['חצי מהמטען יעבור לאדמה','כמעט כל המטען יעבור לאדמה','המטען יישאר, כי האדמה לא טעונה','אלקטרונים יעברו מהכדור לאדמה'],a:1,s:`אפשר לחשוב על כדור הארץ ככדור ענק: ${m(`<i>Q</i>'/<i>Q</i>'<sub>ארץ</sub> = <i>R</i>/<i>R</i><sub>ארץ</sub> ≈ 0`)}. הכדור מגיע לפוטנציאל אפס, ולכן נשאר בלי מטען. בפועל אלקטרונים עולים מהאדמה אל הכדור ומנטרלים אותו.`}
+ ]},
+{id:'lines',title:'קווי שדה חשמלי',sub:'איך מציירים שדה, ומה אפשר לקרוא מהציור',
+ intro:[
+ `<b>קווי שדה</b> הם דרך לצייר את השדה. בכל נקודה הקו משיק לכיוון השדה, והחץ מראה את כיוון הכוח על מטען חיובי.`,
+ `הקווים יוצאים ממטענים חיוביים ונכנסים למטענים שליליים, או ממשיכים לאינסוף.`,
+ `מספר הקווים שיוצאים ממטען או נכנסים אליו יחסי לגודל המטען. במקום שבו הקווים צפופים השדה חזק.`,
+ `קווי שדה לא נחתכים: אילו נחתכו, היו לשדה שני כיוונים באותה נקודה.`,
+ `בין לוחות מקבילים הקווים ישרים, מקבילים ובמרווחים שווים. כך נראה שדה אחיד.`],
+ formulas:[],
+ trap:[`קו שדה הוא לא מסלול`,`מטען שמשוחרר ממנוחה <b>לא</b> נע בדרך כלל לאורך קו השדה. התאוצה שלו משיקה לקו, אבל ברגע שיש לו מהירות, המסלול מתעקם פחות מהקו. רק לאורך קו שדה ישר המסלול והקו מתלכדים.`],
+ ex:{given:[`מטען ${m('+2<i>q</i>')} ומטען ${m('−<i>q</i>')}`,`מכל ${m('<i>q</i>')} יוצאים 4 קווים בציור`],ask:[`א. כמה קווים יוצאים מ־${m('+2<i>q</i>')} וכמה נכנסים ל־${m('−<i>q</i>')}?`,`ב. מה קורה לשאר הקווים?`,`ג. איפה בקירוב השדה מתאפס?`],
+  steps:[
+  `<b>סעיף א.</b> מ־${m('+2<i>q</i>')} יוצאים 8 קווים, ול־${m('−<i>q</i>')} נכנסים 4.`,
+  `<b>סעיף ב.</b> 4 הקווים הנותרים לא מוצאים מטען שלילי, ולכן ממשיכים לאינסוף. ממרחק גדול המערכת נראית כמו מטען נקודתי של ${m('+<i>q</i>')} (סכום המטענים).`,
+  `<b>סעיף ג.</b> לפי השיקול מהנושא "שדה חשמלי": הסימנים הפוכים, ולכן הנקודה מחוץ לקטע ומאחורי המטען הקטן. בציור רואים שם אזור ריק מקווים, ושני קווים שנפרדים לכיוונים הפוכים.`],
+  check:`טענו בסימולציה את "‎+2q ו־‎−q" וספרו את הקווים. הוסיפו את הקווים שווי הפוטנציאל כדי לראות את נקודת האפס.`},
+ qs:[
+ {l:'b',t:'mc',q:`למה קווי שדה חשמלי לא יכולים להיחתך?`,o:['כי הם דוחים זה את זה','כי בנקודת החיתוך היו לשדה שני כיוונים','כי מספר הקווים מוגבל','הם יכולים להיחתך בין שני מטענים'],a:1,s:`הקו משיק לכיוון השדה, ובכל נקודה יש לשדה כיוון אחד בלבד.`},
+ {l:'b',t:'mc',q:`בציור קווי שדה, הקווים בסביבת נקודה A צפופים פי 2 מאשר בסביבת נקודה B. מה נכון?`,o:['E_A > E_B','E_A < E_B','E_A = E_B','V_A > V_B בהכרח'],a:0,s:`צפיפות הקווים מייצגת את עוצמת השדה. על הפוטנציאל אי אפשר להסיק רק מהצפיפות.`},
+ {l:'b',t:'mc',q:`בציור, 8 קווים יוצאים ממטען ${m('+<i>q</i>')}. כמה קווים צריכים להיכנס למטען ${m('−2<i>q</i>')} באותו ציור?`,o:['4','8','16','תלוי במרחק'],a:2,s:`מספר הקווים יחסי לגודל המטען: פי 2 מטען, פי 2 קווים.`},
+ {l:'a',t:'mc',q:`מטען חיובי קטן משתחרר ממנוחה על קו שדה מעוקל. מה נכון לגבי המסלול שלו?`,o:['נע בדיוק לאורך קו השדה','בהתחלה נע בכיוון המשיק לקו, ואחר כך סוטה ממנו','נע ניצב לקו השדה','נע לאורך קו שווה פוטנציאל'],a:1,s:`ברגע השחרור התאוצה, ולכן גם תחילת התנועה, משיקה לקו. אחר כך למטען יש מהירות, והתאוצה משנה את כיוונה בהדרגה בלבד, כך שהמסלול סוטה מהקו המעוקל.`},
+ {l:'a',t:'mc',q:`בציור של שני מטענים A ו־B: מ־A יוצאים 12 קווים. 4 מהם נכנסים ל־B, ו־8 ממשיכים לאינסוף. מה נכון?`,o:['A חיובי, B שלילי, |q_A| = 3|q_B|','A חיובי, B שלילי, |q_A| = |q_B|','שניהם חיוביים','A שלילי, B חיובי'],a:0,s:`קווים יוצאים ממטען חיובי ונכנסים לשלילי. 12 קווים מול 4 קווים: היחס בין גודלי המטענים הוא 3.`}
+ ]},
+{id:'equipotential',title:'קווים שווי פוטנציאל',sub:'נקודות בעלות אותו פוטנציאל, ניצבות לקווי השדה',
+ intro:[
+ `<b>קו שווה פוטנציאל</b> מחבר נקודות בעלות אותו פוטנציאל. במרחב התלת־ממדי אלה משטחים.`,
+ `הקווים שווי הפוטנציאל <b>ניצבים לקווי השדה</b> בכל נקודה.`,
+ `העבודה בהעברת מטען לאורך קו שווה פוטנציאל היא אפס, כי ${m('<i>V</i><sub>AB</sub> = 0')}.`,
+ `כשמציירים את הקווים בהפרשי פוטנציאל שווים, הם צפופים במקום שבו השדה חזק.`,
+ `סביב מטען נקודתי: מעגלים קונצנטריים שהמרווחים ביניהם גדלים ככל שמתרחקים מהמטען. בשדה אחיד: קווים ישרים מקבילים במרווחים שווים.`,
+ `פני מוליך בשיווי משקל הם משטח שווה פוטנציאל, והשדה בתוך המוליך הוא אפס.`],
+ formulas:[[`<i>W</i><sub>A→B</sub> = <i>qV</i><sub>AB</sub> = 0`,'עבודה לאורך קו שווה פוטנציאל'],[`<i>E</i> ≈ ${fr('Δ<i>V</i>','Δ<i>x</i>')}`,'גודל השדה מהמרווח בין קווים שכנים']],
+ trap:[`מרווחים שווים בפוטנציאל ≠ מרווחים שווים במרחק`,`סביב מטען נקודתי, הקווים של ${m('180 kV')}, ${m('90 kV')} ו־${m('60 kV')} נמצאים ברדיוסים של 10, 20 ו־30 cm. הרדיוסים במרווחים שווים, אבל הפרשי הפוטנציאל לא שווים (90 kV ואחר כך 30 kV). בהפרשי פוטנציאל שווים המעגלים מתרחקים זה מזה.`],
+ ex:{given:[`מטען נקודתי ${m('<i>Q</i> = +2 μC')}`,`מטען מועבר ${m('<i>q</i> = +1 nC')}`],ask:[`א. מה הרדיוסים של הקווים שווי הפוטנציאל ${m('180 kV')}, ${m('90 kV')} ו־${m('60 kV')}?`,`ב. מה העבודה של הכוח החשמלי בהעברת q מהקו של 180 kV לקו של 60 kV?`,`ג. ואם מעבירים את q לאורך הקו של 90 kV?`],
+  steps:[
+  `<b>סעיף א.</b> ${m(`<i>r</i> = ${fr('<i>kQ</i>','<i>V</i>')} = ${fr('9·10<sup>9</sup>·2·10<sup>−6</sup>','<i>V</i>')} = ${fr('1.8·10<sup>4</sup>','<i>V</i>')}`)}, ולכן ${m('<i>r</i> = 0.1 m, 0.2 m, 0.3 m')}.`,
+  `<b>סעיף ב.</b> ${m('<i>W</i> = <i>qV</i><sub>AB</sub> = 10<sup>−9</sup>·(1.8·10<sup>5</sup> − 6·10<sup>4</sup>) = 1.2·10<sup>−4</sup> J')}. העבודה חיובית: מטען חיובי שהתרחק מהמטען החיובי.`,
+  `<b>סעיף ג.</b> לאורך קו שווה פוטנציאל ${m('<i>V</i><sub>AB</sub> = 0')}, ולכן ${m('<i>W</i> = 0')}. הכוח ניצב בכל רגע לכיוון התנועה.`],
+  check:`בסימולציה, טענו "מטען יחיד" עם ${m('+2 μC')}. הקווים מצוירים כל 30 kV, ותוכלו לזהות את המעגלים של 180, 90 ו־60 kV.`},
+ qs:[
+ {l:'b',t:'mc',q:`מה הזווית בין קו שדה לקו שווה פוטנציאל בנקודת המפגש ביניהם?`,o:['0°','45°','90°','תלוי בשדה'],a:2,s:`לאורך קו שווה פוטנציאל V לא משתנה, ולכן לשדה אין רכיב לאורכו. השדה ניצב לקו.`},
+ {l:'b',t:'num',q:`מה הרדיוס של הקו שווה הפוטנציאל של ${m('90 V')} סביב מטען נקודתי של ${m('+3 nC')}?`,a:.3,u:'m',s:`${m(`<i>r</i> = ${fr('<i>kQ</i>','<i>V</i>')} = ${fr('9·10<sup>9</sup>·3·10<sup>−9</sup>','90')} = 0.3 m`)}`},
+ {l:'b',t:'mc',q:`מעבירים מטען לאורך קו שווה פוטנציאל. מה העבודה של הכוח החשמלי?`,o:['חיובית','שלילית','אפס','תלויה בגודל המטען'],a:2,s:`${m('<i>W</i> = <i>qV</i><sub>AB</sub>')}, ובין שתי נקודות על אותו קו ${m('<i>V</i><sub>AB</sub> = 0')}.`},
+ {l:'a',t:'num',q:`קווים שווי פוטנציאל מצוירים כל ${m('10 V')}. באזור A המרווח בין קווים שכנים הוא ${m('1 cm')}, ובאזור B הוא ${m('2 cm')}. מה בקירוב גודל השדה באזור A?`,a:1000,u:'V/m',s:`${m(`<i>E</i> ≈ ${fr('Δ<i>V</i>','Δ<i>x</i>')} = ${fr('10','0.01')} = 1000 V/m`)}. באזור B השדה בערך 500 V/m: קווים צפופים פי 2, שדה חזק פי 2.`},
+ {l:'a',t:'mc',q:`כדור מוליך טעון במטען ${m('+<i>Q</i>')} ונמצא בשיווי משקל. מה נכון לגבי נקודה בתוך הכדור?`,o:['E = 0 ו־V = 0','E = 0 ו־V שווה לפוטנציאל על פני הכדור','E ≠ 0 ו־V קבוע','E ו־V גדלים לכיוון המרכז'],a:1,s:`בתוך מוליך בשיווי משקל ${m('<i>E</i> = 0')}. כש־E אפס הפוטנציאל לא משתנה, ולכן בכל נקודה בפנים הוא שווה לפוטנציאל על פני הכדור, ${m('<i>kQ</i>/<i>R</i>')}. הוא לא אפס.`}
+ ]}
+];
+const FIG={vx(){const W=340,H=190,l=40,r=14,t=14,b=30;const xs=[0,2,5,8],vs=[0,40,40,-50];const X=x=>l+x/8*(W-l-r),Y=v=>t+(60-v)/120*(H-t-b);let ticks='';[-60,-40,-20,0,20,40,60].forEach(v=>ticks+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${l-6}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="var(--mut)">${v}</text>`);[0,1,2,3,4,5,6,7,8].forEach(x=>ticks+=`<text x="${X(x)}" y="${Y(0)+(x?14:14)}" text-anchor="middle" font-size="11" fill="var(--mut)">${x?x:''}</text>`);
+  return `<div class="fig" dir="ltr"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="גרף V כפונקציה של x: מ־0 ל־40 וולט בין 0 ל־2 ס״מ, קבוע 40 וולט עד 5 ס״מ, יורד ל־מינוס 50 וולט ב־8 ס״מ">${ticks}<line x1="${l}" x2="${W-r}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--mut)"/><line x1="${l}" x2="${l}" y1="${t}" y2="${H-b+10}" stroke="var(--mut)"/><polyline fill="none" stroke="var(--acc)" stroke-width="2.5" points="${xs.map((x,i)=>X(x)+','+Y(vs[i])).join(' ')}"/>${xs.map((x,i)=>`<circle cx="${X(x)}" cy="${Y(vs[i])}" r="3.5" fill="var(--ink)"/>`).join('')}<text x="${l+4}" y="${t+2}" font-size="12" font-weight="700" fill="var(--ink)">V (V)</text><text x="${W-r}" y="${Y(0)-6}" font-size="12" font-weight="700" fill="var(--ink)" text-anchor="end">x (cm)</text></svg></div>`}};
+
+/* ---------- solving tips per topic ---------- */
+const TIPS={
+coulomb:[
+ `<b>לא מציבים את סימני המטענים.</b> מחשבים את <b>גודל</b> הכוח עם גודלי המטענים, ואת הכיוון קובעים לפי הסיטואציה: קודם משיכה או דחייה, ואז ימינה או שמאלה (או למעלה ולמטה).`,
+ `<b>ממירים יחידות לפני ההצבה:</b> ${m('1 μC = 10<sup>−6</sup> C')}, ${m('1 nC = 10<sup>−9</sup> C')}, ומרחקים במטרים.`,
+ `<b>יש כמה מטענים?</b> מציירים על המטען המבוקש חץ נפרד לכל כוח, מחשבים כל אחד לבד, ורק אז מחברים וקטורית לפי רכיבים.`,
+ `<b>שאלות "פי כמה"</b> פותרים ביחסים, בלי להציב מספרים: מרחק פי 2 נותן כוח קטן פי 4, ומטען פי 3 נותן כוח פי 3.`,
+ `<b>מטען שלישי בשיווי משקל על קו:</b> קודם מחליטים באיזה אזור הוא נמצא (בין המטענים או מחוצה להם) לפי כיווני הכוחות, ורק אחר כך כותבים משוואה. המטען השלישי מצטמצם.`,
+ `<b>מגע בין כדורים זהים:</b> מחברים את המטענים עם הסימנים ומחלקים שווה בשווה.`],
+field:[
+ `<b>כיוון השדה:</b> מדמיינים מטען חיובי קטן בנקודה ושואלים לאן הוא יידחף. זה הכיוון שאנחנו מגדירים ככיוון השדה.`,
+ `<b>גם כאן מציבים גודל מטען בלבד.</b> הכיוון לפי הכלל: החוצה ממטען חיובי, פנימה אל מטען שלילי.`,
+ `<b>מטען שלילי בשדה</b> מרגיש כוח נגד כיוון השדה.`,
+ `<b>שדה מכמה מטענים</b> הוא סכום וקטורי. חפשו סימטריה: לעיתים קרובות רכיב אחד מתבטל וחוסך חצי מהחישוב.`,
+ `<b>איפה השדה מתאפס?</b> סימנים זהים: בין המטענים, קרוב לקטן. סימנים הפוכים: מחוץ לקטע, מאחורי המטען הקטן. לעולם לא ליד המטען הגדול.`,
+ `השדה בנקודה <b>לא תלוי במטען הבוחן</b> שמניחים בה, רק במטענים שיוצרים אותו.`],
+energy:[
+ `<b>כאן כן מציבים את הסימנים.</b> אנרגיה היא סקלר, והסימן הוא חלק מהתשובה.`,
+ `${m('<i>U</i> &gt; 0')}: המטענים דוחים זה את זה. ${m('<i>U</i> &lt; 0')}: הם מושכים.`,
+ `שימו לב: במכנה ${m('<i>r</i>')} ולא ${m('<i>r</i><sup>2</sup>')}.`,
+ `<b>שאלות על מהירות</b> פותרים בשימור אנרגיה, ${m('<i>E</i><sub>k</sub> + <i>U</i> = const')}. לא בקינמטיקה, כי הכוח משתנה עם המרחק והתאוצה לא קבועה.`,
+ `<b>כמה מטענים:</b> סוכמים את האנרגיה של כל הזוגות. לשלושה מטענים יש 3 זוגות, ולארבעה יש 6.`],
+potential:[
+ `<b>בפוטנציאל חובה להציב את סימן המטען.</b> מטען שלילי יוצר פוטנציאל שלילי.`,
+ `פוטנציאל הוא <b>סקלר</b>: מחברים מספרים עם סימנים, בלי רכיבים ובלי כיוונים. לכן חישוב פוטנציאל קל יותר מחישוב שדה.`,
+ `${m('<i>V</i><sub>AB</sub> = <i>V</i><sub>A</sub> − <i>V</i><sub>B</sub>')}: "המוצא פחות היעד". בנוסחה ${m('<i>W</i><sub>A→B</sub> = <i>qV</i><sub>AB</sub>')} מציבים גם את q עם הסימן.`,
+ `<b>בדיקת סבירות לסימן העבודה:</b> מטען חיובי "רוצה" לרדת בפוטנציאל, ומטען שלילי "רוצה" לעלות. אם המטען הולך לכיוון שהוא רוצה, עבודת הכוח החשמלי חיובית.`,
+ `<b>העבודה לא תלויה במסלול.</b> מסלול מעוקל ומסובך בשאלה הוא בדרך כלל מסיח: מסתכלים רק על נקודת ההתחלה ונקודת הסוף.`,
+ `העבודה של כוח חיצוני שמזיז מטען בלי לשנות את מהירותו היא מינוס העבודה של הכוח החשמלי.`],
+relation:[
+ `<b>השדה מצביע לכיוון שבו הפוטנציאל יורד.</b> אם יודעים איפה V גבוה ואיפה נמוך, יודעים את כיוון השדה.`,
+ `<b>בגרף V(x):</b> גודל השדה הוא גודל השיפוע. שיפוע שלילי (V יורד) פירושו שדה בכיוון ${m('+<i>x</i>')}. קטע אופקי פירושו ${m('<i>E</i> = 0')}.`,
+ `${m('V/m')} ו־${m('N/C')} הן אותה יחידה. אפשר לעבור ביניהן בחופשיות.`,
+ `<b>בין לוחות:</b> ${m('<i>V</i> = <i>Ed</i>')}, עם d במטרים.`,
+ `פוטנציאל גבוה לא אומר שדה חזק. השדה תלוי בקצב השינוי של V, לא בערך שלו.`],
+plates:[
+ `<b>שיטה שעובדת לכל צירוף לוחות:</b> מסמנים שלושה אזורים (משמאל, בין הלוחות, מימין). בכל אזור מציירים חץ לשדה של כל לוח, ${m('<i>σ</i>/2<i>ε</i><sub>0</sub>')} לכל אחד, ורק אז מחברים.`,
+ `<b>לוח אחד:</b> ${m('<i>E</i> = 2π<i>kσ</i>')} בכל מרחק. אם בשאלה יש מרחק מהלוח, הוא לא נכנס לחישוב השדה.`,
+ `<b>קבל</b> (${m('+<i>σ</i>')} ו־${m('−<i>σ</i>')}): בין הלוחות ${m('<i>σ</i>/<i>ε</i><sub>0</sub>')}, פי 2 מלוח אחד. מחוץ ללוחות השדה אפס.`,
+ `<b>חלקיק שנכנס בין הלוחות</b> זו שאלת בליסטיקה: בניצב ללוחות יש תאוצה קבועה ${m('<i>a</i> = <i>qE</i>/<i>m</i>')}, ובמקביל ללוחות המהירות קבועה.`,
+ `לאלקטרון ולפרוטון בדרך כלל מזניחים את הכובד. כדי לוודא, משווים ${m('<i>qE</i>')} ל־${m('<i>mg</i>')}.`],
+sphere:[
+ `<b>מחוץ לכדור:</b> מתייחסים אליו כמו למטען נקודתי במרכז. מודדים את r <b>מהמרכז</b>, לא מפני הכדור.`,
+ `<b>בתוך הכדור:</b> ${m('<i>E</i> = 0')} אבל ${m('<i>V</i> = <i>kQ</i>/<i>R</i>')}, לא אפס.`,
+ `<b>על פני הכדור:</b> ${m('<i>V</i> = <i>kQ</i>/<i>R</i>')} ו־${m('<i>E</i> = <i>kQ</i>/<i>R</i><sup>2</sup> = <i>V</i>/<i>R</i>')}. אם נתון אחד מהם, השני במרחק חילוק אחד.`,
+ `<b>כמה קליפות עם מרכז משותף:</b> בנקודה מסוימת, כל קליפה תורמת לפוטנציאל ${m('<i>kQ</i>/<i>R</i>')} אם הנקודה בתוכה, ו־${m('<i>kQ</i>/<i>r</i>')} אם הנקודה מחוצה לה. מחברים עם סימנים.`,
+ `כדור מוליך מלא וקליפה דקה מתנהגים אותו דבר, כי בשניהם המטען יושב על פני השטח.`],
+connect:[
+ `<b>מה שמשתווה הוא הפוטנציאל, לא המטען.</b>`,
+ `<b>כלל אצבע:</b> הכדור הגדול יותר מקבל יותר מטען, ביחס לרדיוס. כדור ברדיוס כפול יקבל מטען כפול.`,
+ `<b>שתי משוואות, שני נעלמים:</b> שימור מטען (עם סימנים) ושוויון פוטנציאלים ${m(`<i>Q</i><sub>1</sub>'/<i>R</i><sub>1</sub> = <i>Q</i><sub>2</sub>'/<i>R</i><sub>2</sub>`)}.`,
+ `<b>כיוון הזרימה:</b> מטען חיובי עובר מהפוטנציאל הגבוה לנמוך, והאלקטרונים, שהם מה שבאמת זז, עוברים בכיוון ההפוך. מספר האלקטרונים: ${m('<i>n</i> = Δ<i>Q</i>/<i>e</i>')}.`,
+ `<b>כדורים זהים</b> הם מקרה פרטי: המטען הכולל מתחלק שווה בשווה.`,
+ `<b>על הכדור הקטן</b> השדה חזק יותר, כי ${m('<i>E</i> = <i>V</i>/<i>R</i>')} והפוטנציאל משותף.`,
+ `<b>הארקה:</b> הכדור מגיע לפוטנציאל אפס. אם אין לידו מטענים אחרים, הוא מתרוקן לגמרי.`],
+lines:[
+ `<b>כיוון קו השדה</b> הוא כיוון הכוח על מטען חיובי. אותו דמיון של מטען חיובי קטן עובד גם כאן.`,
+ `<b>ארבעה כללים לציור:</b> הקווים יוצאים ממטען חיובי ונכנסים לשלילי, מספר הקווים יחסי לגודל המטען, הקווים לא נחתכים, והם ניצבים לפני מוליך.`,
+ `<b>זיהוי מטענים מציור:</b> סופרים קווים. היחס בין מספרי הקווים הוא היחס בין גודלי המטענים.`,
+ `<b>קווים שבורחים לאינסוף</b> אומרים שסכום המטענים במערכת אינו אפס.`,
+ `<b>צפיפות הקווים</b> מראה את עוצמת השדה. מהצפיפות לבדה אי אפשר להסיק על הפוטנציאל.`],
+equipotential:[
+ `<b>קווים שווי פוטנציאל ניצבים לקווי השדה תמיד.</b> אם יש לכם ציור של אחד מהם, ציירו את השני בניצב.`,
+ `<b>שאלת עבודה על מסלול שווה פוטנציאל:</b> התשובה אפס, בלי חישוב.`,
+ `<b>הערכת שדה מציור:</b> ${m('<i>E</i> ≈ Δ<i>V</i>/Δ<i>x</i>')} בין שני קווים שכנים. קווים צפופים פירושם שדה חזק.`,
+ `<b>סביב מטען נקודתי:</b> הרדיוס של קו שווה פוטנציאל הוא ${m('<i>r</i> = <i>kQ</i>/<i>V</i>')}.`,
+ `<b>פני מוליך</b> הם תמיד משטח שווה פוטנציאל, ולכן קווי השדה פוגשים אותם בניצב.`]
+};
+
+/* ---------- rendering ---------- */
+const app=document.getElementById('app');
+function topicStats(t){const b=t.qs.filter(q=>q.l==='b'),a=t.qs.filter(q=>q.l==='a');const s=l=>l.filter(q=>solved[t.id+'-'+t.qs.indexOf(q)]).length;return{b:b.length,a:a.length,sb:s(b),sa:s(a)}}
+function home(){
+  app.innerHTML=`<div class="wrap"><section class="hero"><div><div class="eyebrow">פיזיקה 5 יח״ל · חשמל ומגנטיות</div><h1>מטען, שדה <span class="p">ו</span>פוטנציאל</h1><p class="lead">יחידת לימוד באלקטרוסטטיקה. בכל נושא יש הסבר קצר, סימולציה שאפשר לשחק בה, דוגמה פתורה צעד אחר צעד, ושאלות תרגול בשתי רמות: בסיסית ומתקדמת.</p><div class="cta"><a class="btn pri" href="#coulomb">להתחיל מחוק קולון</a><a class="btn" href="#formulas">דף הנוסחאות</a></div></div>
+  <figure class="hfig"><div class="stage"><canvas aria-label="דיפול חשמלי: קווי שדה וקווים שווי פוטנציאל"></canvas><span class="hint">גררו את המטענים</span></div><figcaption>דיפול: קווי השדה (אפורים) יוצאים מהמטען החיובי ונכנסים לשלילי. הקווים שווי הפוטנציאל (מקווקווים) ניצבים להם בכל נקודה.</figcaption></figure></section>
+  <div class="secth"><h2>הנושאים לפי סדר הלימוד</h2><span>ההתקדמות נשמרת בדפדפן הזה</span></div>
+  <div class="tg">${T.map((t,i)=>{const s=topicStats(t);return `<a class="tc" href="#${t.id}"><span class="tn">${i+1}</span><b>${t.title}</b><span class="ts">${t.sub}</span><span class="pg"><span>בסיסיות <em>${s.sb}/${s.b}</em></span><span>מתקדמות <em>${s.sa}/${s.a}</em></span></span></a>`}).join('')}</div></div>`;
+  Scene(app.querySelector('canvas'),{width:1.0,charges:[{x:-.17,y:0,q:2},{x:.17,y:0,q:-2}],lines:true,equip:true,vstep:3e4});
+}
+function formulas(){
+  const rows=[
+  ['חוק קולון (בגודל)',`<i>F</i> = <i>k</i>${fr(q1+q2,'<i>r</i><sup>2</sup>')}`,'coulomb'],
+  ['כוח על מטען בשדה חשמלי',`<i>F</i> = <i>qE</i>`,'field'],
+  ['גודל השדה סביב מטען נקודתי',`<i>E</i> = <i>k</i>${fr('<i>q</i>','<i>r</i><sup>2</sup>')}`,'field'],
+  ['גודל השדה של לוח טעון',`<i>E</i> = 2π<i>kσ</i> = ${fr('<i>σ</i>','2<i>ε</i><sub>0</sub>')} , <i>σ</i> = ${fr('<i>Q</i>','<i>A</i>')}`,'plates'],
+  ['אנרגיה פוטנציאלית של שני מטענים נקודתיים',`<i>U</i><sub>E</sub> = <i>k</i>${fr(q1+q2,'<i>r</i>')} , (<i>U</i><sub>E(r→∞)</sub> = 0)`,'energy'],
+  ['אנרגיה פוטנציאלית חשמלית',`<i>U</i><sub>E</sub> = <i>qV</i>`,'energy'],
+  ['פוטנציאל סביב מטען נקודתי',`<i>V</i> = <i>k</i>${fr('<i>q</i>','<i>r</i>')} , (<i>V</i><sub>(r→∞)</sub> = 0)`,'potential'],
+  ['הפוטנציאל בנקודה A ביחס לנקודה B (מתח)',`<i>V</i><sub>AB</sub> = <i>V</i><sub>A</sub> − <i>V</i><sub>B</sub>`,'potential'],
+  ['השינוי בפוטנציאל',`Δ<i>V</i> = <i>V</i><sub>B</sub> − <i>V</i><sub>A</sub>`,'potential'],
+  ['עבודת כוח חשמלי',`<i>W</i><sub>A→B</sub> = <i>qV</i><sub>AB</sub>`,'potential'],
+  ['הקשר בין שדה חשמלי אחיד להפרש פוטנציאלים',`<i>E</i> = −${fr('Δ<i>V</i>','Δ<i>x</i>')}`,'relation']];
+  const tt=id=>T.find(t=>t.id===id).title;
+  app.innerHTML=`<div class="wrap"><div class="th"><a class="crumb" href="#">כל הנושאים</a><h1>דף הנוסחאות</h1><p>הנוסחאות באלקטרוסטטיקה כפי שהן מופיעות בדף הנוסחאות לבחינה, עם קישור לנושא שבו משתמשים בכל אחת.</p></div>
+  <div class="tscroll"><table class="ftab"><tbody>${rows.map(r=>`<tr><td>${r[0]}<small><a href="#${r[2]}">← ${tt(r[2])}</a></small></td><td class="fx">${M(r[1])}</td></tr>`).join('')}</tbody></table></div>
+  <div class="fgrid" style="margin-top:16px"><div class="fc">${m('<i>k</i> = 9·10<sup>9</sup> N·m<sup>2</sup>/C<sup>2</sup>')}<small>קבוע קולון</small></div><div class="fc">${m('<i>ε</i><sub>0</sub> = 8.85·10<sup>−12</sup> C<sup>2</sup>/(N·m<sup>2</sup>)')}<small>${m('<i>k</i> = 1/4π<i>ε</i><sub>0</sub>')}</small></div><div class="fc">${m('<i>e</i> = 1.6·10<sup>−19</sup> C')}<small>המטען היסודי</small></div><div class="fc">${m('<i>m</i><sub>e</sub> = 9.1·10<sup>−31</sup> kg')}<small>מסת האלקטרון</small></div></div></div>`;
+}
+let curTab='learn';
+function topic(id,tab){
+  const i=T.findIndex(t=>t.id===id),t=T[i];curTab=tab||'learn';
+  const tabs=[['learn','הסבר'],['sim','סימולציה'],['ex','דוגמה פתורה'],['qs','תרגול']];
+  app.innerHTML=`<div class="wrap"><div class="th"><a class="crumb" href="#">כל הנושאים</a><h1>${i+1}. ${t.title}</h1><p>${t.sub}</p></div>
+  <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button class="tab" role="tab" data-t="${k}" aria-selected="${k===curTab}">${l}</button>`).join('')}</div>
+  <div class="panel" id="panel"></div>
+  <nav class="pn">${i>0?`<a class="btn" href="#${T[i-1].id}">→ ${T[i-1].title}</a>`:'<span></span>'}${i<T.length-1?`<a class="btn pri" href="#${T[i+1].id}">${T[i+1].title} ←</a>`:`<a class="btn pri" href="#formulas">לדף הנוסחאות ←</a>`}</nav></div>`;
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{curTab=b.dataset.t;app.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===b));panel(t,curTab)});
+  panel(t,curTab);
+}
+function panel(t,tab,preset){
+  killScenes();const p=document.getElementById('panel');
+  if(tab==='learn'){p.innerHTML=`<div class="prose">${t.intro.map(x=>`<p>${x}</p>`).join('')}</div>${t.formulas.length?`<div><h2>הנוסחאות בנושא</h2><div class="fgrid">${t.formulas.map(f=>`<div class="fc">${M(f[0])}<small>${f[1]}</small></div>`).join('')}</div></div>`:''}${TIPS[t.id]?`<div class="tips"><h2>טיפים לפתרון</h2><ul>${TIPS[t.id].map(x=>`<li>${x}</li>`).join('')}</ul></div>`:''}<div class="trap"><h2>${t.trap[0]}</h2><p>${t.trap[1]}</p></div><div><button class="btn pri" data-go="sim">לסימולציה ←</button></div>`}
+  if(tab==='sim'){p.innerHTML='<div class="panel" style="padding:0" id="simhost"></div>';SIMS[t.id](p.querySelector('#simhost'),preset)}
+  if(tab==='ex'){const e=t.ex;p.innerHTML=`<article class="ex"><div class="gf"><div><h3>נתונים</h3>${e.given.map(g=>`<p>${g}</p>`).join('')}</div><div><h3>מבוקש</h3>${e.ask.map(g=>`<p>${g}</p>`).join('')}</div></div><div><h3>פתרון</h3><ol class="steps">${e.steps.map(s=>`<li>${s}</li>`).join('')}</ol></div><div class="chk"><h3>בדיקה</h3><p>${e.check}</p></div></article><div><button class="btn pri" data-pre="1">פתיחת הדוגמה בסימולציה ←</button></div>`}
+  if(tab==='qs')practice(t,p);
+  p.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>setTab(t,b.dataset.go));
+  p.querySelectorAll('[data-pre]').forEach(b=>b.onclick=()=>setTab(t,'sim',true));
+}
+function setTab(t,k,preset){curTab=k;app.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x.dataset.t===k));panel(t,k,preset);document.querySelector('.tabs').scrollIntoView({block:'nearest'})}
+function practice(t,p){
+  const lv=[['b','שאלות בסיסיות','הבנת המושגים והצבה ישירה'],['a','שאלות מתקדמות','ברמת בגרות, משלבות כמה רעיונות']];
+  p.innerHTML=`<div class="score" id="score"></div>`+lv.map(([l,h,s])=>`<section class="panel" style="padding:0;gap:14px" data-l="${l}"><div class="lvl"><h2>${h}</h2><span>${s}</span></div></section>`).join('')+`<p class="note">בשאלות חישוב אפשר לכתוב מספרים כמו <span class="mx">2.88e5</span> או <span class="mx">2.88*10^5</span>. תשובה נחשבת נכונה בטווח של 3%.</p>`;
+  const upd=()=>{const s=topicStats(t);p.querySelector('#score').innerHTML=`נפתרו: בסיסיות ${s.sb}/${s.b} · מתקדמות ${s.sa}/${s.a}`};upd();
+  const n={b:0,a:0};
+  t.qs.forEach((q,qi)=>{const id=t.id+'-'+qi;n[q.l]++;const box=el(`<div class="q ${q.l==='a'?'adv':''}"><div class="qn"><span>${q.l==='a'?'מתקדמת':'בסיסית'} ${n[q.l]}</span><span class="st ${solved[id]?'ok':''}">${solved[id]?'✓ נפתרה':''}</span></div><p>${q.q}</p>${q.fig?FIG[q.fig]():''}</div>`);
+    const st=box.querySelector('.st');const good=()=>{markSolved(id);st.textContent='✓ נפתרה';st.classList.add('ok');upd()};
+    const sol=el(`<div class="sol" hidden><b>פתרון</b><p>${q.s}</p></div>`);
+    if(q.t==='mc'){const o=el('<div class="opts"></div>');const fb=el('<div class="fb" hidden></div>');q.o.forEach((txt,k)=>{const b=el(`<button class="opt">${txt}</button>`);b.onclick=()=>{o.querySelectorAll('.opt').forEach((x,j)=>{x.disabled=true;if(j===q.a)x.classList.add('ok')});if(k===q.a){fb.className='fb ok';fb.textContent='נכון.';good()}else{b.classList.add('no');fb.className='fb no';fb.textContent='לא נכון. התשובה הנכונה מסומנת בירוק.'}fb.hidden=false;sol.hidden=false};o.appendChild(b)});box.append(o,fb,sol)}
+    else{const fid='a'+id;const row=el(`<div class="ansrow"><label class="tip" for="${fid}">התשובה שלכם:</label><input id="${fid}" inputmode="decimal" autocomplete="off"><span class="u">${q.u}</span><button class="btn sm pri">בדיקה</button><button class="btn sm">הצגת פתרון</button></div>`);const fb=el('<div class="fb" hidden></div>');const[inp]=row.querySelectorAll('input');const[chk,show]=row.querySelectorAll('button');
+      const check=()=>{const v=parseNum(inp.value);fb.hidden=false;if(isNaN(v)){fb.className='fb';fb.textContent='לא הצלחנו לקרוא את המספר. נסו למשל 4.5e5 או 0.54.';return}const ok=Math.abs(v-q.a)<=Math.abs(q.a)*.03+1e-12;if(ok){fb.className='fb ok';fb.innerHTML='נכון. ';good();sol.hidden=false}else{const sign=Math.sign(v)!==Math.sign(q.a)&&v!==0;fb.className='fb no';fb.textContent=sign?'הסימן לא נכון. בדקו את הסימנים של המטענים או את כיוון התנועה.':Math.abs(Math.log10(Math.abs(v/q.a))%1)<.02&&(Math.abs(v/q.a)>5||Math.abs(v/q.a)<.2)?'הספרות נכונות אבל סדר הגודל לא. בדקו יחידות (μC, cm, nC).':'עדיין לא. נסו שוב, או פתחו את הפתרון.'}};
+      chk.onclick=check;inp.addEventListener('keydown',e=>{if(e.key==='Enter')check()});show.onclick=()=>{sol.hidden=!sol.hidden};box.append(row,fb,sol)}
+    p.querySelector(`[data-l="${q.l}"]`).appendChild(box)});
+}
+function route(){killScenes();const h=location.hash.replace('#','');document.getElementById('nav-f').toggleAttribute('aria-current',h==='formulas');document.getElementById('nav-home').toggleAttribute('aria-current',!h);
+  if(T.some(t=>t.id===h))topic(h);else if(h==='formulas')formulas();else home();window.scrollTo(0,0)}
+addEventListener('hashchange',route);route();
+</script>
+
+</body></html>

@@ -1,1 +1,77 @@
-﻿<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>כוחות - מכניקה</title></head><body style="font-family:system-ui,-apple-system,sans-serif;background:#0f1115;color:#fff;text-align:center;padding:40px 20px;margin:0;"><div style="max-width:900px;margin:0 auto;"><div style="text-align:right;margin-bottom:20px;"><a href="../index.html" style="color:#60a5fa;text-decoration:none;font-weight:bold;">← חזרה למכניקה</a></div><h1 style="font-size:2rem;margin-bottom:10px;">כוחות</h1><p style="color:#a0aec0;font-size:1.1rem;margin-top:20px;">התכנים בפרק זה נמצאים כעת בפיתוח ויעלו בקרוב.</p></div></body></html>
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>כוחות וחוקי ניוטון - מכניקה</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-color: #0b0e14; --card-bg: #ffffff; --text-main: #111827; --text-secondary: #4b5563; --accent-blue: #0070f3; --accent-red: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); background-image: radial-gradient(circle at 50% 0%, #172033 0%, #0b0e14 60%); color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 25px 20px 60px; }
+        .container { width: 100%; max-width: 960px; }
+        .top-nav { display: flex; justify-content: space-between; margin-bottom: 24px; }
+        .back-link { color: #60a5fa; text-decoration: none; font-weight: 700; }
+        .breadcrumbs { color: #94a3b8; font-size: 0.9rem; }
+        .header-section { text-align: center; padding: 10px 0 36px; }
+        .header-section h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+        .header-section p { color: #94a3b8; font-size: 1.05rem; }
+        .cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .card { background: var(--card-bg); color: var(--text-main); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 12px 30px rgba(0,0,0,0.25); transition: transform 0.25s; border-top: 5px solid var(--accent-blue); }
+        .card:hover { transform: translateY(-6px); }
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+        .icon-box { width: 52px; height: 52px; border-radius: 14px; background: #eff6ff; color: var(--accent-blue); display: flex; align-items: center; justify-content: center; }
+        .icon-box svg { width: 26px; height: 26px; stroke-width: 2; }
+        .badge { font-size: 0.78rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; }
+        .card h2 { font-size: 1.35rem; margin-bottom: 8px; }
+        .card p { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
+        .card-btn { display: flex; align-items: center; justify-content: center; padding: 12px 20px; border-radius: 10px; background-color: var(--accent-blue); color: #fff; font-weight: 700; text-decoration: none; }
+        .theme-pdf { border-top-color: var(--accent-red); }
+        .theme-pdf .icon-box { background: #fef2f2; color: var(--accent-red); }
+        .theme-pdf .badge { background: #fef2f2; color: #b91c1c; }
+        .theme-pdf .card-btn { background-color: var(--accent-red); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-nav">
+            <a href="../index.html" class="back-link">← חזרה למכניקה</a>
+            <span class="breadcrumbs">ראשי / מכניקה / כוחות</span>
+        </div>
+        <div class="header-section">
+            <h1>כוחות וחוקי ניוטון</h1>
+            <p>תרגול אינטראקטיבי וסיכום תיאורטי בדינמיקה</p>
+        </div>
+        <div class="cards-container">
+            <div class="card">
+                <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18L12 6z"/><line x1="12" y1="6" x2="18" y2="2"/></svg>
+                        </div>
+                        <span class="badge">תרגיל אינטראקטיבי</span>
+                    </div>
+                    <h2>תרגול דינמיקה וכוחות (004)</h2>
+                    <p>בניית פתרון צעד-אחר-צעד, תרשים כוחות ומשוואות תנועה.</p>
+                </div>
+                <a href="004.html" class="card-btn">כנסו לתרגיל ←</a>
+            </div>
+            <div class="card theme-pdf">
+                <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <span class="badge">PDF סיכום</span>
+                    </div>
+                    <h2>חוקי ניוטון - סיכום שיעור</h2>
+                    <p>החוק הראשון, השני והשלישי של ניוטון, כוח נורמלי וחיכוך (01-4).</p>
+                </div>
+                <a href="01_4_newton_laws.pdf" target="_blank" class="card-btn">פתח קובץ PDF ←</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

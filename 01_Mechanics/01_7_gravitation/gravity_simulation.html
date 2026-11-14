@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מעבדת כבידה</title>
+<style>
+:root{
+  /* layout: toolbar on top; the stage (canvas) sits beside one narrow column of controls; stacks on phones */
+  --bg:#e9edf4; --panel:#ffffff; --stage:#fbfcff; --ink:#0b1322; --muted:#475266; --line:#c3ccdb;
+  --accent:#d24a06; --blue:#1650d0; --red:#c2143c; --green:#0a7537; --violet:#6a2bd4; --teal:#087a85;
+  --pink:#ad1f88; --brown:#7a4a12;
+  --font:"Heebo","Rubik","Assistant","Segoe UI","Arial Hebrew","Noto Sans Hebrew",Arial,sans-serif;
+  --math:"Cambria Math","STIX Two Math","Times New Roman",serif;
+  --sh:clamp(430px,calc(100vh - 10.5rem),880px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#070b14; --panel:#111929; --stage:#060a13; --ink:#f3f6fb; --muted:#aab5c8; --line:#2b3852;
+    --accent:#ffb020; --blue:#62bcff; --red:#ff6f8f; --green:#4fe08a; --violet:#c9a6ff; --teal:#4fd8e0;
+    --pink:#ff8fdc; --brown:#e0a868;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#070b14; --panel:#111929; --stage:#060a13; --ink:#f3f6fb; --muted:#aab5c8; --line:#2b3852;
+  --accent:#ffb020; --blue:#62bcff; --red:#ff6f8f; --green:#4fe08a; --violet:#c9a6ff; --teal:#4fd8e0;
+  --pink:#ff8fdc; --brown:#e0a868;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{font-size:clamp(15px,0.55vw + 9px,21px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.4}
+.wrap{max-width:1900px;margin:0 auto;padding:.6rem clamp(16px,1.4vw,28px) 1.5rem;display:flex;flex-direction:column;gap:.6rem}
+.top{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+h1{font-size:1.3rem;margin:0;font-weight:800;white-space:nowrap}
+h1 b{color:var(--accent)}
+.tabs{display:flex;gap:.3rem;flex:1;min-width:0;overflow-x:auto;padding-bottom:2px}
+.tabs button{font:inherit;font-weight:700;font-size:.98rem;white-space:nowrap;padding:.45rem .8rem;border-radius:.6rem .6rem 0 0;
+  border:2px solid transparent;border-bottom:3px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+.tabs button:hover{color:var(--ink)}
+.tabs button.on{color:var(--ink);background:var(--panel);border-color:var(--line);border-bottom-color:var(--accent)}
+.bar{display:flex;align-items:center;gap:.5rem 1rem;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:.7rem;padding:.45rem .8rem}
+.btn{font:inherit;font-weight:700;padding:.4rem .9rem;border-radius:.55rem;border:2px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;min-width:4.6rem}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:var(--stage)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.spd{display:flex;align-items:center;gap:.5rem;font-weight:600;white-space:nowrap}
+.spd input{width:8.5rem}
+.chk{display:inline-flex;align-items:center;gap:.35rem;font-weight:600;cursor:pointer}
+.chk input{width:1.15rem;height:1.15rem;accent-color:var(--accent)}
+.clock{margin-inline-start:auto;font-weight:700;color:var(--muted)}
+input[type=range]{direction:ltr;accent-color:var(--accent);width:100%;height:1.5rem;margin:0}
+.num{font-variant-numeric:tabular-nums;unicode-bidi:isolate;direction:ltr;display:inline-block;font-weight:700}
+sup,sub{font-size:.72em;line-height:0}
+.tab{display:none;grid-template-columns:minmax(0,1fr) clamp(300px,31%,440px);gap:.7rem;align-items:start}
+.tab.on{display:grid}
+.stage{height:var(--sh);display:grid;gap:.6rem;min-width:0}
+.stage.two{grid-template-columns:1fr 1fr}
+.stage.multi{display:flex;flex-direction:column;gap:.5rem}
+.modebar button{font-size:.98rem;padding:.4rem .8rem}
+.sub{flex:1;min-height:0;min-width:0;display:grid;gap:.6rem}
+.sub.rows{grid-template-rows:38fr 62fr}
+.sub.cols{grid-template-columns:1.12fr 1fr}
+.stage.fg{grid-template-rows:38fr 62fr}
+.stage.en{grid-template-columns:1.2fr 1fr;grid-template-rows:1fr 1fr}
+.stage.en .cv:first-child{grid-row:1 / 3}
+.cv{position:relative;background:var(--stage);border:1px solid var(--line);border-radius:.7rem;overflow:hidden;min-height:0;min-width:0}
+.cv canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.side{display:flex;flex-direction:column;gap:.6rem;max-height:var(--sh);overflow-y:auto;padding-inline-end:2px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:.7rem;padding:.65rem .8rem;display:flex;flex-direction:column;gap:.5rem}
+.card.law{border-inline-start:5px solid var(--accent)}
+.card h2{font-size:1.08rem;margin:0}
+.card h3{font-size:.95rem;margin:0;color:var(--muted)}
+.card p{margin:0;font-size:.93rem;color:var(--muted)}
+.fx{direction:ltr;unicode-bidi:isolate;font-family:var(--math);font-size:1.3rem;text-align:center;display:flex;justify-content:center;align-items:center;gap:.4rem 1.3rem;flex-wrap:wrap;padding:.15rem 0}
+.fx i{font-style:italic}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;margin:0 .1em}
+.fr>span:first-child{border-bottom:2px solid currentColor;padding:0 .25em}
+.fr>span:last-child{padding:0 .25em}
+.rad{border-top:2px solid currentColor;padding:0 .15em;margin-inline-start:-.05em}
+.seg{display:flex;flex-wrap:wrap;gap:.3rem}
+.seg button,.mini{font:inherit;font-size:.88rem;font-weight:700;padding:.3rem .6rem;border-radius:.5rem;border:2px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.seg button.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.seg button:hover,.mini:hover{border-color:var(--ink)}
+.mini{direction:ltr;padding:.15rem .45rem;font-size:.82rem}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:.1rem .6rem;align-items:baseline}
+.ctl label{font-weight:600;font-size:.93rem}
+.ctl output{font-size:.98rem}
+.ctl .rng{grid-column:1 / -1;display:flex;gap:.35rem;align-items:center;direction:ltr}
+.ctl .full{grid-column:1 / -1}
+.ctl small,.alt{color:var(--muted);font-weight:600;font-size:.85em}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;padding:.22rem 0;border-bottom:1px dashed var(--line);font-size:.93rem}
+.row:last-child{border-bottom:0}
+.row .num{font-size:1.02rem;text-align:left;white-space:nowrap}
+.row.big .num{font-size:1.3rem;color:var(--accent)}
+.sw{display:inline-block;width:.8em;height:.8em;border-radius:50%;margin-inline-end:.35em;vertical-align:baseline}
+.gauge{height:.7rem;border-radius:.35rem;background:var(--line);direction:ltr;overflow:hidden}
+.gauge i{display:block;height:100%;width:0;background:var(--red)}
+.areas{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:.15rem .9rem;font-size:.9rem}
+.areas li{display:flex;justify-content:space-between;align-items:baseline;gap:.3rem}
+.tblw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+th,td{padding:.25rem .3rem;border-bottom:1px solid var(--line);text-align:start;white-space:nowrap}
+th{color:var(--muted);font-size:.8rem}
+td small{display:block;color:var(--muted);font-weight:600;font-size:.78rem}
+tr.mine td{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+.chip{display:inline-block;text-align:center;padding:.12rem .6rem;border-radius:1rem;font-weight:700;font-size:.9rem;border:2px solid var(--green);color:var(--green)}
+.chip.warn{border-color:var(--red);color:var(--red)}
+.chip.mid{border-color:var(--accent);color:var(--accent)}
+.hide{display:none!important}
+@media (max-width:900px){
+  .tab{grid-template-columns:minmax(0,1fr)}
+  .stage,.stage.two,.stage.fg,.stage.en{height:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:none}
+  .stage.en .cv:first-child{grid-row:auto}
+  .sub,.sub.rows,.sub.cols{grid-template-columns:minmax(0,1fr);grid-template-rows:none}
+  .cv{aspect-ratio:1 / 1;max-height:78vh}
+  .cv.wide{aspect-ratio:16 / 9}
+  .cv.gr{aspect-ratio:4 / 3}
+  .side{max-height:none;overflow:visible}
+  .clock{margin-inline-start:0}
+  .spd input{width:6.5rem}
+  h1{font-size:1.15rem}
+  .tabs{flex-basis:100%}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>מעבדת <b>כבידה</b></h1>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="נושאים">
+      <button role="tab" data-i="0">חוק קפלר הראשון</button>
+      <button role="tab" data-i="1">חוק קפלר השני</button>
+      <button role="tab" data-i="2">חוק קפלר השלישי</button>
+      <button role="tab" data-i="3">חוק הכבידה העולמי</button>
+      <button role="tab" data-i="4">אנרגיה של לוויין</button>
+    </nav>
+  </header>
+
+  <div class="bar" role="toolbar" aria-label="בקרת הסימולציה">
+    <button class="btn primary" id="btnPlay">עצור</button>
+    <button class="btn" id="btnReset">איפוס</button>
+    <label class="spd" for="spd">קצב הזמן
+      <input type="range" id="spd" min="-1" max="1" step="0.01" value="0">
+      <output class="num" id="spdOut" for="spd">×1.0</output>
+    </label>
+    <label class="chk"><input type="checkbox" id="chkVec" checked> וקטורים</label>
+    <label class="chk"><input type="checkbox" id="chkTrail" checked> מסלול</label>
+    <span class="clock" id="clock"></span>
+    <button class="btn" id="btnTheme">מצב כהה</button>
+  </div>
+
+  <!-- 1 -->
+  <section class="tab" id="p0" role="tabpanel">
+    <div class="stage"><div class="cv"><canvas id="cvK1"></canvas></div></div>
+    <aside class="side">
+      <div class="card law">
+        <h2>חוק קפלר הראשון</h2>
+        <div class="fx"><span><i>r</i><sub>min</sub> = <i>a</i>(1 − <i>e</i>)</span><span><i>r</i><sub>max</sub> = <i>a</i>(1 + <i>e</i>)</span></div>
+        <p>כל כוכב לכת נע במסלול אליפטי, והשמש נמצאת באחד ממוקדי האליפסה.</p>
+      </div>
+      <div class="card">
+        <div class="seg" id="k1Pre"></div>
+        <div class="ctl"><label for="k1a">חצי הציר הגדול <span class="num">a</span></label><output id="k1aO" for="k1a"></output>
+          <div class="rng"><input type="range" id="k1a" min="0.3" max="2.5" step="0.005"></div></div>
+        <div class="ctl"><label for="k1e">אקסצנטריות <span class="num">e</span></label><output id="k1eO" for="k1e"></output>
+          <div class="rng"><input type="range" id="k1e" min="0" max="0.9" step="0.001"></div></div>
+      </div>
+      <div class="card rows">
+        <div class="row"><span>מרחק מינימלי (פריהליון) <span class="num">r<sub>min</sub></span></span><span class="num" id="k1rmin"></span></div>
+        <div class="row"><span>מרחק מקסימלי (אפהליון) <span class="num">r<sub>max</sub></span></span><span class="num" id="k1rmax"></span></div>
+        <div class="row big"><span>המרחק הנוכחי מהשמש <span class="num">r</span></span><span class="num" id="k1r"></span></div>
+        <div class="row"><span>המרחק מהמוקד השני <span class="num">r′</span></span><span class="num" id="k1r2"></span></div>
+        <div class="row"><span>סכום המרחקים <span class="num">r + r′ = 2a</span></span><span class="num" id="k1sum"></span></div>
+        <div class="row"><span>זמן המחזור <span class="num">T</span></span><span id="k1T"></span></div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- 2 -->
+  <section class="tab" id="p1" role="tabpanel">
+    <div class="stage"><div class="cv"><canvas id="cvK2"></canvas></div></div>
+    <aside class="side">
+      <div class="card law">
+        <h2>חוק קפלר השני</h2>
+        <div class="fx"><span><span class="fr"><span>Δ<i>A</i></span><span>Δ<i>t</i></span></span> = const</span><span><i>v</i><sub>max</sub><i>r</i><sub>min</sub> = <i>v</i><sub>min</sub><i>r</i><sub>max</sub></span></div>
+        <p>הקו המחבר בין השמש לכוכב הלכת (רדיוס־וקטור) מכסה שטחים שווים בפרקי זמן שווים.</p>
+      </div>
+      <div class="card">
+        <div class="ctl"><label for="k2e">אקסצנטריות <span class="num">e</span></label><output id="k2eO" for="k2e"></output>
+          <div class="rng"><input type="range" id="k2e" min="0" max="0.9" step="0.01"></div></div>
+        <div class="ctl"><label>מספר פרקי הזמן השווים במחזור</label><span></span>
+          <div class="full seg" id="k2N"><button data-v="4">4</button><button data-v="6">6</button><button data-v="8">8</button><button data-v="12">12</button></div></div>
+      </div>
+      <div class="card">
+        <h3>שטחי הגזרות <span class="num">ΔA</span> (חישוב נומרי מהמסלול)</h3>
+        <ul class="areas" id="k2areas"></ul>
+        <div class="row"><span>קצב כיסוי השטח <span class="num">ΔA/Δt</span></span><span class="num" id="k2rate"></span></div>
+      </div>
+      <div class="card rows">
+        <div class="row"><span>פרק הזמן של כל גזרה <span class="num">Δt</span></span><span id="k2dt"></span></div>
+        <div class="row big"><span>המהירות הנוכחית <span class="num">v</span></span><span class="num" id="k2v"></span></div>
+        <div class="gauge" aria-hidden="true"><i id="k2g"></i></div>
+        <div class="row"><span>בפריהליון <span class="num">v<sub>max</sub></span></span><span class="num" id="k2vmax"></span></div>
+        <div class="row"><span>באפהליון <span class="num">v<sub>min</sub></span></span><span class="num" id="k2vmin"></span></div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- 3 -->
+  <section class="tab" id="p2" role="tabpanel">
+    <div class="stage two"><div class="cv"><canvas id="cvK3"></canvas></div><div class="cv gr"><canvas id="cvK3g"></canvas></div></div>
+    <aside class="side">
+      <div class="card law">
+        <h2>חוק קפלר השלישי</h2>
+        <div class="fx"><span><span class="fr"><span><i>T</i><sup>2</sup></span><span><i>a</i><sup>3</sup></span></span> = <span class="fr"><span>4π<sup>2</sup></span><span><i>GM</i></span></span></span></div>
+        <p>לכל הגופים הסובבים סביב אותו גוף מרכזי, היחס בין ריבוע זמן המחזור לחזקה השלישית של חצי הציר הגדול קבוע.</p>
+      </div>
+      <div class="card">
+        <div class="seg" id="k3Set"><button data-v="inner">כוכבי הלכת הפנימיים</button><button data-v="all">כל כוכבי הלכת</button><button data-v="sat">לווייני כדור הארץ</button></div>
+        <label class="chk"><input type="checkbox" id="k3Mine" checked> הוספת גוף משלי</label>
+        <div class="ctl" id="k3MineC"><label for="k3a">רדיוס המסלול של הגוף שלי <span class="num">a</span></label><output id="k3aO" for="k3a"></output>
+          <div class="rng"><input type="range" id="k3a" min="0" max="1" step="0.001" value="0.5"></div>
+          <span id="k3aT" style="grid-column:1 / -1"></span></div>
+        <label class="chk"><input type="checkbox" id="k3Log"> צירים לוגריתמיים בגרף</label>
+      </div>
+      <div class="card">
+        <div class="tblw"><table>
+          <thead><tr><th>גוף</th><th><span class="num">a (m)</span></th><th><span class="num">T (s)</span></th><th><span class="num">T²/a³ (s²/m³)</span></th></tr></thead>
+          <tbody id="k3tb"></tbody></table></div>
+        <div class="row"><span>הערך התאורטי <span class="num">4π²/GM</span></span><span class="num" id="k3th"></span></div>
+        <p>T מחושב לפי החוק מרדיוס המסלול האמיתי; הערכים הנמדדים שונים ממנו בפחות מ־1%.</p>
+      </div>
+    </aside>
+  </section>
+
+  <!-- 4 -->
+  <section class="tab" id="p3" role="tabpanel">
+    <div class="stage multi">
+      <div class="seg modebar" id="fgTop"><button data-v="two">כוח בין שני גופים</button><button data-v="g">תאוצת הנפילה החופשית</button><button data-v="sat">לוויין במסלול מעגלי</button><button data-v="fall">נפילה מתמדת</button></div>
+      <div class="sub rows" data-fg="two"><div class="cv wide"><canvas id="cvFG"></canvas></div><div class="cv gr"><canvas id="cvFGg"></canvas></div></div>
+      <div class="sub cols" data-fg="g"><div class="cv"><canvas id="cvGB"></canvas></div><div class="cv gr"><canvas id="cvGBg"></canvas></div></div>
+      <div class="sub cols" data-fg="sat"><div class="cv"><canvas id="cvGC"></canvas></div><div class="cv gr"><canvas id="cvGCg"></canvas></div></div>
+      <div class="sub cols" data-fg="fall"><div class="cv"><canvas id="cvGD"></canvas></div><div class="cv gr"><canvas id="cvGDa"></canvas></div></div>
+    </div>
+    <aside class="side">
+      <!-- two bodies -->
+      <div class="card law" data-fg="two">
+        <h2>חוק הכבידה העולמי</h2>
+        <div class="fx"><span><i>F</i> = <span class="fr"><span><i>GMm</i></span><span><i>r</i><sup>2</sup></span></span></span></div>
+        <p>כל שני גופים מושכים זה את זה בכוחות שווים בגודלם והפוכים בכיוונם, ביחס ישר למכפלת המסות וביחס הפוך לריבוע המרחק בין מרכזיהם.</p>
+      </div>
+      <div class="card" data-fg="two">
+        <div class="seg" id="fgPre"></div>
+        <div class="ctl"><label for="fgM">מסה <span class="num">M</span></label><output id="fgMO" for="fgM"></output>
+          <div class="rng"><button class="mini" data-t="fgM" data-k="-1">÷2</button><input type="range" id="fgM" min="0" max="31" step="0.001"><button class="mini" data-t="fgM" data-k="1">×2</button></div></div>
+        <div class="ctl"><label for="fgm">מסה <span class="num">m</span></label><output id="fgmO" for="fgm"></output>
+          <div class="rng"><button class="mini" data-t="fgm" data-k="-1">÷2</button><input type="range" id="fgm" min="0" max="31" step="0.001"><button class="mini" data-t="fgm" data-k="1">×2</button></div></div>
+        <div class="ctl"><label for="fgr">המרחק בין המרכזים <span class="num">r</span></label><output id="fgrO" for="fgr"></output>
+          <div class="rng"><button class="mini" data-t="fgr" data-k="-1">÷2</button><input type="range" id="fgr" min="-1" max="13" step="0.001"><button class="mini" data-t="fgr" data-k="1">×2</button></div></div>
+      </div>
+      <div class="card rows" data-fg="two">
+        <div class="row big"><span>הכוח הפועל על <span class="num">m</span></span><span class="num" id="fgF1"></span></div>
+        <div class="row big"><span>הכוח הפועל על <span class="num">M</span></span><span class="num" id="fgF2"></span></div>
+        <div class="row"><span>יחסית למצב ההתחלתי <span class="num">F/F<sub>0</sub></span></span><span class="num" id="fgRel"></span></div>
+      </div>
+      <!-- g -->
+      <div class="card law" data-fg="g">
+        <h2>תאוצת הנפילה החופשית</h2>
+        <div class="fx"><span><i>mg</i> = <span class="fr"><span><i>GMm</i></span><span>(<i>R</i> + <i>h</i>)<sup>2</sup></span></span></span><span>⇒ <i>g</i> = <span class="fr"><span><i>GM</i></span><span>(<i>R</i> + <i>h</i>)<sup>2</sup></span></span></span></div>
+        <p>כוח הכובד הפועל על גוף הוא כוח הכבידה שהכוכב מפעיל עליו, ולכן תאוצת הנפילה החופשית קטנה ביחס הפוך לריבוע המרחק ממרכז הכוכב.</p>
+      </div>
+      <div class="card" data-fg="g">
+        <div class="seg" id="gbPl"><button data-v="earth">כדור הארץ</button><button data-v="moon">הירח</button><button data-v="mars">מאדים</button></div>
+        <div class="ctl"><label for="gbh">גובה מעל פני השטח <span class="num">h</span></label><output id="gbhO" for="gbh"></output>
+          <div class="rng"><input type="range" id="gbh" min="0" step="10"></div></div>
+        <div class="seg" id="gbQ"><button data-v="0">על פני השטח</button><button data-v="400">400 ק״מ</button><button data-v="R"><span class="num">h = R</span></button><button data-v="2R"><span class="num">h = 2R</span></button></div>
+      </div>
+      <div class="card rows" data-fg="g">
+        <div class="row"><span>רדיוס הכוכב <span class="num">R</span></span><span class="num" id="gbR"></span></div>
+        <div class="row"><span>המרחק ממרכז הכוכב <span class="num">r = R + h</span></span><span class="num" id="gbr"></span></div>
+        <div class="row"><span>על פני השטח <span class="num">g<sub>0</sub> = GM/R²</span></span><span class="num" id="gbg0"></span></div>
+        <div class="row big"><span>בגובה <span class="num">h</span></span><span class="num" id="gbgh"></span></div>
+        <div class="gauge" aria-hidden="true"><i id="gbgb" style="background:var(--red)"></i></div>
+        <div class="row"><span>היחס <span class="num">g/g<sub>0</sub> = (R/r)²</span></span><span class="num" id="gbgr"></span></div>
+      </div>
+      <!-- circular satellite -->
+      <div class="card law" data-fg="sat">
+        <h2>לוויין במסלול מעגלי</h2>
+        <div class="fx"><span><span class="fr"><span><i>GMm</i></span><span><i>r</i><sup>2</sup></span></span> = <i>ma</i><sub>R</sub> = <span class="fr"><span><i>mv</i><sup>2</sup></span><span><i>r</i></span></span></span></div>
+        <div class="fx" style="font-size:1.1rem"><span>⇒ <i>v</i> = √<span class="rad"><i>GM</i>/<i>r</i></span></span><span><i>T</i> = <span class="fr"><span>2π<i>r</i></span><span><i>v</i></span></span></span></div>
+        <p>בכל נקודה במסלול כוח הכבידה הוא הכוח הרדיאלי (הצנטריפטלי); מהשוויון הזה מוצאים את המהירות, את זמן המחזור ואת התאוצה.</p>
+      </div>
+      <div class="card" data-fg="sat">
+        <div class="seg" id="gcPl"><button data-v="earth">כדור הארץ</button><button data-v="moon">הירח</button><button data-v="mars">מאדים</button></div>
+        <div class="ctl"><label for="gcR">רדיוס המסלול <span class="num">r</span></label><output id="gcRO" for="gcR"></output>
+          <div class="rng"><input type="range" id="gcR" step="10"></div></div>
+        <div class="ctl"><label for="gcM">מסת הלוויין <span class="num">m</span></label><output id="gcMO" for="gcM"></output>
+          <div class="rng"><input type="range" id="gcM" min="100" max="5000" step="100" value="1000"></div></div>
+      </div>
+      <div class="card rows" data-fg="sat">
+        <div class="row big"><span>כוח הכבידה <span class="num">GMm/r²</span></span><span class="num" id="gcF1"></span></div>
+        <div class="row big"><span>הכוח הרדיאלי <span class="num">mv²/r</span></span><span class="num" id="gcF2"></span></div>
+        <div class="row"><span>מהירות <span class="num">v</span></span><span class="num" id="gcv"></span></div>
+        <div class="row"><span>זמן המחזור <span class="num">T</span></span><span id="gcT"></span></div>
+        <div class="row"><span>תאוצה רדיאלית <span class="num">a<sub>R</sub> = v²/r</span></span><span class="num" id="gca"></span></div>
+        <div class="row"><span>תאוצת הנפילה החופשית במרחק <span class="num">r</span></span><span class="num" id="gcg"></span></div>
+      </div>
+      <!-- constant fall -->
+      <div class="card law" data-fg="fall">
+        <h2>נפילה מתמדת</h2>
+        <div class="fx"><span><i>mg′</i> − <i>N</i> = <span class="fr"><span><i>mv</i><sup>2</sup></span><span><i>r</i></span></span></span><span><span class="fr"><span><i>v</i><sup>2</sup></span><span><i>r</i></span></span> = <i>g′</i> ⇒ <i>N</i> = 0</span></div>
+        <p>הלוויין וכל מה שבתוכו נמצאים כל הזמן בנפילה חופשית: הם נופלים אל כדור הארץ, אך בגלל המהירות המשיקית אינם פוגעים בו. לכן הכוח הנורמלי <span class="num">N = 0</span>.</p>
+      </div>
+      <div class="card" data-fg="fall">
+        <h3>ירייה אופקית מראש מגדל בגובה 400 ק״מ</h3>
+        <div class="ctl"><label for="gdV">מהירות הירייה <span class="num">v<sub>0</sub></span></label><output id="gdVO" for="gdV"></output>
+          <div class="rng"><input type="range" id="gdV" min="0" max="120" step="1" value="60"></div></div>
+        <div class="seg"><button class="btn go" id="gdGo">שגר</button><button class="btn" id="gdCirc">שגר במהירות המעגלית</button><button class="btn" id="gdClr">נקה</button></div>
+        <div class="ctl"><label for="gdM">מסת האדם <span class="num">m</span></label><output id="gdMO" for="gdM"></output>
+          <div class="rng"><input type="range" id="gdM" min="40" max="120" step="1" value="70"></div></div>
+      </div>
+      <div class="card rows" data-fg="fall">
+        <div class="row"><span>תוצאת הירייה</span><span id="gdRes"></span></div>
+        <div class="row"><span>המהירות המעגלית בגובה זה <span class="num">√(GM/r)</span></span><span class="num" id="gdvc"></span></div>
+        <div class="row"><span>תאוצת הנפילה החופשית בגובה זה <span class="num">g′</span></span><span class="num" id="gdg"></span></div>
+        <div class="row big"><span>הכוח הנורמלי בתחנת החלל <span class="num">N</span></span><span class="num" id="gdN1"></span></div>
+        <div class="row"><span>הכוח הנורמלי על המגדל <span class="num">N = mg′</span></span><span class="num" id="gdN2"></span></div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- 5 -->
+  <section class="tab" id="p4" role="tabpanel">
+    <div class="stage multi">
+      <div class="seg modebar" id="enTop"><button data-v="tr">מעבר בין מסלולים</button><button data-v="free">מסלול אליפטי ומתקפים</button><button data-v="esc">מהירות מילוט</button></div>
+      <div class="sub cols" data-en="tr"><div class="cv"><canvas id="cvET"></canvas></div><div class="cv gr"><canvas id="cvETg"></canvas></div></div>
+      <div class="sub cols" data-en="free"><div class="cv"><canvas id="cvEN"></canvas></div><div class="cv gr"><canvas id="cvENg"></canvas></div></div>
+      <div class="sub cols" data-en="esc"><div class="cv"><canvas id="cvEE"></canvas></div><div class="cv gr"><canvas id="cvEEg"></canvas></div></div>
+    </div>
+    <aside class="side">
+      <!-- transfer -->
+      <div class="card law" data-en="tr">
+        <h2>מעבר ממסלול מעגלי אחד לאחר</h2>
+        <div class="fx"><span><i>E</i> = −<span class="fr"><span><i>GMm</i></span><span>2<i>r</i></span></span></span><span><i>W</i> = Δ<i>E</i> = <i>E</i><sub>2</sub> − <i>E</i><sub>1</sub></span></div>
+        <p>במעבר למסלול גבוה יותר האנרגיה הקינטית קטנה, האנרגיה הפוטנציאלית גדלה פי שניים, והאנרגיה הכוללת גדלה; המנוע מבצע עבודה השווה לשינוי באנרגיה הכוללת.</p>
+      </div>
+      <div class="card" data-en="tr">
+        <div class="seg" id="etPl"><button data-v="earth">כדור הארץ</button><button data-v="moon">הירח</button><button data-v="mars">מאדים</button></div>
+        <div class="ctl"><label for="etR1"><i class="sw" style="background:var(--teal)"></i>רדיוס מסלול 1 <span class="num">r<sub>1</sub></span></label><output id="etR1O" for="etR1"></output>
+          <div class="rng"><input type="range" id="etR1" step="10"></div></div>
+        <div class="ctl"><label for="etR2"><i class="sw" style="background:var(--violet)"></i>רדיוס מסלול 2 <span class="num">r<sub>2</sub></span></label><output id="etR2O" for="etR2"></output>
+          <div class="rng"><input type="range" id="etR2" step="10"></div></div>
+        <div class="ctl"><label for="etM">מסת הלוויין <span class="num">m</span></label><output id="etMO" for="etM"></output>
+          <div class="rng"><input type="range" id="etM" min="100" max="5000" step="100" value="1000"></div></div>
+        <div class="seg"><button class="btn go" id="etGo">מעבר למסלול 2</button></div>
+      </div>
+      <div class="card" data-en="tr">
+        <div class="tblw"><table>
+          <thead><tr><th></th><th>מסלול 1</th><th>מסלול 2</th><th>השינוי <span class="num">Δ</span></th></tr></thead>
+          <tbody id="etTb"></tbody></table></div>
+        <div class="row big"><span>עבודת המנוע <span class="num">W = ΔE</span></span><span class="num" id="etW"></span></div>
+        <div class="row"><span>האנרגיה הכוללת במסלול המעבר האליפטי</span><span class="num" id="etEt"></span></div>
+      </div>
+      <div class="card rows" data-en="tr">
+        <div class="row"><span>מצב הלוויין</span><span id="etSt"></span></div>
+        <div class="row"><span>המרחק ממרכז הכוכב <span class="num">r</span></span><span class="num" id="etr"></span></div>
+        <div class="row"><span>מהירות <span class="num">v</span></span><span class="num" id="etv"></span></div>
+        <div class="row"><span><i class="sw" style="background:var(--blue)"></i>אנרגיה קינטית <span class="num">E<sub>k</sub></span></span><span class="num" id="etEk"></span></div>
+        <div class="row"><span><i class="sw" style="background:var(--red)"></i>אנרגיה פוטנציאלית כובדית <span class="num">E<sub>p</sub> (U)</span></span><span class="num" id="etEp"></span></div>
+        <div class="row big"><span><i class="sw" style="background:var(--green)"></i>אנרגיה כוללת <span class="num">E</span></span><span class="num" id="etE"></span></div>
+      </div>
+      <!-- free -->
+      <div class="card law" data-en="free">
+        <h2>אנרגיה של לוויין</h2>
+        <div class="fx"><span><i>E</i> = <i>E</i><sub>k</sub> + <i>E</i><sub>p</sub> = <span class="fr"><span><i>mv</i><sup>2</sup></span><span>2</span></span> − <span class="fr"><span><i>GMm</i></span><span><i>r</i></span></span></span></div>
+        <div class="fx" id="enCircFx" style="font-size:1.1rem"><span><i>v</i> = √<span class="rad"><i>GM</i>/<i>r</i></span></span><span><i>E</i><sub>k</sub> = <span class="fr"><span><i>GMm</i></span><span>2<i>r</i></span></span></span><span><i>E</i> = −<span class="fr"><span><i>GMm</i></span><span>2<i>r</i></span></span></span></div>
+        <p>במסלול אליפטי האנרגיה הקינטית והאנרגיה הפוטנציאלית משתנות, אך סכומן נשמר; מתקף משנה את האנרגיה הכוללת ואת צורת המסלול.</p>
+      </div>
+      <div class="card" data-en="free">
+        <div class="seg" id="enPl"><button data-v="earth">כדור הארץ</button><button data-v="moon">הירח</button><button data-v="mars">מאדים</button></div>
+        <div class="seg" id="enMode"><button data-v="circ">מסלול מעגלי</button><button data-v="ell">מסלול אליפטי</button></div>
+        <div class="ctl"><label for="enR" id="enRL"></label><output id="enRO" for="enR"></output>
+          <div class="rng"><input type="range" id="enR" step="10"></div></div>
+        <div class="ctl" id="enEC"><label for="enE">אקסצנטריות <span class="num">e</span></label><output id="enEO" for="enE"></output>
+          <div class="rng"><input type="range" id="enE" min="0.05" max="0.85" step="0.01" value="0.5"></div></div>
+        <div class="ctl"><label for="enM">מסת הלוויין <span class="num">m</span></label><output id="enMO" for="enM"></output>
+          <div class="rng"><input type="range" id="enM" min="100" max="5000" step="100" value="1000"></div></div>
+      </div>
+      <div class="card" data-en="free">
+        <div class="ctl"><label for="enDv">שינוי המהירות במתקף</label><output id="enDvO" for="enDv"></output>
+          <div class="rng"><input type="range" id="enDv" min="-40" max="60" step="1" value="20"></div></div>
+        <div class="seg"><button class="btn go" id="enKick">תן מתקף</button><button class="btn" id="enEsc">מתקף עד מהירות המילוט</button></div>
+      </div>
+      <div class="card rows" data-en="free">
+        <div class="row"><span>סוג המסלול</span><span id="enType"></span></div>
+        <div class="row"><span>המרחק ממרכז הכוכב <span class="num">r</span></span><span class="num" id="enr"></span></div>
+        <div class="row"><span>מהירות <span class="num">v</span></span><span class="num" id="env"></span></div>
+        <div class="row"><span>זמן המחזור <span class="num">T</span></span><span id="enT"></span></div>
+        <div class="row"><span><i class="sw" style="background:var(--blue)"></i>אנרגיה קינטית <span class="num">E<sub>k</sub></span></span><span class="num" id="enEk"></span></div>
+        <div class="row"><span><i class="sw" style="background:var(--red)"></i>אנרגיה פוטנציאלית כובדית <span class="num">E<sub>p</sub> (U)</span></span><span class="num" id="enEp"></span></div>
+        <div class="row big"><span><i class="sw" style="background:var(--green)"></i>אנרגיה כוללת <span class="num">E</span></span><span class="num" id="enEt"></span></div>
+        <div class="row"><span>מהירות מעגלית במרחק <span class="num">r</span></span><span class="num" id="envc"></span></div>
+        <div class="row"><span>מהירות המילוט במרחק <span class="num">r</span></span><span class="num" id="enve"></span></div>
+      </div>
+      <!-- escape -->
+      <div class="card law" data-en="esc">
+        <h2>מהירות מילוט</h2>
+        <div class="fx"><span><span class="fr"><span><i>mv</i><sup>2</sup></span><span>2</span></span> − <span class="fr"><span><i>GMm</i></span><span><i>r</i></span></span> = <i>E</i><sub>k∞</sub> + <i>E</i><sub>p∞</sub> = 0</span></div>
+        <div class="fx" style="font-size:1.15rem"><span>⇒ <i>v</i> = √<span class="rad">2<i>GM</i>/<i>r</i></span></span></div>
+        <p>מהירות המילוט היא המהירות שבה הגוף מגיע לאין־סוף כשגם האנרגיה הפוטנציאלית הכובדית וגם האנרגיה הקינטית שלו שוות לאפס, כלומר האנרגיה הכוללת היא אפס.</p>
+      </div>
+      <div class="card" data-en="esc">
+        <div class="seg" id="eePl"><button data-v="earth">כדור הארץ</button><button data-v="moon">הירח</button><button data-v="mars">מאדים</button></div>
+        <div class="ctl"><label for="eeR0">מרחק השיגור מהמרכז <span class="num">r<sub>0</sub></span></label><output id="eeR0O" for="eeR0"></output>
+          <div class="rng"><input type="range" id="eeR0" step="10"></div></div>
+        <div class="ctl"><label for="eeV">מהירות השיגור <span class="num">v<sub>0</sub></span></label><output id="eeVO" for="eeV"></output>
+          <div class="rng"><input type="range" id="eeV" min="20" max="130" step="1" value="80"></div></div>
+        <div class="ctl"><label for="eeM">מסת הגוף <span class="num">m</span></label><output id="eeMO" for="eeM"></output>
+          <div class="rng"><input type="range" id="eeM" min="100" max="5000" step="100" value="1000"></div></div>
+        <div class="seg"><button class="btn go" id="eeGo">שגר</button><button class="btn" id="eeEx">שגר בדיוק במהירות המילוט</button></div>
+      </div>
+      <div class="card rows" data-en="esc">
+        <div class="row"><span>מצב</span><span id="eeSt"></span></div>
+        <div class="row big"><span>מהירות המילוט מנקודת השיגור</span><span class="num" id="eeve"></span></div>
+        <div class="row"><span>מהירות השיגור <span class="num">v<sub>0</sub></span></span><span class="num" id="eev0"></span></div>
+        <div class="row big"><span><i class="sw" style="background:var(--green)"></i>אנרגיה כוללת <span class="num">E</span></span><span class="num" id="eeE"></span></div>
+        <div class="row"><span><i class="sw" style="background:var(--blue)"></i>אנרגיה קינטית <span class="num">E<sub>k</sub></span></span><span class="num" id="eeEk"></span></div>
+        <div class="row"><span><i class="sw" style="background:var(--red)"></i>אנרגיה פוטנציאלית כובדית <span class="num">E<sub>p</sub> (U)</span></span><span class="num" id="eeEp"></span></div>
+        <div class="row"><span>המרחק המרבי מהמרכז <span class="num">r<sub>max</sub></span></span><span class="num" id="eermax"></span></div>
+        <div class="row"><span>המרחק הנוכחי <span class="num">r</span></span><span class="num" id="eer"></span></div>
+        <div class="row"><span>המהירות הנוכחית <span class="num">v</span></span><span class="num" id="eev"></span></div>
+      </div>
+    </aside>
+  </section>
+</div>
+
+<script>
+'use strict';
+/*PHYS-BEGIN*/
+const G=6.674e-11, TAU=2*Math.PI, AU=1.495978707e11, DAY=86400, YEAR=365.25*DAY;
+const M_SUN=1.989e30, MU_SUN=G*M_SUN;
+const BODY={
+  earth:{he:'כדור הארץ',M:5.972e24,R:6.371e6},
+  moon:{he:'הירח',M:7.342e22,R:1.7374e6},
+  mars:{he:'מאדים',M:6.417e23,R:3.3895e6}
+};
+// Kepler's equation  M = E - e sinE  (elliptic), Newton iteration
+function solveE(M,e){
+  M=M-TAU*Math.floor(M/TAU);
+  let E=e<0.8?M:Math.PI;
+  for(let i=0;i<60;i++){const d=(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));E-=d;if(Math.abs(d)<1e-14)break;}
+  return E;
+}
+// hyperbolic Kepler equation  M = e sinhH - H
+function solveH(M,e){
+  let H=Math.abs(M)>3*e?Math.sign(M)*Math.log(2*Math.abs(M)/e+1.8):Math.asinh(M/e);
+  for(let i=0;i<200;i++){const d=(e*Math.sinh(H)-H-M)/(e*Math.cosh(H)-1);H-=d;if(Math.abs(d)<1e-13*(1+Math.abs(H)))break;}
+  return H;
+}
+function periodOf(a,mu){return TAU*Math.sqrt(a*a*a/mu);}
+// state on an ellipse, focus at origin, periapsis on +x, t measured from periapsis
+function ellipseState(a,e,mu,t){
+  const n=Math.sqrt(mu/(a*a*a)),E=solveE(n*t,e),cE=Math.cos(E),sE=Math.sin(E),b=a*Math.sqrt(1-e*e);
+  const r=a*(1-e*cE),Ed=n/(1-e*cE);
+  return {x:a*(cE-e),y:b*sE,r,vx:-a*sE*Ed,vy:b*cE*Ed,v:Math.sqrt(mu*(2/r-1/a)),E};
+}
+// polygon of the sector swept during the k-th of N equal time intervals (frac<1: partly swept); area by triangle fan
+function sectorPoints(a,e,k,N,K,frac){
+  if(frac===undefined)frac=1;
+  const E0=solveE(TAU*k/N,e),E1=(k+frac>=N-1e-12)?TAU:solveE(TAU*(k+frac)/N,e),b=a*Math.sqrt(1-e*e);
+  const n=Math.max(2,Math.ceil(K*frac)),pts=[];let A=0,px=0,py=0;
+  for(let j=0;j<=n;j++){const E=E0+(E1-E0)*j/n,x=a*(Math.cos(E)-e),y=b*Math.sin(E);if(j)A+=0.5*(px*y-x*py);pts.push([x,y]);px=x;py=y;}
+  return {pts,area:A,Emid:(E0+E1)/2};
+}
+// orbital elements from a state vector (2D)
+function elements(x,y,vx,vy,mu){
+  const r=Math.hypot(x,y);let v2=vx*vx+vy*vy,eps=v2/2-mu/r;
+  if(Math.abs(eps)<1e-7*mu/r){vx*=1+1e-6;vy*=1+1e-6;v2=vx*vx+vy*vy;eps=v2/2-mu/r;}
+  const h=x*vy-y*vx,s=h>=0?1:-1,rv=x*vx+y*vy;
+  const ex=((v2-mu/r)*x-rv*vx)/mu,ey=((v2-mu/r)*y-rv*vy)/mu;let e=Math.hypot(ex,ey);
+  const w=e>1e-8?Math.atan2(ey,ex):Math.atan2(y,x);if(e<=1e-8)e=0;
+  let nu=s*(Math.atan2(y,x)-w);nu=Math.atan2(Math.sin(nu),Math.cos(nu));
+  const a=-mu/(2*eps),o={mu,e,w,s,a,eps,h:Math.abs(h)};
+  if(eps<0){
+    const E0=2*Math.atan2(Math.sqrt(1-e)*Math.sin(nu/2),Math.sqrt(1+e)*Math.cos(nu/2));
+    o.M0=E0-e*Math.sin(E0);o.n=Math.sqrt(mu/(a*a*a));o.T=TAU/o.n;o.rp=a*(1-e);o.ra=a*(1+e);o.b=a*Math.sqrt(1-e*e);
+  }else{
+    const A=-a,H0=2*Math.atanh(Math.sqrt((e-1)/(e+1))*Math.tan(nu/2));
+    o.A=A;o.M0=e*Math.sinh(H0)-H0;o.n=Math.sqrt(mu/(A*A*A));o.T=Infinity;o.rp=A*(e-1);o.ra=Infinity;o.b=A*Math.sqrt(e*e-1);
+  }
+  return o;
+}
+function orbState(o,t){
+  const M=o.M0+o.n*t;let xp,yp,vxp,vyp;
+  if(o.eps<0){
+    const E=solveE(M,o.e),c=Math.cos(E),s=Math.sin(E),Ed=o.n/(1-o.e*c);
+    xp=o.a*(c-o.e);yp=o.b*s;vxp=-o.a*s*Ed;vyp=o.b*c*Ed;
+  }else{
+    const H=solveH(M,o.e),c=Math.cosh(H),s=Math.sinh(H),Hd=o.n/(o.e*c-1);
+    xp=o.A*(o.e-c);yp=o.b*s;vxp=-o.A*s*Hd;vyp=o.b*c*Hd;
+  }
+  yp*=o.s;vyp*=o.s;
+  const cw=Math.cos(o.w),sw=Math.sin(o.w);
+  const x=xp*cw-yp*sw,y=xp*sw+yp*cw,vx=vxp*cw-vyp*sw,vy=vxp*sw+vyp*cw;
+  return {x,y,vx,vy,r:Math.hypot(x,y),v:Math.hypot(vx,vy)};
+}
+/*PHYS-END*/
+
+/* ---------- formatting ---------- */
+function fmt(x,sig){
+  if(sig===undefined)sig=3;
+  if(x===0)return '0';
+  if(!isFinite(x))return '∞';
+  const neg=x<0,ax=Math.abs(x);let s;
+  if(ax>=0.01&&ax<1e4){s=ax>=Math.pow(10,sig)?ax.toFixed(0):ax.toPrecision(sig);if(s.indexOf('e')>=0)s=String(Number(s));}
+  else{let e=Math.floor(Math.log10(ax)),m=(ax/Math.pow(10,e)).toFixed(sig-1);
+    if(parseFloat(m)>=10){e++;m=(ax/Math.pow(10,e)).toFixed(sig-1);}
+    s=m+'×10^{'+(e<0?'−'+(-e):e)+'}';}
+  return (neg?'−':'')+s;
+}
+const H=s=>s.replace(/\^\{([^}]*)\}/g,'<sup>$1</sup>').replace(/_\{([^}]*)\}/g,'<sub>$1</sub>');
+const V=(x,u,sig)=>H(fmt(x,sig))+(u?' '+u:'');
+function tP(s){
+  const a=Math.abs(s);let v,u;
+  if(a<120){v=s;u='שניות';}else if(a<7200){v=s/60;u='דקות';}else if(a<2*DAY){v=s/3600;u='שעות';}
+  else if(a<2*YEAR){v=s/DAY;u='ימים';}else{v=s/YEAR;u='שנים';}
+  return [H(fmt(v,3)),u];
+}
+function tHe(s){const p=tP(s);return '<span class="num">'+p[0]+'</span> '+p[1];}
+const EL={};
+function set(id,html){const el=EL[id]||(EL[id]=document.getElementById(id));if(el.__h!==html){el.__h=html;el.innerHTML=html;}}
+const $=id=>document.getElementById(id);
+
+/* ---------- canvas helpers ---------- */
+let REM=16;const C={};const FONT=getComputedStyle(document.documentElement).getPropertyValue('--font')||'sans-serif';
+const TOK=['bg','panel','stage','ink','muted','line','accent','blue','red','green','violet','teal','pink','brown'];
+function readColors(){const s=getComputedStyle(document.documentElement);TOK.forEach(k=>C[k]=s.getPropertyValue('--'+k).trim());REM=parseFloat(s.fontSize)||16;}
+function alpha(hex,a){const n=parseInt(hex.slice(1),16);return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')';}
+function mkCanvas(id){
+  const c=$(id),ctx=c.getContext('2d'),o={c,ctx,w:0,h:0};
+  o.fit=()=>{const r=c.getBoundingClientRect(),d=Math.min(window.devicePixelRatio||1,2.5),w=Math.max(60,Math.round(r.width)),h=Math.max(60,Math.round(r.height));
+    if(c.width!==Math.round(w*d)||c.height!==Math.round(h*d)){c.width=Math.round(w*d);c.height=Math.round(h*d);}
+    o.w=w;o.h=h;ctx.setTransform(d,0,0,d,0,0);ctx.fillStyle=C.stage;ctx.fillRect(0,0,w,h);ctx.setLineDash([]);ctx.lineCap='round';ctx.lineJoin='round';};
+  return o;
+}
+// LTR text with ^{..} superscripts and _{..} subscripts
+function rt(ctx,s,x,y,o){
+  o=o||{};const size=o.size||0.85*REM,wgt=o.bold===false?'500':'700';
+  const parts=[],re=/([\^_])\{([^}]*)\}/g;let i=0,m;
+  while((m=re.exec(s))){if(m.index>i)parts.push({t:s.slice(i,m.index),k:0});parts.push({t:m[2],k:m[1]==='^'?1:-1});i=re.lastIndex;}
+  if(i<s.length)parts.push({t:s.slice(i),k:0});
+  const f0=wgt+' '+size+'px '+FONT,f1=wgt+' '+size*0.7+'px '+FONT;let W=0;
+  ctx.save();ctx.direction='ltr';ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  parts.forEach(p=>{ctx.font=p.k?f1:f0;p.w=ctx.measureText(p.t).width;W+=p.w;});
+  let cx=o.align==='center'?x-W/2:o.align==='right'?x-W:x;
+  if(o.clampW){cx=Math.max(4,Math.min(o.clampW-W-4,cx));}
+  if(o.bg){ctx.fillStyle=o.bg;ctx.fillRect(cx-3,y-size*1.0,W+6,size*1.35);}
+  ctx.fillStyle=o.color||C.ink;
+  parts.forEach(p=>{ctx.font=p.k?f1:f0;ctx.fillText(p.t,cx,y+(p.k===1?-size*0.42:p.k===-1?size*0.22:0));cx+=p.w;});
+  ctx.restore();return W;
+}
+function heb(ctx,s,x,y,o){
+  o=o||{};const size=o.size||0.8*REM;ctx.save();ctx.direction='rtl';ctx.font=(o.bold?'700 ':'600 ')+size+'px '+FONT;
+  ctx.textBaseline='alphabetic';const W=ctx.measureText(s).width;let al=o.align||'center';
+  if(o.clampW){let l=al==='center'?x-W/2:al==='right'?x-W:x;l=Math.max(4,Math.min(o.clampW-W-4,l));x=l;al='left';}
+  ctx.textAlign=al;ctx.fillStyle=o.color||C.ink;ctx.fillText(s,x,y);ctx.restore();return W;
+}
+function arrow(ctx,x1,y1,x2,y2,col,lw){
+  const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy);if(L<1.5)return;const ux=dx/L,uy=dy/L,hd=Math.min(L*0.55,lw*3.8);
+  ctx.save();ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=lw;ctx.lineCap='round';ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2-ux*hd*0.8,y2-uy*hd*0.8);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-ux*hd-uy*hd*0.55,y2-uy*hd+ux*hd*0.55);ctx.lineTo(x2-ux*hd+uy*hd*0.55,y2-uy*hd-ux*hd*0.55);ctx.closePath();ctx.fill();ctx.restore();
+}
+function disc(ctx,x,y,r,col,ring){ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fillStyle=col;ctx.fill();if(ring){ctx.lineWidth=2;ctx.strokeStyle=ring;ctx.stroke();}}
+function seg(ctx,x1,y1,x2,y2,col,lw,dash){ctx.save();ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.setLineDash(dash||[]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();}
+function dim(ctx,x1,x2,y,col,label,W){
+  seg(ctx,x1,y,x2,y,col,2.5);seg(ctx,x1,y-5,x1,y+5,col,2.5);seg(ctx,x2,y-5,x2,y+5,col,2.5);
+  rt(ctx,label,(x1+x2)/2,y+1.05*REM,{align:'center',color:col,clampW:W});
+}
+function apsis(ctx,txt,xe,cy,dir,w){ctx.save();ctx.font='600 '+0.8*REM+'px '+FONT;const W=ctx.measureText(txt).width;ctx.restore();
+  const out=dir>0?(xe+8+W<w-4):(xe-8-W>4);
+  if(out)heb(ctx,txt,xe+dir*8,cy-0.5*REM,{align:dir>0?'left':'right',color:C.muted});
+  else heb(ctx,txt,xe-dir*8,cy-0.6*REM,{align:dir>0?'right':'left',color:C.muted});}
+function sun(ctx,x,y,r){const g=ctx.createRadialGradient(x,y,r*0.3,x,y,r*2.4);g.addColorStop(0,alpha(C.accent,0.55));g.addColorStop(1,alpha(C.accent,0));
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r*2.4,0,TAU);ctx.fill();disc(ctx,x,y,r,C.accent);}
+function niceStep(range,n){const raw=range/(n||5),p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p;return (f<1.5?1:f<3.5?2:f<7.5?5:10)*p;}
+// axes frame; returns mapping functions
+function axes(cv,o){
+  const {ctx,w,h}=cv,fs=0.72*REM,L=3.1*REM,R=1.1*REM,T=2.9*REM,B=2.9*REM,X0=L,X1=w-R,Y0=h-B,Y1=T;
+  const lx0=o.log?Math.log10(o.x0):0,lx1=o.log?Math.log10(o.x1):0,ly0=o.log?Math.log10(o.y0):0,ly1=o.log?Math.log10(o.y1):0;
+  const fx=o.log?v=>X0+(Math.log10(v)-lx0)/(lx1-lx0)*(X1-X0):v=>X0+(v-o.x0)/(o.x1-o.x0)*(X1-X0);
+  const fy=o.log?v=>Y0-(Math.log10(v)-ly0)/(ly1-ly0)*(Y0-Y1):v=>Y0-(v-o.y0)/(o.y1-o.y0)*(Y0-Y1);
+  ctx.save();
+  let xt=o.xs,yt=o.ys;
+  if(o.log){
+    const tick=(l0,l1,horiz)=>{const span=l1-l0,st=Math.max(1,Math.ceil(span/6));
+      for(let k=Math.ceil(l0);k<=Math.floor(l1+1e-9);k+=st){const v=Math.pow(10,k);
+        if(horiz){const X=fx(v);seg(ctx,X,Y0,X,Y1,C.line,1);rt(ctx,'10^{'+(k<0?'−'+(-k):k)+'}',X,Y0+1.15*REM,{align:'center',size:fs,color:C.muted});}
+        else{const Y=fy(v);seg(ctx,X0,Y,X1,Y,C.line,1);rt(ctx,'10^{'+(k<0?'−'+(-k):k)+'}',X0-0.35*REM,Y+fs*0.35,{align:'right',size:fs,color:C.muted});}}};
+    tick(lx0,lx1,true);tick(ly0,ly1,false);xt+=' ('+o.xu+')';yt+=' ('+o.yu+')';
+  }else{
+    const ax=(v0,v1,horiz)=>{const st=niceStep(v1-v0,horiz?Math.max(3,Math.min(6,(X1-X0)/(4.2*REM))):Math.max(3,Math.min(6,(Y0-Y1)/(2.2*REM))));
+      let pw=Math.floor(Math.log10(Math.max(Math.abs(v0),Math.abs(v1))));if(pw>=-2&&pw<=3)pw=0;const sc=Math.pow(10,pw);
+      for(let v=Math.ceil(v0/st-1e-9)*st;v<=v1+st*1e-6;v+=st){
+        const lab=String(+(v/sc).toFixed(2)).replace('-','−');
+        if(horiz){const X=fx(v);seg(ctx,X,Y0,X,Y1,C.line,1);rt(ctx,lab,X,Y0+1.15*REM,{align:'center',size:fs,color:C.muted});}
+        else{const Y=fy(v);seg(ctx,X0,Y,X1,Y,C.line,Math.abs(v)<st*1e-6?0:1);rt(ctx,lab,X0-0.35*REM,Y+fs*0.35,{align:'right',size:fs,color:C.muted});}}
+      return pw;};
+    const px=ax(o.x0,o.x1,true),py=ax(o.y0,o.y1,false);
+    const ex=p=>p?'×10^{'+(p<0?'−'+(-p):p)+'} ':'';
+    xt+=' ('+ex(px)+o.xu+')';yt+=' ('+ex(py)+o.yu+')';
+  }
+  ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.setLineDash([]);
+  const yz=(!o.log&&o.y0<0&&o.y1>0)?fy(0):Y0;
+  ctx.beginPath();ctx.moveTo(X0,Y1);ctx.lineTo(X0,Y0);ctx.stroke();ctx.beginPath();ctx.moveTo(X0,yz);ctx.lineTo(X1,yz);ctx.stroke();
+  rt(ctx,xt,X1,h-0.6*REM,{align:'right',size:0.8*REM});
+  rt(ctx,yt,0.5*REM,2.2*REM,{size:0.8*REM});
+  if(o.title)heb(ctx,o.title,w-0.6*REM,1.1*REM,{align:'right',bold:true,size:0.85*REM});
+  ctx.restore();
+  return {fx,fy,X0,X1,Y0,Y1,clip(){ctx.save();ctx.beginPath();ctx.rect(X0,Y1-2,X1-X0+2,Y0-Y1+4);ctx.clip();},unclip(){ctx.restore();}};
+}
+function bindSeg(id,fn){const el=$(id);el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!el.contains(b))return;fn(b.dataset.v,b);});}
+function markSeg(id,v){[...$(id).children].forEach(b=>b.classList.toggle('on',b.dataset.v===String(v)));}
+
+const OPT={vec:true,trail:true};
+
+/* ================= 1: first law ================= */
+const K1={
+  aMax:2.5,pre:[['כוכב חמה',0.387,0.206],['כדור הארץ',1,0.017],['מאדים',1.524,0.093],['שביט אנקה',2.215,0.848]],
+  init(){this.cv=mkCanvas('cvK1');
+    $('k1Pre').innerHTML=this.pre.map((p,i)=>'<button data-v="'+i+'">'+p[0]+'</button>').join('');
+    bindSeg('k1Pre',v=>{const p=this.pre[+v];this.a=p[1];this.e=p[2];this.t=0;this.sync();});
+    $('k1a').addEventListener('input',e=>{this.a=+e.target.value;this.sync(1);});
+    $('k1e').addEventListener('input',e=>{this.e=+e.target.value;this.sync(1);});
+    this.reset();},
+  reset(){this.a=1.6;this.e=0.6;this.t=0;this.sync();},
+  sync(noSl){if(!noSl){$('k1a').value=this.a;$('k1e').value=this.e;}
+    set('k1aO','<span class="num">'+V(this.a*AU,'m')+'</span> <small class="num">('+this.a.toFixed(2)+' AU)</small>');
+    set('k1eO','<span class="num">'+this.e.toFixed(3)+'</span>');
+    const A=this.a*AU;set('k1rmin',V(A*(1-this.e),'m'));set('k1rmax',V(A*(1+this.e),'m'));set('k1sum',V(2*A,'m'));
+    this.T=periodOf(A,MU_SUN);set('k1T',tHe(this.T));},
+  step(dt){this.t+=dt*YEAR/8;},
+  clock(){return this.t;},
+  read(){const A=this.a*AU,st=ellipseState(A,this.e,MU_SUN,this.t);set('k1r',V(st.r,'m'));set('k1r2',V(2*A-st.r,'m'));},
+  draw(){
+    const cv=this.cv;cv.fit();const {ctx,w,h}=cv,e=this.e;
+    const S=Math.min(w/2-1.2*REM,h/2-2.9*REM)/this.aMax,cx=w/2,cy=h/2,a=this.a*S,b=a*Math.sqrt(1-e*e),c=a*e,sx=cx+c;
+    const st=ellipseState(this.a*AU,e,MU_SUN,this.t),px=sx+st.x/AU*S,py=cy-st.y/AU*S;
+    seg(ctx,cx-a,cy,cx+a,cy,C.line,1.5,[6,6]);
+    if(OPT.trail){ctx.beginPath();ctx.ellipse(cx,cy,a,b,0,0,TAU);ctx.strokeStyle=C.ink;ctx.lineWidth=2.5;ctx.stroke();}
+    const yd=cy+1.2*REM;
+    dim(ctx,sx,cx+a,yd,C.green,'r_{min}',w);dim(ctx,cx-a,sx,yd,C.violet,'r_{max}',w);
+    seg(ctx,cx-c,cy,px,py,C.muted,1.5,[4,5]);
+    seg(ctx,sx,cy,px,py,C.accent,3.5);
+    // foci
+    disc(ctx,cx-c,cy,0.24*REM,C.stage,C.ink);
+    sun(ctx,sx,cy,0.55*REM);
+    heb(ctx,'השמש',sx,cy-2.25*REM,{bold:true,color:C.accent,clampW:w});
+    rt(ctx,'F_{1}',sx,cy-1.15*REM,{align:'center',clampW:w});
+    if(2*c>2.4*REM)rt(ctx,'F_{2}',cx-c,cy-0.8*REM,{align:'center'});
+    // apsides
+    apsis(ctx,'פריהליון',cx+a,cy,1,w);apsis(ctx,'אפהליון',cx-a,cy,-1,w);
+    disc(ctx,cx+a,cy,3.5,C.green);disc(ctx,cx-a,cy,3.5,C.violet);
+    // labels r
+    const mx=sx+(px-sx)*0.68,my=cy+(py-cy)*0.68,L=Math.hypot(px-sx,py-cy)||1,nx=-(py-cy)/L,ny=(px-sx)/L;
+    rt(ctx,'r',mx+nx*0.8*REM,my+ny*0.8*REM+0.3*REM,{align:'center',color:C.accent,size:REM});
+    if(OPT.vec){const k=0.085*REM/1000;arrow(ctx,px,py,px+st.vx*k,py-st.vy*k,C.red,3.5);
+      rt(ctx,'v',px+st.vx*k+0.5*REM*Math.sign(st.vx||1),py-st.vy*k,{align:'center',color:C.red,size:REM});}
+    disc(ctx,px,py,0.42*REM,C.blue,C.stage);
+    rt(ctx,'r = '+fmt(st.r)+' m',0.8*REM,1.6*REM,{size:1.1*REM,color:C.accent});
+  }
+};
+
+/* ================= 2: second law ================= */
+const K2={
+  cols:['blue','accent','green','violet','red','teal'],K:600,
+  init(){this.cv=mkCanvas('cvK2');
+    $('k2e').addEventListener('input',e=>{this.e=+e.target.value;this.build();});
+    bindSeg('k2N',v=>{this.N=+v;this.build();});
+    this.reset();},
+  reset(){this.e=0.6;this.N=8;this.a=AU;$('k2e').value=this.e;this.build();},
+  build(){
+    this.t=0;this.T=periodOf(this.a,MU_SUN);markSeg('k2N',this.N);
+    set('k2eO','<span class="num">'+this.e.toFixed(2)+'</span>');
+    this.sec=[];for(let k=0;k<this.N;k++)this.sec.push(sectorPoints(this.a,this.e,k,this.N,this.K));
+    $('k2areas').innerHTML=this.sec.map((s,k)=>'<li><span><i class="sw" style="background:var(--'+this.cols[k%6]+')"></i>גזרה '+(k+1)+'</span><span class="num" id="k2a'+k+'"></span></li>').join('');
+    for(const k in EL)if(k.indexOf('k2a')===0)delete EL[k];
+    set('k2dt',tHe(this.T/this.N));
+    this.vmax=Math.sqrt(MU_SUN*(1+this.e)/(this.a*(1-this.e)));this.vmin=Math.sqrt(MU_SUN*(1-this.e)/(this.a*(1+this.e)));
+    set('k2vmax',V(this.vmax,'m/s'));set('k2vmin',V(this.vmin,'m/s'));
+    set('k2rate',V(this.sec[0].area/(this.T/this.N),'m<sup>2</sup>/s',4));
+  },
+  step(dt){this.t+=dt*this.T/12;},
+  clock(){return this.t;},
+  cur(){const ph=this.t/this.T,lap=Math.floor(ph),f=(ph-lap)*this.N,i=Math.min(this.N-1,Math.floor(f));return {lap,i,frac:f-i};},
+  read(){
+    const st=ellipseState(this.a,this.e,MU_SUN,this.t),c=this.cur();
+    set('k2v',V(st.v,'m/s'));
+    $('k2g').style.width=(this.vmax-this.vmin<1?100:100*(st.v-this.vmin)/(this.vmax-this.vmin)).toFixed(1)+'%';
+    for(let k=0;k<this.N;k++){
+      let s='—';
+      if(c.lap>0||k<c.i)s=V(this.sec[k].area,'m<sup>2</sup>',4);
+      else if(k===c.i)s=V(sectorPoints(this.a,this.e,k,this.N,this.K,Math.max(c.frac,1e-4)).area,'m<sup>2</sup>',4);
+      set('k2a'+k,s);
+    }
+  },
+  draw(){
+    const cv=this.cv;cv.fit();const {ctx,w,h}=cv,e=this.e,c=this.cur();
+    const S=Math.min(w/2-1.2*REM,h/2-2.4*REM),cx=w/2,cy=h/2,a=S,b=a*Math.sqrt(1-e*e),sx=cx+a*e,k=S/this.a;
+    const poly=(s,col,al,strong)=>{ctx.beginPath();ctx.moveTo(sx,cy);s.pts.forEach(p=>ctx.lineTo(sx+p[0]*k,cy-p[1]*k));ctx.closePath();
+      ctx.fillStyle=alpha(C[col],al);ctx.fill();ctx.strokeStyle=C[col];ctx.lineWidth=strong?3:1.2;ctx.stroke();};
+    for(let i=0;i<this.N;i++){
+      const col=this.cols[i%6];let s=null,strong=false;
+      if(c.lap>0||i<c.i){s=this.sec[i];strong=(c.lap>0&&i===c.i);}
+      else if(i===c.i){s=sectorPoints(this.a,this.e,i,this.N,this.K,Math.max(c.frac,1e-4));strong=true;}
+      if(!s)continue;
+      poly(s,col,strong?0.5:0.3,strong);
+      if(s===this.sec[i]||c.frac>0.35){const E=this.sec[i].Emid,qx=this.a*(Math.cos(E)-e),qy=this.a*Math.sqrt(1-e*e)*Math.sin(E);
+        rt(ctx,String(i+1),sx+qx*k*0.66,cy-qy*k*0.66+0.35*REM,{align:'center',size:REM,color:C.ink});}
+    }
+    if(OPT.trail){ctx.beginPath();ctx.ellipse(cx,cy,a,b,0,0,TAU);ctx.strokeStyle=C.ink;ctx.lineWidth=2.5;ctx.stroke();}
+    const st=ellipseState(this.a,e,MU_SUN,this.t),px=sx+st.x*k,py=cy-st.y*k;
+    seg(ctx,sx,cy,px,py,C.ink,2.5);
+    sun(ctx,sx,cy,0.55*REM);
+    apsis(ctx,'פריהליון',cx+a,cy,1,w);apsis(ctx,'אפהליון',cx-a,cy,-1,w);
+    if(OPT.vec){const kv=2.2*REM/Math.sqrt(MU_SUN/this.a);arrow(ctx,px,py,px+st.vx*kv,py-st.vy*kv,C.red,3.5);
+      rt(ctx,'v',px+st.vx*kv+0.5*REM*Math.sign(st.vx||1),py-st.vy*kv,{align:'center',color:C.red,size:REM});}
+    disc(ctx,px,py,0.42*REM,C.blue,C.stage);
+    rt(ctx,'v = '+fmt(st.v)+' m/s',0.8*REM,1.6*REM,{size:1.1*REM,color:C.red});
+  }
+};
+
+/* ================= 3: third law ================= */
+const K3={
+  cols:['blue','red','green','violet','teal','pink','brown','muted'],
+  sets:{
+    inner:{mu:MU_SUN,p:1,rate:YEAR/6,lo:0.25*AU,hi:1.8*AU,sun:true,list:[['כוכב חמה',5.7909e10],['נוגה',1.0821e11],['כדור הארץ',1.49598e11],['מאדים',2.27956e11]]},
+    all:{mu:MU_SUN,p:0.45,rate:YEAR/2,lo:0.3*AU,hi:34*AU,sun:true,list:[['כוכב חמה',5.7909e10],['נוגה',1.0821e11],['כדור הארץ',1.49598e11],['מאדים',2.27956e11],['צדק',7.78479e11],['שבתאי',1.432041e12],['אורנוס',2.867043e12],['נפטון',4.514953e12]]},
+    sat:{mu:G*BODY.earth.M,p:0.42,rate:DAY/6,lo:BODY.earth.R+2e5,hi:4.4e8,sun:false,list:[['תחנת החלל הבין־לאומית',BODY.earth.R+4.08e5],['לוויין GPS',2.656e7],['לוויין גיאוסטציונרי',4.2164e7],['הירח',3.844e8]]}
+  },
+  init(){this.cv=mkCanvas('cvK3');this.cg=mkCanvas('cvK3g');
+    bindSeg('k3Set',v=>{this.key=v;this.t=0;this.u=0.5;$('k3a').value=0.5;this.build();});
+    $('k3Mine').addEventListener('change',e=>{this.mine=e.target.checked;this.build();});
+    $('k3Log').addEventListener('change',e=>{this.log=e.target.checked;});
+    $('k3a').addEventListener('input',e=>{this.u=+e.target.value;this.build();});
+    this.reset();},
+  reset(){this.key='inner';this.mine=true;this.log=false;this.u=0.5;this.t=0;$('k3Mine').checked=true;$('k3Log').checked=false;$('k3a').value=0.5;this.build();},
+  build(){
+    const s=this.set=this.sets[this.key];markSeg('k3Set',this.key);
+    this.bodies=s.list.map((b,i)=>({n:b[0],a:b[1],T:periodOf(b[1],s.mu),tok:this.cols[i],ph:i*2.4}));
+    $('k3MineC').classList.toggle('hide',!this.mine);
+    if(this.mine){const a=s.lo*Math.pow(s.hi/s.lo,this.u);this.bodies.push({n:'הגוף שלי',a,T:periodOf(a,s.mu),tok:'accent',ph:1.1,mine:true});
+      set('k3aO','<span class="num">'+V(a,'m')+'</span>');set('k3aT','<small>זמן המחזור שלו: '+tHe(periodOf(a,s.mu))+'</small>');}
+    $('k3tb').innerHTML=this.bodies.map(b=>'<tr'+(b.mine?' class="mine"':'')+'><td><i class="sw" style="background:var(--'+b.tok+')"></i>'+b.n+'</td><td><span class="num">'+H(fmt(b.a))+'</span></td><td><span class="num">'+H(fmt(b.T))+'</span><small>'+tHe(b.T)+'</small></td><td><span class="num">'+H(fmt(b.T*b.T/(b.a*b.a*b.a)))+'</span></td></tr>').join('');
+    set('k3th',V(4*Math.PI*Math.PI/s.mu,'s<sup>2</sup>/m<sup>3</sup>'));
+  },
+  step(dt){this.t+=dt*this.set.rate;},
+  clock(){return this.t;},
+  read(){},
+  draw(){
+    const s=this.set;let cv=this.cv;cv.fit();let {ctx,w,h}=cv;
+    const cx=w/2,cy=h/2,Rp=Math.min(w,h)/2-1.7*REM,rp=a=>Rp*Math.pow(a/s.hi,s.p);
+    if(s.sun)sun(ctx,cx,cy,0.5*REM);else{disc(ctx,cx,cy,rp(BODY.earth.R),C.blue);}
+    const vmax=Math.sqrt(s.mu/this.bodies.reduce((m,b)=>Math.min(m,b.a),Infinity));
+    this.bodies.forEach(b=>{
+      const r=rp(b.a),th=b.ph+TAU*this.t/b.T,x=cx+r*Math.cos(th),y=cy-r*Math.sin(th),col=C[b.tok];
+      if(OPT.trail){ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.strokeStyle=alpha(col,b.mine?0.9:0.55);ctx.lineWidth=b.mine?2.5:1.5;ctx.setLineDash(b.mine?[7,5]:[]);ctx.stroke();ctx.setLineDash([]);}
+      if(OPT.vec){const L=Math.max(0.6*REM,2.6*REM*Math.sqrt(s.mu/b.a)/vmax);arrow(ctx,x,y,x-Math.sin(th)*L,y-Math.cos(th)*L,col,2.5);}
+      disc(ctx,x,y,(b.mine?0.42:0.34)*REM,col,b.mine?C.ink:C.stage);
+      const ox=Math.cos(th),oy=-Math.sin(th);
+      heb(ctx,b.n,x+ox*0.75*REM,y+oy*0.95*REM+0.28*REM,{align:ox>0.3?'left':ox<-0.3?'right':'center',size:0.72*REM,color:C.ink,clampW:w});
+    });
+    if(s.p<1)heb(ctx,'קנה המידה של המרחקים במסך אינו ליניארי',w/2,h-0.55*REM,{size:0.72*REM,color:C.muted});
+    // graph
+    cv=this.cg;cv.fit();ctx=cv.ctx;
+    const k=4*Math.PI*Math.PI/s.mu,x1=Math.pow(s.hi,3)*1.05,x0=this.log?Math.pow(s.lo,3)*0.6:0;
+    const A=axes(cv,{x0,x1,y0:this.log?k*x0:0,y1:k*x1,log:this.log,xs:'a^{3}',xu:'m^{3}',ys:'T^{2}',yu:'s^{2}',title:'ריבוע זמן המחזור כפונקציה של חזקת 3 של הרדיוס'});
+    A.clip();seg(ctx,A.fx(this.log?x0:0),A.fy(this.log?k*x0:0),A.fx(x1),A.fy(k*x1),C.ink,2);A.unclip();
+    const used=[];
+    this.bodies.slice().sort((p,q)=>(q.mine?1:0)-(p.mine?1:0)||q.a-p.a).forEach(b=>{
+      const X=A.fx(b.a*b.a*b.a),Y=A.fy(b.T*b.T),col=C[b.tok];
+      if(b.mine){seg(ctx,X,Y,X,A.Y0,col,1.5,[4,4]);seg(ctx,X,Y,A.X0,Y,col,1.5,[4,4]);}
+      disc(ctx,X,Y,(b.mine?0.45:0.36)*REM,col,b.mine?C.ink:C.stage);
+      if(used.every(u=>Math.hypot(u[0]-X,u[1]-Y)>2.1*REM)){used.push([X,Y]);
+        if(X-A.X0<5*REM)heb(ctx,b.n,X+0.8*REM,Y+0.9*REM,{align:'left',size:0.72*REM,bold:b.mine,clampW:cv.w});
+        else heb(ctx,b.n,X-0.6*REM,Y-0.6*REM,{align:'right',size:0.72*REM,bold:b.mine,clampW:cv.w});}
+    });
+  }
+};
+
+/* ---------- shared by sections 4 and 5 ---------- */
+function multi(pre,modes,def){return {k:def,
+  init(){for(const k in modes)modes[k].init();bindSeg(pre+'Top',v=>this.set(v));this.set(def);},
+  set(v){this.k=v;markSeg(pre+'Top',v);document.querySelectorAll('[data-'+pre+']').forEach(el=>el.classList.toggle('hide',el.dataset[pre]!==v));lastDom=0;},
+  reset(){modes[this.k].reset();},step(dt){modes[this.k].step(dt);},draw(){modes[this.k].draw();},read(){modes[this.k].read();},clock(){return modes[this.k].clock();}};}
+function orbitPath(ctx,o,cx,cy,S,viewR,col,dash,lw){
+  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.setLineDash(dash);ctx.beginPath();
+  if(o.eps<0)ctx.ellipse(cx-o.a*o.e*Math.cos(o.w)*S,cy+o.a*o.e*Math.sin(o.w)*S,o.a*S,o.b*S,-o.w,0,TAU);
+  else{const Hm=Math.acosh(Math.max(1.0001,(3*viewR/o.A+1)/o.e)),cw=Math.cos(o.w),sw=Math.sin(o.w);
+    for(let i=0;i<=120;i++){const Hh=-Hm+2*Hm*i/120,xp=o.A*(o.e-Math.cosh(Hh)),yp=o.s*o.b*Math.sinh(Hh),x=xp*cw-yp*sw,y=xp*sw+yp*cw;
+      i?ctx.lineTo(cx+x*S,cy-y*S):ctx.moveTo(cx+x*S,cy-y*S);}}
+  ctx.stroke();ctx.restore();
+}
+function arcPath(ctx,o,t1,cx,cy,S,col,dash,lw){
+  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.setLineDash(dash);ctx.beginPath();
+  for(let i=0;i<=120;i++){const s=orbState(o,t1*i/120);i?ctx.lineTo(cx+s.x*S,cy-s.y*S):ctx.moveTo(cx+s.x*S,cy-s.y*S);}
+  ctx.stroke();ctx.restore();
+}
+function person(ctx,x,yf,Hh,col){const hd=Hh*0.12;ctx.save();ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=Math.max(2.5,Hh*0.05);ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.beginPath();ctx.arc(x,yf-Hh+hd,hd,0,TAU);ctx.fill();
+  ctx.beginPath();ctx.moveTo(x,yf-Hh+2*hd);ctx.lineTo(x,yf-Hh*0.4);ctx.lineTo(x-Hh*0.14,yf);ctx.moveTo(x,yf-Hh*0.4);ctx.lineTo(x+Hh*0.14,yf);
+  ctx.moveTo(x-Hh*0.2,yf-Hh*0.5);ctx.lineTo(x,yf-Hh*0.7);ctx.lineTo(x+Hh*0.2,yf-Hh*0.5);ctx.stroke();ctx.restore();}
+function kmRange(el,b,lo,hi){el.min=Math.ceil(lo/1e4)*10;el.max=Math.round(hi/1e4)*10;}
+const kmTxt=m=>' <small>('+Math.round(m/1000).toLocaleString('en-US')+' ק״מ)</small>';
+const sg=x=>(x>0?'+':'')+fmt(x);
+
+/* ================= 4a: two bodies ================= */
+const FGA={
+  pre:[['כדור הארץ – הירח',5.972e24,7.342e22,3.844e8],['השמש – כדור הארץ',1.989e30,5.972e24,1.496e11],['כדור הארץ – תחנת החלל',5.972e24,4.2e5,6.779e6],['שני תלמידים',60,60,1]],
+  init(){this.cv=mkCanvas('cvFG');this.cg=mkCanvas('cvFGg');
+    $('fgPre').innerHTML=this.pre.map((p,i)=>'<button data-v="'+i+'">'+p[0]+'</button>').join('');
+    bindSeg('fgPre',v=>this.load(+v));
+    ['fgM','fgm','fgr'].forEach(id=>$(id).addEventListener('input',()=>this.sync(1)));
+    document.querySelectorAll('.mini').forEach(b=>b.addEventListener('click',()=>{const el=$(b.dataset.t);
+      el.value=Math.max(+el.min,Math.min(+el.max,+el.value+(+b.dataset.k)*Math.log10(2)));this.sync(1);}));
+    this.reset();},
+  reset(){this.load(0);},
+  load(i){const p=this.pre[i];$('fgM').value=Math.log10(p[1]);$('fgm').value=Math.log10(p[2]);$('fgr').value=Math.log10(p[3]);markSeg('fgPre',i);this.sync(0);},
+  sync(keep){
+    this.M=Math.pow(10,+$('fgM').value);this.m=Math.pow(10,+$('fgm').value);this.r=Math.pow(10,+$('fgr').value);
+    this.F=G*this.M*this.m/(this.r*this.r);
+    if(!keep){this.F0=this.F;this.anc={F:this.F,r:this.r};}else markSeg('fgPre',-1);
+    const a=this.anc;if(this.r>3.999*a.r||this.F>4.4*a.F||this.F<0.012*4.4*a.F)this.anc={F:this.F,r:this.r};
+    set('fgMO','<span class="num">'+V(this.M,'kg')+'</span>');set('fgmO','<span class="num">'+V(this.m,'kg')+'</span>');set('fgrO','<span class="num">'+V(this.r,'m')+'</span>');
+    set('fgF1',V(this.F,'N'));set('fgF2',V(this.F,'N'));set('fgRel','×'+H(fmt(this.F/this.F0)));
+  },
+  step(){},clock(){return null;},read(){},
+  draw(){
+    let cv=this.cv;cv.fit();let {ctx,w,h}=cv;
+    const lr=Math.log10(this.r),d=w*(0.3+0.5*(lr+1)/14),cy=h*0.56,x1=w/2-d/2,x2=w/2+d/2;
+    let R1=6+Math.log10(this.M)/31*Math.min(h*0.3,w*0.1),R2=6+Math.log10(this.m)/31*Math.min(h*0.3,w*0.1);
+    const sc=Math.min(1,(d-10)/(R1+R2));R1*=sc;R2*=sc;
+    disc(ctx,x1,cy,R1,C.blue);disc(ctx,x2,cy,R2,C.violet);
+    rt(ctx,'M',x1,cy-R1-0.45*REM,{align:'center',color:C.blue,size:1.05*REM});
+    rt(ctx,'m',x2,cy-R2-0.45*REM,{align:'center',color:C.violet,size:1.05*REM});
+    const yd=Math.min(h-1.7*REM,cy+Math.max(R1,R2)+0.9*REM);dim(ctx,x1,x2,yd,C.muted,'r',w);
+    if(OPT.vec){const L=Math.max(8,Math.min(d/2-5,0.07*w*this.F/this.anc.F));
+      arrow(ctx,x1,cy,x1+L,cy,C.red,5);arrow(ctx,x2,cy,x2-L,cy,C.red,5);
+      rt(ctx,'F',x1+L*0.5,cy-0.6*REM,{align:'center',color:L*0.5<R1-0.5*REM?C.stage:C.red,size:REM});rt(ctx,'F',x2-L*0.5,cy-0.6*REM,{align:'center',color:L*0.5<R2-0.5*REM?C.stage:C.red,size:REM});}
+    rt(ctx,'F = '+fmt(this.F)+' N',w/2,1.6*REM,{align:'center',size:1.15*REM,color:C.red});
+    cv=this.cg;cv.fit();ctx=cv.ctx;const a=this.anc,k=G*this.M*this.m,xm=4*a.r,ym=4.4*a.F;
+    const A=axes(cv,{x0:0,x1:xm,y0:0,y1:ym,xs:'r',xu:'m',ys:'F',yu:'N',title:'כוח הכבידה כפונקציה של המרחק'});
+    A.clip();ctx.beginPath();const rs=Math.sqrt(k/ym)*0.95;
+    for(let i=0;i<=240;i++){const r=rs+(xm-rs)*i/240,X=A.fx(r),Y=A.fy(k/(r*r));i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}
+    ctx.strokeStyle=C.red;ctx.lineWidth=3;ctx.stroke();A.unclip();
+    const X=A.fx(this.r),Y=A.fy(this.F);seg(ctx,X,Y,X,A.Y0,C.muted,1.5,[4,4]);seg(ctx,X,Y,A.X0,Y,C.muted,1.5,[4,4]);
+    disc(ctx,X,Y,0.45*REM,C.red,C.ink);
+    rt(ctx,'F = '+fmt(this.F)+' N',Math.min(X+0.8*REM,cv.w-9*REM),Math.max(A.Y1+REM,Y-0.7*REM),{size:0.85*REM,color:C.red,bg:alpha(C.stage,0.8)});
+  }
+};
+
+/* ================= 4b: g at height h ================= */
+const FGB={
+  init(){this.cv=mkCanvas('cvGB');this.cg=mkCanvas('cvGBg');
+    bindSeg('gbPl',v=>{this.pl=v;this.ranges();$('gbh').value=Math.min(400,+$('gbh').max);this.sync();});
+    bindSeg('gbQ',v=>{const R=BODY[this.pl].R/1000;$('gbh').value=v==='R'?R:v==='2R'?2*R:+v;this.sync();});
+    $('gbh').addEventListener('input',()=>this.sync());this.reset();},
+  ranges(){$('gbh').max=Math.round(2*BODY[this.pl].R/1e4)*10;},
+  reset(){this.pl='earth';this.ranges();$('gbh').value=400;this.sync();},
+  sync(){markSeg('gbPl',this.pl);const b=this.b=BODY[this.pl];this.h=+$('gbh').value*1000;this.g0=G*b.M/(b.R*b.R);this.g=G*b.M/Math.pow(b.R+this.h,2);
+    set('gbhO','<span class="num">'+V(this.h,'m')+'</span>'+kmTxt(this.h));
+    set('gbR',V(b.R,'m'));set('gbr',V(b.R+this.h,'m'));set('gbg0',V(this.g0,'m/s<sup>2</sup>'));set('gbgh',V(this.g,'m/s<sup>2</sup>'));
+    set('gbgr',(100*this.g/this.g0).toFixed(1)+'%');$('gbgb').style.width=(100*this.g/this.g0).toFixed(1)+'%';},
+  step(){},clock(){return null;},read(){},
+  draw(){
+    const b=this.b,R=b.R;let cv=this.cv;cv.fit();let {ctx,w,h}=cv;
+    const half=Math.min(w,h)/2-1.5*REM,S=half/(3.15*R),cx=w/2,cy=h/2+0.6*REM,Rp=R*S;
+    for(let k=2;k<=3;k++){ctx.beginPath();ctx.arc(cx,cy,k*Rp,0,TAU);ctx.strokeStyle=C.line;ctx.lineWidth=1.5;ctx.setLineDash([5,6]);ctx.stroke();ctx.setLineDash([]);
+      rt(ctx,'g_{0}/'+k*k,cx-k*Rp,cy+0.3*REM,{align:'center',size:0.78*REM,color:C.muted,bg:C.stage});}
+    disc(ctx,cx,cy,Rp,C.blue);
+    heb(ctx,b.he,cx,cy+Rp*0.55,{size:0.75*REM,color:C.stage,bold:true});
+    seg(ctx,cx,cy,cx+Rp,cy,C.stage,2.5);disc(ctx,cx,cy,3,C.stage);rt(ctx,'R',cx+Rp*0.5,cy-0.45*REM,{align:'center',color:C.stage,size:REM});
+    rt(ctx,'g_{0}',cx-Rp-0.3*REM,cy-0.5*REM,{align:'right',size:0.85*REM,color:C.muted});
+    const yb=cy-(R+this.h)*S,xh=cx+1.1*REM;
+    if(this.h*S>3){seg(ctx,xh,cy-Rp,xh,yb,C.accent,2.5);seg(ctx,xh-5,cy-Rp,xh+5,cy-Rp,C.accent,2.5);seg(ctx,xh-5,yb,xh+5,yb,C.accent,2.5);
+      if(this.h*S>1.1*REM)rt(ctx,'h',xh+0.5*REM,(cy-Rp+yb)/2+0.3*REM,{color:C.accent,size:REM});}
+    const L=Math.max(0.5*REM,5*REM*this.g/this.g0);
+    if(OPT.vec){arrow(ctx,cx,yb,cx,yb+L,C.red,4.5);rt(ctx,'g',cx-0.8*REM,yb+Math.min(L,2*REM)*0.6+0.3*REM,{align:'center',color:C.red,size:REM,bg:alpha(C.stage,0.7)});}
+    disc(ctx,cx,yb,0.4*REM,C.accent,C.ink);
+    rt(ctx,'g = '+fmt(this.g)+' m/s^{2}',0.8*REM,1.6*REM,{size:1.15*REM,color:C.red});
+    heb(ctx,'המרחקים בקנה מידה אמיתי',w/2,h-0.55*REM,{size:0.72*REM,color:C.muted});
+    cv=this.cg;cv.fit();ctx=cv.ctx;const hm=2*R,mu=G*b.M;
+    const A=axes(cv,{x0:0,x1:hm,y0:0,y1:this.g0*1.1,xs:'h',xu:'m',ys:'g',yu:'m/s^{2}',title:'תאוצת הנפילה החופשית כפונקציה של הגובה'});
+    A.clip();ctx.beginPath();for(let i=0;i<=200;i++){const x=hm*i/200,X=A.fx(x),Y=A.fy(mu/Math.pow(R+x,2));i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}
+    ctx.strokeStyle=C.red;ctx.lineWidth=3;ctx.stroke();A.unclip();
+    [[R,'h = R']].forEach(q=>{const X=A.fx(q[0]);seg(ctx,X,A.Y0,X,A.fy(mu/Math.pow(R+q[0],2)),C.line,1.5,[3,4]);rt(ctx,q[1],X,A.Y0-0.4*REM,{align:'center',size:0.72*REM,color:C.muted});});
+    const X=A.fx(this.h),Y=A.fy(this.g);seg(ctx,X,Y,X,A.Y0,C.muted,1.5,[4,4]);seg(ctx,X,Y,A.X0,Y,C.muted,1.5,[4,4]);disc(ctx,X,Y,0.45*REM,C.red,C.ink);
+    rt(ctx,'g = '+fmt(this.g)+' m/s^{2}',Math.min(X+0.8*REM,cv.w-10*REM),Math.max(A.Y1+REM,Y-0.7*REM),{size:0.85*REM,color:C.red,bg:alpha(C.stage,0.8)});
+  }
+};
+
+/* ================= 4c: circular orbit ================= */
+const FGC={
+  init(){this.cv=mkCanvas('cvGC');this.cg=mkCanvas('cvGCg');
+    bindSeg('gcPl',v=>{this.pl=v;this.ranges(true);this.sync();});
+    $('gcR').addEventListener('input',()=>this.sync());$('gcM').addEventListener('input',()=>this.sync());this.reset();},
+  ranges(def){const b=BODY[this.pl];kmRange($('gcR'),b,b.R+2e5,7.5*b.R);if(def)$('gcR').value=Math.round((b.R+4e5)/1e4)*10;},
+  reset(){this.pl='earth';this.th=0.6;this.ts=0;$('gcM').value=1000;this.ranges(true);this.sync();this.viewR=Math.max(1.3*this.r,2.2*this.b.R);},
+  sync(){markSeg('gcPl',this.pl);const b=this.b=BODY[this.pl];this.mu=G*b.M;this.r=+$('gcR').value*1000;this.m=+$('gcM').value;
+    this.v=Math.sqrt(this.mu/this.r);this.T=TAU*this.r/this.v;this.F=this.mu*this.m/(this.r*this.r);this.rl=b.R+2e5;this.rate=periodOf(this.rl,this.mu)/3;
+    set('gcRO','<span class="num">'+V(this.r,'m')+'</span>'+kmTxt(this.r));set('gcMO','<span class="num">'+V(this.m,'kg')+'</span>');
+    set('gcF1',V(this.F,'N'));set('gcF2',V(this.m*this.v*this.v/this.r,'N'));set('gcv',V(this.v,'m/s'));
+    set('gcT','<span class="num">'+V(this.T,'s')+'</span> <small>≈ '+tHe(this.T)+'</small>');
+    set('gca',V(this.v*this.v/this.r,'m/s<sup>2</sup>'));set('gcg',V(this.mu/(this.r*this.r),'m/s<sup>2</sup>'));},
+  step(dt){this.ts+=dt*this.rate;this.th+=TAU*dt*this.rate/this.T;},
+  clock(){return this.ts;},read(){},
+  draw(){
+    const b=this.b,R=b.R,r=this.r;this.viewR+=(Math.max(1.3*r,2.2*R)-this.viewR)*0.08;
+    let cv=this.cv;cv.fit();let {ctx,w,h}=cv;
+    const S=(Math.min(w,h)/2-1.5*REM)/this.viewR,cx=w/2,cy=h/2+0.5*REM,c=Math.cos(this.th),s=Math.sin(this.th),px=cx+r*S*c,py=cy-r*S*s;
+    if(OPT.trail){ctx.beginPath();ctx.arc(cx,cy,r*S,0,TAU);ctx.strokeStyle=C.ink;ctx.lineWidth=2.5;ctx.stroke();}
+    disc(ctx,cx,cy,Math.max(4,R*S),C.blue);heb(ctx,b.he,cx,cy+Math.max(4,R*S)+1.0*REM,{size:0.75*REM,color:C.blue,bold:true});
+    seg(ctx,cx,cy,px,py,C.ink,1.5,[4,5]);disc(ctx,cx,cy,3,C.ink);rt(ctx,'r',cx+r*S*c*0.5-s*0.8*REM,cy-r*S*s*0.5-c*0.8*REM+0.3*REM,{align:'center',color:C.ink,size:REM,bg:alpha(C.stage,0.75)});
+    if(OPT.vec){const Lf=Math.max(0.6*REM,3.4*REM*Math.pow(this.rl/r,2)),Lv=Math.max(0.8*REM,3.4*REM*this.v/Math.sqrt(this.mu/this.rl));
+      arrow(ctx,px,py,px-c*Lf,py+s*Lf,C.green,4);arrow(ctx,px,py,px-s*Lv,py-c*Lv,C.red,4);
+      rt(ctx,'v',px-s*(Lv+0.7*REM),py-c*(Lv+0.7*REM)+0.3*REM,{align:'center',color:C.red,size:REM});
+      rt(ctx,'F',px-c*Lf*0.6+s*0.9*REM,py+s*Lf*0.6+c*0.9*REM+0.3*REM,{align:'center',color:C.green,size:REM,bg:alpha(C.stage,0.6)});}
+    disc(ctx,px,py,0.4*REM,C.accent,C.ink);
+    rt(ctx,'GMm/r^{2} = mv^{2}/r = '+fmt(this.F)+' N',0.8*REM,1.6*REM,{size:1.05*REM,color:C.green,clampW:w});
+    heb(ctx,'המרחקים בקנה מידה אמיתי',w/2,h-0.55*REM,{size:0.72*REM,color:C.muted});
+    cv=this.cg;cv.fit();ctx=cv.ctx;const x0=R,x1=7.6*R,mu=this.mu;
+    const A=axes(cv,{x0,x1,y0:0,y1:Math.sqrt(mu/R)*1.1,xs:'r',xu:'m',ys:'v',yu:'m/s',title:'מהירות הלוויין כפונקציה של רדיוס המסלול'});
+    A.clip();ctx.beginPath();for(let i=0;i<=200;i++){const x=x0+(x1-x0)*i/200,X=A.fx(x),Y=A.fy(Math.sqrt(mu/x));i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}
+    ctx.strokeStyle=C.red;ctx.lineWidth=3;ctx.stroke();A.unclip();
+    const X=A.fx(r),Y=A.fy(this.v);seg(ctx,X,Y,X,A.Y0,C.muted,1.5,[4,4]);seg(ctx,X,Y,A.X0,Y,C.muted,1.5,[4,4]);disc(ctx,X,Y,0.45*REM,C.red,C.ink);
+    rt(ctx,'v = '+fmt(this.v)+' m/s',Math.min(X+0.8*REM,cv.w-10*REM),Math.max(A.Y1+REM,Y-0.7*REM),{size:0.85*REM,color:C.red,bg:alpha(C.stage,0.8)});
+  }
+};
+
+/* ================= 4d: constant free fall ================= */
+const FGD={
+  init(){this.cv=mkCanvas('cvGD');this.ca=mkCanvas('cvGDa');this.b=BODY.earth;this.mu=G*this.b.M;this.r0=this.b.R+4e5;
+    this.vc=Math.sqrt(this.mu/this.r0);this.g=this.mu/(this.r0*this.r0);this.rate=periodOf(this.r0,this.mu)/20;
+    $('gdV').addEventListener('input',()=>this.out());$('gdM').addEventListener('input',()=>this.out());
+    $('gdGo').addEventListener('click',()=>this.launch(+$('gdV').value));
+    $('gdCirc').addEventListener('click',()=>{$('gdV').value=100;this.out();this.launch(100);});
+    $('gdClr').addEventListener('click',()=>{this.shots=[];this.cur=null;});
+    this.reset();},
+  reset(){this.shots=[];this.cur=null;this.ts=0;$('gdV').value=60;$('gdM').value=70;this.viewR=1.4*this.b.R;this.out();this.launch(60);},
+  out(){const p=+$('gdV').value;this.m=+$('gdM').value;
+    set('gdVO','<span class="num">'+V(p/100*this.vc,'m/s')+'</span> <small class="num">('+p+'%)</small>');set('gdMO','<span class="num">'+this.m+' kg</span>');
+    set('gdvc',V(this.vc,'m/s'));set('gdg',V(this.g,'m/s<sup>2</sup>'));set('gdN1','0 N');set('gdN2',V(this.m*this.g,'N'));},
+  launch(p){if(this.cur){this.shots.push(this.cur);if(this.shots.length>6)this.shots.shift();}
+    const v0=Math.max(p/100,0.004)*this.vc;this.cur={o:elements(0,this.r0,v0,0,this.mu),t:0,v0,p,hit:null};},
+  step(dt){this.ts+=dt*this.rate;const c=this.cur;if(!c||c.hit)return;const t0=c.t;c.t+=dt*this.rate;
+    if(orbState(c.o,c.t).r<this.b.R){let a=t0,b=c.t;for(let i=0;i<30;i++){const m=(a+b)/2;orbState(c.o,m).r<this.b.R?b=m:a=m;}
+      const s=orbState(c.o,a);c.t=a;c.hit={x:s.x,y:s.y,d:this.b.R*Math.atan2(s.x,s.y)};}},
+  clock(){return this.cur?this.cur.t:null;},
+  read(){const c=this.cur;let s='—';
+    if(c){if(c.hit)s='<span class="chip warn">פגע בקרקע במרחק <span class="num">'+Math.round(c.hit.d/1000).toLocaleString('en-US')+'</span> ק״מ מהמגדל</span>';
+      else if(c.o.rp<this.b.R)s='<span class="chip mid">נופל אל הקרקע</span>';
+      else if(c.o.e<0.012)s='<span class="chip">מסלול מעגלי: נופל כל הזמן ואינו פוגע</span>';
+      else s='<span class="chip">מסלול אליפטי סביב כדור הארץ</span>';}
+    set('gdRes',s);},
+  draw(){
+    const R=this.b.R,c=this.cur;let tg=1.4*R;
+    this.shots.concat(c?[c]:[]).forEach(q=>{if(q.o.rp>=R)tg=Math.max(tg,q.o.ra*1.1);});this.viewR+=(tg-this.viewR)*0.06;
+    let cv=this.cv;cv.fit();let {ctx,w,h}=cv;
+    const S=(Math.min(w,h)/2-1.6*REM)/this.viewR,cx=w/2,cy=h/2+0.8*REM,ty=cy-this.r0*S;
+    seg(ctx,cx,ty,w,ty,C.muted,1.5,[6,6]);heb(ctx,'המסלול ללא כבידה',w-0.6*REM,ty-0.45*REM,{align:'right',size:0.72*REM,color:C.muted});
+    disc(ctx,cx,cy,R*S,C.blue);heb(ctx,this.b.he,cx,cy+0.3*REM,{size:0.85*REM,color:C.stage,bold:true});
+    ctx.beginPath();ctx.moveTo(cx-0.035*R*S,cy-R*S+2);ctx.lineTo(cx,ty);ctx.lineTo(cx+0.035*R*S,cy-R*S+2);ctx.closePath();ctx.fillStyle=C.muted;ctx.fill();
+    const one=(q,col,lw,cur)=>{
+      if(q.o.rp<R)arcPath(ctx,q.o,q.t,cx,cy,S,col,[],lw);
+      else if(q.t>=q.o.T||!cur)orbitPath(ctx,q.o,cx,cy,S,this.viewR,col,[],lw);
+      else arcPath(ctx,q.o,q.t,cx,cy,S,col,[],lw);
+      if(q.hit){const X=cx+q.hit.x*S,Y=cy-q.hit.y*S;seg(ctx,X-5,Y-5,X+5,Y+5,col,2.5);seg(ctx,X-5,Y+5,X+5,Y-5,col,2.5);}};
+    if(OPT.trail){this.shots.forEach(q=>one(q,C.muted,1.5,false));if(c)one(c,C.accent,3,true);}
+    const s=c?orbState(c.o,c.t):{x:0,y:this.r0,vx:0,vy:0,r:this.r0,v:0},px=cx+s.x*S,py=cy-s.y*S;
+    if(OPT.vec&&!(c&&c.hit)){
+      if(s.v>1){const Lv=Math.min(6*REM,3*REM*s.v/this.vc);arrow(ctx,px,py,px+s.vx/s.v*Lv,py-s.vy/s.v*Lv,C.red,3.5);
+        rt(ctx,'v',px+s.vx/s.v*(Lv+0.6*REM),py-s.vy/s.v*(Lv+0.6*REM)+0.3*REM,{align:'center',color:C.red,size:REM});}
+      const Lg=2.4*REM*Math.pow(this.r0/s.r,2);arrow(ctx,px,py,px-s.x/s.r*Lg,py+s.y/s.r*Lg,C.green,3.5);
+      rt(ctx,'g′',px-s.x/s.r*(Lg+0.7*REM),py+s.y/s.r*(Lg+0.7*REM)+0.3*REM,{align:'center',color:C.green,size:REM,bg:alpha(C.stage,0.6)});}
+    disc(ctx,px,py,0.4*REM,C.accent,C.ink);
+    rt(ctx,'v_{0} = '+fmt(c?c.v0:0)+' m/s',0.8*REM,1.6*REM,{size:1.1*REM,color:C.red});
+    heb(ctx,'המרחקים בקנה מידה אמיתי',w/2,h-0.55*REM,{size:0.72*REM,color:C.muted});
+
+    // astronaut vs tower
+    cv=this.ca;cv.fit();ctx=cv.ctx;w=cv.w;h=cv.h;const mid=w/2,m=this.m,g=this.g;
+    seg(ctx,mid,0.8*REM,mid,h-0.8*REM,C.line,1.5);
+    const panel=(x0,x1,title,st)=>{
+      const cxp=(x0+x1)/2,pw=x1-x0,top=2.3*REM,bot=h-4.6*REM,yf=bot-1.9*REM,Fh=Math.max(40,Math.min(yf-top-1.4*REM,pw*0.62));
+      heb(ctx,title,cxp,1.4*REM,{bold:true,size:0.85*REM,clampW:w});
+      ctx.save();ctx.strokeStyle=C.ink;ctx.lineWidth=3;ctx.fillStyle=alpha(C.line,0.35);
+      if(st){const t2=Math.max(top,yf-Fh-2.6*REM);ctx.beginPath();ctx.rect(cxp-pw*0.41,t2,pw*0.82,bot-t2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.arc(cxp+pw*0.27,t2+pw*0.13,pw*0.065,0,TAU);ctx.fillStyle=C.stage;ctx.fill();ctx.stroke();}
+      else{const bw=Fh*0.36;ctx.beginPath();ctx.rect(cxp-bw,yf+0.6*REM,2*bw,bot-yf-0.6*REM);ctx.fill();ctx.stroke();
+        ctx.beginPath();ctx.moveTo(cxp-bw,yf+0.6*REM);ctx.lineTo(cxp+bw,bot);ctx.moveTo(cxp+bw,yf+0.6*REM);ctx.lineTo(cxp-bw,bot);ctx.lineWidth=1.5;ctx.stroke();}
+      ctx.restore();
+      ctx.fillStyle=C.muted;ctx.fillRect(cxp-Fh*0.34,yf,Fh*0.68,0.6*REM);
+      person(ctx,cxp,yf,Fh,C.ink);
+      const La=Fh*0.4,ya=yf-Fh*0.55;
+      arrow(ctx,cxp+Fh*0.08,ya,cxp+Fh*0.08,ya+La,C.red,4);rt(ctx,'mg′',cxp+Fh*0.08+0.5*REM,ya+La*0.75,{color:C.red,size:0.95*REM});
+      if(!st){arrow(ctx,cxp-Fh*0.08,yf,cxp-Fh*0.08,yf-La,C.blue,4);rt(ctx,'N',cxp-Fh*0.08-0.5*REM,yf-La*0.6,{align:'right',color:C.blue,size:0.95*REM});}
+      rt(ctx,st?'N = 0':'N = mg′ = '+fmt(m*g)+' N',cxp,h-2.9*REM,{align:'center',color:C.blue,size:1.05*REM,clampW:w});
+      rt(ctx,st?'a = g′ = '+fmt(g)+' m/s^{2}':'a = 0',cxp,h-1.2*REM,{align:'center',size:0.9*REM,clampW:w});
+    };
+    panel(mid,w,'אסטרונאוט בתחנת החלל',true);panel(0,mid,'אדם על מגדל באותו גובה',false);
+  }
+};
+const FG=multi('fg',{two:FGA,g:FGB,sat:FGC,fall:FGD},'two');
+
+/* ================= 5a: transfer between circular orbits ================= */
+const ENT={
+  init(){this.cv=mkCanvas('cvET');this.cg=mkCanvas('cvETg');
+    bindSeg('etPl',v=>{this.pl=v;this.ranges(true);this.start();});
+    ['etR1','etR2','etM'].forEach(id=>$(id).addEventListener('input',()=>this.start()));
+    $('etGo').addEventListener('click',()=>this.go());this.reset();},
+  ranges(def){const b=BODY[this.pl];['etR1','etR2'].forEach(id=>kmRange($(id),b,b.R+2e5,7.5*b.R));
+    if(def){$('etR1').value=Math.round(1.5*b.R/1e4)*10;$('etR2').value=Math.round(4*b.R/1e4)*10;}},
+  reset(){this.pl='earth';$('etM').value=1000;this.ranges(true);this.start();},
+  start(){const b=this.b=BODY[this.pl],mu=this.mu=G*b.M;markSeg('etPl',this.pl);
+    const r1=this.r1=+$('etR1').value*1000,r2=this.r2=+$('etR2').value*1000,m=this.m=+$('etM').value,k=mu*m;
+    set('etR1O','<span class="num">'+V(r1,'m')+'</span>'+kmTxt(r1));set('etR2O','<span class="num">'+V(r2,'m')+'</span>'+kmTxt(r2));set('etMO','<span class="num">'+V(m,'kg')+'</span>');
+    this.orb=elements(r1,0,0,Math.sqrt(mu/r1),mu);this.at=1;this.ph='c';this.t=0;this.T0=0;this.kicks=[];this.ghost=null;
+    this.rate=periodOf((r1+r2)/2,mu)/8;this.viewR=Math.max(r1,r2)*1.14;
+    const q=r=>({r,v:Math.sqrt(mu/r),T:periodOf(r,mu),Ek:k/(2*r),Ep:-k/r,E:-k/(2*r)}),A=q(r1),B=q(r2);this.E1=A.E;this.E2=B.E;this.Et=-k/(r1+r2);
+    const row=(lab,u,key)=>'<tr><td><span class="num">'+lab+' ('+u+')</span></td><td><span class="num">'+H(fmt(A[key]))+'</span></td><td><span class="num">'+H(fmt(B[key]))+'</span></td><td><span class="num">'+H(sg(B[key]-A[key]))+'</span></td></tr>';
+    $('etTb').innerHTML=row('r','m','r')+row('v','m/s','v')+row('T','s','T')+row('E<sub>k</sub>','J','Ek')+row('E<sub>p</sub>','J','Ep')+row('E','J','E');
+    set('etW',H(sg(B.E-A.E))+' J');set('etEt',V(this.Et,'J'));this.btn();},
+  btn(){const b=$('etGo');b.disabled=this.ph==='tr'||Math.abs(this.r1-this.r2)<1;b.textContent=this.ph==='tr'?'הלוויין במעבר…':this.at===1?'מעבר למסלול 2':'חזרה למסלול 1';},
+  st(){return orbState(this.orb,this.t);},
+  go(){if(this.ph==='tr')return;const from=this.at===1?this.r1:this.r2,to=this.at===1?this.r2:this.r1;if(Math.abs(from-to)<1)return;
+    const s=this.st(),f=Math.sqrt(this.mu*(2/from-2/(from+to)))/s.v;this.T0+=this.t;this.t=0;
+    this.orb=elements(s.x,s.y,s.vx*f,s.vy*f,this.mu);this.tT=this.orb.T/2;this.ph='tr';this.ghost=this.orb;this.kicks=[[s.x,s.y]];this.btn();},
+  step(dt){this.t+=dt*this.rate;
+    if(this.ph==='tr'&&this.t>=this.tT){const s=orbState(this.orb,this.tT),vc=Math.sqrt(this.mu/s.r);
+      this.orb=elements(s.x,s.y,s.vx/s.v*vc,s.vy/s.v*vc,this.mu);this.T0+=this.tT;this.t-=this.tT;this.at=3-this.at;this.ph='c';this.kicks.push([s.x,s.y]);this.btn();}},
+  clock(){return this.T0+this.t;},
+  en(s){return {Ek:0.5*this.m*s.v*s.v,Ep:-this.mu*this.m/s.r,E:this.m*this.orb.eps};},
+  read(){const s=this.st(),e=this.en(s);
+    set('etSt',this.ph==='tr'?'<span class="chip mid">במסלול המעבר האליפטי</span>':'<span class="chip">במסלול '+this.at+'</span>');
+    set('etr',V(s.r,'m'));set('etv',V(s.v,'m/s'));set('etEk',V(e.Ek,'J'));set('etEp',V(e.Ep,'J'));set('etE',V(e.E,'J'));},
+  draw(){
+    const b=this.b,R=b.R,s=this.st(),e=this.en(s),r1=this.r1,r2=this.r2,mu=this.mu,k=mu*this.m;
+    let cv=this.cv;cv.fit();let {ctx,w,h}=cv;
+    const S=(Math.min(w,h)/2-1.5*REM)/this.viewR,cx=w/2,cy=h/2+0.3*REM;
+    if(OPT.trail){[[r1,C.teal,'r_{1}'],[r2,C.violet,'r_{2}']].forEach(q=>{ctx.beginPath();ctx.arc(cx,cy,q[0]*S,0,TAU);ctx.strokeStyle=q[1];ctx.lineWidth=2.5;ctx.stroke();
+        rt(ctx,q[2],cx,cy-q[0]*S-0.4*REM,{align:'center',color:q[1],size:REM,bg:alpha(C.stage,0.7)});});
+      if(this.ghost)orbitPath(ctx,this.ghost,cx,cy,S,this.viewR,C.accent,[7,6],2);}
+    disc(ctx,cx,cy,Math.max(4,R*S),C.blue);heb(ctx,b.he,cx,cy+Math.max(4,R*S)+1.0*REM,{size:0.75*REM,color:C.blue,bold:true});
+    this.kicks.forEach(p=>{ctx.beginPath();ctx.arc(cx+p[0]*S,cy-p[1]*S,0.55*REM,0,TAU);ctx.strokeStyle=C.accent;ctx.lineWidth=2.5;ctx.stroke();});
+    const px=cx+s.x*S,py=cy-s.y*S;
+    if(OPT.vec){const Lv=3*REM*s.v/Math.sqrt(mu/Math.min(r1,r2));arrow(ctx,px,py,px+s.vx/s.v*Lv,py-s.vy/s.v*Lv,C.red,3.5);
+      rt(ctx,'v',px+s.vx/s.v*(Lv+0.6*REM),py-s.vy/s.v*(Lv+0.6*REM)+0.3*REM,{align:'center',color:C.red,size:REM});}
+    disc(ctx,px,py,0.4*REM,C.accent,C.ink);
+    rt(ctx,'E = '+fmt(e.E)+' J',0.8*REM,1.6*REM,{size:1.1*REM,color:C.green});
+    heb(ctx,'המרחקים בקנה מידה אמיתי',w/2,h-0.55*REM,{size:0.72*REM,color:C.muted});
+    // energy graph
+    cv=this.cg;cv.fit();ctx=cv.ctx;const lo=Math.min(r1,r2),hi=Math.max(r1,r2),x0=Math.max(R*0.98,lo*0.8),x1=hi*1.2;
+    const A=axes(cv,{x0,x1,y0:-k/x0*1.04,y1:k/(2*x0)*1.25,xs:'r',xu:'m',ys:'E',yu:'J',title:'אנרגיות הלוויין כפונקציה של רדיוס המסלול המעגלי'});
+    const curve=(f,col)=>{ctx.beginPath();for(let i=0;i<=160;i++){const r=x0+(x1-x0)*i/160,X=A.fx(r),Y=A.fy(f(r));i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}ctx.strokeStyle=col;ctx.lineWidth=3;ctx.stroke();};
+    A.clip();curve(r=>-k/r,C.red);curve(r=>k/(2*r),C.blue);curve(r=>-k/(2*r),C.green);A.unclip();
+    [[r1,C.teal,'r_{1}'],[r2,C.violet,'r_{2}']].forEach(q=>{const X=A.fx(q[0]);seg(ctx,X,A.Y1,X,A.Y0,q[1],2,[5,5]);rt(ctx,q[2],X+0.9*REM,A.Y0-0.5*REM,{align:'center',color:q[1],size:0.95*REM,bg:alpha(C.stage,0.75)});
+      [k/(2*q[0]),-k/q[0],-k/(2*q[0])].forEach((y,i)=>disc(ctx,X,A.fy(y),0.28*REM,[C.blue,C.red,C.green][i],C.stage));});
+    if(Math.abs(r1-r2)>1){ctx.save();ctx.strokeStyle=C.accent;ctx.lineWidth=2.5;ctx.setLineDash([6,5]);ctx.beginPath();
+      ctx.moveTo(A.fx(r1),A.fy(this.E1));ctx.lineTo(A.fx(r1),A.fy(this.Et));ctx.lineTo(A.fx(r2),A.fy(this.Et));ctx.lineTo(A.fx(r2),A.fy(this.E2));ctx.stroke();ctx.restore();
+      heb(ctx,'מסלול המעבר',(A.fx(r1)+A.fx(r2))/2,A.fy(this.Et)-0.45*REM,{color:C.accent,size:0.75*REM,bold:true});}
+    const X=A.fx(s.r);disc(ctx,X,A.fy(e.Ek),0.42*REM,C.blue,C.ink);disc(ctx,X,A.fy(e.Ep),0.42*REM,C.red,C.ink);disc(ctx,X,A.fy(e.E),0.42*REM,C.green,C.ink);
+    let lx=A.X1-0.4*REM;[['E',C.green],['E_{p}',C.red],['E_{k}',C.blue]].forEach(q=>{lx-=rt(ctx,q[0],lx,A.Y1+1.1*REM,{align:'right',color:q[1],size:0.95*REM,bg:alpha(C.stage,0.7)})+0.9*REM;});
+  }
+};
+
+/* ================= 5b: free orbit and impulses ================= */
+const ENF={
+  init(){this.cv=mkCanvas('cvEN');this.cg=mkCanvas('cvENg');
+    bindSeg('enPl',v=>{this.pl=v;this.ranges(true);this.start();});
+    bindSeg('enMode',v=>{this.mode=v;this.start();});
+    $('enR').addEventListener('input',()=>this.start());
+    $('enE').addEventListener('input',()=>this.start());
+    $('enM').addEventListener('input',()=>{this.m=+$('enM').value;set('enMO','<span class="num">'+V(this.m,'kg')+'</span>');});
+    $('enDv').addEventListener('input',()=>this.dvOut());
+    $('enKick').addEventListener('click',()=>this.kick(1+(+$('enDv').value)/100));
+    $('enEsc').addEventListener('click',()=>{const st=this.st();this.kick(Math.sqrt(2*this.mu/st.r)/st.v);});
+    this.reset();},
+  reset(){this.pl='earth';this.mode='ell';this.m=1000;$('enM').value=1000;$('enE').value=0.5;$('enDv').value=20;
+    set('enMO','<span class="num">'+V(this.m,'kg')+'</span>');this.ranges(true);this.start();},
+  ranges(def){const b=BODY[this.pl],el=$('enR');kmRange(el,b,b.R+2e5,7.5*b.R);if(def)el.value=Math.round(1.6*b.R/1e4)*10;},
+  start(){
+    const b=this.b=BODY[this.pl];this.mu=G*b.M;markSeg('enPl',this.pl);markSeg('enMode',this.mode);
+    const rp=+$('enR').value*1000,e=this.mode==='ell'?+$('enE').value:0;
+    $('enEC').classList.toggle('hide',this.mode!=='ell');$('enCircFx').classList.toggle('hide',this.mode!=='circ');
+    set('enRL',this.mode==='ell'?'המרחק המינימלי ממרכז הכוכב <span class="num">r<sub>min</sub></span>':'רדיוס המסלול <span class="num">r</span>');
+    set('enRO','<span class="num">'+V(rp,'m')+'</span>'+kmTxt(rp));
+    set('enEO','<span class="num">'+e.toFixed(2)+'</span>');
+    this.orb=elements(rp,0,0,Math.sqrt(this.mu*(1+e)/rp),this.mu);this.ghost=null;this.kickPt=null;this.t=0;this.T0=0;
+    this.end='';this.rate=this.orb.T/8;this.r0=rp;this.vref=Math.sqrt(this.mu/rp);this.viewR=this.target();this.dvOut();
+    $('enKick').disabled=$('enEsc').disabled=false;
+  },
+  st(){return orbState(this.orb,this.t);},
+  dvOut(){const p=+$('enDv').value,st=this.st();set('enDvO','<span class="num">'+(p>0?'+':p<0?'−':'')+Math.abs(p)+'%</span> <small><span class="num">Δv = '+(p<0?'−':'+')+V(Math.abs(p)/100*st.v,'m/s')+'</span></small>');},
+  kick(f){if(this.end)return;const s=this.st();this.ghost=this.orb;this.kickPt=[s.x,s.y];this.T0+=this.t;
+    this.orb=elements(s.x,s.y,s.vx*f,s.vy*f,this.mu);this.t=0;},
+  target(){const o=this.orb;let t=o.eps<0?o.ra*1.12:Math.max(4*o.rp,1.25*this.st().r);
+    if(this.ghost&&isFinite(this.ghost.ra))t=Math.max(t,this.ghost.ra*1.12);return Math.max(t,this.b.R*1.5);},
+  step(dt){
+    if(this.end)return;this.t+=dt*this.rate;const s=this.st();
+    if(s.r<this.b.R)this.end='crash';else if(s.r>120*this.b.R)this.end='far';
+    if(this.end)$('enKick').disabled=$('enEsc').disabled=true;
+  },
+  clock(){return this.T0+this.t;},
+  energies(s){const Ek=0.5*this.m*s.v*s.v,Ep=-this.mu*this.m/s.r;return {Ek,Ep,E:this.m*this.orb.eps};},
+  read(){
+    const o=this.orb,s=this.st(),en=this.energies(s),zero=Math.abs(en.E)<1e-4*Math.abs(en.Ep);
+    let ty;if(this.end==='crash')ty='<span class="chip warn">הלוויין פגע בפני השטח</span>';
+    else if(o.eps>=0)ty='<span class="chip warn">'+(zero?'מהירות המילוט — מסלול פתוח':'מסלול פתוח — הלוויין נמלט')+'</span>';
+    else if(o.e<1e-4)ty='<span class="chip">מעגלי</span>';
+    else ty='<span class="chip mid">אליפטי, <span class="num">e = '+o.e.toFixed(2)+'</span></span>';
+    set('enType',ty);set('enr',V(s.r,'m'));set('env',V(s.v,'m/s'));
+    set('enT',o.eps<0?'<span class="num">'+V(o.T,'s')+'</span> <small>≈ '+tHe(o.T)+'</small>':'<span class="num">∞</span>');
+    set('enEk',V(en.Ek,'J'));set('enEp',V(en.Ep,'J'));set('enEt',zero?'≈ 0 J':V(en.E,'J'));
+    set('envc',V(Math.sqrt(this.mu/s.r),'m/s'));set('enve',V(Math.sqrt(2*this.mu/s.r),'m/s'));this.dvOut();
+  },
+  draw(){
+    const o=this.orb,b=this.b,s=this.st(),en=this.energies(s),mu=this.mu,m=this.m;
+    this.viewR+=(this.target()-this.viewR)*0.06;
+    let cv=this.cv;cv.fit();let {ctx,w,h}=cv;
+    const S=(Math.min(w,h)/2-1.3*REM)/this.viewR,cx=w/2,cy=h/2;
+    if(OPT.trail){if(this.ghost)orbitPath(ctx,this.ghost,cx,cy,S,this.viewR,C.muted,[6,6],1.5);orbitPath(ctx,o,cx,cy,S,this.viewR,C.ink,[],2.5);}
+    const Rp=Math.max(4,b.R*S);disc(ctx,cx,cy,Rp,C.blue);
+    heb(ctx,b.he,cx,cy+Rp+1.0*REM,{size:0.75*REM,color:C.blue,bold:true});
+    if(o.eps<0&&o.e>0.02){const cw=Math.cos(o.w),sw=Math.sin(o.w);
+      disc(ctx,cx+o.rp*cw*S,cy-o.rp*sw*S,4,C.green);disc(ctx,cx-o.ra*cw*S,cy+o.ra*sw*S,4,C.violet);
+      rt(ctx,'r_{min}',cx+o.rp*cw*S+cw*1.2*REM,cy-o.rp*sw*S-sw*1.0*REM+0.3*REM,{align:'center',color:C.green,clampW:w});
+      rt(ctx,'r_{max}',cx-o.ra*cw*S-cw*1.2*REM,cy+o.ra*sw*S+sw*1.0*REM+0.3*REM,{align:'center',color:C.violet,clampW:w});}
+    if(this.kickPt){ctx.beginPath();ctx.arc(cx+this.kickPt[0]*S,cy-this.kickPt[1]*S,0.5*REM,0,TAU);ctx.strokeStyle=C.accent;ctx.lineWidth=2.5;ctx.stroke();}
+    const px=cx+s.x*S,py=cy-s.y*S;
+    if(OPT.vec&&this.end!=='crash'){
+      const Lv=Math.min(7*REM,2.6*REM*s.v/this.vref);arrow(ctx,px,py,px+s.vx/s.v*Lv,py-s.vy/s.v*Lv,C.red,3.5);
+      rt(ctx,'v',px+s.vx/s.v*(Lv+0.6*REM),py-s.vy/s.v*(Lv+0.6*REM)+0.3*REM,{align:'center',color:C.red,size:REM});
+      const Lf=Math.max(0.5*REM,Math.min(7*REM,2.6*REM*Math.pow(this.r0/s.r,2)));arrow(ctx,px,py,px-s.x/s.r*Lf,py+s.y/s.r*Lf,C.green,3.5);
+      rt(ctx,'F',px-s.x/s.r*(Lf*0.55)+s.y/s.r*0.8*REM,py+s.y/s.r*(Lf*0.55)+s.x/s.r*0.8*REM+0.3*REM,{align:'center',color:C.green,size:REM});}
+    disc(ctx,px,py,0.4*REM,C.accent,C.ink);
+    const msg=this.end==='crash'?'הלוויין פגע בפני השטח — לחצו על איפוס':this.end==='far'?'הלוויין התרחק ואינו חוזר — לחצו על איפוס':o.eps>=0?'האנרגיה הכוללת אינה שלילית: המסלול פתוח':'';
+    if(msg)heb(ctx,msg,w/2,1.5*REM,{bold:true,color:C.red,size:0.95*REM,clampW:w});
+    else rt(ctx,'E = '+fmt(en.E)+' J',0.8*REM,1.6*REM,{size:1.1*REM,color:C.green});
+    heb(ctx,'המרחקים בקנה מידה אמיתי',w/2,h-0.55*REM,{size:0.72*REM,color:C.muted});
+    cv=this.cg;cv.fit();ctx=cv.ctx;const k=mu*m,Ekp=en.E+k/o.rp;
+    const circ=o.eps<0&&o.e<1e-4;let x0,x1,y0,y1;
+    if(circ){x0=b.R;x1=7.5*b.R;y0=-k/x0*1.05;y1=k/(2*x0)*1.15;}
+    else{x0=o.rp*0.8;x1=o.eps<0?o.ra*1.08:Math.max(5*o.rp,1.2*s.r);y0=-k/x0*1.03;y1=Math.max(Ekp,en.E,0.05*k/x0)*1.2;}
+    const A=axes(cv,{x0,x1,y0,y1,xs:'r',xu:'m',ys:'E',yu:'J',title:circ?'אנרגיה כפונקציה של רדיוס המסלול המעגלי':'אנרגיה לאורך המסלול'});
+    const curve=(f,col,ra,rb)=>{ctx.beginPath();for(let i=0;i<=160;i++){const r=ra+(rb-ra)*i/160,X=A.fx(r),Y=A.fy(f(r));i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}ctx.strokeStyle=col;ctx.lineWidth=3;ctx.stroke();};
+    A.clip();
+    curve(r=>-k/r,C.red,x0,x1);
+    if(circ){curve(r=>k/(2*r),C.blue,x0,x1);curve(r=>-k/(2*r),C.green,x0,x1);}
+    else{curve(r=>en.E+k/r,C.blue,o.rp,Math.min(x1,o.ra));seg(ctx,A.X0,A.fy(en.E),A.X1,A.fy(en.E),C.green,3);}
+    A.unclip();
+    const X=A.fx(s.r);if(X>=A.X0&&X<=A.X1+1){seg(ctx,X,A.Y1,X,A.Y0,C.muted,1.5,[4,4]);
+      disc(ctx,X,A.fy(en.Ek),0.36*REM,C.blue,C.ink);disc(ctx,X,A.fy(en.Ep),0.36*REM,C.red,C.ink);disc(ctx,X,A.fy(en.E),0.36*REM,C.green,C.ink);}
+    let lx=A.X1-0.4*REM;[['E',C.green],['E_{p}',C.red],['E_{k}',C.blue]].forEach(q=>{lx-=rt(ctx,q[0],lx,A.Y1+1.1*REM,{align:'right',color:q[1],size:0.95*REM,bg:alpha(C.stage,0.7)})+0.9*REM;});
+  }
+};
+
+/* ================= 5c: escape velocity (radial launch, velocity Verlet) ================= */
+const ENE={
+  init(){this.cv=mkCanvas('cvEE');this.cg=mkCanvas('cvEEg');
+    bindSeg('eePl',v=>{this.pl=v;this.ranges(true);this.prep();this.launch();});
+    ['eeR0','eeV','eeM'].forEach(id=>$(id).addEventListener('input',()=>this.prep()));
+    $('eeGo').addEventListener('click',()=>this.launch());
+    $('eeEx').addEventListener('click',()=>{$('eeV').value=100;this.prep();this.launch();});
+    this.reset();},
+  ranges(def){const b=BODY[this.pl],el=$('eeR0');el.min=Math.round(b.R/1e4)*10+10;el.max=Math.round(4*b.R/1e4)*10;if(def)el.value=el.min;},
+  reset(){this.pl='earth';$('eeV').value=80;$('eeM').value=1000;this.ranges(true);this.prep();this.launch();},
+  prep(){const b=this.b=BODY[this.pl];this.mu=G*b.M;markSeg('eePl',this.pl);
+    this.r0=Math.max(b.R,+$('eeR0').value*1000);this.m=+$('eeM').value;this.ve=Math.sqrt(2*this.mu/this.r0);this.p=+$('eeV').value;this.v0=this.p/100*this.ve;
+    this.eps=this.p===100?0:this.v0*this.v0/2-this.mu/this.r0;this.rmax=this.eps<0?-this.mu/this.eps:Infinity;
+    this.r=this.r0;this.v=0;this.t=0;this.state='idle';this.rate=Math.sqrt(Math.pow(this.r0,3)/this.mu);this.viewR=this.target();
+    set('eeR0O','<span class="num">'+V(this.r0,'m')+'</span>'+kmTxt(this.r0));set('eeMO','<span class="num">'+V(this.m,'kg')+'</span>');
+    set('eeVO','<span class="num">'+V(this.v0,'m/s')+'</span> <small class="num">('+this.p+'%)</small>');
+    set('eeve',V(this.ve,'m/s'));set('eev0',V(this.v0,'m/s'));set('eeE',this.eps===0?'0 J':V(this.m*this.eps,'J'));set('eermax',this.eps<0?V(this.rmax,'m'):'∞');},
+  launch(){this.r=this.r0;this.v=this.v0;this.t=0;this.state='fly';},
+  target(){const R=this.b.R;let t=Math.max(2.6*R,1.25*this.r);if(this.eps<0)t=Math.max(t,Math.min(this.rmax*1.1,9*R));return t;},
+  step(dt){if(this.state!=='fly')return;let T=dt*this.rate;this.t+=T;const mu=this.mu;
+    let n=0;while(T>0&&n++<4000){const hs=Math.min(T,0.002*Math.sqrt(this.r*this.r*this.r/mu));
+      this.v-=mu/(this.r*this.r)*hs/2;this.r+=this.v*hs;this.v-=mu/(this.r*this.r)*hs/2;T-=hs;
+      if(this.r<=this.r0&&this.v<0){this.r=this.r0;this.v=0;this.state='back';break;}
+      if(this.r>90*this.b.R){this.state='gone';break;}}},
+  clock(){return this.t;},
+  vE(){return Math.sqrt(Math.max(0,2*(this.eps+this.mu/this.r)));},
+  read(){const v=this.state==='idle'||this.state==='back'?0:this.vE();
+    let s;if(this.eps<0)s='<span class="chip">'+(this.state==='back'?'הגוף חזר לנקודת השיגור':'האנרגיה הכוללת שלילית: הגוף ייעצר ויחזור')+'</span>';
+    else if(this.eps===0)s='<span class="chip mid">מהירות המילוט: באין־סוף גם <span class="num">E<sub>k</sub></span> וגם <span class="num">E<sub>p</sub></span> מתאפסות</span>';
+    else s='<span class="chip warn">האנרגיה הכוללת חיובית: הגוף נמלט, ונשארת לו מהירות <span class="num">'+V(Math.sqrt(2*this.eps),'m/s')+'</span></span>';
+    set('eeSt',s);set('eer',V(this.r,'m'));set('eev',V(v,'m/s'));set('eeEk',V(0.5*this.m*v*v,'J'));set('eeEp',V(-this.mu*this.m/this.r,'J'));},
+  draw(){
+    const b=this.b,R=b.R,mu=this.mu,k=mu*this.m,r=this.r,fly=this.state==='fly'||this.state==='gone',v=fly?this.vE():0;
+    this.viewR+=(this.target()-this.viewR)*0.06;
+    let cv=this.cv;cv.fit();let {ctx,w,h}=cv;
+    const S=(h-4.2*REM)/(this.viewR+R),cx=w/2,yc=h-1.6*REM-R*S,Y=q=>yc-q*S;
+    seg(ctx,cx,Y(this.r0),cx,0,C.line,1.5,[5,6]);
+    disc(ctx,cx,yc,R*S,C.blue);heb(ctx,b.he,cx+R*S+0.6*REM,yc+0.3*REM,{align:'left',size:0.75*REM,color:C.blue,bold:true,clampW:w});
+    if(this.r0>R*1.01){seg(ctx,cx-0.7*REM,Y(this.r0),cx+0.7*REM,Y(this.r0),C.muted,2);rt(ctx,'r_{0}',cx-1.0*REM,Y(this.r0)+0.3*REM,{align:'right',color:C.muted});}
+    if(this.eps<0&&Y(this.rmax)>2.4*REM){const y=Y(this.rmax);seg(ctx,cx-1.2*REM,y,cx+1.2*REM,y,C.violet,2.5);
+      rt(ctx,'r_{max} = '+fmt(this.rmax)+' m',cx+1.6*REM,y+0.3*REM,{color:C.violet,size:0.85*REM,clampW:w});}
+    const py=Y(r);
+    if(OPT.vec&&fly){const dir=this.v>=0?-1:1,Lv=Math.min(6*REM,3.2*REM*v/this.ve);
+      if(Lv>2){arrow(ctx,cx,py,cx,py+dir*Lv,C.red,4);rt(ctx,'v',cx-0.8*REM,py+dir*Lv*0.7+0.3*REM,{align:'center',color:C.red,size:REM});}
+      const Lf=Math.max(0.4*REM,2.4*REM*Math.pow(this.r0/r,2));arrow(ctx,cx+1.0*REM,py,cx+1.0*REM,py+Lf,C.green,3.5);
+      rt(ctx,'F',cx+1.8*REM,py+Lf*0.7+0.3*REM,{align:'center',color:C.green,size:REM});}
+    disc(ctx,cx,py,0.42*REM,C.accent,C.ink);
+    rt(ctx,'v = '+fmt(v)+' m/s',0.8*REM,1.6*REM,{size:1.1*REM,color:C.red});
+    const msg=this.state==='idle'?'לחצו על «שגר»':this.state==='back'?'הגוף חזר לנקודת השיגור':this.eps===0?'האנרגיה הכוללת אפס: הגוף מגיע לאין־סוף':this.eps>0?'האנרגיה הכוללת חיובית: הגוף אינו חוזר':'';
+    if(msg)heb(ctx,msg,w-0.8*REM,3.2*REM,{align:'right',bold:true,color:this.eps>=0?C.red:C.muted,size:0.9*REM,clampW:w});
+    // graph
+    cv=this.cg;cv.fit();ctx=cv.ctx;const E=this.m*this.eps,x0=this.r0*0.9,x1=Math.max(4*this.r0,Math.min(1.2*this.rmax,16*this.r0),1.2*r);
+    const A=axes(cv,{x0,x1,y0:-k/x0*1.04,y1:Math.max(this.p*this.p/1e4*1.12,0.3)*k/this.r0,xs:'r',xu:'m',ys:'E',yu:'J',title:'אנרגיה כפונקציה של המרחק ממרכז הכוכב'});
+    const curve=(f,col,ra,rb)=>{ctx.beginPath();for(let i=0;i<=200;i++){const q=ra+(rb-ra)*i/200,X=A.fx(q),Yy=A.fy(f(q));i?ctx.lineTo(X,Yy):ctx.moveTo(X,Yy);}ctx.strokeStyle=col;ctx.lineWidth=3;ctx.stroke();};
+    A.clip();curve(q=>-k/q,C.red,x0,x1);curve(q=>E+k/q,C.blue,this.r0,Math.min(x1,this.rmax));seg(ctx,A.fx(this.r0),A.fy(E),A.X1,A.fy(E),C.green,3);A.unclip();
+    seg(ctx,A.fx(this.r0),A.Y1,A.fx(this.r0),A.Y0,C.muted,1.5,[3,4]);rt(ctx,'r_{0}',A.fx(this.r0)+0.9*REM,A.Y0-0.5*REM,{align:'center',color:C.muted,size:0.95*REM,bg:alpha(C.stage,0.75)});
+    if(this.eps<0&&this.rmax<x1){const X=A.fx(this.rmax);seg(ctx,X,A.fy(E),X,A.Y0,C.violet,2,[5,5]);disc(ctx,X,A.fy(E),0.3*REM,C.violet,C.stage);rt(ctx,'r_{max}',X,A.fy(E)-0.6*REM,{align:'center',color:C.violet,size:0.85*REM,bg:alpha(C.stage,0.7)});}
+    const X=A.fx(r),Ep=-k/r;disc(ctx,X,A.fy(E-Ep),0.4*REM,C.blue,C.ink);disc(ctx,X,A.fy(Ep),0.4*REM,C.red,C.ink);disc(ctx,X,A.fy(E),0.4*REM,C.green,C.ink);
+    let lx=A.X1-0.4*REM;[['E',C.green],['E_{p}',C.red],['E_{k}',C.blue]].forEach(q=>{lx-=rt(ctx,q[0],lx,A.Y1+1.1*REM,{align:'right',color:q[1],size:0.95*REM,bg:alpha(C.stage,0.7)})+0.9*REM;});
+  }
+};
+const EN=multi('en',{tr:ENT,free:ENF,esc:ENE},'tr');
+
+/* ================= shell ================= */
+const TABS=[K1,K2,K3,FG,EN],NAMES=['kepler1','kepler2','kepler3','gravity','energy'];
+let cur=0,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,speed=1,last=0,lastDom=0;
+function show(i,noHash){
+  cur=i;document.querySelectorAll('.tab').forEach((s,j)=>s.classList.toggle('on',j===i));
+  document.querySelectorAll('#tabs button').forEach((b,j)=>{b.classList.toggle('on',j===i);b.setAttribute('aria-selected',j===i);
+    if(j===i){const t=$('tabs'),r=b.getBoundingClientRect(),q=t.getBoundingClientRect();if(r.left<q.left)t.scrollLeft-=q.left-r.left+8;else if(r.right>q.right)t.scrollLeft+=r.right-q.right+8;}});
+  if(!noHash){try{history.replaceState(null,'','#'+NAMES[i]);}catch(e){try{location.hash=NAMES[i];}catch(_){}}}
+  lastDom=0;
+}
+function playLabel(){$('btnPlay').textContent=playing?'עצור':'הפעל';}
+function isDark(){const t=document.documentElement.getAttribute('data-theme');return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;}
+function themeLabel(){$('btnTheme').textContent=isDark()?'מצב בהיר':'מצב כהה';}
+function frame(ts){
+  const dt=Math.min(0.05,(ts-last)/1000||0);last=ts;const tab=TABS[cur];
+  if(playing)tab.step(dt*speed);
+  tab.draw();
+  if(ts-lastDom>90){lastDom=ts;tab.read();const c=tab.clock();if(c===null)set('clock','');else{const q=tP(c);set('clock','<span class="num">t = '+q[0]+'</span> '+q[1]);}}
+  requestAnimationFrame(frame);
+}
+readColors();
+TABS.forEach(t=>t.init());
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)show(+b.dataset.i);});
+$('btnPlay').addEventListener('click',()=>{playing=!playing;playLabel();});
+$('btnReset').addEventListener('click',()=>{TABS[cur].reset();lastDom=0;});
+$('spd').addEventListener('input',e=>{speed=Math.pow(10,+e.target.value);$('spdOut').textContent='×'+(speed<1?speed.toFixed(2):speed.toFixed(1));});
+$('chkVec').addEventListener('change',e=>OPT.vec=e.target.checked);
+$('chkTrail').addEventListener('change',e=>OPT.trail=e.target.checked);
+$('btnTheme').addEventListener('click',()=>{document.documentElement.setAttribute('data-theme',isDark()?'light':'dark');});
+new MutationObserver(()=>{readColors();themeLabel();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{readColors();themeLabel();});
+addEventListener('resize',readColors);
+addEventListener('hashchange',()=>{const i=NAMES.indexOf(location.hash.slice(1));if(i>=0&&i!==cur)show(i,true);});
+playLabel();themeLabel();
+show(Math.max(0,NAMES.indexOf(location.hash.slice(1))),true);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

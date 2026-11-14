@@ -1,557 +1,148 @@
-import io
-import matplotlib.pyplot as plt
-from pptx import Presentation
-from pptx.util import Inches, Pt
-from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN
-from pptx.enum.shapes import MSO_SHAPE
-
-# ---------------------------------------------------------
-# 1. ЦВЕТОВАЯ ПАЛИТРА И СТИЛИ (Modern Light UI)
-# ---------------------------------------------------------
-COLOR_BG = RGBColor(248, 250, 252)         # Slate 50 (мягкий офф-вайт)
-COLOR_CARD = RGBColor(255, 255, 255)       # Чистый белый
-COLOR_BORDER = RGBColor(226, 232, 240)     # Slate 200 (тонкая рамка)
-COLOR_TITLE = RGBColor(15, 23, 42)         # Slate 900
-COLOR_TEXT = RGBColor(51, 65, 85)          # Slate 700
-COLOR_MUTED = RGBColor(100, 116, 139)      # Slate 500
-COLOR_ACCENT = RGBColor(37, 99, 235)       # Sapphire Blue
-COLOR_ACCENT_BG = RGBColor(239, 246, 255)  # Голубая подложка бейджа
-COLOR_EMERALD = RGBColor(16, 185, 129)     # Emerald
-COLOR_AMBER = RGBColor(217, 119, 6)        # Amber
-
-FONT_FAMILY = "Segoe UI"
-
-# ---------------------------------------------------------
-# 2. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ РЕНДЕРИНГА MATPLOTLIB
-# ---------------------------------------------------------
-def render_latex(formula_str, fontsize=28, text_color="#1e293b"):
-    """Рендерит LaTeX-формулу на прозрачном фоне с высоким разрешением."""
-    fig = plt.figure(figsize=(0.1, 0.1))
-    fig.patch.set_alpha(0.0)
-    ax = fig.add_axes([0, 0, 1, 1])
-    ax.patch.set_alpha(0.0)
-    ax.axis("off")
-    t = ax.text(0.5, 0.5, f"${formula_str}$", fontsize=fontsize, color=text_color, ha="center", va="center")
-    fig.canvas.draw()
-    bbox = t.get_window_extent(fig.canvas.get_renderer())
-    bbox_inches = bbox.transformed(fig.dpi_scale_trans.inverted())
-    fig.set_size_inches(bbox_inches.width + 0.35, bbox_inches.height + 0.25)
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png", dpi=300, transparent=True, bbox_inches="tight", pad_inches=0.08)
-    plt.close(fig)
-    buf.seek(0)
-    return buf
-
-def render_vector_diagram(mode="parallelogram"):
-    """Создаёт чистую векторную иллюстрацию для правила параллелограмма или треугольника."""
-    fig, ax = plt.subplots(figsize=(4.8, 3.2), dpi=300)
-    fig.patch.set_alpha(0.0)
-    ax.patch.set_alpha(0.0)
-    ax.axis("off")
-
-    if mode == "parallelogram":
-        # Векторы из общего начала (0, 0)
-        ax.quiver(0, 0, 2.5, 0, angles='xy', scale_units='xy', scale=1, color='#2563eb', width=0.016)
-        ax.quiver(0, 0, 1.2, 1.8, angles='xy', scale_units='xy', scale=1, color='#0ea5e9', width=0.016)
-        # Пунктирные стороны параллелограмма
-        ax.plot([2.5, 3.7], [0, 1.8], '--', color='#94a3b8', lw=1.5)
-        ax.plot([1.2, 3.7], [1.8, 1.8], '--', color='#94a3b8', lw=1.5)
-        # Результирующая диагональ
-        ax.quiver(0, 0, 3.7, 1.8, angles='xy', scale_units='xy', scale=1, color='#10b981', width=0.02)
-
-        ax.text(1.25, -0.28, r"$\vec{F}_1$", fontsize=15, color='#1e293b', ha='center', weight='bold')
-        ax.text(0.45, 1.05, r"$\vec{F}_2$", fontsize=15, color='#1e293b', ha='center', weight='bold')
-        ax.text(2.1, 1.25, r"$\vec{R} = \vec{F}_1 + \vec{F}_2$", fontsize=15, color='#047857', ha='center', weight='bold')
-        ax.set_xlim(-0.5, 4.3)
-        ax.set_ylim(-0.5, 2.4)
-
-    elif mode == "triangle":
-        # Сложение "голова к хвосту"
-        ax.quiver(0, 0, 2.6, 0, angles='xy', scale_units='xy', scale=1, color='#2563eb', width=0.016)
-        ax.quiver(2.6, 0, 1.1, 1.8, angles='xy', scale_units='xy', scale=1, color='#0ea5e9', width=0.016)
-        # Замыкающий вектор из начала первого в конец второго
-        ax.quiver(0, 0, 3.7, 1.8, angles='xy', scale_units='xy', scale=1, color='#10b981', width=0.02)
-
-        ax.text(1.3, -0.28, r"$\vec{F}_1$", fontsize=15, color='#1e293b', ha='center', weight='bold')
-        ax.text(3.35, 0.85, r"$\vec{F}_2$", fontsize=15, color='#1e293b', ha='center', weight='bold')
-        ax.text(1.7, 1.15, r"$\vec{R}$", fontsize=16, color='#047857', ha='center', weight='bold')
-        ax.set_xlim(-0.5, 4.3)
-        ax.set_ylim(-0.5, 2.4)
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png", dpi=300, transparent=True, bbox_inches="tight", pad_inches=0.05)
-    plt.close(fig)
-    buf.seek(0)
-    return buf
-
-# ---------------------------------------------------------
-# 3. ПОСТРОЕНИЕ БАЗОВОГО ШАБЛОНА СЛАЙДА (UI КАРКАС)
-# ---------------------------------------------------------
-def create_base_slide(prs, step_num, total_steps, category="פיזיקה תיכונית"):
-    slide = prs.slides.add_slide(prs.slide_layouts[6])
-
-    # Заливка фона офф-вайт
-    bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, prs.slide_width, prs.slide_height)
-    bg.fill.solid()
-    bg.fill.fore_color.rgb = COLOR_BG
-    bg.line.fill.background()
-
-    # Шапка: Бейдж категории (слева вверху)
-    badge = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.1), Inches(2.2), Inches(0.42))
-    badge.fill.solid()
-    badge.fill.fore_color.rgb = COLOR_ACCENT_BG
-    badge.line.fill.background()
-    p = badge.text_frame.paragraphs[0]
-    p.text = category
-    p.font.name = FONT_FAMILY
-    p.font.size = Pt(12)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_ACCENT
-    p.alignment = PP_ALIGN.CENTER
-
-    # Шапка: Счётчик кадров (справа вверху)
-    counter_box = slide.shapes.add_textbox(Inches(5.0), Inches(1.1), Inches(1.7), Inches(0.42))
-    p_cnt = counter_box.text_frame.paragraphs[0]
-    p_cnt.text = f"{step_num:02d} / {total_steps:02d}"
-    p_cnt.font.name = FONT_FAMILY
-    p_cnt.font.size = Pt(13)
-    p_cnt.font.bold = True
-    p_cnt.font.color.rgb = COLOR_MUTED
-    p_cnt.alignment = PP_ALIGN.RIGHT
-
-    return slide
-
-def add_card(slide, top_in, height_in, bg_color=COLOR_CARD, border_color=COLOR_BORDER):
-    card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(top_in), Inches(5.9), Inches(height_in))
-    card.fill.solid()
-    card.fill.fore_color.rgb = bg_color
-    if border_color:
-        card.line.color.rgb = border_color
-        card.line.width = Pt(1.2)
-    else:
-        card.line.fill.background()
-    return card
-
-# ---------------------------------------------------------
-# 4. СБОРКА ПРЕЗЕНТАЦИИ (8 КАДРОВ)
-# ---------------------------------------------------------
-prs = Presentation()
-prs.slide_width = Inches(7.5)
-prs.slide_height = Inches(13.333)
-TOTAL_SLIDES = 8
-
-# --- СЛАЙД 1: Титульный хук ---
-s1 = create_base_slide(prs, 1, TOTAL_SLIDES, "מכניקה | וקטורים")
-card1 = add_card(s1, 1.8, 8.8)
-
-# Заголовок
-tb1 = s1.shapes.add_textbox(Inches(1.1), Inches(2.2), Inches(5.3), Inches(2.2))
-tf1 = tb1.text_frame
-tf1.word_wrap = True
-p1 = tf1.paragraphs[0]
-p1.text = "איך מחברים כוחות באמת?"
-p1.font.name = FONT_FAMILY
-p1.font.size = Pt(32)
-p1.font.bold = True
-p1.font.color.rgb = COLOR_TITLE
-p1.alignment = PP_ALIGN.RIGHT
-
-p1_sub = tf1.add_paragraph()
-p1_sub.text = "חיבור כוחות איננו סכום אלגברי פשוט של מספרים. כוח הוא וקטור, ויש לו גודל וגם כיוון."
-p1_sub.font.name = FONT_FAMILY
-p1_sub.font.size = Pt(17)
-p1_sub.font.color.rgb = COLOR_TEXT
-p1_sub.space_before = Pt(14)
-p1_sub.alignment = PP_ALIGN.RIGHT
-
-# Формула в центре карточки
-f1_buf = render_latex(r"\Sigma \vec{F} = \vec{F}_{\text{net}} = \vec{F}_1 + \vec{F}_2 + \dots", fontsize=24, text_color="#1e293b")
-s1.shapes.add_picture(f1_buf, Inches(1.2), Inches(5.0), width=Inches(5.1))
-
-# Пояснительный бейдж внизу карточки
-note1 = s1.shapes.add_textbox(Inches(1.1), Inches(7.4), Inches(5.3), Inches(2.6))
-tf1_note = note1.text_frame
-tf1_note.word_wrap = True
-p_n1 = tf1_note.paragraphs[0]
-p_n1.text = "מדוע 3N ועוד 4N יכולים לתת 5N, 7N או אפילו 1N?"
-p_n1.font.name = FONT_FAMILY
-p_n1.font.size = Pt(18)
-p_n1.font.bold = True
-p_n1.font.color.rgb = COLOR_ACCENT
-p_n1.alignment = PP_ALIGN.RIGHT
-
-p_n1_desc = tf1_note.add_paragraph()
-p_n1_desc.text = "הכול תלוי בזווית ביניהם! גלו את שני הכללים הגרפיים החשובים בפיזיקה ◄"
-p_n1_desc.font.name = FONT_FAMILY
-p_n1_desc.font.size = Pt(15)
-p_n1_desc.font.color.rgb = COLOR_MUTED
-p_n1_desc.space_before = Pt(8)
-p_n1_desc.alignment = PP_ALIGN.RIGHT
-
-
-# --- СЛАЙД 2: Понятие равнодействующей силы ---
-s2 = create_base_slide(prs, 2, TOTAL_SLIDES)
-add_card(s2, 1.8, 8.8)
-
-tb2 = s2.shapes.add_textbox(Inches(1.1), Inches(2.2), Inches(5.3), Inches(1.8))
-tf2 = tb2.text_frame
-tf2.word_wrap = True
-p2 = tf2.paragraphs[0]
-p2.text = "מהו שקול הכוחות?"
-p2.font.name = FONT_FAMILY
-p2.font.size = Pt(28)
-p2.font.bold = True
-p2.font.color.rgb = COLOR_TITLE
-p2.alignment = PP_ALIGN.RIGHT
-
-p2_sub = tf2.add_paragraph()
-p2_sub.text = "כוח בודד שמחליף את כל הכוחות הפועלים על הגוף, ויוצר בדיוק את אותה ההשפעה הדינמית."
-p2_sub.font.name = FONT_FAMILY
-p2_sub.font.size = Pt(16)
-p2_sub.font.color.rgb = COLOR_TEXT
-p2_sub.space_before = Pt(10)
-p2_sub.alignment = PP_ALIGN.RIGHT
-
-f2_buf = render_latex(r"\vec{R} = \sum_{i=1}^{n} \vec{F}_i = m\vec{a}", fontsize=26, text_color="#1d4ed8")
-s2.shapes.add_picture(f2_buf, Inches(1.3), Inches(4.7), width=Inches(4.9))
-
-tb2_pts = s2.shapes.add_textbox(Inches(1.1), Inches(6.8), Inches(5.3), Inches(3.2))
-tf2_pts = tb2_pts.text_frame
-tf2_pts.word_wrap = True
-pts = [
-    "• כוח שקול (R או Fnet) אינו כוח פיזיקלי נוסף.",
-    "• הוא התוצאה הווקטורית המשותפת של כל משיכה ודחיפה.",
-    "• על פי החוק השני של ניוטון, רק הוא קובע את התאוצה."
-]
-for i, pt in enumerate(pts):
-    p = tf2_pts.add_paragraph() if i > 0 else tf2_pts.paragraphs[0]
-    p.text = pt
-    p.font.name = FONT_FAMILY
-    p.font.size = Pt(15)
-    p.font.color.rgb = COLOR_TEXT
-    p.space_before = Pt(12)
-    p.alignment = PP_ALIGN.RIGHT
-
-
-# --- СЛАЙД 3: Правило параллелограмма (Определение) ---
-s3 = create_base_slide(prs, 3, TOTAL_SLIDES)
-add_card(s3, 1.8, 8.8)
-
-tb3 = s3.shapes.add_textbox(Inches(1.1), Inches(2.2), Inches(5.3), Inches(2.0))
-tf3 = tb3.text_frame
-tf3.word_wrap = True
-p3 = tf3.paragraphs[0]
-p3.text = "כלל המקבילית"
-p3.font.name = FONT_FAMILY
-p3.font.size = Pt(28)
-p3.font.bold = True
-p3.font.color.rgb = COLOR_TITLE
-p3.alignment = PP_ALIGN.RIGHT
-
-p3_sub = tf3.add_paragraph()
-p3_sub.text = "כאשר שני כוחות יוצאים מאותה נקודה בגוף, פורשים עליהם מקבילית. אלכסון המקבילית הוא השקול!"
-p3_sub.font.name = FONT_FAMILY
-p3_sub.font.size = Pt(16)
-p3_sub.font.color.rgb = COLOR_TEXT
-p3_sub.space_before = Pt(10)
-p3_sub.alignment = PP_ALIGN.RIGHT
-
-diag_par = render_vector_diagram("parallelogram")
-s3.shapes.add_picture(diag_par, Inches(1.1), Inches(4.6), width=Inches(5.3))
-
-tb3_steps = s3.shapes.add_textbox(Inches(1.1), Inches(8.0), Inches(5.3), Inches(2.2))
-tf3_st = tb3_steps.text_frame
-tf3_st.word_wrap = True
-p_st1 = tf3_st.paragraphs[0]
-p_st1.text = "1. מעבירים מקביל לכל וקטור מקצה הווקטור השני."
-p_st1.font.name = FONT_FAMILY
-p_st1.font.size = Pt(14)
-p_st1.font.color.rgb = COLOR_MUTED
-p_st1.alignment = PP_ALIGN.RIGHT
-
-p_st2 = tf3_st.add_paragraph()
-p_st2.text = "2. האלכסון שיוצא מנקודת המוצא המשותפת מייצג את גודל וכיוון השקול."
-p_st2.font.name = FONT_FAMILY
-p_st2.font.size = Pt(14)
-p_st2.font.color.rgb = COLOR_MUTED
-p_st2.space_before = Pt(8)
-p_st2.alignment = PP_ALIGN.RIGHT
-
-
-# --- СЛАЙД 4: Аналитический расчёт (Теорема косинусов для векторов) ---
-s4 = create_base_slide(prs, 4, TOTAL_SLIDES)
-add_card(s4, 1.8, 8.8)
-
-tb4 = s4.shapes.add_textbox(Inches(1.1), Inches(2.2), Inches(5.3), Inches(1.8))
-tf4 = tb4.text_frame
-tf4.word_wrap = True
-p4 = tf4.paragraphs[0]
-p4.text = "חישוב גודל השקול"
-p4.font.name = FONT_FAMILY
-p4.font.size = Pt(28)
-p4.font.bold = True
-p4.font.color.rgb = COLOR_TITLE
-p4.alignment = PP_ALIGN.RIGHT
-
-p4_sub = tf4.add_paragraph()
-p4_sub.text = "אם הזווית בין שני הכוחות היא α, ניתן למצוא את גודל השקול בעזרת נוסחת המקבילית המורחבת:"
-p4_sub.font.name = FONT_FAMILY
-p4_sub.font.size = Pt(16)
-p4_sub.font.color.rgb = COLOR_TEXT
-p4_sub.space_before = Pt(10)
-p4_sub.alignment = PP_ALIGN.RIGHT
-
-f4_buf = render_latex(r"R = \sqrt{F_1^2 + F_2^2 + 2 F_1 F_2 \cos\alpha}", fontsize=22, text_color="#1e293b")
-s4.shapes.add_picture(f4_buf, Inches(1.0), Inches(4.5), width=Inches(5.5))
-
-tb4_spec = s4.shapes.add_textbox(Inches(1.1), Inches(6.4), Inches(5.3), Inches(3.8))
-tf4_spec = tb4_spec.text_frame
-tf4_spec.word_wrap = True
-
-p_sp0 = tf4_spec.paragraphs[0]
-p_sp0.text = "שים לב לפלוס (+) לפני הקוסינוס! זו אינה משפט הקוסינוסים הרגיל למשולש, אלא נוסחה לזווית שבין הזנבות."
-p_sp0.font.name = FONT_FAMILY
-p_sp0.font.size = Pt(14)
-p_sp0.font.bold = True
-p_sp0.font.color.rgb = COLOR_AMBER
-p_sp0.alignment = PP_ALIGN.RIGHT
-
-cases = [
-    "• כוחות באותו כיוון (α = 0°): R = F₁ + F₂",
-    "• כוחות מנוגדים (α = 180°): R = |F₁ - F₂|",
-    "• כוחות מאונכים (α = 90°): R = √(F₁² + F₂²)"
-]
-for c in cases:
-    p = tf4_spec.add_paragraph()
-    p.text = c
-    p.font.name = FONT_FAMILY
-    p.font.size = Pt(14)
-    p.font.color.rgb = COLOR_TEXT
-    p.space_before = Pt(8)
-    p.alignment = PP_ALIGN.RIGHT
-
-
-# --- СЛАЙД 5: Правило треугольника ---
-s5 = create_base_slide(prs, 5, TOTAL_SLIDES)
-add_card(s5, 1.8, 8.8)
-
-tb5 = s5.shapes.add_textbox(Inches(1.1), Inches(2.2), Inches(5.3), Inches(2.0))
-tf5 = tb5.text_frame
-tf5.word_wrap = True
-p5 = tf5.paragraphs[0]
-p5.text = "כלל המשולש (ראש לזנב)"
-p5.font.name = FONT_FAMILY
-p5.font.size = Pt(28)
-p5.font.bold = True
-p5.font.color.rgb = COLOR_TITLE
-p5.alignment = PP_ALIGN.RIGHT
-
-p5_sub = tf5.add_paragraph()
-p5_sub.text = "העתק את הווקטור השני במקביל כך שזנבו יתחבר לראש הווקטור הראשון. השקול מחבר את ההתחלה לסוף."
-p5_sub.font.name = FONT_FAMILY
-p5_sub.font.size = Pt(16)
-p5_sub.font.color.rgb = COLOR_TEXT
-p5_sub.space_before = Pt(10)
-p5_sub.alignment = PP_ALIGN.RIGHT
-
-diag_tri = render_vector_diagram("triangle")
-s5.shapes.add_picture(diag_tri, Inches(1.1), Inches(4.6), width=Inches(5.3))
-
-tb5_tip = s5.shapes.add_textbox(Inches(1.1), Inches(8.0), Inches(5.3), Inches(2.2))
-tf5_tip = tb5_tip.text_frame
-tf5_tip.word_wrap = True
-p_t1 = tf5_tip.paragraphs[0]
-p_t1.text = "יתרון כלל המשולש:"
-p_t1.font.name = FONT_FAMILY
-p_t1.font.size = Pt(16)
-p_t1.font.bold = True
-p_t1.font.color.rgb = COLOR_ACCENT
-p_t1.alignment = PP_ALIGN.RIGHT
-
-p_t2 = tf5_tip.add_paragraph()
-p_t2.text = "מאפשר חיבור רציף של שרשרת כוחות רבים (מצולע כוחות) בקלות ובמהירות!"
-p_t2.font.name = FONT_FAMILY
-p_t2.font.size = Pt(14)
-p_t2.font.color.rgb = COLOR_TEXT
-p_t2.space_before = Pt(6)
-p_t2.alignment = PP_ALIGN.RIGHT
-
-
-# --- СЛАЙД 6: Сравнение методов ---
-s6 = create_base_slide(prs, 6, TOTAL_SLIDES)
-add_card(s6, 1.8, 8.8)
-
-tb6 = s6.shapes.add_textbox(Inches(1.1), Inches(2.2), Inches(5.3), Inches(1.5))
-tf6 = tb6.text_frame
-tf6.word_wrap = True
-p6 = tf6.paragraphs[0]
-p6.text = "מתי להשתמש בכל שיטה?"
-p6.font.name = FONT_FAMILY
-p6.font.size = Pt(28)
-p6.font.bold = True
-p6.font.color.rgb = COLOR_TITLE
-p6.alignment = PP_ALIGN.RIGHT
-
-# Внутренняя мини-карточка: מקבילית
-c_par = add_card(s6, 3.8, 2.6, bg_color=RGBColor(241, 245, 249), border_color=COLOR_BORDER)
-tb_c_par = s6.shapes.add_textbox(Inches(1.1), Inches(3.9), Inches(5.3), Inches(2.4))
-tf_cp = tb_c_par.text_frame
-tf_cp.word_wrap = True
-p_cp_h = tf_cp.paragraphs[0]
-p_cp_h.text = "🔷 כלל המקבילית (זנב לזנב)"
-p_cp_h.font.name = FONT_FAMILY
-p_cp_h.font.size = Pt(17)
-p_cp_h.font.bold = True
-p_cp_h.font.color.rgb = COLOR_ACCENT
-p_cp_h.alignment = PP_ALIGN.RIGHT
-
-p_cp_b = tf_cp.add_paragraph()
-p_cp_b.text = "אידיאלי כאשר שני כוחות פועלים בו-זמנית על אותה נקודה פיזית בגוף (תרשים גוף חופשי)."
-p_cp_b.font.name = FONT_FAMILY
-p_cp_b.font.size = Pt(14)
-p_cp_b.font.color.rgb = COLOR_TEXT
-p_cp_b.space_before = Pt(6)
-p_cp_b.alignment = PP_ALIGN.RIGHT
-
-# Внутренняя мини-карточка: משולש
-c_tri = add_card(s6, 6.7, 2.6, bg_color=RGBColor(241, 245, 249), border_color=COLOR_BORDER)
-tb_c_tri = s6.shapes.add_textbox(Inches(1.1), Inches(6.8), Inches(5.3), Inches(2.4))
-tf_ct = tb_c_tri.text_frame
-tf_ct.word_wrap = True
-p_ct_h = tf_ct.paragraphs[0]
-p_ct_h.text = "🟢 כלל המשולש (ראש לזנב)"
-p_ct_h.font.name = FONT_FAMILY
-p_ct_h.font.size = Pt(17)
-p_ct_h.font.bold = True
-p_ct_h.font.color.rgb = COLOR_EMERALD
-p_ct_h.alignment = PP_ALIGN.RIGHT
-
-p_ct_b = tf_ct.add_paragraph()
-p_ct_b.text = "מעולה לפתרון גיאומטרי עם טריגונומטריה (משפט הסינוסים) או בבדיקת שיווי משקל (משולש סגור: R=0)."
-p_ct_b.font.name = FONT_FAMILY
-p_ct_b.font.size = Pt(14)
-p_ct_b.font.color.rgb = COLOR_TEXT
-p_ct_b.space_before = Pt(6)
-p_ct_b.alignment = PP_ALIGN.RIGHT
-
-
-# --- СЛАЙД 7: Типичная ошибка на экзамене ---
-s7 = create_base_slide(prs, 7, TOTAL_SLIDES, "זהירות | מלכודת בגרות")
-add_card(s7, 1.8, 8.8)
-
-tb7 = s7.shapes.add_textbox(Inches(1.1), Inches(2.2), Inches(5.3), Inches(1.8))
-tf7 = tb7.text_frame
-tf7.word_wrap = True
-p7 = tf7.paragraphs[0]
-p7.text = "הטעות הנפוצה ביותר!"
-p7.font.name = FONT_FAMILY
-p7.font.size = Pt(28)
-p7.font.bold = True
-p7.font.color.rgb = COLOR_AMBER
-p7.alignment = PP_ALIGN.RIGHT
-
-p7_sub = tf7.add_paragraph()
-p7_sub.text = "הוספת השקול לתרשים כוחות קיים כאילו היה כוח נוסף מן המציאות."
-p7_sub.font.name = FONT_FAMILY
-p7_sub.font.size = Pt(16)
-p7_sub.font.color.rgb = COLOR_TEXT
-p7_sub.space_before = Pt(8)
-p7_sub.alignment = PP_ALIGN.RIGHT
-
-f7_buf = render_latex(r"\Sigma \vec{F} = \vec{R} \quad (\text{לא סופרים את } F_1, F_2 \text{ וגם את } R!)", fontsize=20, text_color="#dc2626")
-s7.shapes.add_picture(f7_buf, Inches(0.9), Inches(4.5), width=Inches(5.7))
-
-tb7_rules = s7.shapes.add_textbox(Inches(1.1), Inches(6.5), Inches(5.3), Inches(3.8))
-tf7_r = tb7_rules.text_frame
-tf7_r.word_wrap = True
-
-rules = [
-    "❌ אסור לסמן בתרשים גוף חופשי גם את הכוחות האמיתיים וגם את השקול יחד.",
-    "✅ אם מחליפים את הכוחות בשקול – הכוחות המקוריים נמחקים מהחישוב.",
-    "💡 השקול הוא שווה-ערך מתמטי, לא גוף שדוחף או מושך!"
-]
-for r in rules:
-    p = tf7_r.add_paragraph()
-    p.text = r
-    p.font.name = FONT_FAMILY
-    p.font.size = Pt(15)
-    p.font.color.rgb = COLOR_TEXT
-    p.space_before = Pt(12)
-    p.alignment = PP_ALIGN.RIGHT
-
-
-# --- СЛАЙД 8: Резюме и призыв к действию (CTA) ---
-s8 = create_base_slide(prs, 8, TOTAL_SLIDES, "סיכום מעשי")
-card8 = add_card(s8, 1.8, 8.8)
-
-tb8 = s8.shapes.add_textbox(Inches(1.1), Inches(2.2), Inches(5.3), Inches(1.8))
-tf8 = tb8.text_frame
-tf8.word_wrap = True
-p8 = tf8.paragraphs[0]
-p8.text = "שלושה עקרונות ברזל"
-p8.font.name = FONT_FAMILY
-p8.font.size = Pt(28)
-p8.font.bold = True
-p8.font.color.rgb = COLOR_TITLE
-p8.alignment = PP_ALIGN.RIGHT
-
-tb8_sum = s8.shapes.add_textbox(Inches(1.1), Inches(3.5), Inches(5.3), Inches(4.2))
-tf8_sum = tb8_sum.text_frame
-tf8_sum.word_wrap = True
-
-summary_items = [
-    ("1. כיוון קובע הכול", "גודל השקול חסום תמיד בין ההפרש לסכום: |F₁ - F₂| ≤ R ≤ F₁ + F₂"),
-    ("2. מקבילית", "מצויינת לשני כוחות מנקודה אחת (זנב לזנב)."),
-    ("3. משולש ומצולע", "נוחים לרצף כוחות רבים או בדיקת סגירות לשיווי משקל.")
-]
-
-for title, desc in summary_items:
-    p_t = tf8_sum.add_paragraph()
-    p_t.text = title
-    p_t.font.name = FONT_FAMILY
-    p_t.font.size = Pt(16)
-    p_t.font.bold = True
-    p_t.font.color.rgb = COLOR_ACCENT
-    p_t.space_before = Pt(12)
-    p_t.alignment = PP_ALIGN.RIGHT
-
-    p_d = tf8_sum.add_paragraph()
-    p_d.text = desc
-    p_d.font.name = FONT_FAMILY
-    p_d.font.size = Pt(14)
-    p_d.font.color.rgb = COLOR_TEXT
-    p_d.space_before = Pt(2)
-    p_d.alignment = PP_ALIGN.RIGHT
-
-# CTA Плашка
-cta_box = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.1), Inches(8.3), Inches(5.3), Inches(1.8))
-cta_box.fill.solid()
-cta_box.fill.fore_color.rgb = COLOR_ACCENT_BG
-cta_box.line.fill.background()
-
-tb_cta = s8.shapes.add_textbox(Inches(1.2), Inches(8.4), Inches(5.1), Inches(1.6))
-tf_cta = tb_cta.text_frame
-tf_cta.word_wrap = True
-p_c1 = tf_cta.paragraphs[0]
-p_c1.text = "שמרו את הפוסט לחזרה לפני הבגרות!"
-p_c1.font.name = FONT_FAMILY
-p_c1.font.size = Pt(16)
-p_c1.font.bold = True
-p_c1.font.color.rgb = COLOR_ACCENT
-p_c1.alignment = PP_ALIGN.CENTER
-
-p_c2 = tf_cta.add_paragraph()
-p_c2.text = "יש לכם שאלות על פירוק כוחות לרכיבים? כתבו בתגובות!"
-p_c2.font.name = FONT_FAMILY
-p_c2.font.size = Pt(14)
-p_c2.font.color.rgb = COLOR_TEXT
-p_c2.space_before = Pt(6)
-p_c2.alignment = PP_ALIGN.CENTER
-
-# ---------------------------------------------------------
-# 5. СОХРАНЕНИЕ ПРЕЗЕНТАЦИИ
-# ---------------------------------------------------------
-output_filename = "resultant_force_carousel.pptx"
-prs.save(output_filename)
-print(f"Презентация успешно создана: {output_filename}")
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>קינמטיקה - מכניקה 5 יח"ל</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-secondary: #4b5563;
+            --accent-blue: #0070f3;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', system-ui, sans-serif; }
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 0%, #172033 0%, #0b0e14 60%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 25px 20px 60px;
+        }
+        .container { width: 100%; max-width: 1100px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 10px; }
+        .back-link { color: #60a5fa; text-decoration: none; font-weight: 700; }
+        .back-link:hover { text-decoration: underline; }
+        .breadcrumbs { color: #94a3b8; font-size: 0.9rem; }
+        .header-section { text-align: center; padding: 10px 0 32px; }
+        .header-section h1 { font-size: 2.1rem; font-weight: 800; margin-bottom: 8px; }
+        .header-section p { color: #94a3b8; font-size: 1.05rem; }
+
+        .section-title { font-size: 1.35rem; font-weight: 700; margin: 28px 0 16px; color: #e2e8f0; border-right: 4px solid var(--accent-blue); padding-right: 12px; }
+
+        /* Карточки симуляций и PDF */
+        .materials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 36px; }
+        .mat-card {
+            background: var(--card-bg); color: var(--text-main); border-radius: 14px; padding: 22px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.2s; border-top: 4px solid var(--accent-blue);
+        }
+        .mat-card:hover { transform: translateY(-4px); }
+        .mat-card.pdf { border-top-color: var(--accent-red); }
+        .mat-badge { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; margin-bottom: 10px; width: fit-content; }
+        .mat-card.pdf .mat-badge { background: #fef2f2; color: #b91c1c; }
+        .mat-card h3 { font-size: 1.15rem; margin-bottom: 8px; }
+        .mat-card p { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 18px; line-height: 1.4; }
+        .mat-btn { display: block; text-align: center; padding: 10px; border-radius: 8px; background: var(--accent-blue); color: #fff; text-decoration: none; font-weight: 700; font-size: 0.9rem; }
+        .mat-card.pdf .mat-btn { background: var(--accent-red); }
+
+        /* Сетка задач Багрута */
+        .bagrut-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+        .bagrut-item {
+            background: #161b26; border: 1px solid #262f40; border-radius: 12px; padding: 16px;
+            text-decoration: none; color: #fff; display: flex; flex-direction: column; justify-content: space-between;
+            transition: all 0.2s;
+        }
+        .bagrut-item:hover { background: #1e2636; border-color: var(--accent-blue); transform: translateY(-3px); }
+        .bagrut-year { font-size: 1.25rem; font-weight: 800; color: #60a5fa; }
+        .bagrut-q { font-size: 0.9rem; color: #cbd5e1; margin-top: 4px; }
+        .bagrut-tag { font-size: 0.75rem; color: #10b981; margin-top: 10px; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-nav">
+            <a href="../index.html" class="back-link">← חזרה למכניקה</a>
+            <span class="breadcrumbs">ראשי / מכניקה / קינמטיקה</span>
+        </div>
+
+        <div class="header-section">
+            <h1>קינמטיקה</h1>
+            <p>סימולציה אינטראקטיבית, דפי סיכום ופתרונות מודרכים לשאלות בגרות</p>
+        </div>
+
+        <h2 class="section-title">סימולציות וסיכומי שיעור</h2>
+        <div class="materials-grid">
+            <div class="mat-card">
+                <div>
+                    <span class="mat-badge">סימולציה אינטראקטיבית</span>
+                    <h3>סימולציית קינמטיקה</h3>
+                    <p>חקר תנועה בקו ישר, גרפים של מקום-זמן, מהירות-זמן ותאוצה.</p>
+                </div>
+                <a href="kinematics_simulation.html" class="mat-btn">הפעל סימולציה ←</a>
+            </div>
+            <div class="mat-card pdf">
+                <div>
+                    <span class="mat-badge">PDF סיכום 01-0</span>
+                    <h3>תנועה קצובה</h3>
+                    <p>הגדרת מהירות, גרפים ופתרון בעיות בתנועה שוות מהירות.</p>
+                </div>
+                <a href="01_0_uniform_motion.pdf" target="_blank" class="mat-btn">פתח PDF ←</a>
+            </div>
+            <div class="mat-card pdf">
+                <div>
+                    <span class="mat-badge">PDF סיכום 01-1</span>
+                    <h3>קינמטיקה - תנועה שוות תאוצה</h3>
+                    <p>נוסחאות קינמטיקה, ניתוח גרפים ושטחים מתחת לגרף.</p>
+                </div>
+                <a href="01_1_kinematics.pdf" target="_blank" class="mat-btn">פתח PDF ←</a>
+            </div>
+            <div class="mat-card pdf">
+                <div>
+                    <span class="mat-badge">PDF סיכום 01-2</span>
+                    <h3>נפילה חופשית וזריקה אנכית</h3>
+                    <p>תנועה אנכית בהשפעת כוח הכובד בלבד.</p>
+                </div>
+                <a href="01_2_vertical_motion.pdf" target="_blank" class="mat-btn">פתח PDF ←</a>
+            </div>
+        </div>
+
+        <h2 class="section-title">פתרונות מודרכים לבגרות (22 שאלות)</h2>
+        <div class="bagrut-grid">
+            <a href="M_2024_1.html" class="bagrut-item"><span class="bagrut-year">2024</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2023_3.html" class="bagrut-item"><span class="bagrut-year">2023</span><span class="bagrut-q">שאלה 3</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2023_1.html" class="bagrut-item"><span class="bagrut-year">2023</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2022_1.html" class="bagrut-item"><span class="bagrut-year">2022</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2021_3.html" class="bagrut-item"><span class="bagrut-year">2021</span><span class="bagrut-q">שאלה 3</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2021_1.html" class="bagrut-item"><span class="bagrut-year">2021</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2020_1.html" class="bagrut-item"><span class="bagrut-year">2020</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2019_2.html" class="bagrut-item"><span class="bagrut-year">2019</span><span class="bagrut-q">שאלה 2</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2019_1.html" class="bagrut-item"><span class="bagrut-year">2019</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2016_2.html" class="bagrut-item"><span class="bagrut-year">2016</span><span class="bagrut-q">שאלה 2</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2013_1.html" class="bagrut-item"><span class="bagrut-year">2013</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2011_1.html" class="bagrut-item"><span class="bagrut-year">2011</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2008_1.html" class="bagrut-item"><span class="bagrut-year">2008</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2007_1.html" class="bagrut-item"><span class="bagrut-year">2007</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2006_1.html" class="bagrut-item"><span class="bagrut-year">2006</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2003_2.html" class="bagrut-item"><span class="bagrut-year">2003</span><span class="bagrut-q">שאלה 2</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2002_1.html" class="bagrut-item"><span class="bagrut-year">2002</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2001_1.html" class="bagrut-item"><span class="bagrut-year">2001</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_2000_1.html" class="bagrut-item"><span class="bagrut-year">2000</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_1999_2.html" class="bagrut-item"><span class="bagrut-year">1999</span><span class="bagrut-q">שאלה 2</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_1999_1.html" class="bagrut-item"><span class="bagrut-year">1999</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_1998_1.html" class="bagrut-item"><span class="bagrut-year">1998</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_1996_1.html" class="bagrut-item"><span class="bagrut-year">1996</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+            <a href="M_1995_1.html" class="bagrut-item"><span class="bagrut-year">1995</span><span class="bagrut-q">שאלה 1</span><span class="bagrut-tag">פתרון מודרך ←</span></a>
+        </div>
+    </div>
+</body>
+</html>
