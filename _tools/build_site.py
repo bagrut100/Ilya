@@ -234,6 +234,61 @@ def year_chips(items):
     return ('<div class="chips"><button class="on" onclick="setF(\'year\',\'all\',this)">כל השנים</button>'
             + ''.join('<button onclick="setF(\'year\',\'%s\',this)">%s</button>' % (y, y) for y in years) + '</div>')
 
+ELEC_CARDS = [  # folder, description, svg inner
+ ('02_Electricity/02_1_electrostatics', 'מטען, שדה חשמלי ופוטנציאל: יחידות לימוד ושאלות בגרות עם בונה פתרון.',
+  '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
+ ('02_Electricity/02_2_current', 'זרם, מתח והתנגדות במעגלי זרם ישר.', '<path d="M3 12h4l2-6 4 12 2-6h6"/>'),
+ ('02_Electricity/02_3_magnetism', 'שדה מגנטי, כוח לורנץ ותנועת חלקיק טעון בשדה.',
+  '<path d="M6 3v8a6 6 0 0 0 12 0V3"/><line x1="4" y1="3" x2="8" y2="3"/><line x1="16" y1="3" x2="20" y2="3"/>'),
+ ('02_Electricity/02_4_induction', 'שטף מגנטי, חוק פאראדיי וחוק לנץ.', '<path d="M3 12c0-4 4-4 4 0s4 4 4 0 4-4 4 0 4 4 4 0"/>'),
+]
+
+
+def badge_text(n):
+    return 'חומר אחד' if n == 1 else ('%d חומרים' % n if n else 'בפיתוח')
+
+
+def parent_pages(items):
+    """Refresh material counts on the mechanics page and build the electricity page in the same style."""
+    cnt = {f: sum(1 for i in items if i['folder'] == f) for f in SECTIONS}
+    mp = '01_Mechanics/index.html'
+    m = open(mp, encoding='utf-8').read()
+    parts = m.split('<div class="card t')
+    for k in range(1, len(parts)):
+        for f in SECTIONS:
+            if f.startswith('01_Mechanics/') and 'href="%s/index.html"' % f.split('/')[1] in parts[k]:
+                parts[k] = re.sub(r'(<span class="badge badge-active">)[^<]*(</span>)',
+                                  lambda mm: mm.group(1) + badge_text(cnt[f]) + mm.group(2), parts[k], count=1)
+    m2 = '<div class="card t'.join(parts)
+    open(mp, 'w', encoding='utf-8').write(m2)
+    # electricity page: head/style of the mechanics page, own colours and cards
+    head = m2[:m2.index('<style>/* topic-colours */')]
+    head = head.replace('<title>מכניקה - פיזיקה 5 יח"ל</title>', '<title>חשמל ומגנטיות - פיזיקה 5 יח"ל</title>')
+    css = '<style>/* topic-colours */\n'
+    for n, (f, _, _) in enumerate(ELEC_CARDS, 1):
+        c, t = TOPIC[f]
+        css += ('.card.t%d{border-top-color:%s !important}.card.t%d .icon-box{background:%s !important;color:%s !important}'
+                '.card.t%d .badge{background:%s !important;color:%s !important}.card.t%d .card-btn{background-color:%s !important}\n'
+                ) % (n, c, n, t, c, n, t, c, n, c)
+    css += '</style>\n</head>\n<body>\n\n    <div class="container">\n'
+    css += ('        <div class="top-nav">\n            <a href="../index.html" class="back-link">← חזרה לעמוד הראשי</a>\n'
+            '            <span class="breadcrumbs">ראשי / חשמל ומגנטיות</span>\n        </div>\n        \n'
+            '        <div class="header-section">\n            <h1>חשמל ומגנטיות</h1>\n'
+            '            <p>בחר נושא לצפייה ביחידות לימוד, שאלות בגרות ובונה פתרון</p>\n        </div>\n\n'
+            '        <div class="cards-container">\n')
+    cards = ''
+    for n, (f, desc, svg) in enumerate(ELEC_CARDS, 1):
+        cards += ('            <div class="card t%d">\n                <div>\n                    <div class="card-top">\n'
+                  '                        <div class="icon-box">\n'
+                  '                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">\n'
+                  '                                %s\n                            </svg>\n                        </div>\n'
+                  '                        <span class="badge badge-active">%s</span>\n                    </div>\n'
+                  '                    <h2>%s</h2>\n                    <p>%s</p>\n                </div>\n'
+                  '                <a href="%s/index.html" class="card-btn">כנסו לפרק ←</a>\n            </div>\n\n'
+                  ) % (n, svg, badge_text(cnt[f]), esc(SECTIONS[f][0]), esc(desc), f.split('/')[1])
+    open('02_Electricity/index.html', 'w', encoding='utf-8').write(
+        head + css + cards.rstrip('\n') + '\n        </div>\n    </div>\n\n</body>\n</html>\n')
+
 
 def main():
     items, missing = collect()
@@ -254,6 +309,7 @@ def main():
     open('catalog.html', 'w', encoding='utf-8').write(
         page('כל החומרים | איליה וינוקור', top, 'כל החומרים', 'סינון לפי נושא ושנה', tchips + year_chips(items),
              sections_html(items, lambda i: i['folder'] + '/' + i['file'], True)))
+    parent_pages(items)
     print('items:', len(items), '| sections written:', sum(os.path.isdir(f) for f in SECTIONS))
     print('files without description (add to META):', missing or 'none')
 

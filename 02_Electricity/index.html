@@ -3,120 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>חשמל ומגנטיות - תרגילים</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-</head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
-
-    <nav class="bg-slate-900 text-white py-3 px-4 shadow-sm">
-        <div class="container mx-auto max-w-5xl flex justify-between items-center">
-            <span class="font-bold text-cyan-400">חשמל ומגנטיות | מאגר תרגילים</span>
-            <a href="../index.html" class="text-sm bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded transition">חזרה לדף הבית 🏠</a>
-        </div>
-    </nav>
-
-    <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
-        
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
-            <span class="text-sm font-bold text-gray-500 block mb-2">סינון לפי נושאים (נוצר אוטומטית):</span>
-            <div class="flex flex-wrap gap-2" id="tags-container">
-                <button onclick="filterTags('all')" class="bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer">הכל (#all)</button>
-            </div>
-        </div>
-
-        <div class="space-y-4" id="materials-list">
-            
-            
-
-            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
-                 data-tags="אלקטרוסטטיקה,מטען,שדה_חשמלי">
-                <div>
-                    <h4 class="font-bold text-gray-900 text-lg">אלקטרוסטטיקה</h4>
-                    <p class="text-gray-500 text-xs mt-1 mb-3">שדה חשמלי, מטען ופוטנציאל</p>
-                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
-                </div>
-                <a href="02_1_electrostatics/index.html" class="bg-gray-400 text-white text-sm font-medium px-4 py-2 rounded-lg text-center cursor-not-allowed">בקרוב</a>
-            </div>
-
-            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
-                 data-tags="זרם,מעגלים,התנגדות">
-                <div>
-                    <h4 class="font-bold text-gray-900 text-lg">זרם חשמלי ומעגלים</h4>
-                    <p class="text-gray-500 text-xs mt-1 mb-3">זרם, מתח והתנגדות במעגלים</p>
-                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
-                </div>
-                <a href="02_2_current/index.html" class="bg-gray-400 text-white text-sm font-medium px-4 py-2 rounded-lg text-center cursor-not-allowed">בקרוב</a>
-            </div>
-
-            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
-                 data-tags="מגנטיות,בגרות,כוח_לורנץ">
-                <div>
-                    <h4 class="font-bold text-gray-900 text-lg">כוח לורנץ ומסלול חלקיק</h4>
-                    <p class="text-gray-500 text-xs mt-1 mb-3">תנועה מעгלית של פרוטון בשדה מגנטי אחיד.</p>
-                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
-                </div>
-                <a href="02_3_magnetism/index.html" class="bg-gray-400 text-white text-sm font-medium px-4 py-2 rounded-lg text-center cursor-not-allowed">בקרוב</a>
-            </div>
-
-            <div class="item-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition" 
-                 data-tags="חוק_לנץ,השראה_אלקטרומגנטית">
-                <div>
-                    <h4 class="font-bold text-gray-900 text-lg">ניסוי השראה עם סליל ומגנט</h4>
-                    <p class="text-gray-500 text-xs mt-1 mb-3">סימולציה של זרם מושרה וקביעת כיוונו.</p>
-                    <div class="card-tags-visible flex flex-wrap gap-1.5"></div>
-                </div>
-                <a href="02_4_induction/index.html" class="bg-gray-400 text-white text-sm font-medium px-4 py-2 rounded-lg text-center cursor-not-allowed">בקרוב</a>
-            </div>
-
-        </div>
-    </main>
-
-    <script>
-        // 1. Собираем все теги со всех карточек автоматически
-        const cards = document.querySelectorAll('.item-card');
-        const tagsContainer = document.getElementById('tags-container');
-        const allTags = new Set(); // Сет, чтобы теги не повторялись
-
-        cards.forEach(card => {
-            const rawTags = card.getAttribute('data-tags');
-            if (rawTags) {
-                const tagsArray = rawTags.split(',');
-                
-                // Отрисовываем теги внутри самой карточки, чтобы не писать их вручную в HTML
-                const visibleContainer = card.querySelector('.card-tags-visible');
-                tagsArray.forEach(tag => {
-                    allTags.add(tag); // Добавляем в общий список фильтров
-                    
-                    const tagSpan = document.createElement('span');
-                    tagSpan.className = "text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded hover:bg-cyan-100 hover:text-cyan-700 cursor-pointer";
-                    tagSpan.innerText = `#${tag}`;
-                    tagSpan.onclick = () => filterTags(tag);
-                    visibleContainer.appendChild(tagSpan);
-                });
-            }
-        });
-
-        // 2. Автоматически создаем кнопки фильтров наверху страницы
-        allTags.forEach(tag => {
-            const btn = document.createElement('button');
-            btn.className = "bg-cyan-50 hover:bg-cyan-100 text-cyan-700 text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer";
-            btn.innerText = `#${tag}`;
-            btn.onclick = () => filterTags(tag);
-            tagsContainer.appendChild(btn);
-        });
-
-        // 3. Функция самого фильтра (работает так же мгновенно)
-        function filterTags(selectedTag) {
-            cards.forEach(card => {
-                const cardTags = card.getAttribute('data-tags').split(',');
-                if (selectedTag === 'all' || cardTags.includes(selectedTag)) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+    <title>חשמל ומגנטיות - פיזיקה 5 יח"ל</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-secondary: #4b5563;
+            --accent-blue: #0070f3;
+            --accent-slate: #64748b;
         }
-    </script>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Heebo', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 0%, #172033 0%, #0b0e14 60%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 25px 20px 60px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.98rem;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover {
+            opacity: 0.85;
+            text-decoration: underline;
+        }
+
+        .breadcrumbs {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .header-section {
+            text-align: center;
+            padding: 10px 0 36px;
+        }
+
+        .header-section h1 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        .header-section p {
+            color: #94a3b8;
+            font-size: 1.05rem;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border-radius: 16px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            border-top: 5px solid var(--accent-blue);
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .icon-box {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: #eff6ff;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-box svg {
+            width: 26px;
+            height: 26px;
+            stroke-width: 2;
+        }
+
+        .badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .badge-active {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .badge-soon {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .card h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .card-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            background-color: var(--accent-blue);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.98rem;
+            text-decoration: none;
+            transition: filter 0.2s;
+        }
+
+        .card-btn:hover {
+            filter: brightness(1.08);
+        }
+
+        /* Карточки в разработке */
+        .card-soon {
+            border-top-color: #cbd5e1;
+        }
+
+        .card-soon .icon-box {
+            background: #f1f5f9;
+            color: var(--accent-slate);
+        }
+
+        .card-soon .card-btn {
+            background-color: var(--accent-slate);
+        }
+
+        @media (max-width: 600px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            .header-section h1 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+<style>/* topic-colours */
+.card.t1{border-top-color:#CA8A04 !important}.card.t1 .icon-box{background:#FEF6D8 !important;color:#CA8A04 !important}.card.t1 .badge{background:#FEF6D8 !important;color:#CA8A04 !important}.card.t1 .card-btn{background-color:#CA8A04 !important}
+.card.t2{border-top-color:#0891B2 !important}.card.t2 .icon-box{background:#E0F5FA !important;color:#0891B2 !important}.card.t2 .badge{background:#E0F5FA !important;color:#0891B2 !important}.card.t2 .card-btn{background-color:#0891B2 !important}
+.card.t3{border-top-color:#9333EA !important}.card.t3 .icon-box{background:#F3E8FF !important;color:#9333EA !important}.card.t3 .badge{background:#F3E8FF !important;color:#9333EA !important}.card.t3 .card-btn{background-color:#9333EA !important}
+.card.t4{border-top-color:#E11D48 !important}.card.t4 .icon-box{background:#FFE8EE !important;color:#E11D48 !important}.card.t4 .badge{background:#FFE8EE !important;color:#E11D48 !important}.card.t4 .card-btn{background-color:#E11D48 !important}
+</style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="top-nav">
+            <a href="../index.html" class="back-link">← חזרה לעמוד הראשי</a>
+            <span class="breadcrumbs">ראשי / חשמל ומגנטיות</span>
+        </div>
+        
+        <div class="header-section">
+            <h1>חשמל ומגנטיות</h1>
+            <p>בחר נושא לצפייה ביחידות לימוד, שאלות בגרות ובונה פתרון</p>
+        </div>
+
+        <div class="cards-container">
+            <div class="card t1">
+                <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-active">7 חומרים</span>
+                    </div>
+                    <h2>אלקטרוסטטיקה</h2>
+                    <p>מטען, שדה חשמלי ופוטנציאל: יחידות לימוד ושאלות בגרות עם בונה פתרון.</p>
+                </div>
+                <a href="02_1_electrostatics/index.html" class="card-btn">כנסו לפרק ←</a>
+            </div>
+
+            <div class="card t2">
+                <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12h4l2-6 4 12 2-6h6"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-active">חומר אחד</span>
+                    </div>
+                    <h2>זרם חשמלי ומעגלים</h2>
+                    <p>זרם, מתח והתנגדות במעגלי זרם ישר.</p>
+                </div>
+                <a href="02_2_current/index.html" class="card-btn">כנסו לפרק ←</a>
+            </div>
+
+            <div class="card t3">
+                <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 3v8a6 6 0 0 0 12 0V3"/><line x1="4" y1="3" x2="8" y2="3"/><line x1="16" y1="3" x2="20" y2="3"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-active">בפיתוח</span>
+                    </div>
+                    <h2>מגנטיות</h2>
+                    <p>שדה מגנטי, כוח לורנץ ותנועת חלקיק טעון בשדה.</p>
+                </div>
+                <a href="02_3_magnetism/index.html" class="card-btn">כנסו לפרק ←</a>
+            </div>
+
+            <div class="card t4">
+                <div>
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12c0-4 4-4 4 0s4 4 4 0 4-4 4 0 4 4 4 0"/>
+                            </svg>
+                        </div>
+                        <span class="badge badge-active">בפיתוח</span>
+                    </div>
+                    <h2>אינדוקציה</h2>
+                    <p>שטף מגנטי, חוק פאראדיי וחוק לנץ.</p>
+                </div>
+                <a href="02_4_induction/index.html" class="card-btn">כנסו לפרק ←</a>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
