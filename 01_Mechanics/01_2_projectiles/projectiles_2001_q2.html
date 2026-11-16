@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בונה הפתרון - בגרות 2001 שאלה 2 (כדור פורח)</title>
+<style>
+  :root {
+    --primary: #1e40af;
+    --secondary: #3b82f6;
+    --bg: #eff6ff;
+    --card: #ffffff;
+    --text: #1e293b;
+    --border: #bfdbfe;
+  }
+  * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body { background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.6; }
+  .container { max-width: 960px; margin: 0 auto; }
+  header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 20px 25px; border-radius: 12px; margin-bottom: 20px; }
+  header h1 { margin: 0 0 8px 0; font-size: 1.6rem; }
+  .problem-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+  .tab-btn { background: #dbeafe; border: 1px solid #93c5fd; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--primary); }
+  .tab-btn.active { background: var(--secondary); color: white; }
+  .tab-content { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .tab-content.active { display: block; }
+  .step-card { border-right: 4px solid var(--secondary); background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: none; }
+  .step-card.visible { display: block; }
+  .step-title { font-weight: bold; color: var(--primary); margin-bottom: 8px; }
+  .math { direction: ltr; display: inline-block; background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; }
+  .math-block { direction: ltr; text-align: left; background: #1e293b; color: #f8fafc; padding: 12px 16px; border-radius: 8px; font-family: 'Courier New', monospace; margin: 10px 0; }
+  .controls { display: flex; gap: 10px; margin-top: 15px; }
+  .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+  .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+  .final-ans { background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 10px; }
+  .svg-box { text-align: center; margin: 15px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>מרכז הפיזיקה 5 יח"ל | בונה הפתרון[cite: 1]</h1>
+    <p>בגרות 2001, שאלה 2 — אבן המשוחררת מכדור פורח (זריקה משופעת)</p>
+  </header>
+
+  <div class="problem-box">
+    <strong>נתוני השאלה:</strong> כדור פורח עולה במהירות <span class="math">5 m/s</span> ונסחף אופקית ימינה במהירות <span class="math">4.5 m/s</span>.<br>
+    בנקודה A בגובה <span class="math">4 m</span> מעל הקרקע (נקודה P) משוחררת אבן.<br>
+    <strong>עיקרון מפתח (התמדה):</strong> ברגע השחרור האבן מקבלת את מהירות הכדור הפורח: <span class="math">v₀x = 4.5 m/s</span> ימינה, ו-<span class="math">v₀y = 5 m/s</span> כלפי מעלה.
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab('tabA')">סעיף א'</button>
+    <button class="tab-btn" onclick="openTab('tabB')">סעיף ב'</button>
+    <button class="tab-btn" onclick="openTab('tabC')">סעיף ג'</button>
+    <button class="tab-btn" onclick="openTab('tabD')">סעיף ד'</button>
+  </div>
+
+  <!-- סעיף א -->
+  <div id="tabA" class="tab-content active">
+    <h3>סעיף א': תרשים מקורב של מסלול תנועת האבן</h3>
+    <div id="tabA-steps">
+      <div class="step-card visible">
+        <div class="step-title">מאפייני המסלול</div>
+        מכיוון שלעצם יש מהירות התחלתית אופקית (<span class="math">4.5 m/s</span>) ואנכית כלפי מעלה (<span class="math">5 m/s</span>), האבן נעה במסלול <strong>פרבולי</strong>: היא עולה תחילה מעל גובה נקודה A, מגיעה לשיא גובה, ולאחר מכן יורדת ופוגעת בקרקע בנקודה Q מימין לנקודה P.
+        <div class="svg-box">
+          <svg width="400" height="210" viewBox="0 0 400 210">
+            <line x1="30" y1="180" x2="370" y2="180" stroke="#1e293b" stroke-width="2.5"/>
+            <line x1="90" y1="100" x2="90" y2="180" stroke="#94a3b8" stroke-dasharray="4,4"/>
+            <circle cx="90" cy="100" r="4" fill="#1e40af"/>
+            <text x="72" y="102" font-weight="bold">A</text>
+            <text x="85" y="198" font-weight="bold">P</text>
+            <text x="305" y="198" font-weight="bold">Q</text>
+            <!-- מסלול פרבולי -->
+            <path d="M 90 100 Q 175 15 310 180" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+            <circle cx="310" cy="180" r="4" fill="#dc2626"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- סעיף ב -->
+  <div id="tabB" class="tab-content">
+    <h3>סעיף ב': חישוב גודל הרכיב האנכי של המהירות בפגיעה בנקודה Q</h3>
+    <div id="tabB-steps">
+      <div class="step-card visible">
+        <div class="step-title">שלב 1: בחירת ציר y ונוסחת מהירות-מקום</div>
+        נבחר ציר <span class="math">y</span> חיובי כלפי מעלה שראשיתו בקרקע (<span class="math">y₀ = 4 m</span>, <span class="math">y_Q = 0</span>, <span class="math">v₀y = +5 m/s</span>, <span class="math">a_y = -10 m/s²</span>):
+        <div class="math-block">vy² = v₀y² + 2 · a_y · (y_Q - y₀)</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 2: הצבה וחישוב</div>
+        <div class="math-block">vy² = 5² + 2 · (-10) · (0 - 4) = 25 + 80 = 105
+|vy| = √105 = 10.25 m/s</div>
+        <div class="final-ans">תשובה סופית: גודל הרכיב האנכי של המהירות בפגיעה בקרקע הוא 10.25 m/s.</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="nextStep('tabB')">הצג שלב הבא ◄</button>
+      <button class="btn btn-outline" onclick="showAll('tabB')">הצג פתרון מלא</button>
+    </div>
+  </div>
+
+  <!-- סעיף ג -->
+  <div id="tabC" class="tab-content">
+    <h3>סעיף ג': חישוב זווית הפגיעה בקרקע יחסית לכיוון האופקי</h3>
+    <div id="tabC-steps">
+      <div class="step-card visible">
+        <div class="step-title">שימוש ביחס הטריגונומטרי בין רכיבי המהירות</div>
+        הרכיב האופקי של המהירות קבוע: <span class="math">vₓ = 4.5 m/s</span>.<br>
+        הרכיב האנכי בפגיעה הוא <span class="math">|vy| = 10.25 m/s</span>:
+        <div class="math-block">tan(α) = |vy| / vₓ = 10.25 / 4.5 = 2.277  ⟹  α = 66.3°</div>
+        <div class="final-ans">תשובה סופית: זווית הפגיעה בקרקע היא 66.3° מתחת לאופק.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- סעיף ד -->
+  <div id="tabD" class="tab-content">
+    <h3>סעיף ד': מיקום הכדור הפורח יחסית לנקודה Q ברגע פגיעת האבן</h3>
+    <div id="tabD-steps">
+      <div class="step-card visible">
+        <div class="step-title">שלב 1: חישוב זמן התנועה של האבן (<span class="math">t</span>)</div>
+        נשתמש במשוואת המהירות האנכית (<span class="math">vy = -10.25 m/s</span>):
+        <div class="math-block">vy = v₀y - g · t  ⟹  -10.25 = 5 - 10 · t  ⟹  t = 15.25 / 10 = 1.525 s</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 2: ניתוח המיקום האופקי של הכדור הפורח</div>
+        המהירות האופקית של הכדור הפורח (<span class="math">4.5 m/s</span>) זהה למהירות האופקית של האבן לאורך כל התנועה.<br>
+        לכן, הכדור הפורח עובר בדיוק את אותו מרחק אופקי שעברה האבן ונמצא <strong>במרחק אופקי 0 מטר (בדיוק מעל נקודה Q)</strong>.
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 3: חישוב הגובה של הכדור הפורח מעל הקרקע</div>
+        הכדור הפורח עולה במהירות אנכית קבועה <span class="math">5 m/s</span> מגובה התחלתי <span class="math">4 m</span>:
+        <div class="math-block">y_balloon = y₀ + v_y(balloon) · t = 4 + 5 · 1.525 = 4 + 7.625 = 11.625 m</div>
+        <div class="final-ans">תשובה סופית: הכדור הפורח נמצא בדיוק מעל נקודה Q (מרחק אופקי 0) ובגובה 11.63 m מעל הקרקע.</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="nextStep('tabD')">הצג שלב הבא ◄</button>
+      <button class="btn btn-outline" onclick="showAll('tabD')">הצג פתרון מלא</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    event.target.classList.add('active');
+  }
+  function nextStep(tabId) {
+    const steps = document.querySelectorAll(`#${tabId}-steps .step-card`);
+    for (let i = 0; i < steps.length; i++) {
+      if (!steps[i].classList.contains('visible')) {
+        steps[i].classList.add('visible');
+        break;
+      }
+    }
+  }
+  function showAll(tabId) {
+    document.querySelectorAll(`#${tabId}-steps .step-card`).forEach(el => el.classList.add('visible'));
+  }
+</script>
+</body>
+</html>

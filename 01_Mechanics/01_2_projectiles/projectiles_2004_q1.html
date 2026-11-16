@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בונה הפתרון - בגרות 2004 שאלה 1 (חץ ותפוח)</title>
+<style>
+  :root {
+    --primary: #14532d;
+    --secondary: #15803d;
+    --bg: #f0fdf4;
+    --card: #ffffff;
+    --text: #1e293b;
+    --border: #bbf7d0;
+  }
+  * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body { background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.6; }
+  .container { max-width: 960px; margin: 0 auto; }
+  header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 20px 25px; border-radius: 12px; margin-bottom: 20px; }
+  header h1 { margin: 0 0 8px 0; font-size: 1.6rem; }
+  .problem-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+  .tab-btn { background: #dcfce7; border: 1px solid #86efac; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--primary); }
+  .tab-btn.active { background: var(--secondary); color: white; }
+  .tab-content { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .tab-content.active { display: block; }
+  .step-card { border-right: 4px solid var(--secondary); background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: none; }
+  .step-card.visible { display: block; }
+  .step-title { font-weight: bold; color: var(--primary); margin-bottom: 8px; }
+  .math { direction: ltr; display: inline-block; background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; }
+  .math-block { direction: ltr; text-align: left; background: #1e293b; color: #f8fafc; padding: 12px 16px; border-radius: 8px; font-family: 'Courier New', monospace; margin: 10px 0; }
+  .controls { display: flex; gap: 10px; margin-top: 15px; }
+  .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+  .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+  .final-ans { background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>מרכז הפיזיקה 5 יח"ל | בונה הפתרון[cite: 1]</h1>
+    <p>בגרות 2004, שאלה 1 — חץ ותפוח (תנועה יחסית וזריקה משופעת)</p>
+  </header>
+
+  <div class="problem-box">
+    <strong>נתוני השאלה:</strong> החץ והתפוח נמצאים בגובה <span class="math">h = 1.8 m</span> מעל הקרקע ובמרחק אופקי <span class="math">d = 6 m</span> זה מזה.<br>
+    ברגע <span class="math">t = 0</span> החץ נורה אופקית במהירות <span class="math">v₀ = 20 m/s</span>, ובו-זמנית התפוח משוחרר ממנוחה.
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab('tabA')">סעיף א'</button>
+    <button class="tab-btn" onclick="openTab('tabB')">סעיף ב'</button>
+    <button class="tab-btn" onclick="openTab('tabC')">סעיף ג'</button>
+    <button class="tab-btn" onclick="openTab('tabD')">סעיף ד'</button>
+  </div>
+
+  <!-- סעיף א -->
+  <div id="tabA" class="tab-content active">
+    <h3>סעיף א': הוכחה שהחץ עובר 6 מטר לפני שהתפוח פוגע בקרקע</h3>
+    <div id="tabA-steps">
+      <div class="step-card visible">
+        <div class="step-title">שלב 1: זמן ההגעה של החץ לקו האנכי של התפוח (<span class="math">t_arrow</span>)</div>
+        בציר האופקי החץ נע במהירות קבועה <span class="math">vₓ = 20 m/s</span>:
+        <div class="math-block">t_arrow = Δx / vₓ = 6 / 20 = 0.3 s</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 2: זמן נפילת התפוח לקרקע (<span class="math">t_apple</span>)</div>
+        התפוח נופל נפילה חופשית מגובה <span class="math">1.8 m</span>:
+        <div class="math-block">h = ½ · g · t_apple²  ⟹  1.8 = 5 · t_apple²  ⟹  t_apple = √0.36 = 0.6 s</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 3: השוואת הזמנים</div>
+        מכיוון ש- <span class="math">0.3 s &lt; 0.6 s</span>, החץ מגיע לקו האנכי של התפוח בעוד התפוח עדיין באוויר (בגובה <span class="math">1.8 - 5·0.3² = 1.35 m</span>).
+        <div class="final-ans">מ.ש.ל: החץ עובר 6 מטרים ב-0.3 שניות, לפני שהתפוח פוגע בקרקע (ב-0.6 שניות).</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="nextStep('tabA')">הצג שלב הבא ◄</button>
+      <button class="btn btn-outline" onclick="showAll('tabA')">הצג פתרון מלא</button>
+    </div>
+  </div>
+
+  <!-- סעיף ב -->
+  <div id="tabB" class="tab-content">
+    <h3>סעיף ב': הסבר מדוע החץ פוגע בתפוח</h3>
+    <div id="tabB-steps">
+      <div class="step-card visible">
+        <div class="step-title">הסבר באמצעות נוסחאות הקינמטיקה</div>
+        נבחר ציר <span class="math">y</span> כלפי מטה שראשיתו בגובה ההתחלתי (<span class="math">y₀ = 0</span>):<br>
+        <ul>
+          <li><strong>מיקום אנכי של התפוח:</strong> <span class="math">y_apple(t) = 0 + 0·t + ½·g·t² = ½gt²</span></li>
+          <li><strong>מיקום אנכי של החץ:</strong> מכיוון שהחץ נורה אופקית, <span class="math">v₀y = 0</span>, ולכן <span class="math">y_arrow(t) = 0 + 0·t + ½·g·t² = ½gt²</span>.</li>
+        </ul>
+        <strong>מסקנה:</strong> בכל רגע <span class="math">t</span> שני הגופים נמצאים באותו גובה בדיוק (<span class="math">y_arrow(t) = y_apple(t)</span>). לכן ברגע <span class="math">t = 0.3 s</span> שבו הקואורדינטות האופקיות משתוות (<span class="math">x = 6 m</span>), גם הקואורדינטות האנכיות שוות והחץ פוגע בתפוח.
+      </div>
+    </div>
+  </div>
+
+  <!-- סעיף ג -->
+  <div id="tabC" class="tab-content">
+    <h3>סעיף ג': מהירות החץ (גודל וכיוון) ברגע הפגיעה בתפוח</h3>
+    <div id="tabC-steps">
+      <div class="step-card visible">
+        <div class="step-title">שלב 1: רכיבי המהירות ברגע <span class="math">t = 0.3 s</span></div>
+        <ul>
+          <li>רכיב אופקי: <span class="math">vₓ = 20 m/s</span> (קבוע)</li>
+          <li>רכיב אנכי: <span class="math">|vy| = g · t = 10 · 0.3 = 3 m/s</span> (כלפי מטה)</li>
+        </ul>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 2: גודל וכיוון המהירות השקולה</div>
+        <div class="math-block">v = √(vₓ² + vy²) = √(20² + 3²) = √409 = 20.22 m/s
+tan(α) = |vy| / vₓ = 3 / 20 = 0.15  ⟹  α = 8.53° מתחת לאופק</div>
+        <div class="final-ans">תשובה סופית: גודל המהירות הוא 20.22 m/s, וכיוונה 8.53° מתחת לאופק.</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="nextStep('tabC')">הצג שלב הבא ◄</button>
+      <button class="btn btn-outline" onclick="showAll('tabC')">הצג פתרון מלא</button>
+    </div>
+  </div>
+
+  <!-- סעיף ד -->
+  <div id="tabD" class="tab-content">
+    <h3>סעיף ד': מהירות הזריקה האנכית של התפוח בירייה משופעת</h3>
+    <div id="tabD-steps">
+      <div class="step-card visible">
+        <div class="step-title">השוואת המיקום האנכי של החץ והתפוח</div>
+        נתון כי החץ נורה עם <span class="math">v₀x = 20 m/s</span> ו-<span class="math">v₀y(arrow) = 20 m/s</span> כלפי מעלה.<br>
+        כדי שהחץ יפגע בתפוח, על המיקום האנכי שלהם להיות זהה בכל רגע <span class="math">t</span>:
+        <div class="math-block">y_arrow(t) = y_apple(t)
+y₀ + v₀y(arrow)·t - ½gt² = y₀ + v₀y(apple)·t - ½gt²</div>
+        מכיוון ש-<span class="math">y₀</span> ו-<span class="math">-½gt²</span> זהים בשני האגפים, מתקבל:
+        <div class="math-block">v₀y(apple) = v₀y(arrow) = 20 m/s (כלפי מעלה)</div>
+        <div class="final-ans">תשובה סופית: יש לזרוק את התפוח אנכית כלפי מעלה במהירות 20 m/s.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    event.target.classList.add('active');
+  }
+  function nextStep(tabId) {
+    const steps = document.querySelectorAll(`#${tabId}-steps .step-card`);
+    for (let i = 0; i < steps.length; i++) {
+      if (!steps[i].classList.contains('visible')) {
+        steps[i].classList.add('visible');
+        break;
+      }
+    }
+  }
+  function showAll(tabId) {
+    document.querySelectorAll(`#${tabId}-steps .step-card`).forEach(el => el.classList.add('visible'));
+  }
+</script>
+</body>
+</html>

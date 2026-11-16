@@ -1,94 +1,66 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>עבודה ואנרגיה - מכניקה</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root { --bg-color: #0b0e14; --card-bg: #ffffff; --text-main: #111827; --text-secondary: #4b5563; --accent-blue: #0070f3; --accent-orange: #f59e0b; --accent-green: #10b981; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', system-ui, sans-serif; }
-        body { background-color: var(--bg-color); background-image: radial-gradient(circle at 50% 0%, #172033 0%, #0b0e14 60%); color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 25px 20px 60px; }
-        .container { width: 100%; max-width: 1060px; }
-        .top-nav { display: flex; justify-content: space-between; margin-bottom: 24px; }
-        .back-link { color: #60a5fa; text-decoration: none; font-weight: 700; }
-        .breadcrumbs { color: #94a3b8; font-size: 0.9rem; }
-        .header-section { text-align: center; padding: 10px 0 36px; }
-        .header-section h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
-        .header-section p { color: #94a3b8; font-size: 1.05rem; }
-        .cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-        .card { background: var(--card-bg); color: var(--text-main); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 12px 30px rgba(0,0,0,0.25); transition: transform 0.25s; border-top: 5px solid var(--accent-blue); }
-        .card:hover { transform: translateY(-6px); }
-        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
-        .icon-box { width: 52px; height: 52px; border-radius: 14px; background: #eff6ff; color: var(--accent-blue); display: flex; align-items: center; justify-content: center; }
-        .icon-box svg { width: 26px; height: 26px; stroke-width: 2; }
-        .badge { font-size: 0.78rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; }
-        .card h2 { font-size: 1.35rem; margin-bottom: 8px; }
-        .card p { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
-        .card-btn { display: flex; align-items: center; justify-content: center; padding: 12px 20px; border-radius: 10px; background-color: var(--accent-blue); color: #fff; font-weight: 700; text-decoration: none; }
-        .theme-orange { border-top-color: var(--accent-orange); }
-        .theme-orange .icon-box { background: #fffbeb; color: var(--accent-orange); }
-        .theme-orange .badge { background: #fffbeb; color: #b45309; }
-        .theme-orange .card-btn { background-color: var(--accent-orange); }
-        .theme-green { border-top-color: var(--accent-green); }
-        .theme-green .icon-box { background: #ecfdf5; color: var(--accent-green); }
-        .theme-green .badge { background: #ecfdf5; color: #047857; }
-        .theme-green .card-btn { background-color: var(--accent-green); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>עבודה ואנרגיה</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:#0f172a;font-family:Heebo,system-ui,sans-serif;padding:24px 16px 60px}
+.wrap{max-width:1100px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.9rem;color:#64748b}
+.top a{color:#D97706;font-weight:700;text-decoration:none}
+h1{text-align:center;font-size:1.9rem;margin:18px 0 6px}
+.sub{text-align:center;color:#475569;margin:0 0 22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 10px}
+.chips button{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:6px 14px;font:700 .85rem Heebo,sans-serif;cursor:pointer}
+.chips button.on{background:#D97706;border-color:#D97706;color:#fff}
+.grp{margin:30px 0 0}
+.grp h2{font-size:1.25rem;border-right:5px solid;padding-right:10px;margin:0 0 14px}
+.cnt{color:#64748b;font-weight:500;font-size:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;color:#0f172a;text-decoration:none;box-shadow:0 2px 6px rgba(15,23,42,.06);transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(15,23,42,.12)}
+.pill{align-self:flex-start;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px}
+.card b{font-size:1.08rem;line-height:1.35}
+.desc{font-size:.9rem;color:#475569;line-height:1.5;flex:1}
+.topic{font-size:.8rem;color:#64748b}
+.open{font-size:.88rem;font-weight:700}
+.empty{background:#fff;border:1px dashed #cbd5e1;border-radius:14px;padding:28px;text-align:center;color:#64748b;margin-top:24px}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="top-nav">
-            <a href="../index.html" class="back-link">← חזרה למכניקה</a>
-            <span class="breadcrumbs">ראשי / מכניקה / עבודה ואנרגיה</span>
-        </div>
-        <div class="header-section">
-            <h1>עבודה ואנרגיה</h1>
-            <p>סימולציות אינטראקטיביות ותרגול בנושא שימור אנרגיה ועבודת כוח</p>
-        </div>
-        <div class="cards-container">
-            <div class="card">
-                <div>
-                    <div class="card-top">
-                        <div class="icon-box">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                        </div>
-                        <span class="badge">סימולציה</span>
-                    </div>
-                    <h2>עבודה ואנרגיה</h2>
-                    <p>חקר המרות אנרגיה קינטית, פוטנציאלית ועבודת כוחות לא משמרים.</p>
-                </div>
-                <a href="work_energy_simulation.html" class="card-btn">הפעל סימולציה ←</a>
-            </div>
-            <div class="card theme-orange">
-                <div>
-                    <div class="card-top">
-                        <div class="icon-box">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h10a6 6 0 1 0-6-6v6h16"/></svg>
-                        </div>
-                        <span class="badge">סימולציה</span>
-                    </div>
-                    <h2>תנועה בלולאה (Loop)</h2>
-                    <p>שימור אנרגיה ותנועה מעגלית אנכית — תנאי השלמת סיבוב וכוח נורמלי.</p>
-                </div>
-                <a href="loop.html" class="card-btn">הפעל סימולציה ←</a>
-            </div>
-            <div class="card theme-green">
-                <div>
-                    <div class="card-top">
-                        <div class="icon-box">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                        </div>
-                        <span class="badge">תרגיל אינטראקטיבי</span>
-                    </div>
-                    <h2>תרגיל עבודה ואנרגיה (001)</h2>
-                    <p>פתרון מודרך צעד-אחר-צעד לחישוב עבודה ושינוי באנרגיה קינטית.</p>
-                </div>
-                <a href="001_work.html" class="card-btn">כנסו לתרגיל ←</a>
-            </div>
-        </div>
-    </div>
+<div class="wrap">
+<div class="top"><a href="../index.html">← חזרה למכניקה</a><span>ראשי / מכניקה / עבודה ואנרגיה</span><a href="../../catalog.html">כל החומרים</a></div>
+<h1>עבודה ואנרגיה</h1>
+<p class="sub">שימור אנרגיה ועבודת כוחות</p>
+
+<section class="grp"><h2 style="color:#D97706;border-color:#D97706">סימולציות <span class="cnt">(1)</span></h2>
+<div class="grid">
+<a class="card" href="work_energy_simulation.html" data-year="" data-topic="01_Mechanics/01_5_energy" style="border-top:4px solid #D97706"><span class="pill" style="background:#E6F1FB;color:#0C447C">סימולציה</span><b>עבודה ואנרגיה</b><span class="desc">המרות אנרגיה קינטית ופוטנציאלית ועבודת כוחות לא משמרים.</span><span class="open" style="color:#D97706">הפעל סימולציה ←</span></a>
+</div></section>
+<section class="grp"><h2 style="color:#D97706;border-color:#D97706">בונה פתרון <span class="cnt">(2)</span></h2>
+<div class="grid">
+<a class="card" href="energy_circular_loop.html" data-year="" data-topic="01_Mechanics/01_5_energy" style="border-top:4px solid #D97706"><span class="pill" style="background:#EEEDFE;color:#3C3489">בונה פתרון</span><b>תנועה מעגלית אנכית (לולאה)</b><span class="desc">תנועה מעגלית אנכית ועבודת כוחות לא משמרים.</span><span class="open" style="color:#D97706">כנסו לבונה הפתרון ←</span></a>
+<a class="card" href="energy_incline_work.html" data-year="" data-topic="01_Mechanics/01_5_energy" style="border-top:4px solid #D97706"><span class="pill" style="background:#EEEDFE;color:#3C3489">בונה פתרון</span><b>עבודה ואנרגיה במישור משופע</b><span class="desc">בונים את הפתרון צעד אחר צעד: עבודה ואנרגיה במישור משופע.</span><span class="open" style="color:#D97706">כנסו לבונה הפתרון ←</span></a>
+</div></section>
+</div>
+<script>
+var st={topic:'all',year:'all'};
+function setF(k,v,btn){
+  st[k]=v;
+  btn.parentNode.querySelectorAll('button').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  document.querySelectorAll('.card').forEach(function(el){
+    var ok=(st.topic==='all'||el.dataset.topic===st.topic)&&(st.year==='all'||el.dataset.year===st.year);
+    el.style.display=ok?'':'none';
+  });
+  document.querySelectorAll('.grp').forEach(function(g){
+    var any=Array.prototype.some.call(g.querySelectorAll('.card'),function(e){return e.style.display!=='none';});
+    g.style.display=any?'':'none';
+  });
+}
+</script>
 </body>
 </html>

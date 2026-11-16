@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בונה הפתרון - בגרות 2021 שאלה 3 (ניסוי זריקה אופקית)</title>
+<style>
+  :root {
+    --primary: #0f766e;
+    --secondary: #14b8a6;
+    --bg: #f0fdfa;
+    --card: #ffffff;
+    --text: #1e293b;
+    --border: #cbd5e1;
+  }
+  * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body { background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.6; }
+  .container { max-width: 960px; margin: 0 auto; }
+  header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 20px 25px; border-radius: 12px; margin-bottom: 20px; }
+  header h1 { margin: 0 0 8px 0; font-size: 1.6rem; }
+  .problem-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; margin: 15px 0; direction: ltr; text-align: center; }
+  th, td { border: 1px solid #94a3b8; padding: 8px; }
+  th { background: #e2e8f0; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+  .tab-btn { background: #ccfbf1; border: 1px solid #99f6e4; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--primary); }
+  .tab-btn.active { background: var(--primary); color: white; }
+  .tab-content { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .tab-content.active { display: block; }
+  .step-card { border-right: 4px solid var(--primary); background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: none; }
+  .step-card.visible { display: block; }
+  .step-title { font-weight: bold; color: var(--primary); margin-bottom: 8px; }
+  .math { direction: ltr; display: inline-block; background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; }
+  .math-block { direction: ltr; text-align: left; background: #1e293b; color: #f8fafc; padding: 12px 16px; border-radius: 8px; font-family: 'Courier New', monospace; margin: 10px 0; }
+  .controls { display: flex; gap: 10px; margin-top: 15px; }
+  .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+  .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+  .final-ans { background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 10px; }
+  .svg-box { text-align: center; margin: 15px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>מרכז הפיזיקה 5 יח"ל | בונה הפתרון[cite: 1]</h1>
+    <p>בגרות 2021, שאלה 3 — ניסוי זריקה אופקית וניתוח ליניארי</p>
+  </header>
+
+  <div class="problem-box">
+    <strong>נתוני הניסוי:</strong> כדור נזרק אופקית במהירות <span class="math">v₀</span> מגבהים שונים <span class="math">h</span>. להלן טבלת המדידות:
+    <table>
+      <tr><th>h (m)</th><td>10</td><td>20</td><td>30</td><td>40</td><td>50</td></tr>
+      <tr><th>d (m)</th><td>21.2</td><td>31.6</td><td>38.1</td><td>43.6</td><td>47.4</td></tr>
+      <tr><th>d² (m²)</th><td>449.4</td><td>998.6</td><td>1451.6</td><td>1901.0</td><td>2246.8</td></tr>
+    </table>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab('tabA')">סעיף א'</button>
+    <button class="tab-btn" onclick="openTab('tabB')">סעיף ב'</button>
+    <button class="tab-btn" onclick="openTab('tabC')">סעיף ג'</button>
+    <button class="tab-btn" onclick="openTab('tabD')">סעיף ד'</button>
+    <button class="tab-btn" onclick="openTab('tabE')">סעיף ה'</button>
+  </div>
+
+  <!-- סעיף א -->
+  <div id="tabA" class="tab-content active">
+    <h3>סעיף א': זיהוי גרפי המהירות האופקית והאנכית</h3>
+    <div id="tabA-steps">
+      <div class="step-card visible">
+        <div class="step-title">(1) גודל המהירות האופקית</div>
+        בהזנחת התנגדות האוויר, לא פועל כוח אופקי (<span class="math">aₓ = 0</span>), ולכן גודל המהירות האופקית <strong>קבוע</strong> לאורך כל הזמן ושווה ל-<span class="math">v₀</span>.<br>
+        הגרף המתאר גודל קבוע ושונה מאפס הוא <strong>גרף ג'</strong>.
+      </div>
+      <div class="step-card">
+        <div class="step-title">(2) גודל המהירות האנכית</div>
+        בציר האנכי הכדור נופל נפילה חופשית ממנוחה (<span class="math">v₀y = 0</span>) בתאוצה קבועה <span class="math">g</span>.<br>
+        גודל המהירות האנכית מקיים <span class="math">vy(t) = g · t</span> — זוהי פונקציה קווית העוברת בראשית הצירים.<br>
+        לכן הגרף המתאים הוא <strong>גרף ב'</strong>.
+        <div class="final-ans">תשובה: (1) גרף ג' | (2) גרף ב'.</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="nextStep('tabA')">הצג שלב הבא ◄</button>
+      <button class="btn btn-outline" onclick="showAll('tabA')">הצג פתרון מלא</button>
+    </div>
+  </div>
+
+  <!-- סעיף ב -->
+  <div id="tabB" class="tab-content">
+    <h3>סעיף ב': ביטוי לריבוע המרחק d² כפונקציה של h</h3>
+    <div id="tabB-steps">
+      <div class="step-card visible">
+        <div class="step-title">שלב 1: משוואת התנועה בציר האנכי</div>
+        הכדור נופל אנכית מרחק <span class="math">h</span> ללא מהירות התחלתית אנכית:
+        <div class="math-block">h = ½ · g · t²  ⟹  t² = 2h / g</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 2: משוואת התנועה בציר האופקי והעלאה בריבוע</div>
+        בציר האופקי המהירות קבועה ושווה ל-<span class="math">v₀</span>:
+        <div class="math-block">d = v₀ · t  ⟹  d² = v₀² · t²</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 3: הצבת <span class="math">t²</span> לקבלת הביטוי הסופי</div>
+        <div class="math-block">d² = (2 · v₀² / g) · h</div>
+        <div class="final-ans">תשובה סופית: d² = (2v₀² / g) · h</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="nextStep('tabB')">הצג שלב הבא ◄</button>
+      <button class="btn btn-outline" onclick="showAll('tabB')">הצג פתרון מלא</button>
+    </div>
+  </div>
+
+  <!-- סעיף ג -->
+  <div id="tabC" class="tab-content">
+    <h3>סעיף ג': דיאגרמת פיזור וקו מגמה (<span class="math">d²</span> כפונקציה של <span class="math">h</span>)</h3>
+    <div id="tabC-steps">
+      <div class="step-card visible">
+        <div class="step-title">הנחיות לסרטוט וגרף ממוחשב מדויק</div>
+        ציר אופקי: <span class="math">h (m)</span>, ציר אנכי: <span class="math">d² (m²)</span>. נסמן את 5 הנקודות ונעביר ישר מתאים ביותר (קו מגמה) העובר דרך ראשית הצירים <span class="math">(0,0)</span> (כי כאשר <span class="math">h = 0</span>, גם <span class="math">d² = 0</span>).
+        <div class="svg-box">
+          <svg width="460" height="270" viewBox="0 0 460 270">
+            <!-- רשת וצירים -->
+            <line x1="60" y1="220" x2="430" y2="220" stroke="#1e293b" stroke-width="2"/>
+            <line x1="60" y1="220" x2="60" y2="20" stroke="#1e293b" stroke-width="2"/>
+            <text x="415" y="245" font-size="13" font-weight="bold">h (m)</text>
+            <text x="15" y="25" font-size="13" font-weight="bold">d² (m²)</text>
+            <!-- שנתות X -->
+            <text x="55" y="238" font-size="11">0</text>
+            <text x="125" y="238" font-size="11">10</text>
+            <text x="195" y="238" font-size="11">20</text>
+            <text x="265" y="238" font-size="11">30</text>
+            <text x="335" y="238" font-size="11">40</text>
+            <text x="405" y="238" font-size="11">50</text>
+            <!-- שנתות Y (כל 500 מ"ר = 36 פיקסלים) -->
+            <text x="25" y="188" font-size="11">500</text>
+            <text x="20" y="152" font-size="11">1000</text>
+            <text x="20" y="116" font-size="11">1500</text>
+            <text x="20" y="80" font-size="11">2000</text>
+            <text x="20" y="44" font-size="11">2500</text>
+            <!-- קווי עזר -->
+            <line x1="60" y1="184" x2="420" y2="184" stroke="#e2e8f0"/>
+            <line x1="60" y1="148" x2="420" y2="148" stroke="#e2e8f0"/>
+            <line x1="60" y1="112" x2="420" y2="112" stroke="#e2e8f0"/>
+            <line x1="60" y1="76" x2="420" y2="76" stroke="#e2e8f0"/>
+            <line x1="60" y1="40" x2="420" y2="40" stroke="#e2e8f0"/>
+            <!-- קו מגמה: שיפוע ~ 46.2 -->
+            <line x1="60" y1="220" x2="410" y2="53.7" stroke="#dc2626" stroke-width="2"/>
+            <!-- נקודות ניסוי -->
+            <circle cx="130" cy="187.6" r="4" fill="#0f766e"/>
+            <circle cx="200" cy="148.1" r="4" fill="#0f766e"/>
+            <circle cx="270" cy="115.5" r="4" fill="#0f766e"/>
+            <circle cx="340" cy="83.1" r="4" fill="#0f766e"/>
+            <circle cx="410" cy="58.2" r="4" fill="#0f766e"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- סעיף ד -->
+  <div id="tabD" class="tab-content">
+    <h3>סעיף ד': חישוב המהירות ההתחלתית v₀ מתוך שיפוע הישר</h3>
+    <div id="tabD-steps">
+      <div class="step-card visible">
+        <div class="step-title">שלב 1: חישוב שיפוע קו המגמה</div>
+        נבחר שתי נקודות על קו המגמה (לא בהכרח נקודות מדודות): <span class="math">(0, 0)</span> ו-<span class="math">(40, 1850)</span> (או <span class="math">(50, 2310)</span>):
+        <div class="math-block">m = Δ(d²) / Δh = (1850 - 0) / (40 - 0) = 46.25 m</div>
+        (כל שיפוע בטווח <span class="math">45 - 47.5 m</span> מתקבל בהתאם לקו המגמה שסורטט).
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 2: השוואת השיפוע לביטוי התיאורטי</div>
+        מתוך סעיף ב': <span class="math">d² = (2v₀² / g) · h</span>, לכן השיפוע שווה ל-<span class="math">2v₀² / g</span>:
+        <div class="math-block">2 · v₀² / 10 = 46.25  ⟹  v₀² = 231.25  ⟹  v₀ = √231.25 = 15.2 m/s</div>
+        <div class="final-ans">תשובה סופית: המהירות ההתחלתית היא v₀ ≈ 15.2 m/s (טווח מקובל: 15.0 - 15.4 m/s).</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="nextStep('tabD')">הצג שלב הבא ◄</button>
+      <button class="btn btn-outline" onclick="showAll('tabD')">הצג פתרון מלא</button>
+    </div>
+  </div>
+
+  <!-- סעיף ה -->
+  <div id="tabE" class="tab-content">
+    <h3>סעיף ה': מהירות הפגיעה בקרקע (גודל וכיוון) עבור h = 25 m</h3>
+    <div id="tabE-steps">
+      <div class="step-card visible">
+        <div class="step-title">שלב 1: חישוב הרכיב האנכי של המהירות בפגיעה</div>
+        הכדור נופל מגובה <span class="math">h = 25 m</span> ללא מהירות התחלתית אנכית:
+        <div class="math-block">vy² = 0 + 2 · g · h = 2 · 10 · 25 = 500  ⟹  |vy| = √500 = 22.36 m/s</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 2: חישוב גודל המהירות השקולה</div>
+        הרכיב האופקי הוא <span class="math">vₓ = v₀ = 15.2 m/s</span>:
+        <div class="math-block">v = √(vₓ² + vy²) = √(15.2² + 500) = √(231.04 + 500) = √731.04 = 27.04 m/s</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 3: חישוב כיוון המהירות (זווית מתחת לאופק)</div>
+        <div class="math-block">tan(α) = |vy| / vₓ = 22.36 / 15.2 = 1.471  ⟹  α = 55.8° מתחת לאופק</div>
+        <div class="final-ans">תשובה סופית: גודל המהירות בפגיעה הוא 27.04 m/s, וכיוונה 55.8° מתחת לאופק.</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="nextStep('tabE')">הצג שלב הבא ◄</button>
+      <button class="btn btn-outline" onclick="showAll('tabE')">הצג פתרון מלא</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    event.target.classList.add('active');
+  }
+  function nextStep(tabId) {
+    const steps = document.querySelectorAll(`#${tabId}-steps .step-card`);
+    for (let i = 0; i < steps.length; i++) {
+      if (!steps[i].classList.contains('visible')) {
+        steps[i].classList.add('visible');
+        break;
+      }
+    }
+  }
+  function showAll(tabId) {
+    document.querySelectorAll(`#${tabId}-steps .step-card`).forEach(el => el.classList.add('visible'));
+  }
+</script>
+</body>
+</html>

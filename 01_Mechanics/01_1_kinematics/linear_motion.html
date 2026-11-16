@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>תנועה בקו ישר</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700;800&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+<style>
+/* layout: a kinematics bench page. sticky bar, one reading column, a track with live graphs at the centre of each topic. red = body A and its curves, blue = body B, copper = UI accent. */
+:root{
+  --bg:#f2f4f7; --paper:#ffffff; --soft:#eef1f5; --ink:#17202c; --mut:#5a6576; --line:#d8dee7; --grid:#e9edf3;
+  --pos:#cf3328; --neg:#2860c4; --acc:#a85a14; --acc-ink:#ffffff; --fieldln:#3a4557;
+  --ok:#14713f; --ok-bg:#e2f3e9; --no:#b3261e; --no-bg:#fbe7e5; --warn:#7a4a00; --warn-bg:#fff2d6;
+  --shadow:0 1px 2px rgba(23,32,44,.05),0 8px 24px rgba(23,32,44,.07);
+  --fd:"Secular One","Assistant",system-ui,sans-serif;
+  --fb:"Assistant","Arial Hebrew",system-ui,sans-serif;
+  --fm:"STIX Two Text","Cambria Math","Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0d1117; --paper:#151b24; --soft:#1b2330; --ink:#e6ebf2; --mut:#9aa5b6; --line:#2a3342; --grid:#1c2431;
+  --pos:#ff6a5c; --neg:#6aa1ff; --acc:#f0a14a; --acc-ink:#1a1206; --fieldln:#b7c2d4;
+  --ok:#5fd394; --ok-bg:#122b1d; --no:#ff8b80; --no-bg:#371816; --warn:#f2c46e; --warn-bg:#2e240f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0d1117; --paper:#151b24; --soft:#1b2330; --ink:#e6ebf2; --mut:#9aa5b6; --line:#2a3342; --grid:#1c2431;
+  --pos:#ff6a5c; --neg:#6aa1ff; --acc:#f0a14a; --acc-ink:#1a1206; --fieldln:#b7c2d4;
+  --ok:#5fd394; --ok-bg:#122b1d; --no:#ff8b80; --no-bg:#371816; --warn:#f2c46e; --warn-bg:#2e240f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.7 var(--fb);-webkit-text-size-adjust:100%;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1040px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--fd);font-weight:400;line-height:1.2;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px;border-radius:6px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--paper);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:8px;min-height:56px}
+.brand{text-decoration:none;margin-inline-end:auto;display:flex;align-items:center;gap:10px;font:400 1.3rem/1 var(--fd)}
+.brand i{display:inline-flex;gap:3px}
+.brand i b{width:12px;height:12px;border-radius:50%;display:block}
+.nl{font-weight:700;font-size:.95rem;text-decoration:none;padding:8px 12px;border-radius:999px}
+.nl:hover,.nl[aria-current]{background:var(--soft)}
+.btn{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 16px;font-weight:700;font-size:.95rem;line-height:1.3;display:inline-flex;align-items:center;gap:6px;min-height:40px;text-decoration:none}
+.btn:hover{border-color:var(--mut)}
+.btn.pri{background:var(--acc);border-color:transparent;color:var(--acc-ink)}
+.btn.sm{min-height:34px;padding:5px 12px;font-size:.88rem}
+.btn.pos{color:var(--pos)} .btn.neg{color:var(--neg)}
+
+/* home */
+.hero{display:grid;grid-template-columns:1fr 1.05fr;gap:32px;align-items:center;padding-block:34px 20px}
+.eyebrow{font-size:.85rem;font-weight:700;letter-spacing:.04em;color:var(--acc)}
+.hero h1{font-size:clamp(2.3rem,6vw,3.6rem);margin-block:6px 12px}
+.hero h1 .p{color:var(--pos)} .hero h1 .n{color:var(--neg)}
+.lead{font-size:1.1rem;color:var(--mut);max-width:32em}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.hfig{margin:0;min-width:0}
+.hfig .stage canvas{height:300px}
+.hfig figcaption{font-size:.86rem;color:var(--mut);margin-top:8px}
+.secth{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-top:22px;flex-wrap:wrap}
+.secth h2{font-size:1.6rem}
+.secth span{color:var(--mut);font-size:.92rem}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:14px}
+.tc{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-content:start;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0;transition:border-color .15s,transform .15s}
+.tc:hover{border-color:var(--acc);transform:translateY(-2px)}
+.tn{font:400 1.5rem/1.1 var(--fd);color:var(--acc);font-variant-numeric:tabular-nums}
+.tc b{font-size:1.08rem;line-height:1.35}
+.tc .ts{grid-column:2;color:var(--mut);font-size:.9rem;line-height:1.45}
+.tc .pg{grid-column:2;margin-top:8px;font-size:.8rem;color:var(--mut);display:flex;gap:10px;flex-wrap:wrap}
+.pg em{font-style:normal;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* topic */
+.th{padding-block:24px 12px}
+.crumb{font-size:.88rem;font-weight:700;color:var(--acc);text-decoration:none}
+.th h1{font-size:clamp(1.9rem,5vw,2.7rem);margin-block:4px 4px}
+.th p{color:var(--mut);font-size:1.05rem}
+.tabs{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:5;background:var(--bg);display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:12px 16px;font-weight:700;color:var(--mut);border-bottom:3px solid transparent;white-space:nowrap;flex:1 0 auto;min-height:46px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--acc)}
+.panel{padding-block:22px 8px;display:grid;gap:22px;min-width:0}
+.prose{max-width:66ch;display:grid;gap:12px;font-size:1.05rem}
+.prose p,.ex p,.q p,.sol p,.trap p{min-width:0;overflow-wrap:anywhere}
+.panel h2{font-size:1.3rem}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:10px}
+.fc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 10px 10px;text-align:center;min-width:0;display:grid;gap:4px;align-content:center}
+.fc small{color:var(--mut);font-size:.86rem;line-height:1.45}
+.trap{background:var(--warn-bg);border-radius:14px;padding:16px 18px;max-width:72ch;display:grid;gap:6px}
+.trap h2{font-size:1.1rem;color:var(--warn)}
+.tips{background:var(--paper);border:1px solid var(--line);border-inline-start:4px solid var(--acc);border-radius:14px;padding:16px 18px;max-width:72ch;display:grid;gap:8px}
+.tips h2{font-size:1.1rem;color:var(--acc)}
+.tips ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.tips li{position:relative;padding-inline-start:22px;min-width:0;overflow-wrap:anywhere}
+.tips li::before{content:"";position:absolute;inset-inline-start:2px;top:.62em;width:9px;height:9px;border-radius:50%;border:2px solid var(--acc)}
+
+/* lab */
+.stage{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow)}
+.stage canvas{display:block;width:100%;height:380px;touch-action:none;cursor:grab}
+.stage canvas.g{height:190px;cursor:default;border-top:1px solid var(--line)}
+.hint{position:absolute;inset-inline-end:10px;top:8px;font-size:.78rem;color:var(--mut);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:1px 10px;pointer-events:none;max-width:calc(100% - 20px)}
+.simbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.simbar .lab{font-size:.88rem;color:var(--mut);font-weight:600}
+.tgl{display:inline-flex;align-items:center;gap:6px;font-size:.92rem;font-weight:600;border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--paper);cursor:pointer}
+.tgl input{accent-color:var(--acc);margin:0}
+.ctls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 26px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:baseline;min-width:0}
+.ctl .cl{font-size:.95rem;font-weight:600}
+.ctl output{font-weight:700;font-variant-numeric:tabular-nums;color:var(--acc);direction:ltr;unicode-bidi:isolate}
+.ctl input{grid-column:1/-1;width:100%;accent-color:var(--acc);height:30px;margin:0}
+.outs{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.outs div{background:var(--soft);border-radius:10px;padding:8px 12px;min-width:0}
+.outs dt{font-size:.82rem;color:var(--mut);line-height:1.4}
+.outs dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums;font-size:1.02rem;direction:ltr;text-align:right;font-family:var(--fm)}
+.note{font-size:.9rem;color:var(--mut);max-width:72ch}
+
+/* example */
+.ex{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;max-width:80ch}
+.ex h3,.qn{font:700 .82rem/1.3 var(--fb);letter-spacing:.06em;color:var(--acc)}
+.gf{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gf>div{background:var(--soft);border-radius:10px;padding:10px 14px;min-width:0;display:grid;gap:4px}
+.steps{margin:0;padding-inline-start:1.4em;display:grid;gap:12px}
+.steps li{min-width:0}
+.steps li::marker{font-family:var(--fd);color:var(--acc)}
+.chk{background:var(--ok-bg);border-radius:10px;padding:10px 14px;display:grid;gap:4px}
+.chk h3{color:var(--ok)}
+
+/* practice */
+.lvl{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:6px}
+.lvl h2{font-size:1.25rem}
+.lvl span{color:var(--mut);font-size:.9rem}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:12px;max-width:80ch}
+.q.adv{border-inline-start:4px solid var(--acc)}
+.qn{display:flex;justify-content:space-between;gap:8px}
+.qn .st{letter-spacing:0;font-weight:700}
+.qn .st.ok{color:var(--ok)}
+.opts{display:grid;gap:8px}
+.opt{display:block;width:100%;text-align:start;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);line-height:1.5}
+.opt:hover:not([disabled]){border-color:var(--acc)}
+.opt[disabled]{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg);font-weight:700}
+.opt.no{border-color:var(--no);background:var(--no-bg);color:var(--mut)}
+.fb{font-size:.97rem;padding:10px 14px;border-radius:10px;background:var(--soft)}
+.fb.ok{background:var(--ok-bg)} .fb.no{background:var(--no-bg)}
+.ansrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ansrow input{width:10em;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);font-variant-numeric:tabular-nums;font-size:1rem;direction:ltr;text-align:left}
+.ansrow .u{color:var(--mut);font-weight:600;direction:ltr;unicode-bidi:isolate}
+.tip{font-size:.84rem;color:var(--mut)}
+.sol{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:.98rem;display:grid;gap:8px}
+.fig{max-width:360px;width:100%;overflow-x:auto}
+.fig svg{display:block;width:100%;height:auto}
+.score{font-weight:700;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pn{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-block:18px;margin-top:10px}
+
+/* formulas */
+.ftab{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ftab td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.ftab td.fx{text-align:center;width:46%}
+.ftab small{display:block;color:var(--mut);font-size:.85rem}
+.ftab a{font-size:.84rem;font-weight:700;color:var(--acc);text-decoration:none}
+.tscroll{overflow-x:auto}
+.foot{color:var(--mut);font-size:.86rem;padding-block:24px 34px;border-top:1px solid var(--line);margin-top:30px}
+
+/* math */
+.mx{font-family:var(--fm);font-size:1.08em;direction:ltr;unicode-bidi:isolate;display:inline-block;line-height:1.3;white-space:nowrap}
+.mx i{font-style:italic}
+.mx.fx{display:block;text-align:center;font-size:1.3rem;overflow-x:auto;overflow-y:hidden;padding:6px 2px;max-width:100%}
+.mx sup,.mx sub{font-size:.68em;line-height:0}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;font-size:.95em}
+.fr>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .25em .08em}
+.fr>span:last-child{padding:.08em .25em 0}
+.pq{color:var(--pos);font-weight:700} .nq{color:var(--neg);font-weight:700}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr;gap:18px;padding-block:22px 10px}
+  .gf{grid-template-columns:1fr}
+  .stage canvas{height:320px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+html,body{margin:0;padding:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+.stage canvas.trk{height:150px;cursor:default}
+.stage canvas.trk.tall{height:230px}
+.stage canvas.g{height:230px}
+.hint{font-size:.76rem}
+.hint.hr{inset-inline-end:auto;inset-inline-start:10px}
+.btn.sm.pri .mx{color:inherit}
+</style></head><body>
+<div dir="rtl" lang="he">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="#"><i aria-hidden="true"><b style="background:var(--pos)"></b><b style="background:var(--neg)"></b></i>תנועה בקו ישר</a>
+  <a class="nl" href="#" id="nav-home">נושאים</a>
+  <a class="nl" href="#formulas" id="nav-f">נוסחאות</a>
+</div></header>
+<main id="app"></main>
+<footer class="wrap foot">יחידת לימוד בקינמטיקה, פיזיקה 5 יח״ל. הסימונים לפי דף "נוסחאות ונתונים בפיזיקה". בחישובים: <span class="mx"><i>g</i> = 10 m/s<sup>2</sup></span>, ומזניחים את התנגדות האוויר.</footer>
+</div>
+<script>
+document.documentElement.lang='he';document.documentElement.dir='rtl';
+const G=10;
+const m=s=>`<span class="mx">${s}</span>`;
+const M=s=>`<div class="mx fx">${s}</div>`;
+const fr=(a,b)=>`<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const ov=s=>`<span style="text-decoration:overline">${s}</span>`;
+const v0='<i>v</i><sub>0</sub>', x0='<i>x</i><sub>0</sub>', y0='<i>y</i><sub>0</sub>', half=fr('1','2');
+const sq=s=>`${s}<sup>2</sup>`;
+
+/* ---------- number formatting ---------- */
+function fmt(x,d=3){
+  if(!isFinite(x))return '—'; if(Math.abs(x)<1e-30)return '0';
+  const a=Math.abs(x);
+  if(a>=1e4||a<1e-2){let e=Math.floor(Math.log10(a));let mn=+(x/10**e).toPrecision(d);if(Math.abs(mn)>=10){mn=+(mn/10).toPrecision(d);e++}return (String(mn)+'·10<sup>'+e+'</sup>').replace(/-/g,'−')}
+  return String(+x.toPrecision(d)).replace('-','−');
+}
+function parseNum(s){
+  if(!s)return NaN; s=s.trim().replace(/[−–]/g,'-').replace(/\s/g,'').replace(/,/g,'.');
+  s=s.replace(/(?:\*|x|×|·)10\^?\(?(-?\d+)\)?/i,'e$1').replace(/^10\^\(?(-?\d+)\)?$/,'1e$1');
+  return /^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)?parseFloat(s):NaN;
+}
+/* ---------- storage ---------- */
+let solved={};
+try{solved=JSON.parse(localStorage.getItem('kin-solved')||'{}')||{}}catch(e){solved={}}
+function markSolved(id){solved[id]=1;try{localStorage.setItem('kin-solved',JSON.stringify(solved))}catch(e){}}
+
+/* ---------- canvas helpers ---------- */
+function tok(){const cs=getComputedStyle(document.documentElement);const g=n=>cs.getPropertyValue(n).trim();return{paper:g('--paper'),ink:g('--ink'),mut:g('--mut'),line:g('--line'),grid:g('--grid'),pos:g('--pos'),neg:g('--neg'),acc:g('--acc'),fl:g('--fieldln'),ok:g('--ok'),soft:g('--soft')}}
+function arrow(ctx,x1,y1,x2,y2,col,w=2,head=8){const a=Math.atan2(y2-y1,x2-x1),L=Math.hypot(x2-x1,y2-y1);if(L<2)return;ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2-Math.cos(a)*head*.6,y2-Math.sin(a)*head*.6);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-head*Math.cos(a-.42),y2-head*Math.sin(a-.42));ctx.lineTo(x2-head*Math.cos(a+.42),y2-head*Math.sin(a+.42));ctx.closePath();ctx.fill()}
+function font(ctx,sz,w=700){ctx.font=`${w} ${sz}px Assistant, system-ui, sans-serif`}
+const nf=v=>String(+(+v).toFixed(6)).replace('-','−');
+const sg=(v,d=3)=>(v>0?'+':'')+fmt(v,d);
+function niceStep(r,n){const raw=r/n,p=10**Math.floor(Math.log10(raw)),f=raw/p;return(f<1.5?1:f<3.5?2:f<7.5?5:10)*p}
+
+let scenes=[],anims=[];
+function killScenes(){scenes.forEach(s=>s.ro&&s.ro.disconnect());scenes=[];anims.forEach(a=>a.stop());anims=[]}
+const themeMQ=matchMedia('(prefers-color-scheme: dark)');
+const redrawAll=()=>scenes.forEach(s=>s.draw());
+themeMQ.addEventListener&&themeMQ.addEventListener('change',redrawAll);
+new MutationObserver(redrawAll).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+function Canvas(cv,drawFn){
+  const o={cv,ctx:cv.getContext('2d'),W:0,H:0,draw(){if(!o.W)return;const c=o.ctx;c.setTransform(o.dpr,0,0,o.dpr,0,0);c.direction='ltr';const t=tok();c.fillStyle=t.paper;c.fillRect(0,0,o.W,o.H);drawFn(c,t,o)}};
+  o.resize=()=>{const r=cv.getBoundingClientRect();if(!r.width)return;o.dpr=Math.min(2,devicePixelRatio||1);o.W=r.width;o.H=r.height;cv.width=Math.round(r.width*o.dpr);cv.height=Math.round(r.height*o.dpr);o.onResize&&o.onResize();o.draw()};
+  o.ro=new ResizeObserver(o.resize);o.ro.observe(cv);scenes.push(o);return o;
+}
+
+/* one graph inside rectangle R. o:{tmax,name,series:[{f,col}],tnow?,ymin?,ymax?,shade?,tan?,marks?} */
+function graph(ctx,t,R,o){
+  const l=R.x+40,r=R.x+R.w-12,top=R.y+28,bot=R.y+R.h-22,T=o.tmax,N=240;
+  let lo=0,hi=0;
+  if(o.ymin!==undefined){lo=o.ymin;hi=o.ymax}
+  for(const s of o.series)for(let i=0;i<=N;i++){const v=s.f(T*i/N);if(v<lo)lo=v;if(v>hi)hi=v}
+  if(hi-lo<1e-9)hi=lo+1;
+  const stp=niceStep(hi-lo,R.h<210?3:5);lo=Math.floor(lo/stp+1e-9)*stp;hi=Math.ceil(hi/stp-1e-9)*stp;
+  const X=tt=>l+tt/T*(r-l),Y=v=>bot-(v-lo)/(hi-lo)*(bot-top);
+  font(ctx,11,600);ctx.lineWidth=1;ctx.textAlign='right';
+  for(let v=lo;v<=hi+stp/2;v+=stp){ctx.strokeStyle=t.grid;ctx.beginPath();ctx.moveTo(l,Y(v));ctx.lineTo(r,Y(v));ctx.stroke();ctx.fillStyle=t.mut;ctx.fillText(nf(v),l-5,Y(v)+4)}
+  const ts=niceStep(T,(r-l)<230?4:6);ctx.textAlign='center';
+  for(let v=0;v<=T+1e-9;v+=ts){ctx.strokeStyle=t.grid;ctx.beginPath();ctx.moveTo(X(v),top);ctx.lineTo(X(v),bot);ctx.stroke();if(v>0&&X(v)<r-30){ctx.fillStyle=t.mut;ctx.fillText(nf(v),X(v),bot+15)}}
+  ctx.strokeStyle=t.mut;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(l,top-8);ctx.lineTo(l,bot);ctx.moveTo(l,Y(0));ctx.lineTo(r,Y(0));ctx.stroke();
+  font(ctx,12,700);ctx.fillStyle=t.ink;ctx.textAlign='left';ctx.fillText(o.name,l+6,R.y+15);ctx.textAlign='right';ctx.fillStyle=t.mut;ctx.fillText('t (s)',r,bot+15);
+  ctx.save();ctx.beginPath();ctx.rect(l-1,top-10,r-l+3,bot-top+20);ctx.clip();
+  if(o.shade&&o.tnow>0){const s=o.series[0],xe=X(o.tnow);ctx.globalAlpha=.22;for(let px=Math.round(l);px<xe;px++){const w=Math.min(1,xe-px),v=s.f(Math.max(0,(px+w/2-l)/(r-l)*T));ctx.fillStyle=v>=0?t[s.col]:t.mut;ctx.fillRect(px,Math.min(Y(0),Y(v)),w,Math.abs(Y(v)-Y(0)))}ctx.globalAlpha=1}
+  for(const s of o.series){const path=t1=>{ctx.beginPath();const n=Math.max(2,Math.ceil(N*t1/T));for(let i=0;i<=n;i++){const tt=t1*i/n;i?ctx.lineTo(X(tt),Y(s.f(tt))):ctx.moveTo(X(tt),Y(s.f(tt)))}ctx.stroke()};
+    ctx.strokeStyle=t[s.col];
+    if(o.tnow===undefined){ctx.lineWidth=2.5;path(T)}else{ctx.lineWidth=1.4;ctx.globalAlpha=.35;path(T);ctx.globalAlpha=1;ctx.lineWidth=2.7;if(o.tnow>0)path(o.tnow)}}
+  if(o.tan&&o.tnow!==undefined){const s=o.series[0],h=T/2000,tn=o.tnow,a=Math.max(0,tn-h),b=Math.min(T,tn+h),k=(s.f(b)-s.f(a))/(b-a),d=T*.15;ctx.strokeStyle=t.ink;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(X(tn-d),Y(s.f(tn)-k*d));ctx.lineTo(X(tn+d),Y(s.f(tn)+k*d));ctx.stroke()}
+  ctx.restore();
+  if(o.marks)for(const p of o.marks){ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.fillStyle=t.paper;ctx.beginPath();ctx.arc(X(p.t),Y(p.v),5.5,0,7);ctx.fill();ctx.stroke()}
+  if(o.tnow!==undefined)for(const s of o.series){ctx.fillStyle=t[s.col];ctx.strokeStyle=t.paper;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(X(o.tnow),Y(s.f(o.tnow)),5,0,7);ctx.fill();ctx.stroke()}
+  return{X,Y,lo,hi,l,r,top,bot};
+}
+
+/* ---------- DOM builders ---------- */
+const el=(h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild};
+let uid=0;
+function slider(host,label,min,max,step,val,show,on){const id='s'+(++uid);const n=el(`<div class="ctl"><label class="cl" for="${id}">${label}</label><output for="${id}"></output><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"></div>`);const inp=n.querySelector('input'),out=n.querySelector('output');const f=()=>{out.innerHTML=show(+inp.value);on(+inp.value)};inp.addEventListener('input',f);out.innerHTML=show(val);host.appendChild(n);return{set(v){inp.value=v;out.innerHTML=show(v)},el:inp}}
+function outs(host,items){const dl=el(`<dl class="outs"></dl>`);const ref={};for(const[k,lab]of items){const d=el(`<div><dt>${lab}</dt><dd>—</dd></div>`);dl.appendChild(d);ref[k]=d.querySelector('dd')}host.appendChild(dl);return(k,v)=>{ref[k].innerHTML=v}}
+function toggle(host,label,val,on){const id='t'+(++uid);const n=el(`<label class="tgl" for="${id}"><input type="checkbox" id="${id}" ${val?'checked':''}>${label}</label>`);n.querySelector('input').addEventListener('change',e=>on(e.target.checked));host.appendChild(n);return n.querySelector('input')}
+
+/* play / pause / scrub */
+function Runner(host,tmaxFn,onT){
+  const bar=el(`<div class="simbar"><button class="btn sm pri" data-a="play">▶ הפעלה</button><button class="btn sm" data-a="reset">⟲ חזרה להתחלה</button></div>`);
+  const ctl=el('<div class="ctls"></div>');host.append(bar,ctl);
+  const R={t:0,playing:false,raf:0,last:0,bar};const pb=bar.querySelector('[data-a=play]');
+  const sl=slider(ctl,'הזמן t (אפשר לגרור)',0,1000,1,0,v=>fmt(v/1000*tmaxFn(),3)+' s',v=>{R.pause();R.t=v/1000*tmaxFn();onT()});
+  R.sync=()=>{const tm=tmaxFn();if(R.t>tm)R.t=tm;sl.set(Math.round(R.t/tm*1000))};
+  R.pause=()=>{if(R.playing){const tm=tmaxFn();R.t=Math.round(R.t/tm*1000)/1000*tm}R.playing=false;cancelAnimationFrame(R.raf);pb.textContent='▶ הפעלה'};R.stop=R.pause;
+  const step=ts=>{if(!R.playing)return;if(!document.body.contains(bar)){R.pause();return}const dt=Math.min(.05,(ts-R.last)/1000);R.last=ts;const tm=tmaxFn();R.t+=dt*Math.max(1,tm/10);if(R.t>=tm){R.t=tm;onT();R.pause();return}onT();R.raf=requestAnimationFrame(step)};
+  R.play=()=>{if(R.t>=tmaxFn()-1e-9)R.t=0;R.playing=true;R.last=performance.now();pb.textContent='⏸ עצירה';R.raf=requestAnimationFrame(step)};
+  pb.onclick=()=>{if(R.playing){R.pause();onT()}else R.play()};
+  bar.querySelector('[data-a=reset]').onclick=()=>{R.pause();R.t=0;onT()};
+  anims.push(R);return R;
+}
+
+/* horizontal track + graphs. o:{aria,ariaG,hint,tmax(),bodies(),graphs(B),outs,read(t,set,B),showA} */
+function HSim(host,o){
+  host.innerHTML=`<div class="stage"><canvas class="trk" aria-label="${o.aria}"></canvas><canvas class="g" aria-label="${o.ariaG}"></canvas><span class="hint">${o.hint}</span></div>`;
+  const[c1,c2]=host.querySelectorAll('canvas');let top,g;
+  const redraw=()=>{run.sync();top.draw();g.draw()};
+  const run=Runner(host,o.tmax,()=>redraw());
+  const ctls=el('<div class="ctls"></div>');host.appendChild(ctls);
+  const set=outs(host,o.outs);
+  top=Canvas(c1,(ctx,t,cv)=>{const T=o.tmax(),B=o.bodies(),tn=Math.min(run.t,T);
+    let lo=0,hi=0,vm=1e-9;for(const b of B)for(let i=0;i<=80;i++){const x=b.x(T*i/80),v=Math.abs(b.v(T*i/80));if(x<lo)lo=x;if(x>hi)hi=x;if(v>vm)vm=v}
+    if(hi-lo<1)hi=lo+1;const stp=niceStep(hi-lo,cv.W<520?5:9);lo=Math.floor(lo/stp+1e-9)*stp;hi=Math.ceil(hi/stp-1e-9)*stp;
+    const l=30,r=cv.W-62,y=cv.H-32,X=x=>l+(x-lo)/(hi-lo)*(r-l);
+    arrow(ctx,l-16,y,r+24,y,t.mut,1.3,7);font(ctx,11,600);ctx.textAlign='center';
+    for(let x=lo;x<=hi+stp/2;x+=stp){const z=Math.abs(x)<1e-9;ctx.strokeStyle=z?t.ink:t.mut;ctx.lineWidth=z?2.2:1;ctx.beginPath();ctx.moveTo(X(x),y-(z?8:5));ctx.lineTo(X(x),y+(z?8:5));ctx.stroke();ctx.fillStyle=z?t.ink:t.mut;ctx.fillText(nf(x),X(x),y+21)}
+    font(ctx,12,700);ctx.fillStyle=t.ink;ctx.textAlign='right';ctx.fillText('x (m)',cv.W-6,y+21);
+    const dt=niceStep(T,10);
+    B.forEach((b,i)=>{const yb=y-24-i*34,c=t[b.col];ctx.fillStyle=c;ctx.globalAlpha=.4;for(let k=0;k*dt<=tn+1e-9;k++){ctx.beginPath();ctx.arc(X(b.x(k*dt)),yb,3.2,0,7);ctx.fill()}ctx.globalAlpha=1;
+      const xb=X(b.x(tn)),L=b.v(tn)/vm*72;if(Math.abs(L)>3)arrow(ctx,xb+Math.sign(L)*12,yb,xb+Math.sign(L)*12+L,yb,c,2.6,8);
+      ctx.fillStyle=c;ctx.beginPath();ctx.arc(xb,yb,11,0,7);ctx.fill();if(b.label){ctx.fillStyle=t.paper;font(ctx,12,800);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b.label,xb,yb+.5);ctx.textBaseline='alphabetic'}
+      if(o.showA&&b.a){const a=b.a(tn);if(Math.abs(a)>1e-9){const La=Math.sign(a)*(18+Math.min(42,Math.abs(a)*6));arrow(ctx,xb,yb-21,xb+La,yb-21,t.ink,2,7);font(ctx,12,700);ctx.fillStyle=t.ink;ctx.textAlign='center';ctx.fillText('a',xb+La/2,yb-27)}}});
+    o.read(tn,set,B)});
+  g=Canvas(c2,(ctx,t,cv)=>{const T=o.tmax(),B=o.bodies(),gs=o.graphs(B),st=g.stacked;
+    gs.forEach((gr,i)=>{const R=st?{x:0,y:i*cv.H/gs.length,w:cv.W,h:cv.H/gs.length}:{x:i*cv.W/gs.length,y:0,w:cv.W/gs.length,h:cv.H};graph(ctx,t,R,Object.assign({tmax:T,tnow:Math.min(run.t,T)},gr))})});
+  const ng=o.graphs(o.bodies()).length;
+  g.onResize=()=>{g.stacked=g.W/ng<250;const h=g.stacked?ng*190:230;if(Math.abs(g.H-h)>1)c2.style.height=h+'px'};
+  return{run,ctls,set,redraw,bar:run.bar};
+}
+
+/* vertical scene: ball on the left, y(t) on the right with the same height scale */
+function vscene(ctx,t,cv,o){
+  const gx=cv.W<480?88:120;
+  const G1=graph(ctx,t,{x:gx,y:0,w:cv.W-gx,h:cv.H},{tmax:o.T,tnow:o.tn,name:'y (m)',series:[{f:o.y,col:'pos'}],ymin:0,ymax:1,marks:o.marks});
+  const Y=G1.Y,xb=gx*.58,tw=gx*.3;
+  if(o.y0>0){ctx.fillStyle=t.soft;ctx.strokeStyle=t.line;ctx.lineWidth=1;ctx.fillRect(10,Y(o.y0),tw,Y(0)-Y(o.y0));ctx.strokeRect(10,Y(o.y0),tw,Y(0)-Y(o.y0))}
+  ctx.strokeStyle=t.mut;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(6,Y(0));ctx.lineTo(gx-4,Y(0));ctx.stroke();
+  ctx.lineWidth=1;for(let x=14;x<gx-6;x+=9){ctx.beginPath();ctx.moveTo(x,Y(0));ctx.lineTo(x-6,Y(0)+7);ctx.stroke()}
+  let vm=1e-9;for(let i=0;i<=40;i++)vm=Math.max(vm,Math.abs(o.v(o.T*i/40)));
+  const dt=niceStep(o.T,10);ctx.fillStyle=t.pos;ctx.globalAlpha=.4;for(let k=0;k*dt<=o.tn+1e-9;k++){ctx.beginPath();ctx.arc(xb,Y(o.y(k*dt)),3,0,7);ctx.fill()}ctx.globalAlpha=1;
+  const yb=Y(o.y(o.tn)),L=o.v(o.tn)/vm*58;
+  ctx.setLineDash([3,4]);ctx.strokeStyle=t.mut;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xb+10,yb);ctx.lineTo(G1.X(o.tn),yb);ctx.stroke();ctx.setLineDash([]);
+  if(Math.abs(L)>3)arrow(ctx,xb+17,yb,xb+17,yb-L,t.pos,2.6,8);
+  ctx.fillStyle=t.pos;ctx.beginPath();ctx.arc(xb,yb,9,0,7);ctx.fill();
+}
+function VSim(host,o){
+  host.innerHTML=`<div class="stage"><canvas aria-label="${o.aria}"></canvas><canvas class="g" aria-label="גרף המהירות כפונקציה של הזמן"></canvas></div>`;
+  const[c1,c2]=host.querySelectorAll('canvas');let top,g;
+  const redraw=()=>{run.sync();top.draw();g.draw()};
+  const run=Runner(host,o.tmax,()=>redraw());
+  const ctls=el('<div class="ctls"></div>');host.appendChild(ctls);
+  const set=outs(host,o.outs);
+  top=Canvas(c1,(ctx,t,cv)=>{const T=o.tmax(),tn=Math.min(run.t,T);vscene(ctx,t,cv,{y:o.y,v:o.v,T,tn,y0:o.y0(),marks:o.marks&&o.marks()});o.read(tn,set)});
+  g=Canvas(c2,(ctx,t,cv)=>{const T=o.tmax(),gx=cv.W<480?88:120;graph(ctx,t,{x:gx,y:0,w:cv.W-gx,h:cv.H},{tmax:T,tnow:Math.min(run.t,T),name:'v (m/s)',series:[{f:o.v,col:'pos'}],shade:true});
+    font(ctx,12,700);ctx.fillStyle=t.mut;ctx.textAlign='left';ctx.fillText('a = −10',8,cv.H/2-4);ctx.fillText('m/s²',8,cv.H/2+12)});
+  return{run,ctls,set,redraw,bar:run.bar};
+}
+const exBtn=(host,txt,fn,preset)=>{const b=el(`<div class="simbar"><button class="btn sm">${txt}</button></div>`);b.firstElementChild.onclick=fn;host.appendChild(b);if(preset)fn()};
+const note=(host,h)=>host.appendChild(el(`<p class="note">${h}</p>`));
+const u=h=>`<bdi dir="ltr">${h}</bdi>`,rt=h=>`<bdi dir="rtl">${h}</bdi>`;
+const mps=v=>sg(v)+' m/s', ms2=v=>sg(v)+' m/s²', mm=v=>sg(v)+' m';
+
+/* ---------- simulations ---------- */
+const SIMS={
+pos(host,preset){
+  host.innerHTML=`<div class="stage"><canvas class="trk tall" style="cursor:grab" aria-label="גוף על ציר מקום. גוררים אותו ורואים את ההעתק ואת הדרך"></canvas><span class="hint">גררו את הגוף ימינה ושמאלה</span></div>`;
+  const cv=host.querySelector('canvas');const st={pts:[-6],x:-6};let geo={};
+  const set=outs(host,[['x1','מקום התחלתי x₁'],['x','מקום נוכחי x₂'],['dx','העתק Δx = x₂ − x₁'],['s','דרך']]);
+  const dist=()=>{let s=0;const p=[...st.pts,st.x];for(let i=1;i<p.length;i++)s+=Math.abs(p[i]-p[i-1]);return s};
+  const top=Canvas(cv,(ctx,t,o)=>{const l=30,r=o.W-62,y=o.H-36,X=x=>l+(x+10)/20*(r-l);geo={l,r};
+    arrow(ctx,l-16,y,r+24,y,t.mut,1.3,7);font(ctx,11,600);ctx.textAlign='center';
+    for(let x=-10;x<=10;x++){const z=x===0,big=x%2===0;ctx.strokeStyle=z?t.ink:t.mut;ctx.lineWidth=z?2.2:1;ctx.beginPath();ctx.moveTo(X(x),y-(z?8:big?5:3));ctx.lineTo(X(x),y+(z?8:big?5:3));ctx.stroke();if(big&&(o.W>480||x%4===0)){ctx.fillStyle=z?t.ink:t.mut;ctx.fillText(nf(x),X(x),y+22)}}
+    font(ctx,12,700);ctx.fillStyle=t.ink;ctx.textAlign='right';ctx.fillText('x (m)',o.W-6,y+22);
+    const p=[...st.pts,st.x];ctx.strokeStyle=t.mut;ctx.lineWidth=2;
+    for(let i=1;i<p.length;i++){const yy=y-58-((i-1)%9)*11;if(p[i]!==p[i-1])arrow(ctx,X(p[i-1]),yy,X(p[i]),yy,t.mut,1.8,7);if(i<p.length-1){ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(X(p[i]),yy);ctx.lineTo(X(p[i]),yy-11);ctx.stroke();ctx.setLineDash([])}}
+    font(ctx,12,700);ctx.fillStyle=t.mut;ctx.textAlign='left';ctx.fillText('המסלול (דרך)',8,y-64);
+    const xs=st.pts[0];if(st.x!==xs){arrow(ctx,X(xs),y-32,X(st.x),y-32,t.pos,3,10);font(ctx,13,800);ctx.fillStyle=t.pos;ctx.textAlign='center';ctx.fillText('Δx',(X(xs)+X(st.x))/2,y-39)}
+    ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.fillStyle=t.paper;ctx.beginPath();ctx.arc(X(xs),y,6,0,7);ctx.fill();ctx.stroke();
+    ctx.fillStyle=t.neg;ctx.beginPath();ctx.arc(X(st.x),y,11,0,7);ctx.fill();
+    set('x1',mm(xs));set('x',mm(st.x));set('dx',mm(st.x-xs));set('s',fmt(dist())+' m')});
+  let drag=false;const xAt=e=>{const r=cv.getBoundingClientRect();return -10+(e.clientX-r.left-geo.l)/(geo.r-geo.l)*20};
+  cv.addEventListener('pointerdown',e=>{if(Math.abs(xAt(e)-st.x)<1.6){drag=true;cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing';e.preventDefault()}});
+  cv.addEventListener('pointermove',e=>{if(!drag)return;const nx=Math.max(-10,Math.min(10,Math.round(xAt(e)*2)/2));if(nx===st.x)return;const last=st.pts[st.pts.length-1];if((st.x-last)*(nx-st.x)<0)st.pts.push(st.x);st.x=nx;top.draw()});
+  const up=()=>{drag=false;cv.style.cursor='grab'};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  const bar=el(`<div class="simbar"><button class="btn sm pri">נקודת התחלה חדשה כאן</button></div>`);bar.firstElementChild.onclick=()=>{st.pts=[st.x];top.draw()};host.insertBefore(bar,host.children[1]);
+  exBtn(host,`טעינת הדוגמה: מ־${u('2 m')} אל ${u('8 m')} ואז אל ${u('−4 m')}`,()=>{st.pts=[2,8];st.x=-4;top.draw()},preset);
+  note(host,'החץ האדום הוא ההעתק: מנקודת ההתחלה (העיגול הריק) אל המקום הנוכחי. החצים האפורים מראים את המסלול בפועל, קטע אחרי קטע. סכום האורכים שלהם הוא הדרך.');
+},
+uniform(host,preset){
+  const st={x0:-20,v:5};
+  const H=HSim(host,{aria:'גוף נע במהירות קבועה לאורך ציר מקום',ariaG:'גרף מקום־זמן וגרף מהירות־זמן',hint:'החץ: מהירות · הנקודות: המקום בכל שנייה',
+    tmax:()=>10,bodies:()=>[{x:t=>st.x0+st.v*t,v:()=>st.v,col:'pos'}],
+    graphs:B=>[{name:'x (m)',series:[{f:B[0].x,col:'pos'}]},{name:'v (m/s)',series:[{f:B[0].v,col:'pos'}],shade:true,ymin:-10,ymax:10}],
+    outs:[['t','זמן t'],['x','מקום x'],['dx','העתק Δx = x − x₀'],['ar','שטח מתחת לגרף v(t)'],['eq','נוסחת מקום־זמן']],
+    read(t,set){set('t',fmt(t)+' s');set('x',mm(st.x0+st.v*t));set('dx',mm(st.v*t));set('ar',nf(st.v)+' · '+fmt(t)+' = '+mm(st.v*t));set('eq','x = '+nf(st.x0)+(st.v<0?' − ':' + ')+nf(Math.abs(st.v))+'t')}});
+  const a=slider(H.ctls,'מקום התחלתי x₀',-40,40,5,st.x0,mm,v=>{st.x0=v;H.redraw()});
+  const b=slider(H.ctls,'מהירות v',-10,10,1,st.v,mps,v=>{st.v=v;H.redraw()});
+  exBtn(host,`טעינת הדוגמה: ${u('x₀ = −20 m')}, ${u('v = +5 m/s')}`,()=>{st.x0=-20;st.v=5;a.set(-20);b.set(5);H.run.pause();H.run.t=0;H.redraw()},preset);
+  note(host,'הנקודות על המסילה מסמנות את מקום הגוף בכל שנייה. בתנועה קצובה המרווחים ביניהן שווים. השטח הצבוע בגרף המהירות שווה להעתק.');
+},
+avg(host,preset){
+  host.innerHTML=`<div class="stage"><canvas style="cursor:default" aria-label="גרף מקום־זמן עם מיתר בין שתי נקודות ומשיק בנקודה הראשונה"></canvas></div><div class="simbar"><span class="lab">התנועה:</span></div><div class="ctls"></div>`;
+  const F=[{n:'x = t²',x:t=>t*t,v:t=>2*t},{n:'x = 12t − 2t²',x:t=>12*t-2*t*t,v:t=>12-4*t},{n:'x = 4t (קצובה)',x:t=>4*t,v:()=>4}];
+  const st={f:0,t1:1,dt:2},T=6;const bar=host.querySelector('.simbar'),ctls=host.querySelector('.ctls');
+  const set=outs(host,[['x1','x₁ ברגע t₁'],['x2','x₂ ברגע t₂'],['dx','Δx'],['dt','Δt'],['va','מהירות ממוצעת (שיפוע המיתר)'],['vi','מהירות רגעית ב־t₁ (שיפוע המשיק)']]);
+  const top=Canvas(host.querySelector('canvas'),(ctx,t,o)=>{const f=F[st.f],t2=Math.min(T,st.t1+st.dt),d=t2-st.t1;
+    const g=graph(ctx,t,{x:0,y:0,w:o.W,h:o.H},{tmax:T,name:'x (m)',series:[{f:f.x,col:'pos'}]});const{X,Y}=g;
+    const x1=f.x(st.t1),x2=f.x(t2),va=(x2-x1)/d,vi=f.v(st.t1);
+    ctx.save();ctx.beginPath();ctx.rect(g.l,g.top-10,g.r-g.l,g.bot-g.top+20);ctx.clip();
+    ctx.setLineDash([3,3]);ctx.strokeStyle=t.mut;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(X(st.t1),Y(x1));ctx.lineTo(X(t2),Y(x1));ctx.lineTo(X(t2),Y(x2));ctx.stroke();
+    ctx.setLineDash([7,5]);ctx.strokeStyle=t.neg;ctx.lineWidth=2.2;ctx.beginPath();ctx.moveTo(X(st.t1-T),Y(x1-va*T));ctx.lineTo(X(t2+T),Y(x2+va*T));ctx.stroke();ctx.setLineDash([]);
+    ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(X(st.t1-1.3),Y(x1-vi*1.3));ctx.lineTo(X(st.t1+1.3),Y(x1+vi*1.3));ctx.stroke();ctx.restore();
+    font(ctx,12,700);ctx.fillStyle=t.mut;ctx.textAlign='center';if(X(t2)-X(st.t1)>26)ctx.fillText('Δt',(X(st.t1)+X(t2))/2,Y(x1)+(x2>=x1&&Y(x1)+18<g.bot?15:-7));ctx.textAlign='left';if(Math.abs(Y(x2)-Y(x1))>18)ctx.fillText('Δx',X(t2)+5,(Y(x1)+Y(x2))/2+4);
+    [[st.t1,x1,'t₁'],[t2,x2,'t₂']].forEach(([a,b,n])=>{ctx.fillStyle=t.paper;ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X(a),Y(b),6,0,7);ctx.fill();ctx.stroke();font(ctx,12,800);ctx.fillStyle=t.ink;ctx.textAlign='right';ctx.fillText(n,X(a)-8,Y(b)-8)});
+    set('x1',mm(x1));set('x2',mm(x2));set('dx',mm(x2-x1));set('dt',fmt(d)+' s');set('va',mps(va));set('vi',mps(vi))});
+  const btns=F.map((f,i)=>{const b=el(`<button class="btn sm"><span class="mx">${f.n}</span></button>`);b.onclick=()=>{st.f=i;mark();top.draw()};bar.appendChild(b);return b});
+  const mark=()=>btns.forEach((b,i)=>b.classList.toggle('pri',i===st.f));mark();
+  const a=slider(ctls,'הרגע t₁',0,5,.25,st.t1,v=>fmt(v)+' s',v=>{st.t1=v;top.draw()});
+  const b=slider(ctls,'פרק הזמן Δt',.05,4,.05,st.dt,v=>fmt(v)+' s',v=>{st.dt=v;top.draw()});
+  exBtn(host,`טעינת הדוגמה: ${u('x = t²')}, ${u('t₁ = 1 s')}, ${u('Δt = 2 s')}`,()=>{st.f=0;st.t1=1;st.dt=2;a.set(1);b.set(2);mark();top.draw()},preset);
+  note(host,'הקו הכחול המקווקו הוא המיתר בין שתי הנקודות, והקו הכהה הרציף הוא המשיק ב־t₁. הקטינו את Δt בהדרגה: המיתר מסתובב ומתקרב למשיק, והמהירות הממוצעת מתקרבת למהירות הרגעית. בתנועה קצובה המיתר והמשיק מתלכדים תמיד.');
+},
+accel(host,preset){
+  const st={v0:12,a:-3};
+  const H=HSim(host,{aria:'גוף נע בתאוצה קבועה',ariaG:'גרף מהירות־זמן וגרף תאוצה־זמן',hint:'חץ צבעוני: מהירות · חץ כהה: תאוצה',showA:true,
+    tmax:()=>8,bodies:()=>[{x:t=>st.v0*t+.5*st.a*t*t,v:t=>st.v0+st.a*t,a:()=>st.a,col:'pos'}],
+    graphs:B=>[{name:'v (m/s)',series:[{f:B[0].v,col:'pos'}]},{name:'a (m/s²)',series:[{f:B[0].a,col:'neg'}],ymin:-5,ymax:5,shade:true}],
+    outs:[['t','זמן t'],['v','מהירות v'],['dv','שינוי המהירות Δv = at'],['s','גודל המהירות ברגע זה'],['eq','נוסחת מהירות־זמן']],
+    read(t,set){const v=st.v0+st.a*t;set('t',fmt(t)+' s');set('v',mps(v));set('dv',mps(st.a*t));set('s',rt(st.a===0?'קבוע':Math.abs(v)<1e-9?'אפס: עצירה רגעית':v*st.a>0?'גדל: v ו־a באותו סימן':'קטן: v ו־a בסימנים הפוכים'));set('eq','v = '+nf(st.v0)+(st.a<0?' − ':' + ')+nf(Math.abs(st.a))+'t')}});
+  const a=slider(H.ctls,'מהירות התחלתית v₀',-20,20,1,st.v0,mps,v=>{st.v0=v;H.redraw()});
+  const b=slider(H.ctls,'תאוצה a',-5,5,.5,st.a,ms2,v=>{st.a=v;H.redraw()});
+  exBtn(host,`טעינת הדוגמה: ${u('v₀ = +12 m/s')}, ${u('a = −3 m/s²')}`,()=>{st.v0=12;st.a=-3;a.set(12);b.set(-3);H.run.pause();H.run.t=0;H.redraw()},preset);
+  note(host,'נסו v₀ שלילי עם a שלילי: התאוצה שלילית, ובכל זאת הגוף הולך ומגביר את מהירותו. השטח הצבוע בגרף התאוצה שווה לשינוי המהירות Δv.');
+},
+uam(host,preset){
+  const st={x0:0,v0:20,a:-4,stop:true};
+  const cl=t=>st.stop&&st.a*st.v0<0?Math.min(t,-st.v0/st.a):t;
+  const xf=t=>{const k=cl(t);return st.x0+st.v0*k+.5*st.a*k*k},vf=t=>st.v0+st.a*cl(t);
+  const H=HSim(host,{aria:'גוף בתנועה שוות־תאוצה',ariaG:'גרף מקום־זמן וגרף מהירות־זמן',hint:'חץ צבעוני: מהירות · חץ כהה: תאוצה',showA:true,
+    tmax:()=>10,bodies:()=>[{x:xf,v:vf,a:t=>cl(t)<t?0:st.a,col:'pos'}],
+    graphs:B=>[{name:'x (m)',series:[{f:xf,col:'pos'}],tan:true},{name:'v (m/s)',series:[{f:vf,col:'pos'}],shade:true}],
+    outs:[['t','זמן t'],['x','מקום x'],['v','מהירות v'],['dx','העתק Δx (השטח הצבוע)'],['c1','v²'],['c2','v₀² + 2aΔx']],
+    read(t,set){const x=xf(t),v=vf(t);set('t',fmt(t)+' s');set('x',mm(x));set('v',mps(v));set('dx',mm(x-st.x0));set('c1',fmt(v*v,4));set('c2',fmt(st.v0*st.v0+2*st.a*(x-st.x0),4))}});
+  const tg=toggle(H.bar,'עצירה כשהמהירות מתאפסת (בלימה)',true,v=>{st.stop=v;H.redraw()});
+  const a=slider(H.ctls,'מקום התחלתי x₀',-50,50,5,st.x0,mm,v=>{st.x0=v;H.redraw()});
+  const b=slider(H.ctls,'מהירות התחלתית v₀',-20,20,1,st.v0,mps,v=>{st.v0=v;H.redraw()});
+  const c=slider(H.ctls,'תאוצה a',-5,5,.5,st.a,ms2,v=>{st.a=v;H.redraw()});
+  exBtn(host,`טעינת הדוגמה: בלימה מ־${u('20 m/s')} בתאוצה ${u('−4 m/s²')}`,()=>{st.x0=0;st.v0=20;st.a=-4;st.stop=true;tg.checked=true;a.set(0);b.set(20);c.set(-4);H.run.pause();H.run.t=0;H.redraw()},preset);
+  note(host,'הקו הכהה בגרף המקום הוא המשיק: השיפוע שלו שווה למהירות הרגעית. כבו את "עצירה" כדי לראות מה הנוסחאות נותנות כשהתאוצה ממשיכה לפעול: הגוף נעצר לרגע וחוזר.');
+},
+graphs(host,preset){
+  const st={v:[0,8,8,-8]},tk=[0,4,8,12];
+  const seg=t=>Math.min(2,Math.max(0,Math.floor(t/4)));
+  const vf=t=>{const i=seg(t);return st.v[i]+(st.v[i+1]-st.v[i])*(t-tk[i])/4};
+  const af=t=>{const i=seg(Math.min(t,11.999));return(st.v[i+1]-st.v[i])/4};
+  const xf=t=>{let x=0;for(let i=0;i<3;i++){const d=Math.max(0,Math.min(4,t-tk[i]));if(d<=0)break;const k=(st.v[i+1]-st.v[i])/4;x+=st.v[i]*d+.5*k*d*d}return x};
+  const sf=t=>{let s=0;const n=600;for(let i=0;i<n;i++)s+=Math.abs(vf(t*(i+.5)/n))*t/n;return s};
+  const H=HSim(host,{aria:'גוף שמהירותו משתנה לפי גרף שבניתם',ariaG:'גרפים של מקום, מהירות ותאוצה כפונקציה של הזמן',hint:'חץ צבעוני: מהירות · חץ כהה: תאוצה',showA:true,
+    tmax:()=>12,bodies:()=>[{x:xf,v:vf,a:af,col:'pos'}],
+    graphs:()=>[{name:'x (m)',series:[{f:xf,col:'pos'}],tan:true},{name:'v (m/s)',series:[{f:vf,col:'pos'}],shade:true,ymin:-10,ymax:10},{name:'a (m/s²)',series:[{f:af,col:'neg'}],ymin:-5,ymax:5}],
+    outs:[['t','זמן t'],['v','מהירות v (שיפוע x)'],['a','תאוצה a (שיפוע v)'],['dx','העתק (שטח עם סימן)'],['s','דרך (סכום גודלי השטחים)']],
+    read(t,set){set('t',fmt(t)+' s');set('v',mps(vf(t)));set('a',ms2(af(t)));set('dx',mm(xf(t)));set('s',fmt(sf(t))+' m')}});
+  const sl=tk.map((T,i)=>slider(H.ctls,`מהירות ברגע t = ${T} s`,-10,10,1,st.v[i],mps,v=>{st.v[i]=v;H.redraw()}));
+  const load=arr=>{st.v=arr.slice();sl.forEach((s,i)=>s.set(arr[i]));H.run.pause();H.run.t=0;H.redraw()};
+  exBtn(host,`טעינת הדוגמה: ${u('0, 8, 8, −8 m/s')}`,()=>load([0,8,8,-8]),preset);
+  note(host,'קובעים את המהירות בארבעה רגעים, ובין רגע לרגע המהירות משתנה בקצב קבוע. בגרף המהירות, שטח מעל ציר הזמן צבוע בצבע הגוף ושטח מתחתיו באפור. הקו הכהה בגרף המקום הוא המשיק.');
+},
+fall(host,preset){
+  const st={h:45,vd:0};
+  const T=()=>(-st.vd+Math.sqrt(st.vd*st.vd+2*G*st.h))/G;
+  const yf=t=>st.h-st.vd*t-.5*G*t*t,vf=t=>-st.vd-G*t;
+  const H=VSim(host,{aria:'גוף נופל מגובה, ולידו גרף הגובה כפונקציה של הזמן',hint:'ציר y כלפי מעלה, הראשית בקרקע',tmax:T,y:yf,v:vf,y0:()=>st.h,
+    outs:[['t','זמן t'],['y','גובה y'],['v','מהירות v'],['d','ירד עד כה'],['tf','זמן הנפילה הכולל'],['vf','מהירות הפגיעה']],
+    read(t,set){set('t',fmt(t)+' s');set('y',fmt(Math.max(0,yf(t)))+' m');set('v',mps(vf(t)));set('d',fmt(st.h-yf(t))+' m');set('tf',fmt(T())+' s');set('vf',mps(vf(T())))}});
+  const a=slider(H.ctls,'גובה השחרור h',5,80,5,st.h,v=>v+' m',v=>{st.h=v;H.redraw()});
+  const b=slider(H.ctls,'מהירות התחלתית כלפי מטה',0,20,1,st.vd,v=>v+' m/s',v=>{st.vd=v;H.redraw()});
+  exBtn(host,`טעינת הדוגמה: שחרור ממנוחה מגובה ${u('45 m')}`,()=>{st.h=45;st.vd=0;a.set(45);b.set(0);H.run.pause();H.run.t=0;H.redraw()},preset);
+  note(host,'ציר y מכוון כלפי מעלה, והראשית בקרקע. הכדור והגרף חולקים את אותו סולם גובה: הקו המקווקו מחבר את הכדור לנקודה המתאימה בגרף. המרווחים בין הנקודות (מקום הכדור בפרקי זמן שווים) הולכים וגדלים. המהירות שלילית כי הציר מכוון כלפי מעלה והגוף נע מטה.');
+},
+throw(host,preset){
+  const st={v0:20,y0:25};
+  const T=()=>(st.v0+Math.sqrt(st.v0*st.v0+2*G*st.y0))/G;
+  const yf=t=>st.y0+st.v0*t-.5*G*t*t,vf=t=>st.v0-G*t;
+  const H=VSim(host,{aria:'גוף שנזרק אנכית כלפי מעלה, ולידו גרף הגובה כפונקציה של הזמן',hint:'ציר y כלפי מעלה, הראשית בקרקע',tmax:T,y:yf,v:vf,y0:()=>st.y0,
+    marks:()=>[{t:st.v0/G,v:yf(st.v0/G)}],
+    outs:[['t','זמן t'],['y','גובה y'],['v','מהירות v'],['tt','זמן עד השיא'],['ym','גובה מרבי מעל הקרקע'],['tf','זמן עד הפגיעה בקרקע'],['vf','מהירות הפגיעה']],
+    read(t,set){set('t',fmt(t)+' s');set('y',fmt(Math.max(0,yf(t)))+' m');set('v',mps(vf(t)));set('tt',fmt(st.v0/G)+' s');set('ym',fmt(yf(st.v0/G))+' m');set('tf',fmt(T())+' s');set('vf',mps(vf(T())))}});
+  const a=slider(H.ctls,'מהירות הזריקה v₀ (כלפי מעלה)',5,40,1,st.v0,v=>v+' m/s',v=>{st.v0=v;H.redraw()});
+  const b=slider(H.ctls,'גובה נקודת הזריקה y₀',0,60,5,st.y0,v=>v+' m',v=>{st.y0=v;H.redraw()});
+  exBtn(host,`טעינת הדוגמה: ${u('v₀ = 20 m/s')} מגג בגובה ${u('25 m')}`,()=>{st.v0=20;st.y0=25;a.set(20);b.set(25);H.run.pause();H.run.t=0;H.redraw()},preset);
+  note(host,'ציר y מכוון כלפי מעלה, והראשית בקרקע. גרף המהירות הוא קו ישר אחד, בשיפוע '+u('−10 m/s²')+', לאורך כל התנועה: בעלייה, בשיא ובירידה. הוא חוצה את ציר הזמן בדיוק ברגע השיא (העיגול הריק בגרף הגובה). שטח חיובי: העלייה. שטח שלילי: הירידה.');
+},
+meet(host,preset){
+  const st={xb:75,vb:10,va:0,aa:2},T=20;
+  const xa=t=>st.va*t+.5*st.aa*t*t,xb=t=>st.xb+st.vb*t;
+  const roots=()=>{const A=.5*st.aa,B=st.va-st.vb,C=-st.xb;let r=[];if(Math.abs(A)<1e-9){if(Math.abs(B)>1e-9)r=[-C/B]}else{const D=B*B-4*A*C;if(D>=0)r=[(-B-Math.sqrt(D))/(2*A),(-B+Math.sqrt(D))/(2*A)]}return[...new Set(r.filter(t=>t>=-1e-9&&t<=T).map(t=>+Math.max(0,t).toFixed(6)))]};
+  const H=HSim(host,{aria:'שני גופים נעים על אותו ציר',ariaG:'גרפי מקום־זמן ומהירות־זמן של שני הגופים',hint:'A אדום, B כחול · החצים: מהירויות',
+    tmax:()=>T,bodies:()=>[{x:xa,v:t=>st.va+st.aa*t,col:'pos',label:'A'},{x:xb,v:()=>st.vb,col:'neg',label:'B'}],
+    graphs:B=>[{name:'x (m)',series:[{f:xa,col:'pos'},{f:xb,col:'neg'}],marks:roots().map(t=>({t,v:xb(t)}))},{name:'v (m/s)',series:[{f:B[0].v,col:'pos'},{f:B[1].v,col:'neg'}]}],
+    outs:[['t','זמן t'],['xa','מקום A'],['xb','מקום B'],['d','המרחק ביניהם'],['m','מפגש (x_A = x_B)'],['e','מהירויות שוות, והמרחק אז']],
+    read(t,set){set('t',fmt(t)+' s');set('xa',mm(xa(t)));set('xb',mm(xb(t)));set('d',fmt(Math.abs(xb(t)-xa(t)))+' m');const r=roots();set('m',r.length?r.map(q=>'t = '+fmt(q)+' s, x = '+fmt(xb(q))+' m').join(' ; '):rt('אין ב־'+u('20 s')+' הראשונות'));const te=st.aa?(st.vb-st.va)/st.aa:NaN;set('e',te>=0&&te<=T?'t = '+fmt(te)+' s, Δx = '+fmt(Math.abs(xb(te)-xa(te)))+' m':'—')}});
+  const a=slider(H.ctls,'מקום התחלתי של B',0,150,5,st.xb,v=>v+' m',v=>{st.xb=v;H.redraw()});
+  const b=slider(H.ctls,'מהירות B (קבועה)',0,20,1,st.vb,v=>v+' m/s',v=>{st.vb=v;H.redraw()});
+  const c=slider(H.ctls,'מהירות התחלתית של A',0,20,1,st.va,v=>v+' m/s',v=>{st.va=v;H.redraw()});
+  const d=slider(H.ctls,'תאוצת A',0,4,.5,st.aa,v=>v+' m/s²',v=>{st.aa=v;H.redraw()});
+  exBtn(host,`טעינת הדוגמה: A ממנוחה בתאוצה ${u('2 m/s²')}, B במרחק ${u('75 m')} ובמהירות ${u('10 m/s')}`,()=>{st.xb=75;st.vb=10;st.va=0;st.aa=2;a.set(75);b.set(10);c.set(0);d.set(2);H.run.pause();H.run.t=0;H.redraw()},preset);
+  note(host,'A יוצא מהראשית. העיגול הריק בגרף המקום מסמן מפגש: שם שני הגרפים נחתכים. שימו לב שבגרף המהירות הקווים נחתכים ברגע אחר: אז המהירויות שוות, והמרחק בין הגופים מרבי.');
+}
+};
+
+
+/* ---------- small static graph for practice questions ---------- */
+function figG(pts,yl,al){const W=340,H=200,l=40,r=16,tp=18,b=38;const T=pts[pts.length-1][0];let lo=0,hi=0;pts.forEach(p=>{lo=Math.min(lo,p[1]);hi=Math.max(hi,p[1])});const st=niceStep(hi-lo,5);lo=Math.floor(lo/st+1e-9)*st;hi=Math.ceil(hi/st-1e-9)*st;
+  const X=t=>l+t/T*(W-l-r),Y=v=>tp+(hi-v)/(hi-lo)*(H-tp-b);let g='';
+  for(let v=lo;v<=hi+st/2;v+=st)g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${l-6}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="var(--mut)">${nf(v)}</text>`;
+  const ts=niceStep(T,6);for(let t=ts;t<=T+1e-9;t+=ts)g+=`<line x1="${X(t)}" x2="${X(t)}" y1="${tp}" y2="${H-b}" stroke="var(--grid)"/><text x="${X(t)}" y="${H-b+15}" text-anchor="middle" font-size="11" fill="var(--mut)">${nf(t)}</text>`;
+  return `<div class="fig" dir="ltr"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${al}">${g}<line x1="${l}" x2="${W-r}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--mut)"/><line x1="${l}" x2="${l}" y1="${tp-6}" y2="${H-b}" stroke="var(--mut)"/><polyline fill="none" stroke="var(--pos)" stroke-width="2.5" points="${pts.map(p=>X(p[0])+','+Y(p[1])).join(' ')}"/>${pts.map(p=>`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="3.5" fill="var(--ink)"/>`).join('')}<text x="${l+5}" y="${tp-5}" font-size="12" font-weight="700" fill="var(--ink)">${yl}</text><text x="${W-r}" y="${H-5}" font-size="12" font-weight="700" fill="var(--ink)" text-anchor="end">t (s)</text></svg></div>`}
+const FA=()=>figG([[0,0],[5,10],[10,10]],'v (m/s)','גרף מהירות־זמן: המהירות עולה בקו ישר מ־0 ל־10 מטר לשנייה במשך 5 שניות, ואז נשארת 10 מטר לשנייה עד 10 שניות');
+const FB=()=>figG([[0,0],[4,12],[8,12],[10,0]],'x (m)','גרף מקום־זמן: המקום עולה בקו ישר מ־0 ל־12 מטר במשך 4 שניות, נשאר 12 מטר עד 8 שניות, ויורד בקו ישר ל־0 ב־10 שניות');
+const FC=()=>figG([[0,12],[4,0],[6,-6]],'v (m/s)','גרף מהירות־זמן: קו ישר יורד מ־12 מטר לשנייה ברגע 0, דרך אפס ברגע 4 שניות, עד מינוס 6 מטר לשנייה ברגע 6 שניות');
+
+/* ---------- content ---------- */
+const T=[
+{id:'pos',title:'מקום, העתק ודרך',sub:'איפה הגוף נמצא, כמה זז ולאן, וכמה עבר בפועל',
+ intro:[
+ `כדי לתאר תנועה לאורך קו ישר בוחרים <b>ציר מקום</b>: קו שיש לו ראשית (${m('<i>x</i> = 0')}) וכיוון חיובי. הבחירה חופשית, אבל אחרי שבחרנו נשארים איתה עד סוף השאלה.`,
+ `<b>המקום</b> ${m('<i>x</i>')} של הגוף הוא הקואורדינטה שלו על הציר. מקום יכול להיות חיובי, שלילי או אפס. הסימן אומר רק באיזה צד של הראשית הגוף נמצא.`,
+ `<b>ההעתק</b> ${m('Δ<i>x</i> = <i>x</i><sub>2</sub> − <i>x</i><sub>1</sub>')} הוא השינוי במקום: המקום הסופי פחות המקום ההתחלתי. העתק חיובי פירושו שהגוף זז בכיוון החיובי של הציר, והעתק שלילי פירושו שזז בכיוון השלילי. ההעתק תלוי רק בנקודת ההתחלה ובנקודת הסיום.`,
+ `<b>הדרך</b> היא אורך המסלול שהגוף עבר בפועל. היא אף פעם לא שלילית והיא רק גדלה. אם הגוף לא שינה כיוון, הדרך שווה לגודל ההעתק. אם הוא שינה כיוון, הדרך גדולה מגודל ההעתק.`,
+ `הנוסחאות בדף הנוסחאות כתובות בעזרת מקום והעתק, לא בעזרת דרך. לכן כששואלים על דרך בתנועה שיש בה שינוי כיוון, מחלקים את התנועה לקטעים ומחברים את גודלי ההעתקים.`],
+ formulas:[[`Δ<i>x</i> = <i>x</i><sub>2</sub> − <i>x</i><sub>1</sub>`,'העתק: סופי פחות התחלתי, עם סימן'],[`Δ<i>t</i> = <i>t</i><sub>2</sub> − <i>t</i><sub>1</sub>`,'פרק הזמן שבו התרחש ההעתק'],[`<i>s</i> = |Δ<i>x</i><sub>1</sub>| + |Δ<i>x</i><sub>2</sub>| + …`,'דרך: סכום גודלי ההעתקים בקטעים שבהם הכיוון קבוע']],
+ trap:[`חזר לנקודת ההתחלה, אז לא זז?`,`שחיין ששחה בריכה הלוך וחזור סיים בדיוק במקום שבו התחיל. ההעתק שלו אפס, אבל הדרך שעבר היא פעמיים אורך הבריכה. העתק ודרך עונים על שתי שאלות שונות: "כמה השתנה המקום" ו"כמה עבר".`],
+ ex:{given:[`גוף יוצא מהמקום ${m('<i>x</i> = 2 m')}`,`הוא נע עד ${m('<i>x</i> = 8 m')}, משנה כיוון, ונעצר ב־${m('<i>x</i> = −4 m')}`],ask:[`א. מה ההעתק בכל אחד משני הקטעים?`,`ב. מה ההעתק הכולל?`,`ג. מה הדרך הכוללת?`],
+  steps:[
+  `<b>סעיף א.</b> בכל קטע מחסרים את המקום ההתחלתי מהמקום הסופי: ${M('Δ<i>x</i><sub>1</sub> = 8 − 2 = +6 m')} ${M('Δ<i>x</i><sub>2</sub> = −4 − 8 = −12 m')} הקטע הראשון בכיוון החיובי, והשני בכיוון השלילי.`,
+  `<b>סעיף ב.</b> ההעתק הכולל תלוי רק בהתחלה ובסוף: ${M('Δ<i>x</i> = −4 − 2 = −6 m')} אותה תוצאה מתקבלת מחיבור ההעתקים: ${m('+6 + (−12) = −6 m')}.`,
+  `<b>סעיף ג.</b> לדרך מחברים גדלים, בלי סימנים: ${M('<i>s</i> = 6 + 12 = 18 m')}`],
+  check:`גודל ההעתק (${m('6 m')}) קטן מהדרך (${m('18 m')}), כצפוי בתנועה שיש בה שינוי כיוון. הגוף סיים משמאל לנקודת ההתחלה, ולכן ההעתק שלילי.`},
+ qs:[
+ {l:'b',t:'mc',q:`גוף נע מהמקום ${m('<i>x</i> = −3 m')} אל המקום ${m('<i>x</i> = 5 m')}. מה ההעתק שלו?`,o:[m('+8 m'),m('−8 m'),m('+2 m'),m('−2 m')],a:0,s:`${m('Δ<i>x</i> = 5 − (−3) = +8 m')}. שימו לב לחיסור של מספר שלילי.`},
+ {l:'b',t:'mc',q:`ברגע מסוים המקום של גוף הוא ${m('<i>x</i> = −7 m')}. מה אפשר להסיק מכך?`,o:['הגוף נע בכיוון השלילי','הגוף נמצא בצד השלילי של הראשית','ההעתק של הגוף שלילי','הגוף מאט'],a:1,s:`המקום מתאר רק איפה הגוף נמצא ביחס לראשית. הוא לא אומר שום דבר על כיוון התנועה, על ההעתק או על שינוי המהירות.`},
+ {l:'b',t:'num',q:`גוף נע מהמקום ${m('<i>x</i> = 10 m')} אל המקום ${m('<i>x</i> = −2 m')} בלי לשנות כיוון. מה ההעתק שלו?`,a:-12,u:'m',s:`${m('Δ<i>x</i> = −2 − 10 = −12 m')}. הסימן השלילי אומר שהגוף זז בכיוון השלילי של הציר.`},
+ {l:'b',t:'num',q:`שחיינית שוחה לאורך בריכה שאורכה ${m('50 m')}, מגיעה לקצה, וחוזרת לנקודת ההתחלה. מה הדרך שעברה?`,a:100,u:'m',s:`הדרך היא אורך המסלול בפועל: ${m('50 + 50 = 100 m')}. ההעתק שלה, לעומת זאת, שווה לאפס.`},
+ {l:'a',t:'num',q:`גוף יוצא מ־${m('<i>x</i> = −5 m')}, נע עד ${m('<i>x</i> = 7 m')}, חוזר עד ${m('<i>x</i> = 1 m')}, ושוב נע עד ${m('<i>x</i> = 4 m')}. מה הדרך הכוללת שעבר?`,a:21,u:'m',s:`שלושה קטעים: ${m('|7 − (−5)| = 12 m')}, ${m('|1 − 7| = 6 m')}, ${m('|4 − 1| = 3 m')}.<br>${m('<i>s</i> = 12 + 6 + 3 = 21 m')}. ההעתק הכולל הוא רק ${m('4 − (−5) = +9 m')}.`},
+ {l:'a',t:'mc',q:`גוף זז ${m('3 m')} ימינה. דנה בחרה ציר שכיוונו החיובי ימינה, ויואב בחר ציר שכיוונו החיובי שמאלה. מה יקבל כל אחד?`,o:[`שניהם יקבלו העתק ${m('+3 m')}`,`דנה ${m('+3 m')}, יואב ${m('−3 m')}, והדרך אצל שניהם ${m('3 m')}`,`דנה ${m('+3 m')}, יואב ${m('−3 m')}, והדרך אצל יואב ${m('−3 m')}`,'ההעתק זהה, רק המקום שונה'],a:1,s:`סימן ההעתק תלוי בכיוון הציר שבחרנו, ולכן שני הסימנים הפוכים. הדרך היא אורך המסלול, והיא לא תלויה בבחירת הציר ואף פעם לא שלילית.`},
+ {l:'a',t:'num',q:`גוף נמצא ב־${m('<i>x</i> = 6 m')}. הוא מבצע העתק של ${m('−10 m')} ואחריו העתק של ${m('+3 m')}. מה המקום הסופי שלו?`,a:-1,u:'m',s:`מקום סופי = מקום התחלתי + סכום ההעתקים: ${m('<i>x</i> = 6 + (−10) + 3 = −1 m')}.`}
+ ]},
+{id:'uniform',title:'תנועה שוות־מהירות',sub:'תנועה קצובה: המהירות קבועה בגודל ובכיוון',
+ intro:[
+ `בתנועה שוות־מהירות (תנועה קצובה) לאורך קו ישר הגוף מבצע העתקים שווים בפרקי זמן שווים. המהירות ${m(`<i>v</i> = ${fr('Δ<i>x</i>','Δ<i>t</i>')}`)} קבועה לאורך כל התנועה.`,
+ `למהירות יש סימן: מהירות חיובית פירושה תנועה בכיוון החיובי של הציר, ומהירות שלילית פירושה תנועה בכיוון השלילי. גודל המהירות אומר כמה מהר הגוף נע.`,
+ `<b>נוסחת מקום־זמן:</b> ${m(`<i>x</i> = ${x0} + <i>vt</i>`)}. כאן ${m(x0)} הוא המקום ברגע ${m('<i>t</i> = 0')}. זה המקרה הפרטי של הנוסחה מדף הנוסחאות כאשר ${m('<i>a</i> = 0')}.`,
+ `<b>גרף מקום־זמן</b> של תנועה קצובה הוא קו ישר, והשיפוע שלו שווה למהירות. קו עולה: מהירות חיובית. קו יורד: מהירות שלילית. קו אופקי: הגוף במנוחה.`,
+ `<b>גרף מהירות־זמן</b> הוא קו אופקי. השטח שבין הגרף לציר הזמן שווה להעתק, ${m('Δ<i>x</i> = <i>v</i>Δ<i>t</i>')}.`,
+ `בשאלות רבות המהירות נתונה בקמ״ש. לפני שמציבים ממירים: ${m('1 m/s = 3.6 km/h')}, כלומר מחלקים קמ״ש ב־3.6 כדי לקבל מטר לשנייה.`],
+ formulas:[[`<i>v</i> = ${fr('Δ<i>x</i>','Δ<i>t</i>')}`,'מהירות קבועה: העתק חלקי פרק הזמן'],[`<i>x</i> = ${x0} + <i>vt</i>`,'מקום כפונקציה של הזמן'],[`Δ<i>x</i> = <i>v</i>Δ<i>t</i>`,'העתק: השטח מתחת לגרף המהירות'],[`36 km/h = 10 m/s`,'המרה: מחלקים קמ״ש ב־3.6']],
+ trap:[`גרף מקום־זמן הוא לא ציור של המסלול`,`קו עולה בגרף מקום־זמן לא אומר שהגוף מטפס במעלה גבעה, וקו יורד לא אומר שהוא יורד במדרון. הגוף נע כל הזמן על קו ישר. הקו העולה אומר רק שהמקום ${m('<i>x</i>')} גדל עם הזמן.`],
+ ex:{given:[`רוכב אופניים נע במהירות קבועה ${m('<i>v</i> = 5 m/s')} בכיוון החיובי`,`ברגע ${m('<i>t</i> = 0')} הוא נמצא במקום ${m(`${x0} = −20 m`)}`],ask:[`א. מהי נוסחת המקום־זמן של הרוכב?`,`ב. מתי הוא עובר בראשית?`,`ג. היכן הוא נמצא ברגע ${m('<i>t</i> = 10 s')}?`,`ד. מה ההעתק שלו בין ${m('<i>t</i> = 2 s')} ל־${m('<i>t</i> = 6 s')}?`],
+  steps:[
+  `<b>סעיף א.</b> מציבים את ${m(x0)} ואת ${m('<i>v</i>')} בנוסחה ${m(`<i>x</i> = ${x0} + <i>vt</i>`)}: ${M('<i>x</i> = −20 + 5<i>t</i>')}`,
+  `<b>סעיף ב.</b> בראשית ${m('<i>x</i> = 0')}: ${M(`0 = −20 + 5<i>t</i> &nbsp;⟹&nbsp; <i>t</i> = 4 s`)}`,
+  `<b>סעיף ג.</b> ${M('<i>x</i>(10) = −20 + 5·10 = 30 m')}`,
+  `<b>סעיף ד.</b> במהירות קבועה ההעתק הוא מכפלת המהירות בפרק הזמן: ${M('Δ<i>x</i> = <i>v</i>Δ<i>t</i> = 5·(6 − 2) = 20 m')}`],
+  check:`לפי נוסחת המקום: ${m('<i>x</i>(2) = −10 m')} ו־${m('<i>x</i>(6) = 10 m')}, וההפרש אכן ${m('20 m')}.`},
+ qs:[
+ {l:'b',t:'num',q:`מכונית נוסעת במהירות קבועה של ${m('72 km/h')}. מה מהירותה במטר לשנייה?`,a:20,u:'m/s',s:`מחלקים ב־3.6: ${m(`${fr('72','3.6')} = 20 m/s`)}.`},
+ {l:'b',t:'num',q:`גוף נע לפי ${m('<i>x</i> = 12 − 3<i>t</i>')} (במטרים ובשניות). היכן הוא נמצא ברגע ${m('<i>t</i> = 6 s')}?`,a:-6,u:'m',s:`${m('<i>x</i> = 12 − 3·6 = −6 m')}. הגוף יצא מ־${m('12 m')}, נע בכיוון השלילי במהירות ${m('−3 m/s')}, ועבר את הראשית ברגע ${m('<i>t</i> = 4 s')}.`},
+ {l:'b',t:'mc',q:`גרף המקום־זמן של גוף הוא קו ישר יורד. מה נכון?`,o:['הגוף מאט','הגוף נע במהירות קבועה בכיוון השלילי של הציר','הגוף יורד במדרון','המהירות של הגוף הולכת וקטנה עד אפס'],a:1,s:`קו ישר פירושו שיפוע קבוע, כלומר מהירות קבועה. השיפוע שלילי, ולכן המהירות שלילית: הגוף נע בכיוון השלילי.`},
+ {l:'b',t:'num',q:`רכבת נוסעת במהירות קבועה של ${m('90 km/h')}. כמה זמן נדרש לה כדי לעבור ${m('500 m')}?`,a:20,u:'s',s:`${m('90 km/h = 25 m/s')}.<br>${m(`Δ<i>t</i> = ${fr('Δ<i>x</i>','<i>v</i>')} = ${fr('500','25')} = 20 s`)}.`},
+ {l:'a',t:'num',q:`רכבת שאורכה ${m('200 m')} נוסעת במהירות קבועה של ${m('20 m/s')} וחוצה גשר שאורכו ${m('400 m')}. כמה זמן עובר מהרגע שהקטר עולה על הגשר ועד שהקרון האחרון יורד ממנו?`,a:30,u:'s',s:`עוקבים אחרי נקודה אחת ברכבת, למשל הקטר. מהרגע שהוא עולה על הגשר ועד שהקרון האחרון יורד, הקטר עובר את אורך הגשר ועוד את אורך הרכבת: ${m('400 + 200 = 600 m')}.<br>${m(`Δ<i>t</i> = ${fr('600','20')} = 30 s`)}.`},
+ {l:'a',t:'num',q:`מטיילת צועקת מול צוק ושומעת את ההד כעבור ${m('3 s')}. מהירות הקול באוויר ${m('340 m/s')}. מה המרחק בינה לבין הצוק?`,a:510,u:'m',s:`הקול עבר את המרחק פעמיים, הלוך וחזור: ${m('2<i>d</i> = <i>v</i>Δ<i>t</i> = 340·3 = 1020 m')}, ולכן ${m('<i>d</i> = 510 m')}.`},
+ {l:'a',t:'num',q:`גוף נע במהירות קבועה. ברגע ${m('<i>t</i> = 2 s')} הוא במקום ${m('<i>x</i> = −8 m')}, וברגע ${m('<i>t</i> = 8 s')} הוא במקום ${m('<i>x</i> = 16 m')}. היכן היה ברגע ${m('<i>t</i> = 0')}?`,a:-16,u:'m',s:`קודם המהירות: ${m(`<i>v</i> = ${fr('16 − (−8)','8 − 2')} = 4 m/s`)}.<br>עכשיו חוזרים שתי שניות אחורה מ־${m('<i>t</i> = 2 s')}: ${m(`${x0} = −8 − 4·2 = −16 m`)}.`}
+ ]},
+{id:'avg',title:'מהירות ממוצעת ומהירות רגעית',sub:'שיפוע של מיתר ושיפוע של משיק בגרף מקום־זמן',
+ intro:[
+ `כשהמהירות משתנה במהלך התנועה, מגדירים <b>מהירות ממוצעת</b>: ההעתק הכולל חלקי פרק הזמן הכולל, ${m(`${ov('<i>v</i>')} = ${fr('Δ<i>x</i>','Δ<i>t</i>')}`)}. זו המהירות הקבועה שבה גוף היה מבצע את אותו העתק באותו זמן.`,
+ `בגרף מקום־זמן, המהירות הממוצעת בין שני רגעים היא השיפוע של <b>המיתר</b>: הקו הישר שמחבר את שתי הנקודות המתאימות על הגרף.`,
+ `<b>המהירות הרגעית</b> היא המהירות ברגע מסוים. מקבלים אותה כשמחשבים מהירות ממוצעת על פרק זמן קצר מאוד סביב אותו רגע. בגרף זה השיפוע של <b>המשיק</b>, ובכתיב מתמטי ${m(`<i>v</i> = ${fr('<i>dx</i>','<i>dt</i>')}`)}: הנגזרת של המקום לפי הזמן.`,
+ `המהירות הממוצעת מוגדרת לפי ההעתק ולא לפי הדרך. גוף שחזר לנקודת ההתחלה ביצע העתק אפס, ולכן המהירות הממוצעת שלו אפס, גם אם רץ כל הזמן.`,
+ `מהירות ממוצעת היא בדרך כלל <b>לא</b> ממוצע המהירויות. רק בתנועה שוות־תאוצה מתקיים ${m(`${ov('<i>v</i>')} = ${fr(`${v0} + <i>v</i>`,'2')}`)}.`],
+ formulas:[[`${ov('<i>v</i>')} = ${fr('Δ<i>x</i>','Δ<i>t</i>')}`,'מהירות ממוצעת: שיפוע המיתר בגרף מקום־זמן'],[`<i>v</i> = ${fr('<i>dx</i>','<i>dt</i>')}`,'מהירות רגעית: שיפוע המשיק בגרף מקום־זמן'],[`${ov('<i>v</i>')} = ${fr(`${v0} + <i>v</i>`,'2')}`,'נכון רק בתנועה שוות־תאוצה']],
+ trap:[`חצי דרך ב־40 וחצי דרך ב־60, אז בממוצע 50?`,`לא. את החצי האיטי נוסעים יותר זמן, ולכן הוא משפיע יותר. אם כל חצי הוא ${m('120 km')}, הזמנים הם 3 שעות ו־2 שעות, והמהירות הממוצעת היא ${m(`${fr('240','5')} = 48 km/h`)}. ממוצע פשוט של המהירויות נכון רק כשפרקי <b>הזמן</b> שווים.`],
+ ex:{given:[`גוף נע לאורך ציר x לפי ${m('<i>x</i> = <i>t</i><sup>2</sup>')}`,`${m('<i>x</i>')} במטרים, ${m('<i>t</i>')} בשניות`],ask:[`א. מה המהירות הממוצעת בין ${m('<i>t</i> = 1 s')} ל־${m('<i>t</i> = 3 s')}?`,`ב. מה המהירות הממוצעת בין ${m('<i>t</i> = 1 s')} ל־${m('<i>t</i> = 1.1 s')}?`,`ג. מה המהירות הרגעית ברגע ${m('<i>t</i> = 1 s')}?`],
+  steps:[
+  `<b>סעיף א.</b> מחשבים את המקום בשני הרגעים: ${m('<i>x</i>(1) = 1 m')}, ${m('<i>x</i>(3) = 9 m')}. ${M(`${ov('<i>v</i>')} = ${fr('9 − 1','3 − 1')} = 4 m/s`)}`,
+  `<b>סעיף ב.</b> ${m('<i>x</i>(1.1) = 1.21 m')}. ${M(`${ov('<i>v</i>')} = ${fr('1.21 − 1','1.1 − 1')} = ${fr('0.21','0.1')} = 2.1 m/s`)}`,
+  `<b>סעיף ג.</b> גוזרים את המקום לפי הזמן: ${M(`<i>v</i> = ${fr('<i>dx</i>','<i>dt</i>')} = 2<i>t</i>`)} ולכן ${m('<i>v</i>(1) = 2 m/s')}.`],
+  check:`ככל שפרק הזמן מתקצר, המהירות הממוצעת (${m('4')}, ואז ${m('2.1 m/s')}) מתקרבת למהירות הרגעית ${m('2 m/s')}. בסימולציה אפשר לראות איך המיתר מתקרב למשיק.`},
+ qs:[
+ {l:'b',t:'num',q:`גוף נע מהמקום ${m('<i>x</i> = 4 m')} אל המקום ${m('<i>x</i> = 28 m')} במשך ${m('6 s')}. מה המהירות הממוצעת שלו?`,a:4,u:'m/s',s:`${m(`${ov('<i>v</i>')} = ${fr('28 − 4','6')} = 4 m/s`)}.`},
+ {l:'b',t:'mc',q:`רצה רצה ${m('100 m')} לאורך מסלול ישר, מסתובבת וחוזרת לנקודת ההתחלה. הריצה כולה נמשכה ${m('40 s')}. מה המהירות הממוצעת שלה?`,o:[m('5 m/s'),m('2.5 m/s'),'אפס',m('10 m/s')],a:2,s:`ההעתק הכולל הוא אפס, כי היא חזרה לנקודת ההתחלה. לכן המהירות הממוצעת אפס. (הדרך חלקי הזמן, ${m('5 m/s')}, היא גודל אחר.)`},
+ {l:'b',t:'mc',q:`מה מייצג השיפוע של המשיק לגרף מקום־זמן בנקודה מסוימת?`,o:['את ההעתק עד לאותו רגע','את המהירות הממוצעת מתחילת התנועה','את המהירות הרגעית באותו רגע','את התאוצה באותו רגע'],a:2,s:`שיפוע המשיק הוא ${m(`${fr('<i>dx</i>','<i>dt</i>')}`)}, כלומר המהירות הרגעית. שיפוע המיתר הוא המהירות הממוצעת.`},
+ {l:'b',t:'num',q:`מכונית נוסעת שעתיים במהירות ${m('60 km/h')}, ומיד אחר כך שעה נוספת באותו כיוון במהירות ${m('90 km/h')}. מה המהירות הממוצעת שלה? (בקמ״ש)`,a:70,u:'km/h',s:`ההעתק הכולל: ${m('60·2 + 90·1 = 210 km')}. הזמן הכולל: ${m('3 h')}.<br>${m(`${ov('<i>v</i>')} = ${fr('210','3')} = 70 km/h`)}.`},
+ {l:'a',t:'num',q:`מכונית נוסעת את המחצית הראשונה של הדרך במהירות ${m('40 km/h')}, ואת המחצית השנייה במהירות ${m('60 km/h')}. מה המהירות הממוצעת שלה? (בקמ״ש)`,a:48,u:'km/h',s:`מסמנים כל חצי ב־${m('<i>d</i>')}. הזמנים: ${m(`${fr('<i>d</i>','40')}`)} ו־${m(`${fr('<i>d</i>','60')}`)}.${M(`${ov('<i>v</i>')} = ${fr('2<i>d</i>',`${fr('<i>d</i>','40')} + ${fr('<i>d</i>','60')}`)} = ${fr('2·40·60','40 + 60')} = 48 km/h`)}המרחק מצטמצם, והתוצאה קרובה יותר למהירות הנמוכה.`},
+ {l:'a',t:'num',q:`גוף נע לפי ${m('<i>x</i> = 3<i>t</i><sup>2</sup> − 12<i>t</i>')} (במטרים ובשניות). מה המהירות הרגעית שלו ברגע ${m('<i>t</i> = 3 s')}?`,a:6,u:'m/s',s:`גוזרים: ${m(`<i>v</i> = ${fr('<i>dx</i>','<i>dt</i>')} = 6<i>t</i> − 12`)}.<br>${m('<i>v</i>(3) = 18 − 12 = 6 m/s')}.`},
+ {l:'a',t:'mc',q:`עבור אותו גוף, ${m('<i>x</i> = 3<i>t</i><sup>2</sup> − 12<i>t</i>')}: באיזה רגע הוא משנה את כיוון התנועה?`,o:[m('<i>t</i> = 0'),m('<i>t</i> = 2 s'),m('<i>t</i> = 4 s'),'הוא לא משנה כיוון'],a:1,s:`הגוף משנה כיוון כשהמהירות מתאפסת ומחליפה סימן: ${m('6<i>t</i> − 12 = 0')}, כלומר ${m('<i>t</i> = 2 s')}. ברגע ${m('<i>t</i> = 4 s')} הגוף רק חוזר לראשית (${m('<i>x</i> = 0')}), בלי לשנות כיוון.`}
+ ]},
+{id:'accel',title:'תאוצה',sub:'קצב השינוי של המהירות',
+ intro:[
+ `<b>התאוצה</b> מתארת כמה מהר משתנה המהירות: ${m(`${ov('<i>a</i>')} = ${fr('Δ<i>v</i>','Δ<i>t</i>')}`)}. היחידה היא ${m('m/s<sup>2</sup>')}. תאוצה של ${m('2 m/s<sup>2</sup>')} פירושה שבכל שנייה המהירות גדלה ב־${m('2 m/s')}.`,
+ `בתנועה <b>שוות־תאוצה</b> התאוצה קבועה, והמהירות משתנה בקצב אחיד: ${m(`<i>v</i> = ${v0} + <i>at</i>`)}. גרף המהירות־זמן הוא קו ישר, והשיפוע שלו שווה לתאוצה.`,
+ `גם לתאוצה יש סימן, אבל הסימן לבדו <b>לא</b> אומר אם הגוף מאיץ או מאט. מה שקובע הוא היחס בין הסימנים: כש־${m('<i>v</i>')} ו־${m('<i>a</i>')} באותו סימן, גודל המהירות גדל. כשהסימנים הפוכים, גודל המהירות קטן.`,
+ `דוגמה: גוף שנע בכיוון השלילי והולך ומגביר את מהירותו. המהירות שלו שלילית, וגם התאוצה שלו שלילית.`,
+ `כשהמהירות מתאפסת לרגע, התאוצה לא חייבת להתאפס. גוף שנעצר לרגע ומיד מתחיל לנוע בכיוון ההפוך נמצא כל הזמן הזה באותה תאוצה.`],
+ formulas:[[`${ov('<i>a</i>')} = ${fr('Δ<i>v</i>','Δ<i>t</i>')}`,'תאוצה ממוצעת'],[`<i>a</i> = ${fr('<i>dv</i>','<i>dt</i>')}`,'תאוצה רגעית: שיפוע המשיק בגרף מהירות־זמן'],[`<i>v</i> = ${v0} + <i>at</i>`,'מהירות בתנועה שוות־תאוצה']],
+ trap:[`תאוצה שלילית היא תמיד האטה?`,`לא. תאוצה שלילית אומרת רק שהמהירות משתנה לכיוון השלילי של הציר. אם הגוף נע בכיוון החיובי, הוא מאט. אם הוא נע בכיוון השלילי, הוא דווקא מגביר מהירות. כדי לדעת אם גוף מאט, משווים בין הסימן של ${m('<i>v</i>')} לסימן של ${m('<i>a</i>')}.`],
+ ex:{given:[`עגלה נשלחת במעלה מישור משופע. הכיוון החיובי של הציר הוא במעלה המישור`,`${m(`${v0} = +12 m/s`)}, ${m('<i>a</i> = −3 m/s<sup>2</sup>')} לאורך כל התנועה`],ask:[`א. מה מהירות העגלה ברגע ${m('<i>t</i> = 2 s')}?`,`ב. מתי העגלה נעצרת לרגע?`,`ג. מה מהירותה ברגע ${m('<i>t</i> = 6 s')}, ומה משמעות הסימן?`,`ד. באילו רגעים גודל המהירות הוא ${m('6 m/s')}?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`<i>v</i> = ${v0} + <i>at</i> = 12 − 3·2 = +6 m/s`)}`,
+  `<b>סעיף ב.</b> עצירה רגעית פירושה ${m('<i>v</i> = 0')}: ${M('0 = 12 − 3<i>t</i> &nbsp;⟹&nbsp; <i>t</i> = 4 s')}`,
+  `<b>סעיף ג.</b> ${M('<i>v</i> = 12 − 3·6 = −6 m/s')} הסימן השלילי אומר שהעגלה כבר נעה במורד המישור. גודל המהירות ${m('6 m/s')}.`,
+  `<b>סעיף ד.</b> גודל של ${m('6 m/s')} מתאים לשתי מהירויות, ${m('+6')} ו־${m('−6 m/s')}. לפי סעיפים א ו־ג אלה הרגעים ${m('<i>t</i> = 2 s')} (בעלייה) ו־${m('<i>t</i> = 6 s')} (בירידה).`],
+  check:`שני הרגעים סימטריים סביב רגע העצירה ${m('<i>t</i> = 4 s')}: שתי שניות לפניו ושתי שניות אחריו. התאוצה לא השתנתה גם ברגע העצירה עצמו.`},
+ qs:[
+ {l:'b',t:'num',q:`מכונית מגבירה את מהירותה מ־${m('10 m/s')} ל־${m('30 m/s')} במשך ${m('5 s')}, בתאוצה קבועה. מה התאוצה?`,a:4,u:'m/s²',s:`${m(`<i>a</i> = ${fr('Δ<i>v</i>','Δ<i>t</i>')} = ${fr('30 − 10','5')} = 4 m/s<sup>2</sup>`)}.`},
+ {l:'b',t:'num',q:`גוף נע במהירות התחלתית ${m('6 m/s')} ובתאוצה קבועה ${m('2 m/s<sup>2</sup>')}. מה מהירותו כעבור ${m('7 s')}?`,a:20,u:'m/s',s:`${m(`<i>v</i> = ${v0} + <i>at</i> = 6 + 2·7 = 20 m/s`)}.`},
+ {l:'b',t:'mc',q:`ברגע מסוים ${m('<i>v</i> = −8 m/s')} ו־${m('<i>a</i> = −2 m/s<sup>2</sup>')}. מה קורה לגוף?`,o:['הוא מאט','גודל המהירות שלו גדל','הוא במנוחה','הוא משנה כיוון באותו רגע'],a:1,s:`המהירות והתאוצה באותו סימן, ולכן גודל המהירות גדל: כעבור שנייה המהירות תהיה ${m('−10 m/s')}.`},
+ {l:'b',t:'mc',q:`מה מייצג השיפוע של גרף מהירות־זמן?`,o:['את המקום','את ההעתק','את התאוצה','את הדרך'],a:2,s:`השיפוע הוא ${m(`${fr('Δ<i>v</i>','Δ<i>t</i>')}`)}, כלומר התאוצה. ההעתק הוא השטח שמתחת לגרף.`},
+ {l:'a',t:'num',q:`מכונית מאיצה ממנוחה ל־${m('100 km/h')} במשך ${m('8 s')} בתאוצה קבועה. מה התאוצה שלה ב־${m('m/s<sup>2</sup>')}?`,a:3.47,u:'m/s²',s:`קודם ממירים: ${m(`${fr('100','3.6')} = 27.8 m/s`)}.<br>${m(`<i>a</i> = ${fr('27.8','8')} ≈ 3.5 m/s<sup>2</sup>`)}.`},
+ {l:'a',t:'num',q:`גוף נע במהירות התחלתית ${m('+15 m/s')} ובתאוצה קבועה ${m('−2.5 m/s<sup>2</sup>')}. כעבור כמה זמן מהירותו תהיה ${m('−10 m/s')}?`,a:10,u:'s',s:`${m('−10 = 15 − 2.5<i>t</i>')}, ולכן ${m(`<i>t</i> = ${fr('25','2.5')} = 10 s`)}. בדרך, ברגע ${m('<i>t</i> = 6 s')}, הגוף נעצר לרגע ושינה כיוון.`},
+ {l:'a',t:'mc',q:`כדור נזרק אנכית כלפי מעלה. מה נכון לגבי הרגע שבו הוא בשיא הגובה?`,o:['המהירות אפס והתאוצה אפס',`המהירות אפס, והתאוצה שווה ל־${m('<i>g</i>')} כלפי מטה`,'המהירות והתאוצה שתיהן כלפי מטה','המהירות כלפי מעלה והתאוצה אפס'],a:1,s:`בשיא הגובה המהירות מתאפסת לרגע, אבל היא ממשיכה להשתנות באותו קצב: רגע לפני היא כלפי מעלה ורגע אחרי כלפי מטה. לכן התאוצה שם היא ${m('<i>g</i>')} כלפי מטה, כמו בכל רגע אחר בתנועה.`}
+ ]},
+{id:'uam',title:'תנועה שוות־תאוצה',sub:'מקום כפונקציה של הזמן, ונוסחה שאין בה זמן',
+ intro:[
+ `בתנועה שוות־תאוצה המקום משתנה לפי ${m(`<i>x</i> = ${x0} + ${v0}<i>t</i> + ${half}<i>at</i><sup>2</sup>`)}. גרף המקום־זמן הוא פרבולה: כשהתאוצה חיובית היא פתוחה כלפי מעלה, וכשהתאוצה שלילית היא פתוחה כלפי מטה.`,
+ `ההעתק שווה לשטח שמתחת לגרף המהירות־זמן. בתנועה שוות־תאוצה זה שטח של טרפז, ומכאן הנוסחה ${m(`<i>x</i> = ${x0} + ${fr(`${v0} + <i>v</i>`,'2')}<i>t</i>`)}: המהירות הממוצעת כפול הזמן.`,
+ `כשהזמן לא נתון ולא מבוקש, משתמשים בנוסחה שאין בה זמן: ${m(`<i>v</i><sup>2</sup> = ${v0}<sup>2</sup> + 2<i>a</i>(<i>x</i> − ${x0})`)}.`,
+ `בארבע הנוסחאות מופיעים חמישה גדלים: ${m(`Δ<i>x</i>`)}, ${m(v0)}, ${m('<i>v</i>')}, ${m('<i>a</i>')} ו־${m('<i>t</i>')}. בכל נוסחה חסר אחד מהם. כשיודעים שלושה גדלים, בוחרים את הנוסחה שלא מכילה את הגודל שלא נתון וגם לא מבוקש.`,
+ `מסקנה חשובה מהנוסחה בלי הזמן: בבלימה בתאוצה קבועה, מרחק הבלימה יחסי לריבוע המהירות ההתחלתית.`],
+ formulas:[[`<i>v</i> = ${v0} + <i>at</i>`,'אין בה מקום'],[`<i>x</i> = ${x0} + ${v0}<i>t</i> + ${half}<i>at</i><sup>2</sup>`,'אין בה מהירות סופית'],[`<i>x</i> = ${x0} + ${fr(`${v0} + <i>v</i>`,'2')}<i>t</i>`,'אין בה תאוצה'],[`<i>v</i><sup>2</sup> = ${v0}<sup>2</sup> + 2<i>a</i>(<i>x</i> − ${x0})`,'אין בה זמן']],
+ trap:[`מהירות כפולה, מרחק בלימה כפול?`,`לא: פי 4. מרחק הבלימה הוא ${m(`Δ<i>x</i> = ${fr(`${v0}<sup>2</sup>`,'2|<i>a</i>|')}`)}, והמהירות מופיעה בו בריבוע. מכונית שנוסעת ב־${m('100 km/h')} צריכה מרחק בלימה גדול פי 4 ממכונית שנוסעת ב־${m('50 km/h')}, באותה תאוצת בלימה.`],
+ ex:{given:[`מכונית נוסעת במהירות ${m(`${v0} = 20 m/s`)}`,`הנהג בולם, והתאוצה קבועה: ${m('<i>a</i> = −4 m/s<sup>2</sup>')}`],ask:[`א. כמה זמן נמשכת הבלימה עד לעצירה?`,`ב. מה מרחק הבלימה?`,`ג. מה מהירות המכונית אחרי שעברה ${m('32 m')} מתחילת הבלימה?`,`ד. מה ההעתק במהלך השנייה השלישית של הבלימה?`],
+  steps:[
+  `<b>סעיף א.</b> בעצירה ${m('<i>v</i> = 0')}: ${M(`0 = 20 − 4<i>t</i> &nbsp;⟹&nbsp; <i>t</i> = 5 s`)}`,
+  `<b>סעיף ב.</b> הזמן לא נחוץ, ולכן נוח להשתמש בנוסחה בלי זמן: ${M(`0 = 20<sup>2</sup> + 2·(−4)·Δ<i>x</i> &nbsp;⟹&nbsp; Δ<i>x</i> = ${fr('400','8')} = 50 m`)}`,
+  `<b>סעיף ג.</b> שוב בלי זמן: ${M('<i>v</i><sup>2</sup> = 20<sup>2</sup> + 2·(−4)·32 = 400 − 256 = 144')} ${m('<i>v</i> = 12 m/s')}. בוחרים בשורש החיובי, כי המכונית עדיין נעה קדימה.`,
+  `<b>סעיף ד.</b> השנייה השלישית היא בין ${m('<i>t</i> = 2 s')} ל־${m('<i>t</i> = 3 s')}. עם ${m(`${x0} = 0`)}: ${M('<i>x</i>(3) = 20·3 − 2·3<sup>2</sup> = 42 m &nbsp;,&nbsp; <i>x</i>(2) = 20·2 − 2·2<sup>2</sup> = 32 m')} ${m('Δ<i>x</i> = 42 − 32 = 10 m')}.`],
+  check:`מרחק הבלימה לפי המהירות הממוצעת: ${m(`${fr('20 + 0','2')}·5 = 50 m`)}. בסעיף ד: המהירות באמצע השנייה השלישית היא ${m('<i>v</i>(2.5) = 10 m/s')}, ואכן ${m('10·1 = 10 m')}.`},
+ qs:[
+ {l:'b',t:'num',q:`גוף מתחיל לנוע ממנוחה בתאוצה קבועה של ${m('3 m/s<sup>2</sup>')}. מה ההעתק שלו ב־${m('4 s')} הראשונות?`,a:24,u:'m',s:`${m(`Δ<i>x</i> = ${v0}<i>t</i> + ${half}<i>at</i><sup>2</sup> = 0 + ${half}·3·4<sup>2</sup> = 24 m`)}.`},
+ {l:'b',t:'num',q:`גוף נע במהירות ${m('10 m/s')} ומתחיל להאיץ בתאוצה קבועה של ${m('2 m/s<sup>2</sup>')}. מה מהירותו אחרי שעבר ${m('75 m')}?`,a:20,u:'m/s',s:`הזמן לא נתון, ולכן: ${m(`<i>v</i><sup>2</sup> = 10<sup>2</sup> + 2·2·75 = 400`)}, ${m('<i>v</i> = 20 m/s')}.`},
+ {l:'b',t:'mc',q:`מה צורת גרף המקום־זמן של תנועה שוות־תאוצה (כשהתאוצה שונה מאפס)?`,o:['קו ישר משופע','פרבולה','קו אופקי','היפרבולה'],a:1,s:`בנוסחת המקום מופיע ${m('<i>t</i><sup>2</sup>')}, ולכן הגרף הוא פרבולה. גרף המהירות־זמן הוא הקו הישר המשופע.`},
+ {l:'b',t:'num',q:`מכונית מאיצה ממנוחה ל־${m('30 m/s')} במשך ${m('10 s')} בתאוצה קבועה. מה המרחק שעברה?`,a:150,u:'m',s:`התאוצה לא נחוצה: ${m(`Δ<i>x</i> = ${fr(`${v0} + <i>v</i>`,'2')}<i>t</i> = ${fr('0 + 30','2')}·10 = 150 m`)}.`},
+ {l:'a',t:'num',q:`מטוס צריך להגיע למהירות של ${m('80 m/s')} כדי להמריא. התאוצה שלו על המסלול קבועה, ${m('2.5 m/s<sup>2</sup>')}, והוא מתחיל ממנוחה. מה האורך המזערי של מסלול ההמראה?`,a:1280,u:'m',s:`${m(`<i>v</i><sup>2</sup> = ${v0}<sup>2</sup> + 2<i>a</i>Δ<i>x</i>`)}: ${m(`Δ<i>x</i> = ${fr('80<sup>2</sup>','2·2.5')} = ${fr('6400','5')} = 1280 m`)}.`},
+ {l:'a',t:'num',q:`נהג נוסע במהירות ${m('25 m/s')} ומבחין במכשול. זמן התגובה שלו ${m('0.8 s')}, ובמהלכו המכונית ממשיכה במהירות קבועה. אחר כך הוא בולם בתאוצה קבועה של ${m('−5 m/s<sup>2</sup>')}. מה מרחק העצירה הכולל?`,a:82.5,u:'m',s:`<b>בזמן התגובה</b> (תנועה קצובה): ${m('25·0.8 = 20 m')}.<br><b>בבלימה:</b> ${m(`Δ<i>x</i> = ${fr('25<sup>2</sup>','2·5')} = 62.5 m`)}.<br>סך הכול ${m('20 + 62.5 = 82.5 m')}.`},
+ {l:'a',t:'num',q:`גוף מתחיל לנוע ממנוחה בתאוצה קבועה. במהלך השנייה הרביעית (בין ${m('<i>t</i> = 3 s')} ל־${m('<i>t</i> = 4 s')}) הוא עובר ${m('14 m')}. מה התאוצה שלו?`,a:4,u:'m/s²',s:`${m(`Δ<i>x</i> = <i>x</i>(4) − <i>x</i>(3) = ${half}<i>a</i>·4<sup>2</sup> − ${half}<i>a</i>·3<sup>2</sup> = 3.5<i>a</i>`)}.<br>${m('3.5<i>a</i> = 14')}, ולכן ${m('<i>a</i> = 4 m/s<sup>2</sup>')}.`},
+ {l:'a',t:'mc',q:`מכונית בולמת בתאוצה קבועה. אם המהירות ההתחלתית שלה תהיה גדולה פי 3 (באותה תאוצת בלימה), פי כמה יגדל מרחק הבלימה?`,o:['פי 3','פי 6','פי 9','פי √3'],a:2,s:`${m(`Δ<i>x</i> = ${fr(`${v0}<sup>2</sup>`,'2|<i>a</i>|')}`)}. המרחק יחסי לריבוע המהירות: ${m('3<sup>2</sup> = 9')}.`}
+ ]},
+{id:'graphs',title:'גרפים של תנועה',sub:'שיפוע ושטח: איך עוברים בין מקום, מהירות ותאוצה',
+ intro:[
+ `תנועה לאורך קו ישר מתארים בשלושה גרפים: מקום־זמן, מהירות־זמן ותאוצה־זמן. עוברים מגרף לגרף בעזרת שני כלים בלבד: <b>שיפוע</b> ו<b>שטח</b>.`,
+ `<b>שיפוע:</b> השיפוע של גרף מקום־זמן הוא המהירות, והשיפוע של גרף מהירות־זמן הוא התאוצה.`,
+ `<b>שטח:</b> השטח שבין גרף מהירות־זמן לציר הזמן הוא ההעתק, והשטח שבין גרף תאוצה־זמן לציר הזמן הוא שינוי המהירות. שטח שנמצא מתחת לציר הזמן נחשב שלילי.`,
+ `כדי למצוא את <b>הדרך</b> מגרף מהירות־זמן, מחברים את גודלי השטחים, בלי סימנים. כדי למצוא את <b>ההעתק</b>, מחברים אותם עם הסימנים.`,
+ `כשגרף המהירות־זמן חוצה את ציר הזמן, המהירות מחליפה סימן: הגוף משנה כיוון. באותו רגע יש לגרף המקום־זמן נקודת קיצון.`,
+ `גרף מהירות־זמן נותן רק את ההעתק. כדי לדעת את המקום עצמו צריך לדעת גם את המקום ההתחלתי ${m(x0)}.`],
+ formulas:[[`<i>v</i> = שיפוע גרף <i>x</i>(<i>t</i>)`,'מהירות מתוך גרף מקום־זמן'],[`<i>a</i> = שיפוע גרף <i>v</i>(<i>t</i>)`,'תאוצה מתוך גרף מהירות־זמן'],[`Δ<i>x</i> = שטח מתחת ל־<i>v</i>(<i>t</i>)`,'העתק, עם סימן'],[`Δ<i>v</i> = שטח מתחת ל־<i>a</i>(<i>t</i>)`,'שינוי המהירות, עם סימן']],
+ trap:[`הגרף יורד, אז הגוף חוזר אחורה?`,`תלוי באיזה גרף מדובר. בגרף <b>מקום</b>־זמן, קו יורד אכן אומר שהגוף נע בכיוון השלילי. אבל בגרף <b>מהירות</b>־זמן, קו יורד שנמצא מעל ציר הזמן אומר שהגוף עדיין מתקדם בכיוון החיובי, רק לאט יותר. הגוף חוזר אחורה רק אחרי שהגרף יורד אל מתחת לציר הזמן.`],
+ ex:{given:[`גרף מהירות־זמן של גוף בנוי משלושה קטעים ישרים (אפשר לראות אותו בסימולציה)`,`${m('<i>v</i>(0) = 0')}, ${m('<i>v</i>(4) = 8 m/s')}, ${m('<i>v</i>(8) = 8 m/s')}, ${m('<i>v</i>(12) = −8 m/s')}`],ask:[`א. מה התאוצה בכל קטע?`,`ב. מתי הגוף משנה כיוון?`,`ג. מה ההעתק הכולל ב־${m('12 s')}?`,`ד. מה הדרך הכוללת?`,`ה. מתי הגוף נמצא הכי רחוק מנקודת ההתחלה, ובאיזה מרחק?`],
+  steps:[
+  `<b>סעיף א.</b> התאוצה היא השיפוע בכל קטע: ${M(`<i>a</i><sub>1</sub> = ${fr('8 − 0','4')} = 2 m/s<sup>2</sup> &nbsp;,&nbsp; <i>a</i><sub>2</sub> = 0 &nbsp;,&nbsp; <i>a</i><sub>3</sub> = ${fr('−8 − 8','4')} = −4 m/s<sup>2</sup>`)}`,
+  `<b>סעיף ב.</b> מחפשים מתי ${m('<i>v</i> = 0')} בקטע השלישי: המהירות יורדת מ־${m('8 m/s')} בקצב של ${m('4 m/s')} בכל שנייה, ולכן מתאפסת כעבור ${m('2 s')}, ברגע ${m('<i>t</i> = 10 s')}.`,
+  `<b>סעיף ג.</b> מחשבים שטחים: משולש ${m(`${half}·4·8 = 16`)}, מלבן ${m('4·8 = 32')}, משולש מעל הציר ${m(`${half}·2·8 = 8`)}, משולש מתחת לציר ${m(`${half}·2·8 = 8`)}. ${M('Δ<i>x</i> = 16 + 32 + 8 − 8 = 48 m')}`,
+  `<b>סעיף ד.</b> לדרך מחברים את כל השטחים כגדלים חיוביים: ${M('<i>s</i> = 16 + 32 + 8 + 8 = 64 m')}`,
+  `<b>סעיף ה.</b> הגוף מתרחק כל עוד המהירות חיובית, כלומר עד ${m('<i>t</i> = 10 s')}. המרחק אז: ${m('16 + 32 + 8 = 56 m')}.`],
+  check:`הדרך (${m('64 m')}) גדולה מההעתק (${m('48 m')}) בדיוק בפעמיים השטח השלילי, ${m('2·8 = 16 m')}: את הקטע הזה הגוף עבר, אבל הוא החזיר אותו אחורה.`},
+ qs:[
+ {l:'b',t:'num',fig:FA,q:`לפי גרף המהירות־זמן: מה ההעתק של הגוף ב־${m('10 s')}?`,a:75,u:'m',s:`השטח שמתחת לגרף: משולש ${m(`${half}·5·10 = 25 m`)} ועוד מלבן ${m('5·10 = 50 m')}. סך הכול ${m('75 m')}.`},
+ {l:'b',t:'num',fig:FA,q:`לפי אותו גרף: מה התאוצה של הגוף ב־${m('5 s')} הראשונות?`,a:2,u:'m/s²',s:`השיפוע: ${m(`<i>a</i> = ${fr('10 − 0','5 − 0')} = 2 m/s<sup>2</sup>`)}.`},
+ {l:'b',t:'mc',fig:FB,q:`לפי גרף המקום־זמן: באיזה פרק זמן הגוף במנוחה?`,o:[`בין ${m('0')} ל־${m('4 s')}`,`בין ${m('4 s')} ל־${m('8 s')}`,`בין ${m('8 s')} ל־${m('10 s')}`,'הגוף לא נמצא במנוחה'],a:1,s:`בין ${m('4 s')} ל־${m('8 s')} הגרף אופקי: המקום לא משתנה, השיפוע אפס, ולכן המהירות אפס.`},
+ {l:'b',t:'num',fig:FB,q:`לפי אותו גרף: מה מהירות הגוף בין ${m('<i>t</i> = 8 s')} ל־${m('<i>t</i> = 10 s')}?`,a:-6,u:'m/s',s:`השיפוע: ${m(`<i>v</i> = ${fr('0 − 12','10 − 8')} = −6 m/s`)}. המהירות שלילית: הגוף חוזר לכיוון הראשית.`},
+ {l:'a',t:'num',fig:FC,q:`לפי גרף המהירות־זמן: מה <b>הדרך</b> שעבר הגוף ב־${m('6 s')}?`,a:30,u:'m',s:`עד ${m('<i>t</i> = 4 s')} המהירות חיובית: שטח ${m(`${half}·4·12 = 24 m`)}. מ־${m('4 s')} עד ${m('6 s')} המהירות שלילית: שטח ${m(`${half}·2·6 = 6 m`)}.<br>הדרך: ${m('24 + 6 = 30 m')}.`},
+ {l:'a',t:'num',fig:FC,q:`לפי אותו גרף: מה <b>ההעתק</b> של הגוף ב־${m('6 s')}?`,a:18,u:'m',s:`עכשיו השטח שמתחת לציר נחשב שלילי: ${m('Δ<i>x</i> = 24 − 6 = +18 m')}.`},
+ {l:'a',t:'mc',q:`גרף המהירות־זמן של גוף הוא קו ישר יורד, שמתחיל מעל ציר הזמן וחוצה אותו. איך נראה גרף המקום־זמן שלו?`,o:['קו ישר יורד','פרבולה שיש לה נקודת מקסימום','פרבולה שיש לה נקודת מינימום','קו אופקי'],a:1,s:`קו ישר יורד ב־${m('<i>v</i>(<i>t</i>)')} פירושו תאוצה שלילית קבועה, ולכן ${m('<i>x</i>(<i>t</i>)')} הוא פרבולה שפתוחה כלפי מטה. ברגע שבו ${m('<i>v</i> = 0')} המקום מגיע למקסימום, ואחריו הגוף חוזר.`},
+ {l:'a',t:'num',q:`גוף מתחיל ממנוחה. במשך ${m('4 s')} התאוצה שלו ${m('+3 m/s<sup>2</sup>')}, ובמשך ${m('3 s')} הבאות התאוצה שלו ${m('−2 m/s<sup>2</sup>')}. מה מהירותו בסוף?`,a:6,u:'m/s',s:`שינוי המהירות הוא השטח שמתחת לגרף התאוצה־זמן: ${m('Δ<i>v</i> = 3·4 + (−2)·3 = 12 − 6 = +6 m/s')}. הגוף התחיל ממנוחה, ולכן ${m('<i>v</i> = 6 m/s')}.`}
+ ]},
+{id:'fall',title:'נפילה חופשית',sub:'תנועה אנכית שבה פועל רק כוח הכובד',
+ intro:[
+ `<b>נפילה חופשית</b> היא תנועה שבה פועל על הגוף רק כוח הכובד, כלומר מזניחים את התנגדות האוויר. כל הגופים נופלים אז באותה תאוצה, <b>תאוצת הנפילה החופשית</b> ${m('<i>g</i>')}, שכיוונה כלפי מטה ואינה תלויה במסת הגוף. ליד פני כדור הארץ ${m('<i>g</i> ≈ 9.8 m/s<sup>2</sup>')}, ובחישובים כאן ${m('<i>g</i> = 10 m/s<sup>2</sup>')}.`,
+ `זו תנועה שוות־תאוצה לכל דבר, ומשתמשים באותן נוסחאות, רק שנהוג לסמן את המקום ב־${m('<i>y</i>')}. הדבר הראשון שעושים הוא לבחור ציר. אם הכיוון החיובי כלפי <b>מעלה</b>, התאוצה היא ${m('<i>a</i> = −<i>g</i>')}. אם הכיוון החיובי כלפי <b>מטה</b>, התאוצה היא ${m('<i>a</i> = +<i>g</i>')}.`,
+ `לגוף שמשוחרר ממנוחה נוח לבחור ציר כלפי מטה שראשיתו בנקודת השחרור. אז ${m(`<i>y</i> = ${half}<i>gt</i><sup>2</sup>`)}, ${m('<i>v</i> = <i>gt</i>')} ו־${m('<i>v</i><sup>2</sup> = 2<i>gy</i>')}.`,
+ `מכאן: זמן הנפילה מגובה ${m('<i>h</i>')} הוא ${m(`<i>t</i> = √(2<i>h</i>/<i>g</i>)`)}, וגודל מהירות הפגיעה הוא ${m(`<i>v</i> = √(2<i>gh</i>)`)}.`,
+ `הגוף נופל יותר ויותר בכל שנייה: ${m('5 m')} בשנייה הראשונה, ${m('15 m')} בשנייה השנייה, ${m('25 m')} בשלישית. המהירות, לעומת זאת, גדלה בקצב קבוע: ${m('10 m/s')} בכל שנייה.`],
+ formulas:[[`<i>a</i> = −<i>g</i>`,'כשהכיוון החיובי של הציר כלפי מעלה'],[`<i>v</i> = ${v0} − <i>gt</i>`,'מהירות (ציר כלפי מעלה)'],[`<i>y</i> = ${y0} + ${v0}<i>t</i> − ${half}<i>gt</i><sup>2</sup>`,'גובה (ציר כלפי מעלה)'],[`<i>v</i><sup>2</sup> = ${v0}<sup>2</sup> − 2<i>g</i>(<i>y</i> − ${y0})`,'בלי זמן (ציר כלפי מעלה)']],
+ trap:[`גוף כבד נופל מהר יותר?`,`בנפילה חופשית לא. התאוצה ${m('<i>g</i>')} לא תלויה במסה, ולכן כדור ברזל וכדור עץ שמשוחררים יחד מאותו גובה מגיעים לקרקע יחד. נוצה נופלת לאט יותר רק בגלל התנגדות האוויר, שאותה אנחנו מזניחים. על הירח, שאין בו אוויר, פטיש ונוצה נופלים יחד.`],
+ ex:{given:[`אבן משוחררת ממנוחה מגג בניין שגובהו ${m('45 m')}`,`${m('<i>g</i> = 10 m/s<sup>2</sup>')}, מזניחים את התנגדות האוויר`],ask:[`א. כמה זמן נמשכת הנפילה?`,`ב. באיזו מהירות האבן פוגעת בקרקע?`,`ג. באיזה גובה מעל הקרקע היא נמצאת כעבור ${m('2 s')}?`,`ד. איזו דרך היא עוברת בשנייה האחרונה של הנפילה?`],
+  steps:[
+  `<b>בחירת ציר.</b> ציר ${m('<i>y</i>')} כלפי מעלה, והראשית בקרקע. אז ${m(`${y0} = 45 m`)}, ${m(`${v0} = 0`)} ו־${m('<i>a</i> = −10 m/s<sup>2</sup>')}: ${M('<i>y</i> = 45 − 5<i>t</i><sup>2</sup> &nbsp;,&nbsp; <i>v</i> = −10<i>t</i>')}`,
+  `<b>סעיף א.</b> בקרקע ${m('<i>y</i> = 0')}: ${M('0 = 45 − 5<i>t</i><sup>2</sup> &nbsp;⟹&nbsp; <i>t</i><sup>2</sup> = 9 &nbsp;⟹&nbsp; <i>t</i> = 3 s')}`,
+  `<b>סעיף ב.</b> ${M('<i>v</i> = −10·3 = −30 m/s')} גודל המהירות ${m('30 m/s')}, והסימן השלילי אומר שכיוונה כלפי מטה.`,
+  `<b>סעיף ג.</b> ${M('<i>y</i>(2) = 45 − 5·2<sup>2</sup> = 25 m')}`,
+  `<b>סעיף ד.</b> השנייה האחרונה היא בין ${m('<i>t</i> = 2 s')} ל־${m('<i>t</i> = 3 s')}. האבן יורדת מגובה ${m('25 m')} לגובה אפס, כלומר עוברת ${m('25 m')}.`],
+  check:`בלי זמן: ${m('<i>v</i><sup>2</sup> = 2·10·45 = 900')}, ולכן ${m('|<i>v</i>| = 30 m/s')}. הדרכים בשלוש השניות הן ${m('5, 15, 25 m')}, וסכומן ${m('45 m')}.`},
+ qs:[
+ {l:'b',t:'num',q:`כדור משוחרר ממנוחה. מה גודל מהירותו כעבור ${m('2.5 s')}?`,a:25,u:'m/s',s:`${m('<i>v</i> = <i>gt</i> = 10·2.5 = 25 m/s')}, כלפי מטה.`},
+ {l:'b',t:'num',q:`גוף משוחרר ממנוחה. כמה מטרים הוא נופל ב־${m('4 s')} הראשונות?`,a:80,u:'m',s:`${m(`${half}<i>gt</i><sup>2</sup> = ${half}·10·4<sup>2</sup> = 80 m`)}.`},
+ {l:'b',t:'mc',q:`אסטרונאוט על הירח, שאין בו אוויר, משחרר באותו רגע ומאותו גובה פטיש ונוצה. מה יקרה?`,o:['הפטיש יגיע ראשון','הנוצה תגיע ראשונה','שניהם יגיעו יחד','זה תלוי בגובה השחרור'],a:2,s:`בלי התנגדות אוויר שני הגופים נמצאים בנפילה חופשית, באותה תאוצה, שאינה תלויה במסה. הם מגיעים יחד.`},
+ {l:'b',t:'num',q:`אבן משוחררת ממנוחה מגובה ${m('20 m')}. כמה זמן נמשכת הנפילה?`,a:2,u:'s',s:`${m(`20 = ${half}·10·<i>t</i><sup>2</sup>`)}, לכן ${m('<i>t</i><sup>2</sup> = 4')} ו־${m('<i>t</i> = 2 s')}.`},
+ {l:'a',t:'num',q:`אבן נזרקת אנכית כלפי <b>מטה</b> במהירות ${m('5 m/s')} מגובה ${m('30 m')}. כעבור כמה זמן היא פוגעת בקרקע?`,a:2,u:'s',s:`נוח לבחור ציר כלפי מטה שראשיתו בנקודת הזריקה: ${m('30 = 5<i>t</i> + 5<i>t</i><sup>2</sup>')}.<br>מחלקים ב־5: ${m('<i>t</i><sup>2</sup> + <i>t</i> − 6 = 0')}, כלומר ${m('(<i>t</i> − 2)(<i>t</i> + 3) = 0')}.<br>הפתרון החיובי: ${m('<i>t</i> = 2 s')}.`},
+ {l:'a',t:'num',q:`גוף משוחרר ממנוחה ועובר ${m('35 m')} בשנייה האחרונה של נפילתו. מאיזה גובה הוא שוחרר?`,a:80,u:'m',s:`מסמנים את זמן הנפילה ב־${m('<i>t</i>')}. הדרך בשנייה האחרונה: ${m('5<i>t</i><sup>2</sup> − 5(<i>t</i> − 1)<sup>2</sup> = 10<i>t</i> − 5')}.<br>${m('10<i>t</i> − 5 = 35')}, ולכן ${m('<i>t</i> = 4 s')}.<br>הגובה: ${m('<i>h</i> = 5·4<sup>2</sup> = 80 m')}.`},
+ {l:'a',t:'num',q:`שתי אבנים משוחררות ממנוחה מאותו גג גבוה, השנייה ${m('1 s')} אחרי הראשונה. מה המרחק ביניהן ${m('3 s')} אחרי שחרור האבן הראשונה? (שתיהן עדיין באוויר)`,a:25,u:'m',s:`הראשונה נפלה ${m('3 s')}: ${m('5·3<sup>2</sup> = 45 m')}. השנייה נפלה רק ${m('2 s')}: ${m('5·2<sup>2</sup> = 20 m')}.<br>המרחק: ${m('45 − 20 = 25 m')}.`},
+ {l:'a',t:'mc',q:`בהמשך לשאלה הקודמת: מה קורה למרחק בין שתי האבנים כל עוד שתיהן באוויר?`,o:['נשאר קבוע','הולך וגדל','הולך וקטן','קודם גדל ואחר כך קטן'],a:1,s:`לשתי האבנים אותה תאוצה, אבל הראשונה תמיד מהירה מהשנייה ב־${m('10 m/s')}, כי היא נופלת שנייה אחת יותר. הפרש מהירויות קבוע פירושו שהמרחק ביניהן גדל בקצב קבוע.`}
+ ]},
+{id:'throw',title:'זריקה אנכית כלפי מעלה',sub:'עולה, נעצר לרגע ויורד, והתאוצה אותה תאוצה כל הדרך',
+ intro:[
+ `גוף שנזרק אנכית כלפי מעלה במהירות ${m(v0)} נמצא בנפילה חופשית מהרגע שעזב את היד. לאורך כל התנועה, בעלייה, בשיא ובירידה, התאוצה שלו היא ${m('<i>g</i>')} כלפי מטה. בציר שכיוונו החיובי כלפי מעלה: ${m('<i>a</i> = −<i>g</i>')}.`,
+ `אין צורך לחלק את התנועה לעלייה ולירידה. נוסחה אחת, ${m(`<i>y</i> = ${y0} + ${v0}<i>t</i> − ${half}<i>gt</i><sup>2</sup>`)}, מתארת את כל התנועה, והסימן של ${m('<i>v</i> = ' + v0 + ' − <i>gt</i>')} אומר אם הגוף עולה או יורד.`,
+ `<b>שיא הגובה</b> הוא הרגע שבו ${m('<i>v</i> = 0')}. מכאן זמן העלייה ${m(`<i>t</i> = ${fr(v0,'<i>g</i>')}`)}, והגובה המרבי מעל נקודת הזריקה ${m(`<i>h</i> = ${fr(`${v0}<sup>2</sup>`,'2<i>g</i>')}`)}.`,
+ `<b>סימטריה:</b> זמן העלייה מגובה מסוים עד השיא שווה לזמן הירידה מהשיא חזרה לאותו גובה. באותו גובה גודל המהירות בעלייה ובירידה זהה, והכיוון הפוך. לכן הגוף חוזר לנקודת הזריקה כעבור ${m(`${fr(`2${v0}`,'<i>g</i>')}`)}, במהירות ${m(`−${v0}`)}.`,
+ `כשהגוף נזרק מגובה ${m(y0)} מעל הקרקע ושואלים מתי הוא פוגע בקרקע, מציבים ${m('<i>y</i> = 0')} ומקבלים משוואה ריבועית. בוחרים בפתרון החיובי.`],
+ formulas:[[`<i>v</i> = ${v0} − <i>gt</i>`,'מהירות (ציר כלפי מעלה)'],[`<i>y</i> = ${y0} + ${v0}<i>t</i> − ${half}<i>gt</i><sup>2</sup>`,'גובה (ציר כלפי מעלה)'],[`<i>t</i><sub>שיא</sub> = ${fr(v0,'<i>g</i>')}`,'זמן העלייה עד השיא'],[`<i>h</i><sub>max</sub> = ${fr(`${v0}<sup>2</sup>`,'2<i>g</i>')}`,'הגובה המרבי מעל נקודת הזריקה']],
+ trap:[`בשיא הגובה התאוצה אפס?`,`לא. בשיא הגובה <b>המהירות</b> אפס, אבל התאוצה היא ${m('<i>g</i>')} כלפי מטה, כמו בכל רגע אחר. אילו התאוצה הייתה מתאפסת, הגוף היה נשאר תלוי באוויר. גרף המהירות־זמן הוא קו ישר אחד בשיפוע קבוע, שחוצה את ציר הזמן ברגע השיא בלי שום שינוי בשיפוע.`],
+ ex:{given:[`כדור נזרק אנכית כלפי מעלה במהירות ${m(`${v0} = 20 m/s`)}`,`נקודת הזריקה: גג בניין בגובה ${m('25 m')} מעל הקרקע. ${m('<i>g</i> = 10 m/s<sup>2</sup>')}`],ask:[`א. כעבור כמה זמן הכדור מגיע לשיא הגובה?`,`ב. מה הגובה המרבי שלו מעל הקרקע?`,`ג. מתי הוא פוגע בקרקע?`,`ד. באיזו מהירות הוא פוגע בקרקע?`],
+  steps:[
+  `<b>בחירת ציר.</b> ציר ${m('<i>y</i>')} כלפי מעלה, והראשית בקרקע: ${M('<i>y</i> = 25 + 20<i>t</i> − 5<i>t</i><sup>2</sup> &nbsp;,&nbsp; <i>v</i> = 20 − 10<i>t</i>')}`,
+  `<b>סעיף א.</b> בשיא ${m('<i>v</i> = 0')}: ${M('0 = 20 − 10<i>t</i> &nbsp;⟹&nbsp; <i>t</i> = 2 s')}`,
+  `<b>סעיף ב.</b> ${M('<i>y</i>(2) = 25 + 20·2 − 5·2<sup>2</sup> = 45 m')}`,
+  `<b>סעיף ג.</b> בקרקע ${m('<i>y</i> = 0')}: ${M('0 = 25 + 20<i>t</i> − 5<i>t</i><sup>2</sup> &nbsp;⟹&nbsp; <i>t</i><sup>2</sup> − 4<i>t</i> − 5 = 0 &nbsp;⟹&nbsp; (<i>t</i> − 5)(<i>t</i> + 1) = 0')} הפתרון ${m('<i>t</i> = −1 s')} נפסל, ולכן ${m('<i>t</i> = 5 s')}.`,
+  `<b>סעיף ד.</b> ${M('<i>v</i>(5) = 20 − 10·5 = −30 m/s')} גודל המהירות ${m('30 m/s')}, כלפי מטה.`],
+  check:`בלי זמן: ${m('<i>v</i><sup>2</sup> = 20<sup>2</sup> − 2·10·(0 − 25) = 900')}, ולכן ${m('|<i>v</i>| = 30 m/s')}. מהירות הפגיעה גדולה ממהירות הזריקה, כי הקרקע נמוכה מנקודת הזריקה.`},
+ qs:[
+ {l:'b',t:'num',q:`כדור נזרק מהקרקע אנכית כלפי מעלה במהירות ${m('30 m/s')}. כעבור כמה זמן הוא מגיע לשיא הגובה?`,a:3,u:'s',s:`בשיא ${m('<i>v</i> = 0')}: ${m(`<i>t</i> = ${fr(v0,'<i>g</i>')} = ${fr('30','10')} = 3 s`)}.`},
+ {l:'b',t:'num',q:`לאיזה גובה מרבי מגיע אותו כדור (${m(`${v0} = 30 m/s`)})?`,a:45,u:'m',s:`${m(`<i>h</i> = ${fr(`${v0}<sup>2</sup>`,'2<i>g</i>')} = ${fr('900','20')} = 45 m`)}.`},
+ {l:'b',t:'mc',q:`כדור נזרק אנכית כלפי מעלה. מה נכון ברגע שבו הוא בשיא הגובה?`,o:['המהירות אפס והתאוצה אפס',`המהירות אפס והתאוצה ${m('<i>g</i>')} כלפי מטה`,'המהירות כלפי מטה והתאוצה אפס',`המהירות אפס והתאוצה ${m('<i>g</i>')} כלפי מעלה`],a:1,s:`המהירות מתאפסת לרגע, אבל התאוצה נשארת ${m('<i>g</i>')} כלפי מטה לאורך כל התנועה.`},
+ {l:'b',t:'num',q:`ילדה זורקת כדור אנכית כלפי מעלה במהירות ${m('15 m/s')} ותופסת אותו באותו גובה. כמה זמן היה הכדור באוויר?`,a:3,u:'s',s:`זמן העלייה ${m(`${fr('15','10')} = 1.5 s`)}, וזמן הירידה שווה לו. סך הכול ${m(`${fr(`2${v0}`,'<i>g</i>')} = 3 s`)}.`},
+ {l:'a',t:'num',q:`כדור נזרק מהקרקע אנכית כלפי מעלה במהירות ${m('25 m/s')}. הכיוון החיובי של הציר כלפי מעלה. מה מהירותו ברגע ${m('<i>t</i> = 4 s')}? (עם סימן)`,a:-15,u:'m/s',s:`${m(`<i>v</i> = ${v0} − <i>gt</i> = 25 − 10·4 = −15 m/s`)}. הסימן השלילי אומר שהכדור כבר בדרך למטה.`},
+ {l:'a',t:'num',q:`כדור נזרק מהקרקע כלפי מעלה במהירות ${m('20 m/s')}. הוא עובר בגובה ${m('15 m')} פעמיים: פעם בעלייה ופעם בירידה. כמה זמן עובר בין שני המעברים?`,a:2,u:'s',s:`${m('15 = 20<i>t</i> − 5<i>t</i><sup>2</sup>')}, כלומר ${m('<i>t</i><sup>2</sup> − 4<i>t</i> + 3 = 0')}, ולכן ${m('<i>t</i> = 1 s')} ו־${m('<i>t</i> = 3 s')}.<br>ההפרש: ${m('2 s')}. שני הרגעים סימטריים סביב רגע השיא, ${m('<i>t</i> = 2 s')}.`},
+ {l:'a',t:'num',q:`כדור נזרק אנכית כלפי מעלה במהירות ${m('20 m/s')} מגג שגובהו ${m('60 m')}. כעבור כמה זמן הוא פוגע בקרקע?`,a:6,u:'s',s:`ציר כלפי מעלה, ראשית בקרקע: ${m('0 = 60 + 20<i>t</i> − 5<i>t</i><sup>2</sup>')}.<br>מחלקים ב־${m('−5')}: ${m('<i>t</i><sup>2</sup> − 4<i>t</i> − 12 = 0')}, כלומר ${m('(<i>t</i> − 6)(<i>t</i> + 2) = 0')}.<br>הפתרון החיובי: ${m('<i>t</i> = 6 s')}.`},
+ {l:'a',t:'mc',q:`זורקים כדור כלפי מעלה, ואחר כך זורקים אותו שוב במהירות התחלתית כפולה. פי כמה גדל הגובה המרבי?`,o:['פי 2','פי 4','פי √2','הוא לא משתנה'],a:1,s:`${m(`<i>h</i> = ${fr(`${v0}<sup>2</sup>`,'2<i>g</i>')}`)}. הגובה יחסי לריבוע המהירות, ולכן הוא גדל פי 4. זמן העלייה, לעומת זאת, גדל רק פי 2.`}
+ ]},
+{id:'meet',title:'מפגש בין שני גופים',sub:'שני גופים, ציר אחד ושעון אחד',
+ intro:[
+ `בשאלות על שני גופים הדבר הראשון שעושים הוא לבחור <b>ציר אחד ושעון אחד</b> לשניהם: אותה ראשית, אותו כיוון חיובי ואותו רגע ${m('<i>t</i> = 0')}.`,
+ `אחר כך כותבים לכל גוף נוסחת מקום־זמן משלו: ${m('<i>x</i><sub>A</sub>(<i>t</i>)')} ו־${m('<i>x</i><sub>B</sub>(<i>t</i>)')}. <b>מפגש</b> פירושו שהגופים באותו מקום באותו רגע: ${m('<i>x</i><sub>A</sub> = <i>x</i><sub>B</sub>')}. פותרים את המשוואה ומוצאים את זמן המפגש, ואז מציבים אותו באחת הנוסחאות כדי למצוא את מקום המפגש.`,
+ `אם אחד הגופים יוצא באיחור של ${m(`<i>t</i><sub>0</sub>`)}, הוא נע פחות זמן. בנוסחה שלו כותבים ${m('(<i>t</i> − <i>t</i><sub>0</sub>)')} במקום ${m('<i>t</i>')}.`,
+ `בגרף מקום־זמן המפגש הוא נקודת החיתוך של שני הגרפים. חיתוך בגרף <b>מהירות</b>־זמן הוא דבר אחר: הוא אומר רק שברגע הזה המהירויות שוות.`,
+ `ברדיפה, כל עוד הרודף איטי מהנרדף המרחק ביניהם גדל, וכשהרודף מהיר יותר המרחק קטן. לכן המרחק הגדול ביותר מתקבל ברגע שבו המהירויות שוות.`],
+ formulas:[[`<i>x</i><sub>A</sub>(<i>t</i>) = <i>x</i><sub>B</sub>(<i>t</i>)`,'תנאי המפגש: אותו מקום באותו רגע'],[`<i>x</i> = ${x0} + ${v0}<i>t</i> + ${half}<i>at</i><sup>2</sup>`,'נוסחת מקום־זמן, אחת לכל גוף'],[`<i>x</i><sub>B</sub> = <i>x</i><sub>0B</sub> + <i>v</i><sub>B</sub>(<i>t</i> − <i>t</i><sub>0</sub>)`,'גוף שיוצא באיחור של <i>t</i><sub>0</sub>']],
+ trap:[`גרפי המהירות נחתכים, אז הגופים נפגשו?`,`לא. בנקודת החיתוך של גרפי המהירות־זמן לשני הגופים יש אותה <b>מהירות</b>, לא אותו מקום. ברדיפה זה בדרך כלל הרגע שבו המרחק ביניהם הגדול ביותר. מפגש מזהים רק בגרף המקום־זמן, או מהשוואת השטחים שמתחת לגרפי המהירות.`],
+ ex:{given:[`מכונית A מתחילה לנוע ממנוחה מהראשית בתאוצה קבועה ${m('2 m/s<sup>2</sup>')}`,`באותו רגע משאית B נמצאת ${m('75 m')} לפניה ונוסעת באותו כיוון במהירות קבועה ${m('10 m/s')}`],ask:[`א. מתי המכונית משיגה את המשאית?`,`ב. היכן זה קורה?`,`ג. מה מהירות המכונית באותו רגע?`,`ד. מה המרחק הגדול ביותר בין כלי הרכב לפני המפגש?`],
+  steps:[
+  `<b>נוסחאות המקום.</b> ציר בכיוון הנסיעה, ראשית בנקודת היציאה של A, ו־${m('<i>t</i> = 0')} ברגע היציאה: ${M(`<i>x</i><sub>A</sub> = ${half}·2·<i>t</i><sup>2</sup> = <i>t</i><sup>2</sup> &nbsp;,&nbsp; <i>x</i><sub>B</sub> = 75 + 10<i>t</i>`)}`,
+  `<b>סעיף א.</b> משווים מקומות: ${M('<i>t</i><sup>2</sup> = 75 + 10<i>t</i> &nbsp;⟹&nbsp; <i>t</i><sup>2</sup> − 10<i>t</i> − 75 = 0 &nbsp;⟹&nbsp; (<i>t</i> − 15)(<i>t</i> + 5) = 0')} הפתרון השלילי נפסל, ולכן ${m('<i>t</i> = 15 s')}.`,
+  `<b>סעיף ב.</b> ${M('<i>x</i><sub>A</sub> = 15<sup>2</sup> = 225 m')}`,
+  `<b>סעיף ג.</b> ${M('<i>v</i><sub>A</sub> = <i>at</i> = 2·15 = 30 m/s')}`,
+  `<b>סעיף ד.</b> המרחק גדל כל עוד המכונית איטית מהמשאית, ומגיע למקסימום כשהמהירויות שוות: ${m('2<i>t</i> = 10')}, כלומר ${m('<i>t</i> = 5 s')}. ${M('<i>x</i><sub>B</sub> − <i>x</i><sub>A</sub> = (75 + 10·5) − 5<sup>2</sup> = 100 m')}`],
+  check:`ברגע ${m('<i>t</i> = 15 s')} גם המשאית נמצאת ב־${m('75 + 10·15 = 225 m')}. ברגע המפגש המכונית מהירה פי 3 מהמשאית, ולכן היא עוקפת אותה.`},
+ qs:[
+ {l:'b',t:'num',q:`שני גופים נעים על אותו ציר: ${m('<i>x</i><sub>A</sub> = 4<i>t</i>')} ו־${m('<i>x</i><sub>B</sub> = 60 − 2<i>t</i>')} (במטרים ובשניות). מתי הם נפגשים?`,a:10,u:'s',s:`${m('4<i>t</i> = 60 − 2<i>t</i>')}, לכן ${m('6<i>t</i> = 60')} ו־${m('<i>t</i> = 10 s')}.`},
+ {l:'b',t:'num',q:`בהמשך לשאלה הקודמת: באיזה מקום על הציר הם נפגשים?`,a:40,u:'m',s:`מציבים את זמן המפגש באחת הנוסחאות: ${m('<i>x</i><sub>A</sub> = 4·10 = 40 m')}. בדיקה בנוסחה השנייה: ${m('60 − 2·10 = 40 m')}.`},
+ {l:'b',t:'mc',q:`בגרף מקום־זמן משורטטים הגרפים של שני גופים שנעים על אותו ציר. מה מייצגת נקודת החיתוך שלהם?`,o:['רגע שבו לשני הגופים אותה מהירות','רגע שבו שני הגופים באותו מקום','רגע שבו לשני הגופים אותה תאוצה','רגע שבו שני הגופים עברו אותה דרך'],a:1,s:`בנקודת החיתוך לשני הגופים אותו ${m('<i>x</i>')} באותו ${m('<i>t</i>')}: זה מפגש. המהירויות (השיפועים) יכולות להיות שונות לגמרי.`},
+ {l:'b',t:'num',q:`שתי רכבות יוצאות באותו רגע זו לקראת זו משתי תחנות שהמרחק ביניהן ${m('300 km')}. מהירות האחת ${m('70 km/h')} ומהירות השנייה ${m('80 km/h')}. כעבור כמה שעות הן נפגשות?`,a:2,u:'h',s:`ציר מהתחנה הראשונה לשנייה: ${m('70<i>t</i> = 300 − 80<i>t</i>')}, לכן ${m('150<i>t</i> = 300')} ו־${m('<i>t</i> = 2 h')}. המרחק ביניהן מתקצר בקצב של ${m('150 km/h')}.`},
+ {l:'a',t:'num',q:`מכונית חולפת על פני ניידת משטרה חונה במהירות קבועה של ${m('30 m/s')}. באותו רגע הניידת מתחילה לנוע ממנוחה בתאוצה קבועה של ${m('3 m/s<sup>2</sup>')}. כעבור כמה זמן הניידת משיגה את המכונית?`,a:20,u:'s',s:`${m('<i>x</i><sub>מכונית</sub> = 30<i>t</i>')}, ${m(`<i>x</i><sub>ניידת</sub> = ${half}·3·<i>t</i><sup>2</sup> = 1.5<i>t</i><sup>2</sup>`)}.<br>${m('1.5<i>t</i><sup>2</sup> = 30<i>t</i>')}. הפתרון ${m('<i>t</i> = 0')} הוא רגע היציאה, והפתרון השני: ${m('<i>t</i> = 20 s')}.`},
+ {l:'a',t:'num',q:`בהמשך לשאלה הקודמת: מה מהירות הניידת ברגע שהיא משיגה את המכונית?`,a:60,u:'m/s',s:`${m('<i>v</i> = <i>at</i> = 3·20 = 60 m/s')}: פי 2 ממהירות המכונית. זה לא מקרה: שני כלי הרכב ביצעו אותו העתק באותו זמן, ולכן יש להם אותה מהירות ממוצעת, ${m('30 m/s')}. לניידת, שהתחילה ממנוחה, ${m(`${ov('<i>v</i>')} = ${fr('0 + <i>v</i>','2')}`)}.`},
+ {l:'a',t:'num',q:`רוכב A יוצא מנקודה מסוימת במהירות קבועה של ${m('10 m/s')}. רוכב B יוצא מאותה נקודה ${m('4 s')} אחריו, באותו כיוון, במהירות קבועה של ${m('15 m/s')}. כמה זמן אחרי יציאת A משיג B את A?`,a:12,u:'s',s:`${m('<i>t</i> = 0')} ברגע היציאה של A: ${m('<i>x</i><sub>A</sub> = 10<i>t</i>')}, ${m('<i>x</i><sub>B</sub> = 15(<i>t</i> − 4)')}.<br>${m('10<i>t</i> = 15<i>t</i> − 60')}, ולכן ${m('<i>t</i> = 12 s')}. הם נפגשים ב־${m('<i>x</i> = 120 m')}.`},
+ {l:'a',t:'num',q:`כדור א משוחרר ממנוחה מגובה ${m('40 m')}. באותו רגע כדור ב נזרק מהקרקע, בדיוק מתחתיו, אנכית כלפי מעלה במהירות ${m('20 m/s')}. כעבור כמה זמן הכדורים נפגשים?`,a:2,u:'s',s:`ציר כלפי מעלה, ראשית בקרקע: ${m('<i>y</i><sub>א</sub> = 40 − 5<i>t</i><sup>2</sup>')}, ${m('<i>y</i><sub>ב</sub> = 20<i>t</i> − 5<i>t</i><sup>2</sup>')}.<br>${m('40 − 5<i>t</i><sup>2</sup> = 20<i>t</i> − 5<i>t</i><sup>2</sup>')}. האיבר ${m('5<i>t</i><sup>2</sup>')} מצטמצם, כי לשני הכדורים אותה תאוצה: ${m('<i>t</i> = 2 s')}, בגובה ${m('20 m')}.`}
+ ]}
+];
+
+/* ---------- solving tips per topic ---------- */
+const TIPS={
+pos:[
+ `<b>מתחילים מציור של ציר:</b> מסמנים ראשית וכיוון חיובי, וכותבים על הציר את המקומות שנתונים בשאלה.`,
+ `<b>העתק הוא תמיד "סופי פחות התחלתי".</b> לא הופכים את הסדר כדי לקבל מספר חיובי: הסימן הוא חלק מהתשובה.`,
+ `<b>שואלים על דרך?</b> מחפשים את הנקודות שבהן הגוף שינה כיוון, מחלקים את התנועה לקטעים, ומחברים את גודלי ההעתקים.`,
+ `<b>בדיקה מהירה:</b> הדרך אף פעם לא קטנה מגודל ההעתק. אם יצא אחרת, יש טעות.`],
+uniform:[
+ `<b>קודם יחידות:</b> ממירים קמ״ש למטר לשנייה (מחלקים ב־3.6) ודקות לשניות לפני שמציבים.`,
+ `<b>כותבים נוסחת מקום־זמן</b> ${m(`<i>x</i> = ${x0} + <i>vt</i>`)} עם המספרים של השאלה. כמעט כל סעיף נפתר אחר כך בהצבה אחת.`,
+ `<b>המהירות נכנסת עם סימן.</b> גוף שנע בכיוון השלילי של הציר מקבל ${m('<i>v</i>')} שלילי.`,
+ `<b>גוף שיש לו אורך</b> (רכבת, שיירה): עוקבים אחרי נקודה אחת שלו, ומוסיפים את אורך הגוף להעתק שהיא צריכה לבצע.`,
+ `<b>מגרף מקום־זמן:</b> בוחרים שתי נקודות נוחות על הקו ומחשבים שיפוע. זו המהירות.`],
+avg:[
+ `<b>מהירות ממוצעת מחשבים תמיד מההגדרה:</b> העתק כולל חלקי זמן כולל. לא מחברים מהירויות ומחלקים ב־2.`,
+ `<b>כמה קטעים?</b> מחשבים לכל קטע את ההעתק ואת הזמן, מחברים בנפרד את ההעתקים ובנפרד את הזמנים, ורק אז מחלקים.`,
+ `<b>נתונים חסרים</b> (למשל "חצי מהדרך")? מסמנים את הגודל החסר באות. בסוף הוא מצטמצם.`,
+ `<b>מהירות רגעית מגרף מקום־זמן:</b> משרטטים משיק בנקודה ומחשבים את שיפועו משתי נקודות רחוקות על המשיק.`,
+ `<b>כשהמקום נתון כפונקציה של הזמן:</b> גוזרים לפי הזמן ומקבלים את המהירות הרגעית.`],
+accel:[
+ `<b>רושמים לכל גודל סימן</b> לפי הציר שנבחר, לפני כל חישוב: ${m(v0)}, ${m('<i>v</i>')} ו־${m('<i>a</i>')}.`,
+ `<b>מאיץ או מאט?</b> משווים סימנים: ${m('<i>v</i>')} ו־${m('<i>a</i>')} באותו סימן פירושו שגודל המהירות גדל, ובסימנים הפוכים פירושו שהוא קטן.`,
+ `<b>"נעצר"</b> מתרגמים ל־${m('<i>v</i> = 0')}. <b>"ממנוחה"</b> מתרגמים ל־${m(`${v0} = 0`)}.`,
+ `<b>תאוצה מגרף מהירות־זמן:</b> שיפוע הקו. קו עולה: תאוצה חיובית. קו יורד: תאוצה שלילית.`,
+ `<b>כששואלים על גודל המהירות</b> בתנועה עם שינוי כיוון, בודקים אם יש שני רגעים מתאימים: אחד לפני העצירה ואחד אחריה.`],
+uam:[
+ `<b>טבלת נתונים:</b> רושמים את חמשת הגדלים ${m('Δ<i>x</i>')}, ${m(v0)}, ${m('<i>v</i>')}, ${m('<i>a</i>')}, ${m('<i>t</i>')} ומסמנים מה נתון ומה מבוקש. בוחרים את הנוסחה שלא מכילה את הגודל החמישי.`,
+ `<b>אין זמן בשאלה?</b> ${m(`<i>v</i><sup>2</sup> = ${v0}<sup>2</sup> + 2<i>a</i>(<i>x</i> − ${x0})`)}. <b>אין תאוצה?</b> ${m(`<i>x</i> = ${x0} + ${fr(`${v0} + <i>v</i>`,'2')}<i>t</i>`)}.`,
+ `<b>בלימה:</b> התאוצה מנוגדת למהירות, ולכן הסימנים שלהן הפוכים. המהירות הסופית בעצירה היא אפס.`,
+ `<b>"בשנייה ה־n":</b> ההעתק בין ${m('<i>t</i> = <i>n</i> − 1')} ל־${m('<i>t</i> = <i>n</i>')}. מחשבים את המקום בשני הרגעים ומחסרים.`,
+ `<b>תנועה בשני שלבים</b> (זמן תגובה ואז בלימה, האצה ואז נסיעה קצובה): פותרים כל שלב בנפרד. המהירות בסוף שלב אחד היא המהירות ההתחלתית של השלב הבא.`,
+ `<b>שורש נותן שני פתרונות.</b> את הסימן של ${m('<i>v</i>')} קובעים לפי כיוון התנועה באותו רגע.`],
+graphs:[
+ `<b>קודם קוראים את הצירים.</b> אותו קו אומר דברים שונים לגמרי בגרף מקום־זמן ובגרף מהירות־זמן.`,
+ `<b>שיפוע מחשבים משתי נקודות</b> על הקו, עם היחידות של הצירים: ${m(`${fr('Δ<i>y</i>','Δ<i>t</i>')}`)}.`,
+ `<b>שטח מחלקים לצורות פשוטות:</b> מלבנים, משולשים וטרפזים. לכל צורה רושמים אם היא מעל ציר הזמן או מתחתיו.`,
+ `<b>העתק:</b> שטחים עם סימן. <b>דרך:</b> שטחים כגדלים חיוביים.`,
+ `<b>שינוי כיוון</b> מזהים בגרף מהירות־זמן לפי חציית ציר הזמן, ובגרף מקום־זמן לפי נקודת קיצון.`,
+ `<b>שרטוט גרף מגרף אחר:</b> עוברים קטע אחרי קטע. מהירות קבועה נותנת קו ישר ב־${m('<i>x</i>(<i>t</i>)')}, ותאוצה קבועה נותנת פרבולה.`],
+fall:[
+ `<b>שורה ראשונה בפתרון: בחירת ציר.</b> כותבים במפורש את הכיוון החיובי ואת מקום הראשית, ולפיהם קובעים את הסימנים של ${m('<i>g</i>')}, של ${m(v0)} ושל ${m(y0)}.`,
+ `<b>"משוחרר", "נשמט", "נופל ממנוחה"</b> פירושם ${m(`${v0} = 0`)}. <b>"נזרק כלפי מטה"</b> פירושו שיש מהירות התחלתית.`,
+ `<b>לנפילה ממנוחה</b> נוח ציר כלפי מטה שראשיתו בנקודת השחרור: כל הגדלים חיוביים.`,
+ `<b>"פוגע בקרקע"</b> מתרגמים למקום של הקרקע על הציר שבחרתם.`,
+ `<b>"בשנייה האחרונה":</b> מסמנים את זמן הנפילה הכולל ב־${m('<i>t</i>')}, וכותבים את ההעתק בין ${m('<i>t</i> − 1')} ל־${m('<i>t</i>')}.`,
+ `<b>המסה לא מופיעה בנוסחאות.</b> אם היא נתונה בשאלה על נפילה חופשית, היא לא נחוצה לקינמטיקה.`],
+throw:[
+ `<b>ציר כלפי מעלה, ונוסחה אחת לכל התנועה.</b> לא מחלקים לעלייה ולירידה, אלא אם מבקשים זאת במפורש.`,
+ `<b>"שיא הגובה"</b> מתרגמים ל־${m('<i>v</i> = 0')}. <b>"חוזר לנקודת הזריקה"</b> מתרגמים ל־${m(`<i>y</i> = ${y0}`)}.`,
+ `<b>משתמשים בסימטריה:</b> זמן העלייה שווה לזמן הירידה לאותו גובה, וגודל המהירות באותו גובה זהה.`,
+ `<b>משוואה ריבועית בזמן</b> נותנת שני פתרונות. כשמחפשים מעבר בגובה מסוים, שניהם בעלי משמעות: בעלייה ובירידה. כשמחפשים פגיעה בקרקע, השלילי נפסל.`,
+ `<b>זריקה מגג:</b> הגובה המרבי מעל הקרקע הוא ${m(y0)} ועוד ${m(`${fr(`${v0}<sup>2</sup>`,'2<i>g</i>')}`)}.`,
+ `<b>מהירות עם סימן:</b> חיובית בעלייה, שלילית בירידה. כששואלים על "גודל המהירות", עונים בלי הסימן ומציינים את הכיוון במילים.`],
+meet:[
+ `<b>ציר אחד, ראשית אחת ושעון אחד</b> לשני הגופים. כותבים את הבחירה במפורש.`,
+ `<b>שתי נוסחאות מקום־זמן,</b> אחת לכל גוף. גוף שנע בכיוון השלילי מקבל מהירות שלילית.`,
+ `<b>מפגש:</b> משווים מקומות ופותרים עבור ${m('<i>t</i>')}. את מקום המפגש מוצאים בהצבה באחת הנוסחאות, ובודקים בשנייה.`,
+ `<b>יציאה באיחור:</b> לגוף המאחר כותבים ${m('(<i>t</i> − <i>t</i><sub>0</sub>)')}. הנוסחה שלו תקפה רק מהרגע ${m('<i>t</i><sub>0</sub>')}.`,
+ `<b>מרחק מרבי או מזערי בין הגופים</b> מתקבל כשהמהירויות שוות.`,
+ `<b>שרטוט מהיר של שני הגרפים</b> על אותה מערכת צירים עוזר להבין כמה מפגשים יש, לפני שפותרים.`]
+};
+
+/* ---------- rendering ---------- */
+const app=document.getElementById('app');
+function topicStats(t){const b=t.qs.filter(q=>q.l==='b'),a=t.qs.filter(q=>q.l==='a');const s=l=>l.filter(q=>solved[t.id+'-'+t.qs.indexOf(q)]).length;return{b:b.length,a:a.length,sb:s(b),sa:s(a)}}
+function home(){
+  app.innerHTML=`<div class="wrap"><section class="hero"><div><div class="eyebrow">פיזיקה 5 יח״ל · מכניקה · קינמטיקה</div><h1>תנועה בקו <span class="p">ישר</span></h1><p class="lead">יחידת לימוד בקינמטיקה: תנועה שוות־מהירות, תנועה שוות־תאוצה, נפילה חופשית וזריקה אנכית. בכל נושא יש הסבר קצר, סימולציה עם גרפים, דוגמה פתורה צעד אחר צעד, ושאלות תרגול בשתי רמות: בסיסית ומתקדמת.</p><div class="cta"><a class="btn pri" href="#pos">להתחיל ממקום והעתק</a><a class="btn" href="#formulas">דף הנוסחאות</a></div></div>
+  <figure class="hfig"><div class="stage"><canvas style="cursor:default" aria-label="כדור שנזרק אנכית כלפי מעלה, ולידו גרף הגובה כפונקציה של הזמן"></canvas></div><figcaption>זריקה אנכית כלפי מעלה במהירות ${m('25 m/s')}. הכדור והגרף חולקים את אותו סולם גובה, והחץ מראה את המהירות. הנקודות מסמנות את מקום הכדור כל חצי שנייה.</figcaption></figure></section>
+  <div class="secth"><h2>הנושאים לפי סדר הלימוד</h2><span>ההתקדמות נשמרת בדפדפן הזה</span></div>
+  <div class="tg">${T.map((t,i)=>{const s=topicStats(t);return `<a class="tc" href="#${t.id}"><span class="tn">${i+1}</span><b>${t.title}</b><span class="ts">${t.sub}</span><span class="pg"><span>בסיסיות <em>${s.sb}/${s.b}</em></span><span>מתקדמות <em>${s.sa}/${s.a}</em></span></span></a>`}).join('')}</div></div>`;
+  const yf=t=>25*t-5*t*t,vf=t=>25-10*t,TT=5;const still=matchMedia('(prefers-reduced-motion: reduce)').matches;let tn=still?1.5:0,raf=0,last=0,on=!still;
+  const c=Canvas(app.querySelector('canvas'),(ctx,t,cv)=>vscene(ctx,t,cv,{y:yf,v:vf,T:TT,tn:Math.min(tn,TT),y0:0,marks:[{t:2.5,v:yf(2.5)}]}));
+  const step=ts=>{if(!on)return;if(!document.body.contains(c.cv)){on=false;return}const dt=Math.min(.05,(ts-(last||ts))/1000);last=ts;tn+=dt;if(tn>TT+1.2)tn=0;c.draw();raf=requestAnimationFrame(step)};
+  if(on)raf=requestAnimationFrame(step);anims.push({stop(){on=false;cancelAnimationFrame(raf)}});
+}
+function formulas(){
+  const rows=[
+  ['מהירות ממוצעת',`${ov('<i>v</i>')} = ${fr('Δ<i>x</i>','Δ<i>t</i>')}`,'avg'],
+  ['מהירות רגעית',`<i>v</i> = ${fr('<i>dx</i>','<i>dt</i>')}`,'avg'],
+  ['תאוצה ממוצעת',`${ov('<i>a</i>')} = ${fr('Δ<i>v</i>','Δ<i>t</i>')}`,'accel'],
+  ['תאוצה רגעית',`<i>a</i> = ${fr('<i>dv</i>','<i>dt</i>')}`,'accel'],
+  ['תנועה שוות־תאוצה: מהירות',`<i>v</i> = ${v0} + <i>at</i>`,'accel'],
+  ['תנועה שוות־תאוצה: מקום',`<i>x</i> = ${x0} + ${v0}<i>t</i> + ${half}<i>at</i><sup>2</sup>`,'uam'],
+  ['תנועה שוות־תאוצה: מקום לפי המהירות הממוצעת',`<i>x</i> = ${x0} + ${fr(`${v0} + <i>v</i>`,'2')}<i>t</i>`,'uam'],
+  ['תנועה שוות־תאוצה: בלי זמן',`<i>v</i><sup>2</sup> = ${v0}<sup>2</sup> + 2<i>a</i>(<i>x</i> − ${x0})`,'uam']];
+  const tt=id=>T.find(t=>t.id===id).title;
+  app.innerHTML=`<div class="wrap"><div class="th"><a class="crumb" href="#">כל הנושאים</a><h1>דף הנוסחאות</h1><p>הנוסחאות של "קינמטיקה: תנועה לאורך קו ישר" כפי שהן מופיעות בדף "נוסחאות ונתונים בפיזיקה" לבחינת הבגרות, עם קישור לנושא שבו משתמשים בכל אחת.</p></div>
+  <div class="tscroll"><table class="ftab"><tbody>${rows.map(r=>`<tr><td>${r[0]}<small><a href="#${r[2]}">← ${tt(r[2])}</a></small></td><td class="fx">${M(r[1])}</td></tr>`).join('')}</tbody></table></div>
+  <div class="secth"><h2>מקרים פרטיים שכדאי לזכור</h2><span>נובעים מהנוסחאות שלמעלה, ואינם מופיעים בדף</span></div>
+  <div class="fgrid" style="margin-top:14px"><div class="fc">${M(`<i>x</i> = ${x0} + <i>vt</i>`)}<small>תנועה שוות־מהירות (${m('<i>a</i> = 0')})</small></div><div class="fc">${M('<i>a</i> = −<i>g</i>')}<small>נפילה חופשית וזריקה אנכית, כשהציר כלפי מעלה</small></div><div class="fc">${M(`<i>t</i> = ${fr(v0,'<i>g</i>')} &nbsp;,&nbsp; <i>h</i> = ${fr(`${v0}<sup>2</sup>`,'2<i>g</i>')}`)}<small>זמן העלייה והגובה המרבי בזריקה כלפי מעלה</small></div><div class="fc">${M('<i>g</i> = 10 m/s<sup>2</sup>')}<small>בחישובים ביחידה הזו (ערך מדויק יותר: 9.8)</small></div><div class="fc">${M('1 m/s = 3.6 km/h')}<small>המרת יחידות של מהירות</small></div></div></div>`;
+}
+let curTab='learn';
+function topic(id,tab){
+  const i=T.findIndex(t=>t.id===id),t=T[i];curTab=tab||'learn';
+  const tabs=[['learn','הסבר'],['sim','סימולציה'],['ex','דוגמה פתורה'],['qs','תרגול']];
+  app.innerHTML=`<div class="wrap"><div class="th"><a class="crumb" href="#">כל הנושאים</a><h1>${i+1}. ${t.title}</h1><p>${t.sub}</p></div>
+  <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button class="tab" role="tab" data-t="${k}" aria-selected="${k===curTab}">${l}</button>`).join('')}</div>
+  <div class="panel" id="panel"></div>
+  <nav class="pn">${i>0?`<a class="btn" href="#${T[i-1].id}">→ ${T[i-1].title}</a>`:'<span></span>'}${i<T.length-1?`<a class="btn pri" href="#${T[i+1].id}">${T[i+1].title} ←</a>`:`<a class="btn pri" href="#formulas">לדף הנוסחאות ←</a>`}</nav></div>`;
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{curTab=b.dataset.t;app.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===b));panel(t,curTab)});
+  panel(t,curTab);
+}
+function panel(t,tab,preset){
+  killScenes();const p=document.getElementById('panel');
+  if(tab==='learn'){p.innerHTML=`<div class="prose">${t.intro.map(x=>`<p>${x}</p>`).join('')}</div>${t.formulas.length?`<div><h2>הנוסחאות בנושא</h2><div class="fgrid">${t.formulas.map(f=>`<div class="fc">${M(f[0])}<small>${f[1]}</small></div>`).join('')}</div></div>`:''}${TIPS[t.id]?`<div class="tips"><h2>טיפים לפתרון</h2><ul>${TIPS[t.id].map(x=>`<li>${x}</li>`).join('')}</ul></div>`:''}<div class="trap"><h2>${t.trap[0]}</h2><p>${t.trap[1]}</p></div><div><button class="btn pri" data-go="sim">לסימולציה ←</button></div>`}
+  if(tab==='sim'){p.innerHTML='<div class="panel" style="padding:0" id="simhost"></div>';SIMS[t.id](p.querySelector('#simhost'),preset)}
+  if(tab==='ex'){const e=t.ex;p.innerHTML=`<article class="ex"><div class="gf"><div><h3>נתונים</h3>${e.given.map(g=>`<p>${g}</p>`).join('')}</div><div><h3>מבוקש</h3>${e.ask.map(g=>`<p>${g}</p>`).join('')}</div></div><div><h3>פתרון</h3><ol class="steps">${e.steps.map(s=>`<li>${s}</li>`).join('')}</ol></div><div class="chk"><h3>בדיקה</h3><p>${e.check}</p></div></article><div><button class="btn pri" data-pre="1">פתיחת הדוגמה בסימולציה ←</button></div>`}
+  if(tab==='qs')practice(t,p);
+  p.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>setTab(t,b.dataset.go));
+  p.querySelectorAll('[data-pre]').forEach(b=>b.onclick=()=>setTab(t,'sim',true));
+}
+function setTab(t,k,preset){curTab=k;app.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x.dataset.t===k));panel(t,k,preset);document.querySelector('.tabs').scrollIntoView({block:'nearest'})}
+function practice(t,p){
+  const lv=[['b','שאלות בסיסיות','הבנת המושגים והצבה ישירה'],['a','שאלות מתקדמות','ברמת בגרות, משלבות כמה רעיונות']];
+  p.innerHTML=`<div class="score" id="score"></div>`+lv.map(([l,h,s])=>`<section class="panel" style="padding:0;gap:14px" data-l="${l}"><div class="lvl"><h2>${h}</h2><span>${s}</span></div></section>`).join('')+`<p class="note">בשאלות חישוב כותבים מספר בלבד, עם סימן מינוס כשצריך, למשל <span class="mx">−12</span> או <span class="mx">82.5</span>. תשובה נחשבת נכונה בטווח של 3%. בכל השאלות <span class="mx"><i>g</i> = 10 m/s<sup>2</sup></span>.</p>`;
+  const upd=()=>{const s=topicStats(t);p.querySelector('#score').innerHTML=`נפתרו: בסיסיות ${s.sb}/${s.b} · מתקדמות ${s.sa}/${s.a}`};upd();
+  const n={b:0,a:0};
+  t.qs.forEach((q,qi)=>{const id=t.id+'-'+qi;n[q.l]++;const box=el(`<div class="q ${q.l==='a'?'adv':''}"><div class="qn"><span>${q.l==='a'?'מתקדמת':'בסיסית'} ${n[q.l]}</span><span class="st ${solved[id]?'ok':''}">${solved[id]?'✓ נפתרה':''}</span></div><p>${q.q}</p>${q.fig?q.fig():''}</div>`);
+    const st=box.querySelector('.st');const good=()=>{markSolved(id);st.textContent='✓ נפתרה';st.classList.add('ok');upd()};
+    const sol=el(`<div class="sol" hidden><b>פתרון</b><p>${q.s}</p></div>`);
+    if(q.t==='mc'){const o=el('<div class="opts"></div>');const fb=el('<div class="fb" hidden></div>');q.o.forEach((txt,k)=>{const b=el(`<button class="opt">${txt}</button>`);b.onclick=()=>{o.querySelectorAll('.opt').forEach((x,j)=>{x.disabled=true;if(j===q.a)x.classList.add('ok')});if(k===q.a){fb.className='fb ok';fb.textContent='נכון.';good()}else{b.classList.add('no');fb.className='fb no';fb.textContent='לא נכון. התשובה הנכונה מסומנת בירוק.'}fb.hidden=false;sol.hidden=false};o.appendChild(b)});box.append(o,fb,sol)}
+    else{const fid='a'+id;const row=el(`<div class="ansrow"><label class="tip" for="${fid}">התשובה שלכם:</label><input id="${fid}" inputmode="decimal" autocomplete="off"><span class="u">${q.u}</span><button class="btn sm pri">בדיקה</button><button class="btn sm">הצגת פתרון</button></div>`);const fb=el('<div class="fb" hidden></div>');const[inp]=row.querySelectorAll('input');const[chk,show]=row.querySelectorAll('button');
+      const check=()=>{const v=parseNum(inp.value);fb.hidden=false;if(isNaN(v)){fb.className='fb';fb.textContent='לא הצלחנו לקרוא את המספר. נסו למשל 12.5 או ‎−6.';return}const ok=Math.abs(v-q.a)<=Math.abs(q.a)*.03+1e-12;if(ok){fb.className='fb ok';fb.innerHTML='נכון. ';good();sol.hidden=false}else{const sign=Math.sign(v)!==Math.sign(q.a)&&v!==0;fb.className='fb no';fb.textContent=sign?'הסימן לא נכון. בדקו את כיוון הציר ואת כיוון התנועה.':Math.abs(Math.log10(Math.abs(v/q.a))%1)<.02&&(Math.abs(v/q.a)>5||Math.abs(v/q.a)<.2)?'הספרות נכונות אבל סדר הגודל לא. בדקו את היחידות.':'עדיין לא. נסו שוב, או פתחו את הפתרון.'}};
+      chk.onclick=check;inp.addEventListener('keydown',e=>{if(e.key==='Enter')check()});show.onclick=()=>{sol.hidden=!sol.hidden};box.append(row,fb,sol)}
+    p.querySelector(`[data-l="${q.l}"]`).appendChild(box)});
+}
+function route(){killScenes();const h=location.hash.replace('#','');document.getElementById('nav-f').toggleAttribute('aria-current',h==='formulas');document.getElementById('nav-home').toggleAttribute('aria-current',!h);
+  if(T.some(t=>t.id===h))topic(h);else if(h==='formulas')formulas();else home();window.scrollTo(0,0)}
+addEventListener('hashchange',route);route();
+
+</script>
+</body></html>

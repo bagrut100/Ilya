@@ -1,57 +1,65 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>כבידה - מכניקה</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root { --bg-color: #0b0e14; --card-bg: #ffffff; --text-main: #111827; --text-secondary: #4b5563; --accent-blue: #0070f3; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', system-ui, sans-serif; }
-        body { background-color: var(--bg-color); background-image: radial-gradient(circle at 50% 0%, #172033 0%, #0b0e14 60%); color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 25px 20px 60px; }
-        .container { width: 100%; max-width: 960px; }
-        .top-nav { display: flex; justify-content: space-between; margin-bottom: 24px; }
-        .back-link { color: #60a5fa; text-decoration: none; font-weight: 700; }
-        .breadcrumbs { color: #94a3b8; font-size: 0.9rem; }
-        .header-section { text-align: center; padding: 10px 0 36px; }
-        .header-section h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
-        .header-section p { color: #94a3b8; font-size: 1.05rem; }
-        .card { background: var(--card-bg); color: var(--text-main); border-radius: 16px; padding: 28px; max-width: 450px; margin: 0 auto; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 12px 30px rgba(0,0,0,0.25); transition: transform 0.25s; border-top: 5px solid var(--accent-blue); }
-        .card:hover { transform: translateY(-6px); }
-        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
-        .icon-box { width: 52px; height: 52px; border-radius: 14px; background: #eff6ff; color: var(--accent-blue); display: flex; align-items: center; justify-content: center; }
-        .icon-box svg { width: 26px; height: 26px; stroke-width: 2; }
-        .badge { font-size: 0.78rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; }
-        .card h2 { font-size: 1.35rem; margin-bottom: 8px; }
-        .card p { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
-        .card-btn { display: flex; align-items: center; justify-content: center; padding: 12px 20px; border-radius: 10px; background-color: var(--accent-blue); color: #fff; font-weight: 700; text-decoration: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>כבידה ולוויינים</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:#0f172a;font-family:Heebo,system-ui,sans-serif;padding:24px 16px 60px}
+.wrap{max-width:1100px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.9rem;color:#64748b}
+.top a{color:#0D9488;font-weight:700;text-decoration:none}
+h1{text-align:center;font-size:1.9rem;margin:18px 0 6px}
+.sub{text-align:center;color:#475569;margin:0 0 22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 10px}
+.chips button{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:6px 14px;font:700 .85rem Heebo,sans-serif;cursor:pointer}
+.chips button.on{background:#0D9488;border-color:#0D9488;color:#fff}
+.grp{margin:30px 0 0}
+.grp h2{font-size:1.25rem;border-right:5px solid;padding-right:10px;margin:0 0 14px}
+.cnt{color:#64748b;font-weight:500;font-size:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;color:#0f172a;text-decoration:none;box-shadow:0 2px 6px rgba(15,23,42,.06);transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(15,23,42,.12)}
+.pill{align-self:flex-start;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px}
+.card b{font-size:1.08rem;line-height:1.35}
+.desc{font-size:.9rem;color:#475569;line-height:1.5;flex:1}
+.topic{font-size:.8rem;color:#64748b}
+.open{font-size:.88rem;font-weight:700}
+.empty{background:#fff;border:1px dashed #cbd5e1;border-radius:14px;padding:28px;text-align:center;color:#64748b;margin-top:24px}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="top-nav">
-            <a href="../index.html" class="back-link">← חזרה למכניקה</a>
-            <span class="breadcrumbs">ראשי / מכניקה / כבידה</span>
-        </div>
-        <div class="header-section">
-            <h1>כבידה ותנועת לוויינים</h1>
-            <p>סימולציה אינטראקטיבית לחקר חוק הכבידה העולמי, מסלולים ומהירות מילוט</p>
-        </div>
-        <div class="card">
-            <div>
-                <div class="card-top">
-                    <div class="icon-box">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-25 12 12)"/><circle cx="19" cy="8" r="1.5"/></svg>
-                    </div>
-                    <span class="badge">סימולציה</span>
-                </div>
-                <h2>סימולציית כבידה ולוויינים</h2>
-                <p>שיגור לוויינים למסלול מעגלי ואליפטי, חוקי קפלר ומהירות הקפה.</p>
-            </div>
-            <a href="gravity_simulation.html" class="card-btn">הפעל סימולציה ←</a>
-        </div>
-    </div>
+<div class="wrap">
+<div class="top"><a href="../index.html">← חזרה למכניקה</a><span>ראשי / מכניקה / כבידה ולוויינים</span><a href="../../catalog.html">כל החומרים</a></div>
+<h1>כבידה ולוויינים</h1>
+<p class="sub">חוק הכבידה העולמי, חוקי קפלר ומסלולי לוויינים</p>
+
+<section class="grp"><h2 style="color:#0D9488;border-color:#0D9488">סימולציות <span class="cnt">(1)</span></h2>
+<div class="grid">
+<a class="card" href="gravity_simulation.html" data-year="" data-topic="01_Mechanics/01_7_gravitation" style="border-top:4px solid #0D9488"><span class="pill" style="background:#E6F1FB;color:#0C447C">סימולציה</span><b>מעבדת כבידה</b><span class="desc">חוקי קפלר, חוק הכבידה העולמי ואנרגיה של לוויין.</span><span class="open" style="color:#0D9488">הפעל סימולציה ←</span></a>
+</div></section>
+<section class="grp"><h2 style="color:#0D9488;border-color:#0D9488">יחידות לימוד <span class="cnt">(1)</span></h2>
+<div class="grid">
+<a class="card" href="gravitation_satellites.html" data-year="" data-topic="01_Mechanics/01_7_gravitation" style="border-top:4px solid #0D9488"><span class="pill" style="background:#E1F5EE;color:#085041">יחידת לימוד</span><b>כבידה ולוויינים</b><span class="desc">יחידת לימוד בכבידה, 5 יח&quot;ל: נושאים, נוסחאות והדגמות.</span><span class="open" style="color:#0D9488">פתח יחידה ←</span></a>
+</div></section>
+</div>
+<script>
+var st={topic:'all',year:'all'};
+function setF(k,v,btn){
+  st[k]=v;
+  btn.parentNode.querySelectorAll('button').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  document.querySelectorAll('.card').forEach(function(el){
+    var ok=(st.topic==='all'||el.dataset.topic===st.topic)&&(st.year==='all'||el.dataset.year===st.year);
+    el.style.display=ok?'':'none';
+  });
+  document.querySelectorAll('.grp').forEach(function(g){
+    var any=Array.prototype.some.call(g.querySelectorAll('.card'),function(e){return e.style.display!=='none';});
+    g.style.display=any?'':'none';
+  });
+}
+</script>
 </body>
 </html>

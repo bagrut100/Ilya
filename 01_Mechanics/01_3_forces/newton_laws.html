@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>כוחות וחוקי ניוטון</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700;800&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+<style>
+/* layout: a dynamics bench page. sticky bar, one reading column, a free-body diagram at the centre of each topic. red = applied force / tension, blue = gravity, green = normal, copper = friction and UI accent. */
+:root{
+  --bg:#f2f4f7; --paper:#ffffff; --soft:#eef1f5; --ink:#17202c; --mut:#5a6576; --line:#d8dee7; --grid:#e9edf3;
+  --pos:#cf3328; --neg:#2860c4; --acc:#a85a14; --acc-ink:#ffffff; --fieldln:#3a4557;
+  --ok:#14713f; --ok-bg:#e2f3e9; --no:#b3261e; --no-bg:#fbe7e5; --warn:#7a4a00; --warn-bg:#fff2d6;
+  --shadow:0 1px 2px rgba(23,32,44,.05),0 8px 24px rgba(23,32,44,.07);
+  --fd:"Secular One","Assistant",system-ui,sans-serif;
+  --fb:"Assistant","Arial Hebrew",system-ui,sans-serif;
+  --fm:"STIX Two Text","Cambria Math","Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0d1117; --paper:#151b24; --soft:#1b2330; --ink:#e6ebf2; --mut:#9aa5b6; --line:#2a3342; --grid:#1c2431;
+  --pos:#ff6a5c; --neg:#6aa1ff; --acc:#f0a14a; --acc-ink:#1a1206; --fieldln:#b7c2d4;
+  --ok:#5fd394; --ok-bg:#122b1d; --no:#ff8b80; --no-bg:#371816; --warn:#f2c46e; --warn-bg:#2e240f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0d1117; --paper:#151b24; --soft:#1b2330; --ink:#e6ebf2; --mut:#9aa5b6; --line:#2a3342; --grid:#1c2431;
+  --pos:#ff6a5c; --neg:#6aa1ff; --acc:#f0a14a; --acc-ink:#1a1206; --fieldln:#b7c2d4;
+  --ok:#5fd394; --ok-bg:#122b1d; --no:#ff8b80; --no-bg:#371816; --warn:#f2c46e; --warn-bg:#2e240f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.7 var(--fb);-webkit-text-size-adjust:100%;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1040px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--fd);font-weight:400;line-height:1.2;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px;border-radius:6px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--paper);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:8px;min-height:56px}
+.brand{text-decoration:none;margin-inline-end:auto;display:flex;align-items:center;gap:10px;font:400 1.3rem/1 var(--fd)}
+.brand i{display:inline-flex;gap:3px}
+.brand i b{width:12px;height:12px;border-radius:50%;display:block}
+.nl{font-weight:700;font-size:.95rem;text-decoration:none;padding:8px 12px;border-radius:999px}
+.nl:hover,.nl[aria-current]{background:var(--soft)}
+.btn{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 16px;font-weight:700;font-size:.95rem;line-height:1.3;display:inline-flex;align-items:center;gap:6px;min-height:40px;text-decoration:none}
+.btn:hover{border-color:var(--mut)}
+.btn.pri{background:var(--acc);border-color:transparent;color:var(--acc-ink)}
+.btn.sm{min-height:34px;padding:5px 12px;font-size:.88rem}
+.btn.pos{color:var(--pos)} .btn.neg{color:var(--neg)}
+
+/* home */
+.hero{display:grid;grid-template-columns:1fr 1.05fr;gap:32px;align-items:center;padding-block:34px 20px}
+.eyebrow{font-size:.85rem;font-weight:700;letter-spacing:.04em;color:var(--acc)}
+.hero h1{font-size:clamp(2.3rem,6vw,3.6rem);margin-block:6px 12px}
+.hero h1 .p{color:var(--pos)} .hero h1 .n{color:var(--neg)}
+.lead{font-size:1.1rem;color:var(--mut);max-width:32em}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.hfig{margin:0;min-width:0}
+.hfig .stage canvas{height:300px}
+.hfig figcaption{font-size:.86rem;color:var(--mut);margin-top:8px}
+.secth{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-top:22px;flex-wrap:wrap}
+.secth h2{font-size:1.6rem}
+.secth span{color:var(--mut);font-size:.92rem}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:14px}
+.tc{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-content:start;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0;transition:border-color .15s,transform .15s}
+.tc:hover{border-color:var(--acc);transform:translateY(-2px)}
+.tn{font:400 1.5rem/1.1 var(--fd);color:var(--acc);font-variant-numeric:tabular-nums}
+.tc b{font-size:1.08rem;line-height:1.35}
+.tc .ts{grid-column:2;color:var(--mut);font-size:.9rem;line-height:1.45}
+.tc .pg{grid-column:2;margin-top:8px;font-size:.8rem;color:var(--mut);display:flex;gap:10px;flex-wrap:wrap}
+.pg em{font-style:normal;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* topic */
+.th{padding-block:24px 12px}
+.crumb{font-size:.88rem;font-weight:700;color:var(--acc);text-decoration:none}
+.th h1{font-size:clamp(1.9rem,5vw,2.7rem);margin-block:4px 4px}
+.th p{color:var(--mut);font-size:1.05rem}
+.tabs{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:5;background:var(--bg);display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:12px 16px;font-weight:700;color:var(--mut);border-bottom:3px solid transparent;white-space:nowrap;flex:1 0 auto;min-height:46px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--acc)}
+.panel{padding-block:22px 8px;display:grid;gap:22px;min-width:0}
+.prose{max-width:66ch;display:grid;gap:12px;font-size:1.05rem}
+.prose p,.ex p,.q p,.sol p,.trap p{min-width:0;overflow-wrap:anywhere}
+.panel h2{font-size:1.3rem}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:10px}
+.fc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 10px 10px;text-align:center;min-width:0;display:grid;gap:4px;align-content:center}
+.fc small{color:var(--mut);font-size:.86rem;line-height:1.45}
+.trap{background:var(--warn-bg);border-radius:14px;padding:16px 18px;max-width:72ch;display:grid;gap:6px}
+.trap h2{font-size:1.1rem;color:var(--warn)}
+.tips{background:var(--paper);border:1px solid var(--line);border-inline-start:4px solid var(--acc);border-radius:14px;padding:16px 18px;max-width:72ch;display:grid;gap:8px}
+.tips h2{font-size:1.1rem;color:var(--acc)}
+.tips ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.tips li{position:relative;padding-inline-start:22px;min-width:0;overflow-wrap:anywhere}
+.tips li::before{content:"";position:absolute;inset-inline-start:2px;top:.62em;width:9px;height:9px;border-radius:50%;border:2px solid var(--acc)}
+
+/* lab */
+.stage{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow)}
+.stage canvas{display:block;width:100%;height:380px;touch-action:none;cursor:grab}
+.stage canvas.g{height:190px;cursor:default;border-top:1px solid var(--line)}
+.hint{position:absolute;inset-inline-end:10px;top:8px;font-size:.78rem;color:var(--mut);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:1px 10px;pointer-events:none;max-width:calc(100% - 20px)}
+.simbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.simbar .lab{font-size:.88rem;color:var(--mut);font-weight:600}
+.tgl{display:inline-flex;align-items:center;gap:6px;font-size:.92rem;font-weight:600;border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--paper);cursor:pointer}
+.tgl input{accent-color:var(--acc);margin:0}
+.ctls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 26px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:baseline;min-width:0}
+.ctl .cl{font-size:.95rem;font-weight:600}
+.ctl output{font-weight:700;font-variant-numeric:tabular-nums;color:var(--acc);direction:ltr;unicode-bidi:isolate}
+.ctl input{grid-column:1/-1;width:100%;accent-color:var(--acc);height:30px;margin:0}
+.outs{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.outs div{background:var(--soft);border-radius:10px;padding:8px 12px;min-width:0}
+.outs dt{font-size:.82rem;color:var(--mut);line-height:1.4}
+.outs dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums;font-size:1.02rem;direction:ltr;text-align:right;font-family:var(--fm)}
+.note{font-size:.9rem;color:var(--mut);max-width:72ch}
+
+/* example */
+.ex{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;max-width:80ch}
+.ex h3,.qn{font:700 .82rem/1.3 var(--fb);letter-spacing:.06em;color:var(--acc)}
+.gf{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gf>div{background:var(--soft);border-radius:10px;padding:10px 14px;min-width:0;display:grid;gap:4px}
+.steps{margin:0;padding-inline-start:1.4em;display:grid;gap:12px}
+.steps li{min-width:0}
+.steps li::marker{font-family:var(--fd);color:var(--acc)}
+.chk{background:var(--ok-bg);border-radius:10px;padding:10px 14px;display:grid;gap:4px}
+.chk h3{color:var(--ok)}
+
+/* practice */
+.lvl{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:6px}
+.lvl h2{font-size:1.25rem}
+.lvl span{color:var(--mut);font-size:.9rem}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:12px;max-width:80ch}
+.q.adv{border-inline-start:4px solid var(--acc)}
+.qn{display:flex;justify-content:space-between;gap:8px}
+.qn .st{letter-spacing:0;font-weight:700}
+.qn .st.ok{color:var(--ok)}
+.opts{display:grid;gap:8px}
+.opt{display:block;width:100%;text-align:start;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);line-height:1.5}
+.opt:hover:not([disabled]){border-color:var(--acc)}
+.opt[disabled]{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg);font-weight:700}
+.opt.no{border-color:var(--no);background:var(--no-bg);color:var(--mut)}
+.fb{font-size:.97rem;padding:10px 14px;border-radius:10px;background:var(--soft)}
+.fb.ok{background:var(--ok-bg)} .fb.no{background:var(--no-bg)}
+.ansrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ansrow input{width:10em;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);font-variant-numeric:tabular-nums;font-size:1rem;direction:ltr;text-align:left}
+.ansrow .u{color:var(--mut);font-weight:600;direction:ltr;unicode-bidi:isolate}
+.tip{font-size:.84rem;color:var(--mut)}
+.sol{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:.98rem;display:grid;gap:8px}
+.fig{max-width:360px;width:100%;overflow-x:auto}
+.fig svg{display:block;width:100%;height:auto}
+.score{font-weight:700;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pn{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-block:18px;margin-top:10px}
+
+/* formulas */
+.ftab{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ftab td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.ftab td.fx{text-align:center;width:46%}
+.ftab small{display:block;color:var(--mut);font-size:.85rem}
+.ftab a{font-size:.84rem;font-weight:700;color:var(--acc);text-decoration:none}
+.tscroll{overflow-x:auto}
+.foot{color:var(--mut);font-size:.86rem;padding-block:24px 34px;border-top:1px solid var(--line);margin-top:30px}
+
+/* math */
+.mx{font-family:var(--fm);font-size:1.08em;direction:ltr;unicode-bidi:isolate;display:inline-block;line-height:1.3;white-space:nowrap}
+.mx i{font-style:italic}
+.mx.fx{display:block;text-align:center;font-size:1.3rem;overflow-x:auto;overflow-y:hidden;padding:6px 2px;max-width:100%}
+.mx sup,.mx sub{font-size:.68em;line-height:0}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;font-size:.95em}
+.fr>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .25em .08em}
+.fr>span:last-child{padding:.08em .25em 0}
+.pq{color:var(--pos);font-weight:700} .nq{color:var(--neg);font-weight:700}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr;gap:18px;padding-block:22px 10px}
+  .gf{grid-template-columns:1fr}
+  .stage canvas{height:320px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+html,body{margin:0;padding:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+.stage canvas.trk{height:150px;cursor:default}
+.stage canvas.trk.tall{height:230px}
+.stage canvas.g{height:230px}
+.hint{font-size:.76rem}
+.vc{position:relative;display:inline-block}
+.vc::after{content:"→";position:absolute;left:0;right:0;top:-.58em;text-align:center;font-size:.62em;font-style:normal;line-height:1}
+.ftab .mx.fx{padding-top:14px}
+.btn.sm.pri .mx{color:inherit}
+</style></head><body>
+<div dir="rtl" lang="he">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="#"><i aria-hidden="true"><b style="background:var(--pos)"></b><b style="background:var(--neg)"></b></i>כוחות וחוקי ניוטון</a>
+  <a class="nl" href="#" id="nav-home">נושאים</a>
+  <a class="nl" href="#formulas" id="nav-f">נוסחאות</a>
+</div></header>
+<main id="app"></main>
+<footer class="wrap foot">יחידת לימוד בדינמיקה, פיזיקה 5 יח״ל. הסימונים לפי דף "נוסחאות ונתונים בפיזיקה". בחישובים: <span class="mx"><i>g</i> = 10 m/s<sup>2</sup></span>, <span class="mx">sin37° = 0.6</span>, <span class="mx">cos37° = 0.8</span>.</footer>
+</div>
+<script>
+document.documentElement.lang='he';document.documentElement.dir='rtl';
+const G=10;
+const m=s=>`<span class="mx">${s}</span>`;
+const M=s=>`<div class="mx fx">${s}</div>`;
+const fr=(a,b)=>`<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const ov=s=>`<span style="text-decoration:overline">${s}</span>`;
+const mus='<i>μ</i><sub>s</sub>',muk='<i>μ</i><sub>k</sub>',SF='Σ<i>F</i>',Fsp='<i>F</i><sub>sp</sub>',dl='Δ<i>ℓ</i>',th='<i>θ</i>',vec=x=>`<span class="vc"><i>${x}</i></span>`;
+const v0='<i>v</i><sub>0</sub>', x0='<i>x</i><sub>0</sub>', y0='<i>y</i><sub>0</sub>', half=fr('1','2');
+const sq=s=>`${s}<sup>2</sup>`;
+
+/* ---------- number formatting ---------- */
+function fmt(x,d=3){
+  if(!isFinite(x))return '—'; if(Math.abs(x)<1e-30)return '0';
+  const a=Math.abs(x);
+  if(a>=1e4||a<1e-2){let e=Math.floor(Math.log10(a));let mn=+(x/10**e).toPrecision(d);if(Math.abs(mn)>=10){mn=+(mn/10).toPrecision(d);e++}return (String(mn)+'·10<sup>'+e+'</sup>').replace(/-/g,'−')}
+  return String(+x.toPrecision(d)).replace('-','−');
+}
+function parseNum(s){
+  if(!s)return NaN; s=s.trim().replace(/[−–]/g,'-').replace(/\s/g,'').replace(/,/g,'.');
+  s=s.replace(/(?:\*|x|×|·)10\^?\(?(-?\d+)\)?/i,'e$1').replace(/^10\^\(?(-?\d+)\)?$/,'1e$1');
+  return /^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)?parseFloat(s):NaN;
+}
+/* ---------- storage ---------- */
+let solved={};
+try{solved=JSON.parse(localStorage.getItem('dyn-solved')||'{}')||{}}catch(e){solved={}}
+function markSolved(id){solved[id]=1;try{localStorage.setItem('dyn-solved',JSON.stringify(solved))}catch(e){}}
+
+/* ---------- canvas helpers ---------- */
+function tok(){const cs=getComputedStyle(document.documentElement);const g=n=>cs.getPropertyValue(n).trim();return{paper:g('--paper'),ink:g('--ink'),mut:g('--mut'),line:g('--line'),grid:g('--grid'),pos:g('--pos'),neg:g('--neg'),acc:g('--acc'),fl:g('--fieldln'),ok:g('--ok'),soft:g('--soft')}}
+function arrow(ctx,x1,y1,x2,y2,col,w=2,head=8){const a=Math.atan2(y2-y1,x2-x1),L=Math.hypot(x2-x1,y2-y1);if(L<2)return;ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2-Math.cos(a)*head*.6,y2-Math.sin(a)*head*.6);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-head*Math.cos(a-.42),y2-head*Math.sin(a-.42));ctx.lineTo(x2-head*Math.cos(a+.42),y2-head*Math.sin(a+.42));ctx.closePath();ctx.fill()}
+function font(ctx,sz,w=700){ctx.font=`${w} ${sz}px Assistant, system-ui, sans-serif`}
+const nf=v=>String(+(+v).toFixed(6)).replace('-','−');
+const sg=(v,d=3)=>(v>0?'+':'')+fmt(v,d);
+function niceStep(r,n){const raw=r/n,p=10**Math.floor(Math.log10(raw)),f=raw/p;return(f<1.5?1:f<3.5?2:f<7.5?5:10)*p}
+
+let scenes=[],anims=[];
+function killScenes(){scenes.forEach(s=>s.ro&&s.ro.disconnect());scenes=[];anims.forEach(a=>a.stop());anims=[]}
+const themeMQ=matchMedia('(prefers-color-scheme: dark)');
+const redrawAll=()=>scenes.forEach(s=>s.draw());
+themeMQ.addEventListener&&themeMQ.addEventListener('change',redrawAll);
+new MutationObserver(redrawAll).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+function Canvas(cv,drawFn){
+  const o={cv,ctx:cv.getContext('2d'),W:0,H:0,draw(){if(!o.W)return;const c=o.ctx;c.setTransform(o.dpr,0,0,o.dpr,0,0);c.direction='ltr';const t=tok();c.fillStyle=t.paper;c.fillRect(0,0,o.W,o.H);drawFn(c,t,o)}};
+  o.resize=()=>{const r=cv.getBoundingClientRect();if(!r.width)return;o.dpr=Math.min(2,devicePixelRatio||1);o.W=r.width;o.H=r.height;cv.width=Math.round(r.width*o.dpr);cv.height=Math.round(r.height*o.dpr);o.onResize&&o.onResize();o.draw()};
+  o.ro=new ResizeObserver(o.resize);o.ro.observe(cv);scenes.push(o);return o;
+}
+
+/* one graph inside rectangle R. o:{tmax,name,series:[{f,col}],tnow?,ymin?,ymax?,shade?,tan?,marks?} */
+function graph(ctx,t,R,o){
+  const l=R.x+40,r=R.x+R.w-12,top=R.y+28,bot=R.y+R.h-22,T=o.tmax,N=240;
+  let lo=0,hi=0;
+  if(o.ymin!==undefined){lo=o.ymin;hi=o.ymax}
+  if(!o.fix)for(const s of o.series)for(let i=0;i<=N;i++){const v=s.f(T*i/N);if(v<lo)lo=v;if(v>hi)hi=v}
+  if(hi-lo<1e-9)hi=lo+1;
+  const stp=niceStep(hi-lo,R.h<210?3:5);lo=Math.floor(lo/stp+1e-9)*stp;hi=Math.ceil(hi/stp-1e-9)*stp;
+  const X=tt=>l+tt/T*(r-l),Y=v=>bot-(v-lo)/(hi-lo)*(bot-top);
+  font(ctx,11,600);ctx.lineWidth=1;ctx.textAlign='right';
+  for(let v=lo;v<=hi+stp/2;v+=stp){ctx.strokeStyle=t.grid;ctx.beginPath();ctx.moveTo(l,Y(v));ctx.lineTo(r,Y(v));ctx.stroke();ctx.fillStyle=t.mut;ctx.fillText(nf(v),l-5,Y(v)+4)}
+  const ts=niceStep(T,(r-l)<230?4:6);ctx.textAlign='center';
+  for(let v=0;v<=T+1e-9;v+=ts){ctx.strokeStyle=t.grid;ctx.beginPath();ctx.moveTo(X(v),top);ctx.lineTo(X(v),bot);ctx.stroke();if(v>0&&X(v)<r-(o.xl?54:30)){ctx.fillStyle=t.mut;ctx.fillText(nf(v),X(v),bot+15)}}
+  ctx.strokeStyle=t.mut;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(l,top-8);ctx.lineTo(l,bot);ctx.moveTo(l,Y(0));ctx.lineTo(r,Y(0));ctx.stroke();
+  font(ctx,12,700);ctx.fillStyle=t.ink;ctx.textAlign='left';ctx.fillText(o.name,l+6,R.y+15);ctx.textAlign='right';ctx.fillStyle=t.mut;ctx.fillText(o.xl||'t (s)',r,bot+15);
+  ctx.save();ctx.beginPath();ctx.rect(l-1,top-10,r-l+3,bot-top+20);ctx.clip();
+  if(o.shade&&o.tnow>0){const s=o.series[0],xe=X(o.tnow);ctx.globalAlpha=.22;for(let px=Math.round(l);px<xe;px++){const w=Math.min(1,xe-px),v=s.f(Math.max(0,(px+w/2-l)/(r-l)*T));ctx.fillStyle=v>=0?t[s.col]:t.mut;ctx.fillRect(px,Math.min(Y(0),Y(v)),w,Math.abs(Y(v)-Y(0)))}ctx.globalAlpha=1}
+  for(const s of o.series){const path=t1=>{ctx.beginPath();const n=Math.max(2,Math.ceil(N*t1/T));for(let i=0;i<=n;i++){const tt=t1*i/n;i?ctx.lineTo(X(tt),Y(s.f(tt))):ctx.moveTo(X(tt),Y(s.f(tt)))}ctx.stroke()};
+    ctx.strokeStyle=t[s.col];
+    if(o.tnow===undefined){ctx.lineWidth=2.5;path(T)}else{ctx.lineWidth=1.4;ctx.globalAlpha=.35;path(T);ctx.globalAlpha=1;ctx.lineWidth=2.7;if(o.tnow>0)path(o.tnow)}}
+  if(o.tan&&o.tnow!==undefined){const s=o.series[0],h=T/2000,tn=o.tnow,a=Math.max(0,tn-h),b=Math.min(T,tn+h),k=(s.f(b)-s.f(a))/(b-a),d=T*.15;ctx.strokeStyle=t.ink;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(X(tn-d),Y(s.f(tn)-k*d));ctx.lineTo(X(tn+d),Y(s.f(tn)+k*d));ctx.stroke()}
+  ctx.restore();
+  if(o.marks)for(const p of o.marks){ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.fillStyle=t.paper;ctx.beginPath();ctx.arc(X(p.t),Y(p.v),5.5,0,7);ctx.fill();ctx.stroke()}
+  if(o.tnow!==undefined)for(const s of o.series){ctx.fillStyle=t[s.col];ctx.strokeStyle=t.paper;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(X(o.tnow),Y(s.f(o.tnow)),5,0,7);ctx.fill();ctx.stroke()}
+  return{X,Y,lo,hi,l,r,top,bot};
+}
+
+/* ---------- DOM builders ---------- */
+const el=(h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild};
+let uid=0;
+function slider(host,label,min,max,step,val,show,on){const id='s'+(++uid);const n=el(`<div class="ctl"><label class="cl" for="${id}">${label}</label><output for="${id}"></output><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"></div>`);const inp=n.querySelector('input'),out=n.querySelector('output');const f=()=>{out.innerHTML=show(+inp.value);on(+inp.value)};inp.addEventListener('input',f);out.innerHTML=show(val);host.appendChild(n);return{set(v){inp.value=v;out.innerHTML=show(v)},el:inp}}
+function outs(host,items){const dl=el(`<dl class="outs"></dl>`);const ref={};for(const[k,lab]of items){const d=el(`<div><dt>${lab}</dt><dd>—</dd></div>`);dl.appendChild(d);ref[k]=d.querySelector('dd')}host.appendChild(dl);return(k,v)=>{ref[k].innerHTML=v}}
+function toggle(host,label,val,on){const id='t'+(++uid);const n=el(`<label class="tgl" for="${id}"><input type="checkbox" id="${id}" ${val?'checked':''}>${label}</label>`);n.querySelector('input').addEventListener('change',e=>on(e.target.checked));host.appendChild(n);return n.querySelector('input')}
+
+/* play / pause / scrub */
+function Runner(host,tmaxFn,onT){
+  const bar=el(`<div class="simbar"><button class="btn sm pri" data-a="play">▶ הפעלה</button><button class="btn sm" data-a="reset">⟲ חזרה להתחלה</button></div>`);
+  const ctl=el('<div class="ctls"></div>');host.append(bar,ctl);
+  const R={t:0,playing:false,raf:0,last:0,bar};const pb=bar.querySelector('[data-a=play]');
+  const sl=slider(ctl,'הזמן t (אפשר לגרור)',0,1000,1,0,v=>fmt(v/1000*tmaxFn(),3)+' s',v=>{R.pause();R.t=v/1000*tmaxFn();onT()});
+  R.sync=()=>{const tm=tmaxFn();if(R.t>tm)R.t=tm;sl.set(Math.round(R.t/tm*1000))};
+  R.pause=()=>{if(R.playing){const tm=tmaxFn();R.t=Math.round(R.t/tm*1000)/1000*tm}R.playing=false;cancelAnimationFrame(R.raf);pb.textContent='▶ הפעלה'};R.stop=R.pause;
+  const step=ts=>{if(!R.playing)return;if(!document.body.contains(bar)){R.pause();return}const dt=Math.min(.05,(ts-R.last)/1000);R.last=ts;const tm=tmaxFn();R.t+=dt*Math.max(1,tm/10);if(R.t>=tm){R.t=tm;onT();R.pause();return}onT();R.raf=requestAnimationFrame(step)};
+  R.play=()=>{if(R.t>=tmaxFn()-1e-9)R.t=0;R.playing=true;R.last=performance.now();pb.textContent='⏸ עצירה';R.raf=requestAnimationFrame(step)};
+  pb.onclick=()=>{if(R.playing){R.pause();onT()}else R.play()};
+  bar.querySelector('[data-a=reset]').onclick=()=>{R.pause();R.t=0;onT()};
+  anims.push(R);return R;
+}
+
+/* horizontal track + graphs. o:{aria,ariaG,hint,tmax(),bodies(),graphs(B),outs,read(t,set,B),showA} */
+function HSim(host,o){
+  host.innerHTML=`<div class="stage"><canvas class="trk" aria-label="${o.aria}"></canvas><canvas class="g" aria-label="${o.ariaG}"></canvas><span class="hint">${o.hint}</span></div>`;
+  const[c1,c2]=host.querySelectorAll('canvas');let top,g;
+  const redraw=()=>{run.sync();top.draw();g.draw()};
+  const run=Runner(host,o.tmax,()=>redraw());
+  const ctls=el('<div class="ctls"></div>');host.appendChild(ctls);
+  const set=outs(host,o.outs);
+  top=Canvas(c1,(ctx,t,cv)=>{const T=o.tmax(),B=o.bodies(),tn=Math.min(run.t,T);
+    let lo=0,hi=0,vm=1e-9;for(const b of B)for(let i=0;i<=80;i++){const x=b.x(T*i/80),v=Math.abs(b.v(T*i/80));if(x<lo)lo=x;if(x>hi)hi=x;if(v>vm)vm=v}
+    if(hi-lo<1)hi=lo+1;const stp=niceStep(hi-lo,cv.W<520?5:9);lo=Math.floor(lo/stp+1e-9)*stp;hi=Math.ceil(hi/stp-1e-9)*stp;
+    const l=30,r=cv.W-62,y=cv.H-32,X=x=>l+(x-lo)/(hi-lo)*(r-l);
+    arrow(ctx,l-16,y,r+24,y,t.mut,1.3,7);font(ctx,11,600);ctx.textAlign='center';
+    for(let x=lo;x<=hi+stp/2;x+=stp){const z=Math.abs(x)<1e-9;ctx.strokeStyle=z?t.ink:t.mut;ctx.lineWidth=z?2.2:1;ctx.beginPath();ctx.moveTo(X(x),y-(z?8:5));ctx.lineTo(X(x),y+(z?8:5));ctx.stroke();ctx.fillStyle=z?t.ink:t.mut;ctx.fillText(nf(x),X(x),y+21)}
+    font(ctx,12,700);ctx.fillStyle=t.ink;ctx.textAlign='right';ctx.fillText('x (m)',cv.W-6,y+21);
+    const dt=niceStep(T,10);
+    B.forEach((b,i)=>{const yb=y-24-i*34,c=t[b.col];ctx.fillStyle=c;ctx.globalAlpha=.4;for(let k=0;k*dt<=tn+1e-9;k++){ctx.beginPath();ctx.arc(X(b.x(k*dt)),yb,3.2,0,7);ctx.fill()}ctx.globalAlpha=1;
+      const xb=X(b.x(tn)),L=b.v(tn)/vm*72;if(Math.abs(L)>3)arrow(ctx,xb+Math.sign(L)*12,yb,xb+Math.sign(L)*12+L,yb,c,2.6,8);
+      ctx.fillStyle=c;ctx.beginPath();ctx.arc(xb,yb,11,0,7);ctx.fill();if(b.label){ctx.fillStyle=t.paper;font(ctx,12,800);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b.label,xb,yb+.5);ctx.textBaseline='alphabetic'}
+      if(o.showA&&b.a){const a=b.a(tn);if(Math.abs(a)>1e-9){const La=Math.sign(a)*(18+Math.min(42,Math.abs(a)*6));arrow(ctx,xb,yb-21,xb+La,yb-21,t.ink,2,7);font(ctx,12,700);ctx.fillStyle=t.ink;ctx.textAlign='center';ctx.fillText('a',xb+La/2,yb-27)}}});
+    o.read(tn,set,B)});
+  g=Canvas(c2,(ctx,t,cv)=>{const T=o.tmax(),B=o.bodies(),gs=o.graphs(B),st=g.stacked;
+    gs.forEach((gr,i)=>{const R=st?{x:0,y:i*cv.H/gs.length,w:cv.W,h:cv.H/gs.length}:{x:i*cv.W/gs.length,y:0,w:cv.W/gs.length,h:cv.H};graph(ctx,t,R,Object.assign({tmax:T,tnow:Math.min(run.t,T)},gr))})});
+  const ng=o.graphs(o.bodies()).length;
+  g.onResize=()=>{g.stacked=g.W/ng<250;const h=g.stacked?ng*190:230;if(Math.abs(g.H-h)>1)c2.style.height=h+'px'};
+  return{run,ctls,set,redraw,bar:run.bar};
+}
+
+/* vertical scene: ball on the left, y(t) on the right with the same height scale */
+function vscene(ctx,t,cv,o){
+  const gx=cv.W<480?88:120;
+  const G1=graph(ctx,t,{x:gx,y:0,w:cv.W-gx,h:cv.H},{tmax:o.T,tnow:o.tn,name:'y (m)',series:[{f:o.y,col:'pos'}],ymin:0,ymax:1,marks:o.marks});
+  const Y=G1.Y,xb=gx*.58,tw=gx*.3;
+  if(o.y0>0){ctx.fillStyle=t.soft;ctx.strokeStyle=t.line;ctx.lineWidth=1;ctx.fillRect(10,Y(o.y0),tw,Y(0)-Y(o.y0));ctx.strokeRect(10,Y(o.y0),tw,Y(0)-Y(o.y0))}
+  ctx.strokeStyle=t.mut;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(6,Y(0));ctx.lineTo(gx-4,Y(0));ctx.stroke();
+  ctx.lineWidth=1;for(let x=14;x<gx-6;x+=9){ctx.beginPath();ctx.moveTo(x,Y(0));ctx.lineTo(x-6,Y(0)+7);ctx.stroke()}
+  let vm=1e-9;for(let i=0;i<=40;i++)vm=Math.max(vm,Math.abs(o.v(o.T*i/40)));
+  const dt=niceStep(o.T,10);ctx.fillStyle=t.pos;ctx.globalAlpha=.4;for(let k=0;k*dt<=o.tn+1e-9;k++){ctx.beginPath();ctx.arc(xb,Y(o.y(k*dt)),3,0,7);ctx.fill()}ctx.globalAlpha=1;
+  const yb=Y(o.y(o.tn)),L=o.v(o.tn)/vm*58;
+  ctx.setLineDash([3,4]);ctx.strokeStyle=t.mut;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xb+10,yb);ctx.lineTo(G1.X(o.tn),yb);ctx.stroke();ctx.setLineDash([]);
+  if(Math.abs(L)>3)arrow(ctx,xb+17,yb,xb+17,yb-L,t.pos,2.6,8);
+  ctx.fillStyle=t.pos;ctx.beginPath();ctx.arc(xb,yb,9,0,7);ctx.fill();
+}
+function VSim(host,o){
+  host.innerHTML=`<div class="stage"><canvas aria-label="${o.aria}"></canvas><canvas class="g" aria-label="גרף המהירות כפונקציה של הזמן"></canvas></div>`;
+  const[c1,c2]=host.querySelectorAll('canvas');let top,g;
+  const redraw=()=>{run.sync();top.draw();g.draw()};
+  const run=Runner(host,o.tmax,()=>redraw());
+  const ctls=el('<div class="ctls"></div>');host.appendChild(ctls);
+  const set=outs(host,o.outs);
+  top=Canvas(c1,(ctx,t,cv)=>{const T=o.tmax(),tn=Math.min(run.t,T);vscene(ctx,t,cv,{y:o.y,v:o.v,T,tn,y0:o.y0(),marks:o.marks&&o.marks()});o.read(tn,set)});
+  g=Canvas(c2,(ctx,t,cv)=>{const T=o.tmax(),gx=cv.W<480?88:120;graph(ctx,t,{x:gx,y:0,w:cv.W-gx,h:cv.H},{tmax:T,tnow:Math.min(run.t,T),name:'v (m/s)',series:[{f:o.v,col:'pos'}],shade:true});
+    font(ctx,12,700);ctx.fillStyle=t.mut;ctx.textAlign='left';ctx.fillText('a = −10',8,cv.H/2-4);ctx.fillText('m/s²',8,cv.H/2+12)});
+  return{run,ctls,set,redraw,bar:run.bar};
+}
+/* ---------- force-diagram helpers ---------- */
+const D=Math.PI/180,cz=v=>Math.abs(v)<1e-9?0:v,fN=v=>fmt(cz(v))+' N';
+function fv(ctx,x,y,dx,dy,col,label,w=3){const L=Math.hypot(dx,dy);if(L<4)return;arrow(ctx,x,y,x+dx,y+dy,col,w,10);if(label){font(ctx,13,800);ctx.fillStyle=col;ctx.textAlign='center';ctx.textBaseline='middle';const k=(L+16)/L;ctx.fillText(label,x+dx*k,y+dy*k);ctx.textBaseline='alphabetic'}}
+function box(ctx,t,x,y,w,h,lab){ctx.fillStyle=t.soft;ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.fillRect(x-w/2,y-h/2,w,h);ctx.strokeRect(x-w/2,y-h/2,w,h);if(lab){font(ctx,13,800);ctx.fillStyle=t.mut;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lab,x,y);ctx.textBaseline='alphabetic'}}
+function ground(ctx,t,x1,x2,y,up){ctx.strokeStyle=t.mut;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();ctx.lineWidth=1;for(let x=x1+8;x<x2;x+=10){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-6,y+(up?-7:7));ctx.stroke()}}
+function aArrow(ctx,t,x,y,dx,dy,a){if(Math.abs(a)<1e-9)return;const L=18+Math.min(46,Math.abs(a)*5),s=Math.sign(a);arrow(ctx,x,y,x+dx*L*s,y+dy*L*s,t.ink,2,7);font(ctx,12,800);ctx.fillStyle=t.ink;ctx.textAlign='center';ctx.fillText('a',x+dx*L*s/2-dy*10,y+dy*L*s/2-Math.abs(dx)*7+dx*0)}
+/* static scene with sliders. o:{aria,hint,h,bar,outs,draw(ctx,t,cv,set),gdraw,ariaG} */
+function SSim(host,o){
+  host.innerHTML=`<div class="stage"><canvas style="cursor:default${o.h?';height:'+o.h+'px':''}" aria-label="${o.aria}"></canvas>${o.gdraw?`<canvas class="g" aria-label="${o.ariaG}"></canvas>`:''}${o.hint?`<span class="hint">${o.hint}</span>`:''}</div>${o.bar?'<div class="simbar"></div>':''}<div class="ctls"></div>`;
+  const[c1,c2]=host.querySelectorAll('canvas');const bar=host.querySelector('.simbar'),ctls=host.querySelector('.ctls');const set=outs(host,o.outs);let top,g;
+  top=Canvas(c1,(ctx,t,cv)=>{o.draw(ctx,t,cv,set);g&&g.draw()});
+  if(c2)g=Canvas(c2,(ctx,t,cv)=>o.gdraw(ctx,t,cv));
+  return{bar,ctls,set,redraw:()=>top.draw(),cv:c1};
+}
+const exBtn=(host,txt,fn,preset)=>{const b=el(`<div class="simbar"><button class="btn sm">${txt}</button></div>`);b.firstElementChild.onclick=fn;host.appendChild(b);if(preset)fn()};
+const note=(host,h)=>host.appendChild(el(`<p class="note">${h}</p>`));
+const u=h=>`<bdi dir="ltr">${h}</bdi>`,rt=h=>`<bdi dir="rtl">${h}</bdi>`;
+const mps=v=>sg(v)+' m/s', ms2=v=>sg(cz(v))+' m/s²', mm=v=>sg(v)+' m';
+
+function incl(st){const th=st.th*D,W=st.m*G,par=W*Math.sin(th),N=W*Math.cos(th),fs=st.us*N,fk=st.uk*N,mov=par>fs+1e-9;return{th,W,par,N,fs,fk,mov,f:mov?fk:par,a:mov?(par-fk)/st.m:0}}
+function inclDraw(ctx,t,cv,st,comp){const q=incl(st),th=q.th,L=Math.min(cv.W*.78,460,(cv.H-120)/Math.max(.2,Math.sin(th))),cx=cv.W/2,cy=cv.H/2+34;
+  const A=[cx-L*Math.cos(th)/2,cy+L*Math.sin(th)/2],B=[cx+L*Math.cos(th)/2,cy-L*Math.sin(th)/2];
+  ctx.fillStyle=t.soft;ctx.strokeStyle=t.mut;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B[0],B[1]);ctx.lineTo(B[0],A[1]);ctx.closePath();ctx.fill();ctx.stroke();
+  if(st.th>5){ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(A[0],A[1],36,-th,0);ctx.stroke();font(ctx,13,800);ctx.fillStyle=t.mut;ctx.textAlign='center';ctx.fillText('θ',A[0]+50*Math.cos(th/2),A[1]-50*Math.sin(th/2)+5)}
+  const uu=[Math.cos(th),-Math.sin(th)],n=[-Math.sin(th),-Math.cos(th)],bs=40,c=[cx+n[0]*bs/2,cy+n[1]*bs/2];
+  ctx.save();ctx.translate(c[0],c[1]);ctx.rotate(-th);ctx.fillStyle=t.paper;ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.fillRect(-bs/2-7,-bs/2,bs+14,bs);ctx.strokeRect(-bs/2-7,-bs/2,bs+14,bs);ctx.restore();
+  const sc=Math.min(100,cv.H*.27)/q.W;
+  if(comp&&st.th>0){ctx.setLineDash([5,4]);arrow(ctx,c[0],c[1],c[0]-uu[0]*q.par*sc,c[1]-uu[1]*q.par*sc,t.neg,1.6,8);arrow(ctx,c[0],c[1],c[0]-n[0]*q.N*sc,c[1]-n[1]*q.N*sc,t.neg,1.6,8);ctx.strokeStyle=t.mut;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(c[0]-uu[0]*q.par*sc,c[1]-uu[1]*q.par*sc);ctx.lineTo(c[0],c[1]+q.W*sc);ctx.lineTo(c[0]-n[0]*q.N*sc,c[1]-n[1]*q.N*sc);ctx.stroke();ctx.setLineDash([]);
+    font(ctx,11,700);ctx.fillStyle=t.neg;ctx.textAlign='right';if(q.par*sc>26)ctx.fillText('mg sinθ',c[0]-uu[0]*q.par*sc-6,c[1]-uu[1]*q.par*sc+4);ctx.textAlign='left';if(q.N*sc>26)ctx.fillText('mg cosθ',c[0]-n[0]*q.N*sc+7,c[1]-n[1]*q.N*sc+12)}
+  fv(ctx,c[0],c[1],0,q.W*sc,t.neg,'mg');fv(ctx,c[0],c[1],n[0]*q.N*sc,n[1]*q.N*sc,t.ok,'N');
+  if(q.f>1e-9)fv(ctx,c[0],c[1],uu[0]*q.f*sc,uu[1]*q.f*sc,t.acc,'f');
+  if(q.mov)aArrow(ctx,t,c[0]+n[0]*34-uu[0]*40,c[1]+n[1]*34-uu[1]*40,-uu[0],-uu[1],q.a);
+  return q}
+
+/* ---------- simulations ---------- */
+const SIMS={
+force(host,preset){
+  const st={F1:10,a1:0,F2:8,a2:120,par:true};
+  const S=SSim(host,{bar:true,aria:'שני כוחות שפועלים על גוף, והשקול שלהם',hint:'אדום וכחול: הכוחות · כהה: השקול',
+    outs:[['x','רכיב השקול בציר x'],['y','רכיב השקול בציר y'],['r','גודל השקול'],['d','כיוון השקול (זווית מציר x)']],
+    draw(ctx,t,cv,set){const cx=cv.W/2,cy=cv.H/2,sc=Math.min(cv.W,cv.H)*.45/26;
+      ctx.strokeStyle=t.line;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(10,cy);ctx.lineTo(cv.W-10,cy);ctx.moveTo(cx,34);ctx.lineTo(cx,cv.H-10);ctx.stroke();font(ctx,12,700);ctx.fillStyle=t.mut;ctx.textAlign='right';ctx.fillText('x',cv.W-12,cy-6);ctx.textAlign='left';ctx.fillText('y',cx+6,46);
+      const v=(F,a)=>[F*Math.cos(a*D),F*Math.sin(a*D)],[ax,ay]=v(st.F1,st.a1),[bx,by]=v(st.F2,st.a2),rx=ax+bx,ry=ay+by;
+      if(st.par){ctx.setLineDash([4,4]);ctx.strokeStyle=t.mut;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(cx+ax*sc,cy-ay*sc);ctx.lineTo(cx+rx*sc,cy-ry*sc);ctx.lineTo(cx+bx*sc,cy-by*sc);ctx.stroke();ctx.setLineDash([])}
+      fv(ctx,cx,cy,rx*sc,-ry*sc,t.ink,'ΣF',3.6);fv(ctx,cx,cy,ax*sc,-ay*sc,t.pos,'F₁');fv(ctx,cx,cy,bx*sc,-by*sc,t.neg,'F₂');
+      ctx.fillStyle=t.ink;ctx.beginPath();ctx.arc(cx,cy,6,0,7);ctx.fill();
+      const R=Math.hypot(rx,ry);set('x',sg(cz(rx))+' N');set('y',sg(cz(ry))+' N');set('r',fN(R));set('d',R<1e-6?'—':fmt(((Math.atan2(ry,rx)/D)%360+360)%360)+'°')}});
+  toggle(S.bar,'כלל המקבילית',true,v=>{st.par=v;S.redraw()});
+  const s=[slider(S.ctls,'גודל הכוח F₁',0,20,1,st.F1,v=>v+' N',v=>{st.F1=v;S.redraw()}),slider(S.ctls,'כיוון F₁ (זווית מציר x)',0,355,5,st.a1,v=>v+'°',v=>{st.a1=v;S.redraw()}),
+    slider(S.ctls,'גודל הכוח F₂',0,20,1,st.F2,v=>v+' N',v=>{st.F2=v;S.redraw()}),slider(S.ctls,'כיוון F₂ (זווית מציר x)',0,355,5,st.a2,v=>v+'°',v=>{st.a2=v;S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('F₁ = 10 N')} בכיוון ${u('0°')}, ${u('F₂ = 8 N')} בכיוון ${u('120°')}`,()=>{Object.assign(st,{F1:10,a1:0,F2:8,a2:120});[10,0,8,120].forEach((v,i)=>s[i].set(v));S.redraw()},preset);
+  note(host,'הזוויות נמדדות מהכיוון החיובי של ציר x, נגד כיוון השעון. נסו שני כוחות שווים בכיוונים מנוגדים, ואחר כך אותם כוחות בזווית ישרה זה לזה: גודל השקול תלוי בזווית שבין הכוחות.');
+},
+law1(host,preset){
+  const st={m:6,a:53,b:37};
+  const S=SSim(host,{aria:'משקולת תלויה בשני חוטים שקשורים לתקרה',hint:'הכוחות על נקודת הקשר',
+    outs:[['w','כוח הכובד mg'],['t1','מתיחות T₁'],['t2','מתיחות T₂'],['h','רכיבים אופקיים: T₁cosα | T₂cosβ'],['v','רכיבים אנכיים: T₁sinα + T₂sinβ']],
+    draw(ctx,t,cv,set){const cx=cv.W/2,top=44,drop=Math.min(150,cv.W*.2),ky=top+drop,a=st.a*D,b=st.b*D,W=st.m*G,T1=W*Math.cos(b)/Math.sin(a+b),T2=W*Math.cos(a)/Math.sin(a+b);
+      const A=[cx-drop/Math.tan(a),top],B=[cx+drop/Math.tan(b),top];ground(ctx,t,Math.max(6,A[0]-40),Math.min(cv.W-6,B[0]+40),top,true);
+      ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(cx,ky);ctx.lineTo(B[0],B[1]);ctx.moveTo(cx,ky);ctx.lineTo(cx,ky+112);ctx.stroke();box(ctx,t,cx,ky+130,50,36,'m');
+      font(ctx,13,800);ctx.fillStyle=t.mut;ctx.textAlign='center';ctx.fillText('α',A[0]+26*Math.cos(a/2)+4,top+26*Math.sin(a/2)+8);ctx.fillText('β',B[0]-26*Math.cos(b/2)-4,top+26*Math.sin(b/2)+8);
+      const sc=92/Math.max(T1,T2,W);
+      fv(ctx,cx,ky,0,W*sc,t.ink,'mg');fv(ctx,cx,ky,-Math.cos(a)*T1*sc,-Math.sin(a)*T1*sc,t.pos,'T₁');fv(ctx,cx,ky,Math.cos(b)*T2*sc,-Math.sin(b)*T2*sc,t.neg,'T₂');
+      ctx.fillStyle=t.ink;ctx.beginPath();ctx.arc(cx,ky,4.5,0,7);ctx.fill();
+      set('w',fN(W));set('t1',fN(T1));set('t2',fN(T2));set('h',fmt(T1*Math.cos(a))+' N | '+fmt(T2*Math.cos(b))+' N');set('v',fmt(T1*Math.sin(a)+T2*Math.sin(b))+' N')}});
+  const s=[slider(S.ctls,'מסת המשקולת m',1,10,.5,st.m,v=>v+' kg',v=>{st.m=v;S.redraw()}),slider(S.ctls,'זווית החוט השמאלי α (מעל האופק)',25,80,1,st.a,v=>v+'°',v=>{st.a=v;S.redraw()}),slider(S.ctls,'זווית החוט הימני β (מעל האופק)',25,80,1,st.b,v=>v+'°',v=>{st.b=v;S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('m = 6 kg')}, ${u('α = 53°')}, ${u('β = 37°')}`,()=>{Object.assign(st,{m:6,a:53,b:37});[6,53,37].forEach((v,i)=>s[i].set(v));S.redraw()},preset);
+  note(host,'המערכת במנוחה, ולכן שקול הכוחות על נקודת הקשר אפס: הרכיבים האופקיים של שתי המתיחויות שווים זה לזה, וסכום הרכיבים האנכיים שלהן שווה ל־mg. הקטינו את שתי הזוויות וראו איך המתיחויות גדלות. החוט התלול יותר נושא את החלק הגדול יותר של המשקל.');
+},
+law2(host,preset){
+  const st={F1:20,F2:8,m:4},a=()=>(st.F1-st.F2)/st.m;
+  const H=HSim(host,{aria:'גוף על משטח חלק שפועלים עליו שני כוחות אופקיים',ariaG:'גרף מהירות־זמן וגרף תאוצה־זמן',hint:'חץ צבעוני: מהירות · חץ כהה: תאוצה',showA:true,
+    tmax:()=>8,bodies:()=>[{x:t=>.5*a()*t*t,v:t=>a()*t,a:()=>a(),col:'pos'}],
+    graphs:B=>[{name:'v (m/s)',series:[{f:B[0].v,col:'pos'}]},{name:'a (m/s²)',series:[{f:B[0].a,col:'neg'}],ymin:-5,ymax:5}],
+    outs:[['f','שקול הכוחות ΣF = F₁ − F₂'],['a','תאוצה a = ΣF/m'],['t','זמן t'],['v','מהירות v'],['x','העתק Δx']],
+    read(t,set){set('f',sg(st.F1-st.F2)+' N');set('a',ms2(a()));set('t',fmt(t)+' s');set('v',mps(cz(a()*t)));set('x',mm(cz(.5*a()*t*t)))}});
+  const s=[slider(H.ctls,'כוח F₁ (ימינה)',0,30,1,st.F1,v=>v+' N',v=>{st.F1=v;H.redraw()}),slider(H.ctls,'כוח F₂ (שמאלה)',0,30,1,st.F2,v=>v+' N',v=>{st.F2=v;H.redraw()}),slider(H.ctls,'מסת הגוף m',1,10,.5,st.m,v=>v+' kg',v=>{st.m=v;H.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('F₁ = 20 N')}, ${u('F₂ = 8 N')}, ${u('m = 4 kg')}`,()=>{Object.assign(st,{F1:20,F2:8,m:4});[20,8,4].forEach((v,i)=>s[i].set(v));H.run.pause();H.run.t=0;H.redraw()},preset);
+  note(host,'הגוף מתחיל ממנוחה על משטח חלק, והכיוון החיובי של הציר ימינה. הכפילו את שקול הכוחות והתאוצה תוכפל. הכפילו את המסה והתאוצה תקטן פי 2. כשהכוחות שווים, השקול אפס והגוף נשאר במנוחה.');
+},
+law3(host,preset){
+  const st={F:30,m1:6,m2:4,rev:false};
+  const S=SSim(host,{bar:true,h:330,aria:'שני ארגזים צמודים על משטח חלק, וכוח שדוחף אותם',hint:'ירוק וכתום: זוג הכוחות שבין הארגזים',
+    outs:[['a','תאוצת שני הארגזים'],['n12','הכוח ש־1 מפעיל על 2'],['n21','הכוח ש־2 מפעיל על 1'],['s1','שקול הכוחות על ארגז 1'],['s2','שקול הכוחות על ארגז 2']],
+    draw(ctx,t,cv,set){const gy=cv.H-50,s1=46+7*st.m1,s2=46+7*st.m2,xi=cv.W/2+(s1-s2)/2,a=st.F/(st.m1+st.m2),Nc=(st.rev?st.m1:st.m2)*a,sc=Math.max(.5,Math.min(2.2,(cv.W/2-Math.max(s1,s2)-40)/60)),dir=st.rev?-1:1,tp=gy-Math.max(s1,s2);
+      ground(ctx,t,10,cv.W-10,gy);box(ctx,t,xi-s1/2,gy-s1/2,s1,s1,'1');box(ctx,t,xi+s2/2,gy-s2/2,s2,s2,'2');
+      if(st.rev)fv(ctx,xi+s2+5+st.F*sc,gy-s2/2,-st.F*sc,0,t.pos,'');else fv(ctx,xi-s1-5-st.F*sc,gy-s1/2,st.F*sc,0,t.pos,'');
+      if(st.F>0){font(ctx,13,800);ctx.fillStyle=t.pos;ctx.textAlign='center';ctx.fillText('F',st.rev?xi+s2+5+st.F*sc/2:xi-s1-5-st.F*sc/2,gy-(st.rev?s2:s1)/2-9)}
+      ctx.setLineDash([3,4]);ctx.strokeStyle=t.mut;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xi,tp-44);ctx.lineTo(xi,gy);ctx.stroke();ctx.setLineDash([]);
+      fv(ctx,xi,tp-14,Nc*sc,0,t.ok,'');fv(ctx,xi,tp-34,-Nc*sc,0,t.acc,'');
+      if(Nc*sc>4){font(ctx,11,800);ctx.textAlign='left';ctx.fillStyle=t.ok;ctx.fillText('F(1→2)',xi+Nc*sc+6,tp-10);ctx.textAlign='right';ctx.fillStyle=t.acc;ctx.fillText('F(2→1)',xi-Nc*sc-6,tp-30)}
+      aArrow(ctx,t,cv.W/2-dir*20,tp-62,dir,0,a);
+      const w=v=>cz(v)===0?'0':fmt(Math.abs(v))+' N '+(v>0?'ימינה':'שמאלה');
+      set('a',cz(a)===0?'0':fmt(a)+' m/s² '+(st.rev?'שמאלה':'ימינה'));set('n12',w(Nc));set('n21',w(-Nc));set('s1',w(dir*st.m1*a));set('s2',w(dir*st.m2*a))}});
+  const tg=toggle(S.bar,'הכוח F דוחף מהצד של ארגז 2',false,v=>{st.rev=v;S.redraw()});
+  const s=[slider(S.ctls,'הכוח הדוחף F',0,60,2,st.F,v=>v+' N',v=>{st.F=v;S.redraw()}),slider(S.ctls,'מסת ארגז 1',1,10,1,st.m1,v=>v+' kg',v=>{st.m1=v;S.redraw()}),slider(S.ctls,'מסת ארגז 2',1,10,1,st.m2,v=>v+' kg',v=>{st.m2=v;S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('F = 30 N')}, ${u('m₁ = 6 kg')}, ${u('m₂ = 4 kg')}`,()=>{Object.assign(st,{F:30,m1:6,m2:4,rev:false});tg.checked=false;[30,6,4].forEach((v,i)=>s[i].set(v));S.redraw()},preset);
+  note(host,'המשטח חלק. שני הכוחות שבין הארגזים תמיד שווים בגודלם והפוכים בכיוונם, בכל בחירה של מסות ושל כוח. הם פועלים על שני גופים שונים, ולכן אינם מבטלים זה את זה. החליפו את הצד שממנו דוחפים: כוח המגע משתנה, כי עכשיו הוא צריך להאיץ ארגז אחר.');
+},
+weight(host,preset){
+  const st={m:60,a:2};
+  const S=SSim(host,{bar:true,aria:'אדם עומד על משקל בתוך מעלית',hint:'כחול: כוח הכובד · ירוק: הכוח הנורמלי',
+    outs:[['w','כוח הכובד mg'],['n','הכוח הנורמלי N (קריאת המשקל)'],['s','שקול הכוחות N − mg = ma'],['f','התחושה']],
+    draw(ctx,t,cv,set){const cx=cv.W/2,x1=cx-88,x2=cx+88,y1=34,fl=cv.H-34,W=st.m*G,N=Math.max(0,st.m*(G+st.a)),sc=.07;
+      ctx.strokeStyle=t.mut;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,y1);ctx.stroke();ctx.strokeStyle=t.ink;ctx.lineWidth=2.5;ctx.strokeRect(x1,y1,x2-x1,fl-y1);
+      ctx.fillStyle=t.acc;ctx.fillRect(cx-44,fl-16,88,16);font(ctx,11,800);ctx.fillStyle=t.paper;ctx.textAlign='center';ctx.fillText(fmt(N)+' N',cx,fl-4);
+      const ft=fl-16;ctx.fillStyle=t.soft;ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.fillRect(cx-15,ft-88,30,88);ctx.strokeRect(cx-15,ft-88,30,88);ctx.beginPath();ctx.arc(cx,ft-104,14,0,7);ctx.fill();ctx.stroke();
+      fv(ctx,cx-34,ft-76,0,W*sc,t.neg,'');font(ctx,13,800);ctx.fillStyle=t.neg;ctx.textAlign='right';ctx.fillText('mg',cx-42,ft-76+W*sc/2+4);fv(ctx,cx+34,ft,0,-N*sc,t.ok,'N');
+      if(st.a)aArrow(ctx,t,x2+26,cv.H/2+Math.sign(st.a)*20,0,-1,st.a);else{font(ctx,12,800);ctx.fillStyle=t.mut;ctx.textAlign='center';ctx.fillText('a = 0',Math.min(cv.W-24,x2+30),cv.H/2)}
+      set('w',fN(W));set('n',fN(N));set('s',sg(cz(N-W))+' N');set('f',rt(st.a<=-G?'חוסר משקל: N = 0':st.a<0?'קל מהרגיל: N קטן מ־mg':st.a>0?'כבד מהרגיל: N גדול מ־mg':'רגיל: N = mg'))}});
+  const s=[slider(S.ctls,'מסת האדם m',40,100,5,st.m,v=>v+' kg',v=>{st.m=v;S.redraw()}),slider(S.ctls,'תאוצת המעלית a (חיובי: כלפי מעלה)',-10,5,.5,st.a,ms2,v=>{st.a=v;S.redraw()})];
+  [['מנוחה או מהירות קבועה',0],['נפילה חופשית',-10]].forEach(([n,a])=>{const b=el(`<button class="btn sm">${n}</button>`);b.onclick=()=>{st.a=a;s[1].set(a);S.redraw()};S.bar.appendChild(b)});
+  exBtn(host,`טעינת הדוגמה: ${u('m = 60 kg')}, ${u('a = +2 m/s²')}`,()=>{st.m=60;st.a=2;s[0].set(60);s[1].set(2);S.redraw()},preset);
+  note(host,'הציר מכוון כלפי מעלה. הקריאה במשקל תלויה רק בתאוצה, לא בכיוון התנועה: מעלית שעולה ומאטה ומעלית שיורדת ומגבירה מהירות נמצאות שתיהן בתאוצה כלפי מטה, ובשתיהן המשקל מראה פחות מ־mg.');
+},
+spring(host,preset){
+  const st={k:100,m:.5},L0=.2,dl=()=>st.m*G/st.k;
+  const S=SSim(host,{aria:'משקולת תלויה על קפיץ אנכי',ariaG:'גרף הכוח האלסטי כפונקציה של ההתארכות',hint:'כתום: הכוח האלסטי · כחול: כוח הכובד',
+    outs:[['d','התארכות Δℓ'],['l','אורך הקפיץ '+u('ℓ = ℓ₀ + Δℓ')],['f','הכוח האלסטי kΔℓ'],['w','כוח הכובד mg']],
+    draw(ctx,t,cv,set){const cx=cv.W/2,top=26,pm=(cv.H-top-64)/.62,ye=top+(L0+dl())*pm,y0=top+L0*pm;ground(ctx,t,cx-70,cx+70,top,true);
+      ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx,top);const n=14,a=top+8,b=ye-8;ctx.lineTo(cx,a);for(let i=0;i<n;i++)ctx.lineTo(cx+(i%2?-13:13),a+(b-a)*(i+.5)/n);ctx.lineTo(cx,b);ctx.lineTo(cx,ye);ctx.stroke();box(ctx,t,cx,ye+18,52,36,'m');
+      ctx.setLineDash([4,4]);ctx.strokeStyle=t.mut;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(cx-90,y0);ctx.lineTo(cx+100,y0);ctx.moveTo(cx+34,ye);ctx.lineTo(cx+100,ye);ctx.stroke();ctx.setLineDash([]);
+      font(ctx,12,800);ctx.fillStyle=t.mut;ctx.textAlign='right';ctx.fillText('ℓ₀',cx-94,y0+4);if(ye-y0>16){ctx.strokeStyle=t.mut;ctx.beginPath();ctx.moveTo(cx+88,y0);ctx.lineTo(cx+88,ye);ctx.stroke();ctx.textAlign='left';ctx.fillText('Δℓ',cx+104,(y0+ye)/2+4)}
+      const sc=3;fv(ctx,cx-52,ye+18,0,-st.m*G*sc,t.acc,'Fsp');fv(ctx,cx-52,ye+18,0,st.m*G*sc,t.neg,'mg');
+      set('d',fmt(dl()*100)+' cm');set('l',fmt((L0+dl())*100)+' cm');set('f',fN(st.k*dl()));set('w',fN(st.m*G))},
+    gdraw(ctx,t,cv){graph(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{tmax:.4,xl:'Δℓ (m)',name:'Fsp (N)',series:[{f:x=>st.k*x,col:'acc'}],tnow:Math.min(.4,dl()),ymin:0,ymax:20,fix:true})}});
+  const s=[slider(S.ctls,'קבוע הקפיץ k',50,400,10,st.k,v=>v+' N/m',v=>{st.k=v;S.redraw()}),slider(S.ctls,'מסת המשקולת m',.1,2,.1,st.m,v=>v+' kg',v=>{st.m=v;S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('k = 100 N/m')}, ${u('m = 0.5 kg')}`,()=>{st.k=100;st.m=.5;s[0].set(100);s[1].set(.5);S.redraw()},preset);
+  note(host,'האורך הרפוי של הקפיץ הוא '+u('ℓ₀ = 20 cm')+', והמשקולת תלויה במנוחה, ולכן kΔℓ = mg. בגרף, שיפוע הקו הוא קבוע הקפיץ k: קפיץ קשיח יותר נותן קו תלול יותר, והתארכות קטנה יותר לאותה משקולת.');
+},
+friction(host,preset){
+  const st={F:30,m:10,us:.5,uk:.4};
+  const q=()=>{const N=st.m*G,fs=st.us*N,fk=st.uk*N,mov=st.F>fs+1e-9;return{N,fs,fk,mov,f:mov?fk:st.F,a:mov?(st.F-fk)/st.m:0}};
+  const S=SSim(host,{h:290,aria:'ארגז על רצפה אופקית שמושכים אותו בכוח אופקי',ariaG:'גרף כוח החיכוך כפונקציה של הכוח המושך',hint:'אדום: הכוח המושך · כתום: החיכוך',
+    outs:[['n','הכוח הנורמלי N'],['fs','החיכוך הסטטי המרבי μₛN'],['fk','החיכוך הקינטי μₖN'],['f','כוח החיכוך כעת'],['s','מצב'],['a','תאוצה']],
+    draw(ctx,t,cv,set){const r=q(),cx=cv.W/2,gy=cv.H-76,cy=gy-30,sc=Math.min((cv.W/2-74)/Math.max(st.F,r.fs,10),78/r.N);
+      ground(ctx,t,10,cv.W-10,gy);box(ctx,t,cx,cy,92,60,'m');
+      fv(ctx,cx+46,cy,st.F*sc,0,t.pos,'F');fv(ctx,cx-46,gy-7,-r.f*sc,0,t.acc,'f');fv(ctx,cx,cy-30,0,-r.N*sc,t.ok,'N');fv(ctx,cx,cy,0,r.N*sc,t.neg,'mg');
+      if(r.mov)aArrow(ctx,t,cx+60,cy-52,1,0,r.a);
+      set('n',fN(r.N));set('fs',fN(r.fs));set('fk',fN(r.fk));set('f',fN(r.f));set('s',rt(r.mov?'מחליק: חיכוך קינטי':st.F===0?'במנוחה: אין צורך בחיכוך':'במנוחה: החיכוך הסטטי מאזן את F'));set('a',ms2(r.a))},
+    gdraw(ctx,t,cv){const r=q();graph(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{tmax:100,xl:'F (N)',name:'f (N)',series:[{f:F=>F<=r.fs?F:r.fk,col:'acc'}],tnow:st.F})}});
+  const s=[slider(S.ctls,'הכוח המושך F',0,100,1,st.F,v=>v+' N',v=>{st.F=v;S.redraw()}),slider(S.ctls,'מסת הארגז m',1,20,1,st.m,v=>v+' kg',v=>{st.m=v;S.redraw()}),
+    slider(S.ctls,'מקדם החיכוך הסטטי μₛ',.1,1,.05,st.us,v=>fmt(v),v=>{st.us=v;if(st.uk>v){st.uk=v;s[3].set(v)}S.redraw()}),slider(S.ctls,'מקדם החיכוך הקינטי μₖ',.05,1,.05,st.uk,v=>fmt(v),v=>{st.uk=v;if(st.us<v){st.us=v;s[2].set(v)}S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('m = 10 kg')}, ${u('μₛ = 0.5')}, ${u('μₖ = 0.4')}, ${u('F = 30 N')}`,()=>{Object.assign(st,{F:30,m:10,us:.5,uk:.4});[30,10,.5,.4].forEach((v,i)=>s[i].set(v));S.redraw()},preset);
+  note(host,'הגדילו את F לאט מאפס. כל עוד הארגז במנוחה, החיכוך הסטטי גדל יחד עם F ושווה לו בדיוק. כש־F עובר את הערך המרבי μₛN הארגז מתחיל להחליק, והחיכוך יורד לערך הקינטי הקבוע μₖN. בגרף רואים את העלייה, את הקפיצה למטה ואת הקו האופקי.');
+},
+incline(host,preset){
+  const st={th:37,m:2,us:.4,uk:.25,comp:true};
+  const S=SSim(host,{bar:true,aria:'ארגז על מישור משופע והכוחות שפועלים עליו',hint:'כחול: כובד · ירוק: נורמל · כתום: חיכוך',
+    outs:[['p','רכיב הכובד לאורך המדרון mg sinθ'],['n','הכוח הנורמלי N = mg cosθ'],['fs','החיכוך הסטטי המרבי μₛN'],['f','כוח החיכוך כעת'],['s','מצב'],['a','תאוצה במורד המדרון']],
+    draw(ctx,t,cv,set){const r=inclDraw(ctx,t,cv,st,st.comp);set('p',fN(r.par));set('n',fN(r.N));set('fs',fN(r.fs));set('f',fN(r.f));set('s',rt(r.mov?'מחליק במורד המדרון':st.th===0?'במנוחה על משטח אופקי':'במנוחה: החיכוך הסטטי מאזן את mg sinθ'));set('a',ms2(r.a))}});
+  const tg=toggle(S.bar,'פירוק כוח הכובד לרכיבים',true,v=>{st.comp=v;S.redraw()});
+  const s=[slider(S.ctls,'זווית המדרון θ',0,60,1,st.th,v=>v+'°',v=>{st.th=v;S.redraw()}),slider(S.ctls,'מסת הארגז m',1,10,.5,st.m,v=>v+' kg',v=>{st.m=v;S.redraw()}),
+    slider(S.ctls,'מקדם החיכוך הסטטי μₛ',0,1,.05,st.us,v=>fmt(v),v=>{st.us=v;if(st.uk>v){st.uk=v;s[3].set(v)}S.redraw()}),slider(S.ctls,'מקדם החיכוך הקינטי μₖ',0,1,.05,st.uk,v=>fmt(v),v=>{st.uk=v;if(st.us<v){st.us=v;s[2].set(v)}S.redraw()})];
+  const b=el(`<button class="btn sm">מדרון חלק</button>`);b.onclick=()=>{st.us=0;st.uk=0;s[2].set(0);s[3].set(0);S.redraw()};S.bar.appendChild(b);
+  exBtn(host,`טעינת הדוגמה: ${u('θ = 37°')}, ${u('m = 2 kg')}, ${u('μₛ = 0.4')}, ${u('μₖ = 0.25')}`,()=>{Object.assign(st,{th:37,m:2,us:.4,uk:.25});[37,2,.4,.25].forEach((v,i)=>s[i].set(v));S.redraw()},preset);
+  note(host,'הארגז משוחרר ממנוחה. הגדילו את הזווית בהדרגה: רכיב הכובד לאורך המדרון גדל, הנורמל קטן, והארגז מתחיל להחליק כאשר tanθ עובר את μₛ. שנו את המסה: הכוחות משתנים, אבל התאוצה לא.');
+},
+tension(host,preset){
+  const st={m1:3,m2:2,mu:.2};
+  const q=()=>{const W2=st.m2*G,fm=st.mu*st.m1*G,mov=W2>fm+1e-9,a=mov?(W2-fm)/(st.m1+st.m2):0;return{W2,mov,a,T:mov?st.m2*(G-a):W2,f:mov?fm:W2}};
+  const S=SSim(host,{h:370,aria:'גוף על שולחן שקשור בחוט דרך גלגלת לגוף תלוי',hint:'אדום: מתיחות · כתום: חיכוך · כחול: כובד',
+    outs:[['a','תאוצת המערכת'],['t','מתיחות החוט T'],['f','החיכוך על גוף 1'],['w','כוח הכובד על גוף 2'],['s','מצב']],
+    draw(ctx,t,cv,set){const r=q(),ty=128,px=cv.W*.66,b1x=px-Math.min(cv.W*.28,210),b1y=ty-22,b2x=px+18,b2y=ty+132,sc=60/Math.max(st.m1*G,r.W2);
+      ctx.fillStyle=t.soft;ctx.strokeStyle=t.mut;ctx.lineWidth=1.5;ctx.fillRect(16,ty,px-16,14);ctx.strokeRect(16,ty,px-16,14);ctx.fillRect(px-46,ty+14,16,cv.H-ty-30);ctx.strokeRect(px-46,ty+14,16,cv.H-ty-30);
+      ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(b1x+36,b1y);ctx.lineTo(px+6,b1y);ctx.moveTo(b2x,ty-10);ctx.lineTo(b2x,b2y-22);ctx.stroke();ctx.fillStyle=t.paper;ctx.beginPath();ctx.arc(px+6,ty-10,12,0,7);ctx.fill();ctx.stroke();ctx.fillStyle=t.ink;ctx.beginPath();ctx.arc(px+6,ty-10,2.5,0,7);ctx.fill();
+      box(ctx,t,b1x,b1y,72,44,'1');box(ctx,t,b2x,b2y,52,44,'2');
+      fv(ctx,b1x+36,b1y,r.T*sc,0,t.pos,'T');fv(ctx,b1x-36,ty-7,-r.f*sc,0,t.acc,'f');fv(ctx,b1x,b1y-22,0,-st.m1*G*sc,t.ok,'N');fv(ctx,b1x,b1y,0,st.m1*G*sc,t.neg,'m₁g');
+      fv(ctx,b2x,b2y-22,0,-r.T*sc,t.pos,'T');fv(ctx,b2x,b2y,0,r.W2*sc,t.neg,'m₂g');
+      if(r.mov){aArrow(ctx,t,b1x-50,b1y-46,1,0,r.a);aArrow(ctx,t,Math.min(cv.W-22,b2x+48),b2y-10,0,1,r.a)}
+      set('a',ms2(r.a).replace('+',''));set('t',fN(r.T));set('f',fN(r.f));set('w',fN(r.W2));set('s',rt(r.mov?'המערכת מאיצה: גוף 2 יורד':'במנוחה: החיכוך הסטטי מאזן את המתיחות'))}});
+  const s=[slider(S.ctls,'מסת גוף 1 (על השולחן)',.5,10,.5,st.m1,v=>v+' kg',v=>{st.m1=v;S.redraw()}),slider(S.ctls,'מסת גוף 2 (התלוי)',.5,10,.5,st.m2,v=>v+' kg',v=>{st.m2=v;S.redraw()}),slider(S.ctls,'מקדם החיכוך בין גוף 1 לשולחן μ',0,1,.05,st.mu,v=>fmt(v),v=>{st.mu=v;S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('m₁ = 3 kg')}, ${u('m₂ = 2 kg')}, ${u('μ = 0.2')}`,()=>{Object.assign(st,{m1:3,m2:2,mu:.2});[3,2,.2].forEach((v,i)=>s[i].set(v));S.redraw()},preset);
+  note(host,'החוט והגלגלת אידיאליים, ולכן המתיחות זהה בשני קצות החוט ולשני הגופים אותו גודל תאוצה. בסימולציה מקדם החיכוך הסטטי והקינטי שווים. שימו לב שכשהמערכת מאיצה, המתיחות קטנה מכוח הכובד על גוף 2. אפסו את החיכוך כדי לקבל שולחן חלק.');
+}
+};
+
+
+/* ---------- content ---------- */
+const s37=`${m('sin37° = 0.6')}, ${m('cos37° = 0.8')}`;
+const T=[
+{id:'force',title:'כוחות ושקול כוחות',sub:'כוח הוא וקטור: יש לו גודל וכיוון, ומחברים אותו לפי רכיבים',
+ intro:[
+ `<b>כוח</b> הוא פעולה של גוף אחד על גוף אחר: דחיפה, משיכה, מתיחה. לכל כוח יש גוף שמפעיל אותו וגוף שעליו הוא פועל. יחידת הכוח היא ניוטון, ${m('N')}.`,
+ `כוח הוא <b>וקטור</b>: כדי לתאר אותו צריך גם גודל וגם כיוון. לכן מציירים כוח כחץ. הדבר הראשון שעושים בכל שאלה בדינמיקה הוא <b>תרשים כוחות</b>: מציירים את הגוף, ועליו חץ לכל כוח שפועל עליו.`,
+ `<b>שקול הכוחות</b> ${m(SF)} הוא הסכום הווקטורי של כל הכוחות שפועלים על הגוף. כשכל הכוחות על קו אחד, בוחרים כיוון חיובי ומחברים עם סימנים.`,
+ `כשהכוחות לא על קו אחד, <b>מפרקים לרכיבים</b>. כוח שגודלו ${m('<i>F</i>')} ויוצר זווית ${m(th)} עם ציר x מתפרק ל־${m(`<i>F</i><sub>x</sub> = <i>F</i> cos${th}`)} ול־${m(`<i>F</i><sub>y</sub> = <i>F</i> sin${th}`)}.`,
+ `מחברים בנפרד את רכיבי x ואת רכיבי y. גודל השקול מתקבל ממשפט פיתגורס, והכיוון שלו מ־${m(`tan<i>α</i> = ${fr(`${SF}<sub>y</sub>`,`${SF}<sub>x</sub>`)}`)}.`],
+ formulas:[[`<i>F</i><sub>x</sub> = <i>F</i> cos${th}`,'הרכיב בציר x, כש־θ נמדדת מציר x'],[`<i>F</i><sub>y</sub> = <i>F</i> sin${th}`,'הרכיב בציר y'],[`${SF} = √(${SF}<sub>x</sub><sup>2</sup> + ${SF}<sub>y</sub><sup>2</sup>)`,'גודל השקול'],[`tan<i>α</i> = ${fr(`${SF}<sub>y</sub>`,`${SF}<sub>x</sub>`)}`,'כיוון השקול ביחס לציר x']],
+ trap:[`3 ניוטון ועוד 4 ניוטון הם 7 ניוטון?`,`רק אם שני הכוחות פועלים באותו כיוון. אם הם בכיוונים מנוגדים השקול הוא ${m('1 N')}, ואם הם ניצבים זה לזה השקול הוא ${m('5 N')}. גודל השקול של שני כוחות יכול להיות כל ערך בין ההפרש שלהם לסכום שלהם, לפי הזווית שביניהם.`],
+ ex:{given:[`על גוף פועלים שני כוחות במישור`,`${m('<i>F</i><sub>1</sub> = 10 N')} בכיוון החיובי של ציר x`,`${m('<i>F</i><sub>2</sub> = 8 N')} בזווית ${m('120°')} מציר x`],ask:[`א. מה הרכיבים של ${m('<i>F</i><sub>2</sub>')}?`,`ב. מה הרכיבים של השקול?`,`ג. מה גודל השקול?`,`ד. מה כיוון השקול?`],
+  steps:[
+  `<b>סעיף א.</b> ${M('<i>F</i><sub>2x</sub> = 8·cos120° = −4 N &nbsp;,&nbsp; <i>F</i><sub>2y</sub> = 8·sin120° = 6.93 N')} הרכיב בציר x שלילי, כי הכוח נוטה שמאלה.`,
+  `<b>סעיף ב.</b> ל־${m('<i>F</i><sub>1</sub>')} יש רק רכיב x. מחברים רכיב לרכיב: ${M(`${SF}<sub>x</sub> = 10 − 4 = 6 N &nbsp;,&nbsp; ${SF}<sub>y</sub> = 0 + 6.93 = 6.93 N`)}`,
+  `<b>סעיף ג.</b> ${M(`${SF} = √(6<sup>2</sup> + 6.93<sup>2</sup>) = √84 ≈ 9.17 N`)}`,
+  `<b>סעיף ד.</b> ${M(`tan<i>α</i> = ${fr('6.93','6')} = 1.155 &nbsp;⟹&nbsp; <i>α</i> ≈ 49°`)} שני הרכיבים חיוביים, ולכן השקול ברביע הראשון.`],
+  check:`גודל השקול (${m('9.17 N')}) נמצא בין ההפרש ${m('10 − 8 = 2 N')} לסכום ${m('10 + 8 = 18 N')}, כצפוי.`},
+ qs:[
+ {l:'b',t:'num',q:`על גוף פועלים כוח של ${m('12 N')} ימינה וכוח של ${m('7 N')} שמאלה. הכיוון החיובי ימינה. מה שקול הכוחות?`,a:5,u:'N',s:`${m(`${SF} = 12 − 7 = +5 N`)}, ימינה.`},
+ {l:'b',t:'num',q:`שני כוחות, ${m('3 N')} ו־${m('4 N')}, פועלים על גוף בכיוונים ניצבים זה לזה. מה גודל השקול?`,a:5,u:'N',s:`${m(`${SF} = √(3<sup>2</sup> + 4<sup>2</sup>) = 5 N`)}.`},
+ {l:'b',t:'num',q:`כוח של ${m('20 N')} פועל בזווית ${m('30°')} מעל האופק. מה הרכיב האופקי שלו?`,a:17.3,u:'N',s:`${m('<i>F</i><sub>x</sub> = 20·cos30° = 17.3 N')}. הרכיב האנכי הוא ${m('20·sin30° = 10 N')}.`},
+ {l:'b',t:'mc',q:`על גוף פועלים שני כוחות, ${m('6 N')} ו־${m('10 N')}. איזה מהערכים הבאים <b>לא</b> יכול להיות גודל השקול?`,o:[m('4 N'),m('10 N'),m('16 N'),m('18 N')],a:3,s:`השקול נמצא בין ההפרש ${m('10 − 6 = 4 N')} (כוחות מנוגדים) לבין הסכום ${m('16 N')} (כוחות באותו כיוון). ${m('18 N')} מחוץ לטווח.`},
+ {l:'a',t:'num',q:`על גוף פועלים שלושה כוחות: ${m('20 N')} בכיוון ${m('0°')}, ${m('15 N')} בכיוון ${m('90°')} ו־${m('10 N')} בכיוון ${m('180°')} (הזוויות מציר x). מה גודל השקול?`,a:18,u:'N',s:`${m(`${SF}<sub>x</sub> = 20 − 10 = 10 N`)}, ${m(`${SF}<sub>y</sub> = 15 N`)}.<br>${m(`${SF} = √(10<sup>2</sup> + 15<sup>2</sup>) = √325 ≈ 18 N`)}.`},
+ {l:'a',t:'num',q:`בהמשך לשאלה הקודמת: מה הזווית בין השקול לבין ציר x? (במעלות)`,a:56.3,u:'°',s:`${m(`tan<i>α</i> = ${fr('15','10')} = 1.5`)}, ולכן ${m('<i>α</i> ≈ 56°')}.`},
+ {l:'a',t:'num',q:`שני כוחות שגודל כל אחד מהם ${m('10 N')} פועלים על גוף, והזווית ביניהם ${m('120°')}. מה גודל השקול?`,a:10,u:'N',s:`בוחרים את ציר x לאורך חוצה הזווית. כל כוח יוצר איתו זווית של ${m('60°')}: רכיבי y מתבטלים, ורכיבי x מתחברים: ${m('2·10·cos60° = 10 N')}.`}
+ ]},
+{id:'law1',title:'החוק הראשון של ניוטון',sub:'התמדה ושיווי משקל: כשהשקול אפס, המהירות לא משתנה',
+ intro:[
+ `<b>החוק הראשון של ניוטון:</b> גוף ששקול הכוחות עליו אפס נשאר במנוחה, או ממשיך לנוע במהירות קבועה בקו ישר.`,
+ `התכונה הזו נקראת <b>התמדה</b> (אינרציה): גוף "מתנגד" לשינוי במהירות שלו. המסה היא המדד להתמדה: ככל שהמסה גדולה יותר, קשה יותר לשנות את המהירות.`,
+ `מכאן שכוח לא נחוץ כדי <b>לשמור</b> על תנועה. כוח נחוץ רק כדי <b>לשנות</b> אותה: להאיץ, להאט או לשנות כיוון.`,
+ `החוק פועל גם בכיוון ההפוך: אם ידוע שגוף במנוחה או נע במהירות קבועה, שקול הכוחות עליו <b>חייב</b> להיות אפס. מצב כזה נקרא <b>שיווי משקל</b>.`,
+ `בשיווי משקל השקול מתאפס בכל ציר בנפרד: ${m(`${SF}<sub>x</sub> = 0`)} וגם ${m(`${SF}<sub>y</sub> = 0`)}. אלה שתי משוואות, ובעזרתן מוצאים כוחות לא ידועים.`],
+ formulas:[[`${SF} = 0 &nbsp;⟺&nbsp; <i>v</i> קבועה`,'מנוחה, או מהירות קבועה בקו ישר'],[`${SF}<sub>x</sub> = 0`,'תנאי שיווי המשקל בציר x'],[`${SF}<sub>y</sub> = 0`,'תנאי שיווי המשקל בציר y']],
+ trap:[`כדי שגוף ימשיך לנוע צריך להמשיך לדחוף אותו?`,`בחיי היומיום זה נראה כך, כי כמעט תמיד פועל חיכוך. כשמפסיקים לדחוף עגלה היא נעצרת בגלל החיכוך, לא בגלל ש"נגמר לה הכוח". בלי חיכוך היא הייתה ממשיכה באותה מהירות. כשדוחפים עגלה במהירות קבועה, הדחיפה רק מאזנת את החיכוך, והשקול אפס.`],
+ ex:{given:[`משקולת שמסתה ${m('6 kg')} תלויה במנוחה משני חוטים שקשורים לתקרה`,`החוט השמאלי יוצר זווית ${m('53°')} עם התקרה, והימני זווית ${m('37°')}`,`${m('<i>g</i> = 10 m/s<sup>2</sup>')}, ${s37}`],ask:[`א. אילו כוחות פועלים על נקודת הקשר?`,`ב. מהן משוואות שיווי המשקל?`,`ג. מה המתיחות בכל חוט?`],
+  steps:[
+  `<b>סעיף א.</b> שלושה כוחות: ${m('<i>T</i><sub>1</sub>')} לאורך החוט השמאלי, ${m('<i>T</i><sub>2</sub>')} לאורך החוט הימני, והחוט האנכי שמושך כלפי מטה בכוח ששווה ל־${m('<i>mg</i> = 60 N')}.`,
+  `<b>סעיף ב.</b> מפרקים את המתיחויות לרכיבים. ציר x ימינה וציר y מעלה: ${M(`${SF}<sub>x</sub> = 0: &nbsp; <i>T</i><sub>2</sub>cos37° − <i>T</i><sub>1</sub>cos53° = 0`)} ${M(`${SF}<sub>y</sub> = 0: &nbsp; <i>T</i><sub>1</sub>sin53° + <i>T</i><sub>2</sub>sin37° − 60 = 0`)}`,
+  `<b>סעיף ג.</b> מהמשוואה הראשונה: ${m('0.8<i>T</i><sub>2</sub> = 0.6<i>T</i><sub>1</sub>')}, כלומר ${m(`<i>T</i><sub>1</sub> = ${fr('4','3')}<i>T</i><sub>2</sub>`)}. מציבים בשנייה: ${M(`0.8·${fr('4','3')}<i>T</i><sub>2</sub> + 0.6<i>T</i><sub>2</sub> = 60 &nbsp;⟹&nbsp; ${fr('5','3')}<i>T</i><sub>2</sub> = 60 &nbsp;⟹&nbsp; <i>T</i><sub>2</sub> = 36 N`)} ולכן ${m('<i>T</i><sub>1</sub> = 48 N')}.`],
+  check:`שני החוטים ניצבים זה לזה (${m('53° + 37° = 90°')}), ולכן ${m('48<sup>2</sup> + 36<sup>2</sup> = 60<sup>2</sup>')}. החוט התלול יותר נושא מתיחות גדולה יותר.`},
+ qs:[
+ {l:'b',t:'mc',q:`חללית נמצאת רחוק מאוד מכל כוכב, והמנועים שלה כבויים. מה יקרה לה?`,o:['היא תאט בהדרגה עד שתיעצר','היא תמשיך לנוע במהירות קבועה בקו ישר','היא תאיץ','היא תיעצר מיד'],a:1,s:`לא פועל על החללית שום כוח, ולכן השקול אפס. לפי החוק הראשון היא ממשיכה באותה מהירות ובאותו כיוון.`},
+ {l:'b',t:'num',q:`גוררים ארגז על רצפה אופקית <b>במהירות קבועה</b> בעזרת כוח אופקי של ${m('40 N')}. מה גודל כוח החיכוך שפועל על הארגז?`,a:40,u:'N',s:`מהירות קבועה פירושה ${m(`${SF} = 0`)}. בציר האופקי פועלים רק הכוח הגורר והחיכוך, ולכן הם שווים בגודלם: ${m('40 N')}.`},
+ {l:'b',t:'mc',q:`אוטובוס בולם בפתאומיות, והנוסעים העומדים "נזרקים" קדימה. מה ההסבר?`,o:['כוח דוחף אותם קדימה בזמן הבלימה','הם ממשיכים בתנועתם בגלל ההתמדה, בזמן שהאוטובוס מאט','כוח הכובד שלהם גדל בזמן הבלימה','האוטובוס מושך אותם קדימה'],a:1,s:`שום כוח לא דוחף את הנוסעים קדימה. הם פשוט ממשיכים לנוע במהירות שהייתה להם, ואילו האוטובוס מתחתם מאט.`},
+ {l:'b',t:'num',q:`נברשת שמסתה ${m('3 kg')} תלויה במנוחה על חוט אנכי אחד. מה המתיחות בחוט?`,a:30,u:'N',s:`שיווי משקל בציר האנכי: ${m('<i>T</i> = <i>mg</i> = 3·10 = 30 N')}.`},
+ {l:'a',t:'num',q:`צנחן שמסתו (יחד עם הציוד) ${m('80 kg')} יורד במהירות קבועה. מה גודל כוח התנגדות האוויר שפועל עליו?`,a:800,u:'N',s:`מהירות קבועה, ולכן השקול אפס: התנגדות האוויר מאזנת את כוח הכובד, ${m('<i>mg</i> = 800 N')}.`},
+ {l:'a',t:'num',q:`גוף שמסתו ${m('4 kg')} תלוי במנוחה משני חוטים סימטריים. כל חוט יוצר זווית של ${m('30°')} עם האופק. מה המתיחות בכל חוט?`,a:40,u:'N',s:`בציר האנכי: ${m('2<i>T</i> sin30° = <i>mg</i>')}, כלומר ${m('2<i>T</i>·0.5 = 40')}, ולכן ${m('<i>T</i> = 40 N')}. המתיחות בכל חוט שווה כאן למשקל כולו.`},
+ {l:'a',t:'num',q:`גוף שמסתו ${m('5 kg')} תלוי על חוט. מושכים אותו הצידה בכוח אופקי ${m('<i>F</i>')} עד שהחוט יוצר זווית של ${m('37°')} עם האנך, והגוף במנוחה. מה גודל ${m('<i>F</i>')}?`,a:37.5,u:'N',s:`אנכי: ${m('<i>T</i> cos37° = <i>mg</i> = 50 N')}. אופקי: ${m('<i>T</i> sin37° = <i>F</i>')}.<br>מחלקים את המשוואות: ${m('<i>F</i> = <i>mg</i> tan37° = 50·0.75 = 37.5 N')}.`},
+ {l:'a',t:'mc',q:`משקולת תלויה משני חוטים סימטריים. מרחיקים את נקודות הקשירה כך שהחוטים נעשים אופקיים יותר. מה קורה למתיחות בחוטים?`,o:['קטנה','לא משתנה','גדלה','מתאפסת'],a:2,s:`${m(`<i>T</i> = ${fr('<i>mg</i>',`2 sin${th}`)}`)}, כאשר ${m(th)} הזווית מעל האופק. כשהזווית קטנה גם ${m(`sin${th}`)} קטן, ולכן המתיחות גדלה. חוט כמעט אופקי צריך מתיחות עצומה כדי לספק את הרכיב האנכי הדרוש.`}
+ ]},
+{id:'law2',title:'החוק השני של ניוטון',sub:'שקול הכוחות קובע את התאוצה',
+ intro:[
+ `<b>החוק השני של ניוטון:</b> ${m(`${SF} = <i>ma</i>`)}. שקול הכוחות שפועלים על גוף שווה למכפלת המסה שלו בתאוצה שלו.`,
+ `התאוצה היא תמיד <b>בכיוון השקול</b>. היא יחסית לשקול ויחסית הפוך למסה: שקול כפול נותן תאוצה כפולה, ומסה כפולה נותנת חצי מהתאוצה. מכאן גם היחידה: ${m('1 N = 1 kg·m/s<sup>2</sup>')}.`,
+ `זו משוואה וקטורית, ולכן כותבים אותה לכל ציר בנפרד: ${m(`${SF}<sub>x</sub> = <i>ma</i><sub>x</sub>`)} ו־${m(`${SF}<sub>y</sub> = <i>ma</i><sub>y</sub>`)}. נוח לבחור ציר אחד בכיוון התאוצה, ואז בציר השני השקול אפס.`,
+ `השקול קובע את <b>התאוצה</b>, לא את המהירות. גוף יכול לנוע ימינה בזמן שהשקול עליו פונה שמאלה: הוא פשוט מאט.`,
+ `החוק השני מחבר בין הדינמיקה לקינמטיקה. מהכוחות מוצאים את התאוצה, ומהתאוצה מוצאים מהירות ומקום בעזרת נוסחאות התנועה. ולהפך: מהתנועה מוצאים תאוצה, וממנה כוח.`],
+ formulas:[[`${SF} = <i>ma</i>`,'החוק השני של ניוטון'],[`${SF}<sub>x</sub> = <i>ma</i><sub>x</sub>`,'בציר x'],[`${SF}<sub>y</sub> = <i>ma</i><sub>y</sub>`,'בציר y'],[`<i>a</i> = ${fr(SF,'<i>m</i>')}`,'התאוצה מתוך הכוחות']],
+ trap:[`גוף נע תמיד בכיוון הכוח שפועל עליו?`,`לא. הכוח השקול קובע את כיוון <b>התאוצה</b>, לא את כיוון התנועה. כדור שנזרק כלפי מעלה נע מעלה בזמן שהכוח היחיד עליו, כוח הכובד, פועל מטה. מכונית שבולמת נעה קדימה בזמן שהשקול עליה פונה אחורה.`],
+ ex:{given:[`ארגז שמסתו ${m('4 kg')} נמצא במנוחה על משטח אופקי חלק`,`מפעילים עליו כוח ${m('<i>F</i><sub>1</sub> = 20 N')} ימינה וכוח ${m('<i>F</i><sub>2</sub> = 8 N')} שמאלה`],ask:[`א. מה תאוצת הארגז?`,`ב. מה מהירותו כעבור ${m('5 s')}?`,`ג. מה ההעתק שלו ב־${m('5 s')} האלה?`,`ד. ברגע ${m('<i>t</i> = 5 s')} מפסיקים להפעיל את ${m('<i>F</i><sub>1</sub>')}. מה התאוצה עכשיו, וכעבור כמה זמן המהירות מתאפסת?`],
+  steps:[
+  `<b>סעיף א.</b> ציר x ימינה. בציר האנכי הנורמל מאזן את כוח הכובד. בציר האופקי: ${M(`${SF} = 20 − 8 = 12 N &nbsp;⟹&nbsp; <i>a</i> = ${fr('12','4')} = 3 m/s<sup>2</sup>`)}`,
+  `<b>סעיף ב.</b> ${M(`<i>v</i> = ${v0} + <i>at</i> = 0 + 3·5 = 15 m/s`)}`,
+  `<b>סעיף ג.</b> ${M(`Δ<i>x</i> = ${half}<i>at</i><sup>2</sup> = ${half}·3·5<sup>2</sup> = 37.5 m`)}`,
+  `<b>סעיף ד.</b> נשאר רק ${m('<i>F</i><sub>2</sub>')}, שפונה שמאלה: ${M(`<i>a</i> = ${fr('−8','4')} = −2 m/s<sup>2</sup>`)} הארגז ממשיך לנוע ימינה ומאט. המהירות מתאפסת כעבור ${m(`${fr('15','2')} = 7.5 s`)}.`],
+  check:`בסעיף ד הארגז נע ימינה בזמן שהשקול פונה שמאלה. אין כאן סתירה: השקול קובע את התאוצה, לא את כיוון התנועה.`},
+ qs:[
+ {l:'b',t:'num',q:`שקול הכוחות על גוף שמסתו ${m('3 kg')} הוא ${m('12 N')}. מה תאוצת הגוף?`,a:4,u:'m/s²',s:`${m(`<i>a</i> = ${fr(SF,'<i>m</i>')} = ${fr('12','3')} = 4 m/s<sup>2</sup>`)}.`},
+ {l:'b',t:'num',q:`מכונית שמסתה ${m('1200 kg')} מאיצה בתאוצה של ${m('2.5 m/s<sup>2</sup>')}. מה שקול הכוחות שפועל עליה?`,a:3000,u:'N',s:`${m(`${SF} = <i>ma</i> = 1200·2.5 = 3000 N`)}.`},
+ {l:'b',t:'mc',q:`מכפילים את שקול הכוחות על גוף, ומכפילים גם את מסת הגוף. מה קורה לתאוצה?`,o:['גדלה פי 4','גדלה פי 2','לא משתנה','קטנה פי 2'],a:2,s:`${m(`<i>a</i> = ${fr(SF,'<i>m</i>')}`)}. גם המונה וגם המכנה הוכפלו, ולכן התאוצה לא השתנתה.`},
+ {l:'b',t:'num',q:`על גוף שמסתו ${m('2 kg')}, שנמצא על משטח חלק, פועלים כוח של ${m('10 N')} ימינה וכוח של ${m('4 N')} שמאלה. מה תאוצת הגוף?`,a:3,u:'m/s²',s:`${m(`${SF} = 10 − 4 = 6 N`)}, ${m(`<i>a</i> = ${fr('6','2')} = 3 m/s<sup>2</sup>`)}, ימינה.`},
+ {l:'a',t:'num',q:`מכונית שמסתה ${m('1000 kg')} נוסעת במהירות ${m('20 m/s')}. הנהג בולם, והמכונית נעצרת אחרי ${m('50 m')} בתאוצה קבועה. מה גודל הכוח הבולם?`,a:4000,u:'N',s:`<b>קינמטיקה:</b> ${m(`0 = 20<sup>2</sup> + 2<i>a</i>·50`)}, ולכן ${m('<i>a</i> = −4 m/s<sup>2</sup>')}.<br><b>דינמיקה:</b> ${m(`|${SF}| = <i>m</i>|<i>a</i>| = 1000·4 = 4000 N`)}, בכיוון המנוגד לתנועה.`},
+ {l:'a',t:'num',q:`מושכים ארגז שמסתו ${m('6 kg')} על משטח אופקי חלק, בכוח של ${m('30 N')} שיוצר זווית של ${m('37°')} מעל האופק. מה תאוצת הארגז? (${s37})`,a:4,u:'m/s²',s:`רק הרכיב האופקי של הכוח מאיץ את הארגז: ${m('<i>F</i><sub>x</sub> = 30·0.8 = 24 N')}.<br>${m(`<i>a</i> = ${fr('24','6')} = 4 m/s<sup>2</sup>`)}.`},
+ {l:'a',t:'num',q:`גוף שמסתו ${m('5 kg')} מאיץ ממנוחה ל־${m('12 m/s')} במשך ${m('4 s')}. פועלים עליו כוח מושך ${m('<i>F</i>')} וכוח מתנגד קבוע של ${m('10 N')}. מה גודל ${m('<i>F</i>')}?`,a:25,u:'N',s:`${m(`<i>a</i> = ${fr('12','4')} = 3 m/s<sup>2</sup>`)}.<br>${m('<i>F</i> − 10 = 5·3')}, ולכן ${m('<i>F</i> = 25 N')}.`},
+ {l:'a',t:'mc',q:`גוף נע ימינה, ומהירותו הולכת וקטנה. מה כיוון שקול הכוחות שפועל עליו?`,o:['ימינה','שמאלה','השקול אפס','אי אפשר לדעת'],a:1,s:`הגוף מאט, ולכן התאוצה מנוגדת למהירות: היא פונה שמאלה. השקול תמיד בכיוון התאוצה.`}
+ ]},
+{id:'law3',title:'החוק השלישי של ניוטון',sub:'כוחות באים בזוגות: פעולה ותגובה',
+ intro:[
+ `<b>החוק השלישי של ניוטון:</b> כשגוף א מפעיל כוח על גוף ב, גוף ב מפעיל על גוף א כוח שווה בגודלו והפוך בכיוונו: ${m(`${vec('F')}<sub>1,2</sub> = −${vec('F')}<sub>2,1</sub>`)}.`,
+ `שני הכוחות של הזוג פועלים על <b>שני גופים שונים</b>. לכן הם אף פעם לא מבטלים זה את זה, ואף פעם לא מופיעים יחד באותו תרשים כוחות.`,
+ `שני הכוחות של הזוג הם תמיד <b>מאותו סוג</b>: שניהם כוחות כבידה, או שניהם כוחות מגע. מזהים זוג לפי הניסוח: "הכוח ש־א מפעיל על ב" ו"הכוח ש־ב מפעיל על א".`,
+ `הכוחות שווים, אבל ההשפעה שלהם יכולה להיות שונה לגמרי, כי ${m(`<i>a</i> = ${fr('<i>F</i>','<i>m</i>')}`)}: אותו כוח נותן לגוף הקל תאוצה גדולה ולגוף הכבד תאוצה קטנה.`,
+ `החוק נכון תמיד: גם כשהגופים מאיצים, גם כשהמסות שונות מאוד, וגם כשרק אחד מהגופים "פעיל".`],
+ formulas:[[`${vec('F')}<sub>1,2</sub> = −${vec('F')}<sub>2,1</sub>`,'שווים בגודל, הפוכים בכיוון, ופועלים על גופים שונים']],
+ trap:[`הנורמל הוא התגובה לכוח הכובד?`,`לא. על ספר שמונח על שולחן פועלים כוח הכובד והנורמל, והם שווים בגודלם. אבל הם לא זוג של החוק השלישי: שניהם פועלים על <b>אותו גוף</b>, והם מסוגים שונים. הם שווים בגלל שהספר בשיווי משקל (החוק הראשון). התגובה לכוח הכובד היא הכוח שבו הספר מושך את כדור הארץ. התגובה לנורמל היא הכוח שבו הספר לוחץ על השולחן.`],
+ ex:{given:[`שני ארגזים צמודים על משטח אופקי חלק: ${m('<i>m</i><sub>1</sub> = 6 kg')} ו־${m('<i>m</i><sub>2</sub> = 4 kg')}`,`כוח אופקי ${m('<i>F</i> = 30 N')} דוחף את ארגז 1 לכיוון ארגז 2`],ask:[`א. מה תאוצת הארגזים?`,`ב. מה הכוח שארגז 1 מפעיל על ארגז 2?`,`ג. מה הכוח שארגז 2 מפעיל על ארגז 1?`,`ד. מה היה כוח המגע אילו אותו כוח היה דוחף מהצד השני, על ארגז 2?`],
+  steps:[
+  `<b>סעיף א.</b> שני הארגזים נעים יחד, ולכן מתייחסים אליהם כאל גוף אחד שמסתו ${m('10 kg')}: ${M(`<i>a</i> = ${fr('<i>F</i>','<i>m</i><sub>1</sub> + <i>m</i><sub>2</sub>')} = ${fr('30','10')} = 3 m/s<sup>2</sup>`)}`,
+  `<b>סעיף ב.</b> תרשים כוחות לארגז 2 בלבד. בציר האופקי פועל עליו רק הכוח מארגז 1: ${M('<i>F</i><sub>1→2</sub> = <i>m</i><sub>2</sub><i>a</i> = 4·3 = 12 N')} ימינה.`,
+  `<b>סעיף ג.</b> לפי החוק השלישי: ${m('12 N')}, שמאלה.`,
+  `<b>סעיף ד.</b> התאוצה לא משתנה, ${m('3 m/s<sup>2</sup>')}. עכשיו כוח המגע הוא הכוח היחיד שמאיץ את ארגז 1: ${M('<i>F</i><sub>2→1</sub> = <i>m</i><sub>1</sub><i>a</i> = 6·3 = 18 N')}`],
+  check:`החוק השני לארגז 1 בסעיפים א עד ג: ${m('30 − 12 = 18 N = 6·3')}. כוח המגע קטן מ־${m('<i>F</i>')}, כי חלק מ־${m('<i>F</i>')} "נשאר" כדי להאיץ את ארגז 1.`},
+ qs:[
+ {l:'b',t:'mc',q:`ספר מונח על שולחן. כדור הארץ מושך את הספר בכוח הכובד. מהו כוח התגובה לכוח הזה, לפי החוק השלישי?`,o:['הכוח הנורמלי שהשולחן מפעיל על הספר','הכוח שבו הספר מושך את כדור הארץ','הכוח שבו הספר לוחץ על השולחן','כוח החיכוך בין הספר לשולחן'],a:1,s:`"כדור הארץ מושך את הספר" ↔ "הספר מושך את כדור הארץ". שני כוחות כבידה, על שני גופים שונים.`},
+ {l:'b',t:'mc',q:`יתוש מתנגש בשמשה של מכונית נוסעת. איך גודל הכוח שהשמשה מפעילה על היתוש משתווה לגודל הכוח שהיתוש מפעיל על השמשה?`,o:['גדול הרבה יותר','קטן יותר','שווה','תלוי במהירות המכונית'],a:2,s:`זה זוג כוחות של החוק השלישי, ולכן הם שווים בגודלם. התוצאה שונה כל כך בגלל ההבדל העצום במסות: אותו כוח נותן ליתוש תאוצה עצומה ולמכונית תאוצה זניחה.`},
+ {l:'b',t:'num',q:`אדם שמסתו ${m('70 kg')} עומד במנוחה על רצפה. מה גודל הכוח שהוא מפעיל על הרצפה?`,a:700,u:'N',s:`האדם בשיווי משקל, ולכן הנורמל שהרצפה מפעילה עליו שווה ל־${m('<i>mg</i> = 700 N')}. לפי החוק השלישי הוא לוחץ על הרצפה בכוח שווה, ${m('700 N')}, כלפי מטה.`},
+ {l:'b',t:'mc',q:`מדוע שני הכוחות של זוג "פעולה ותגובה" לא מבטלים זה את זה?`,o:['כי הם לא שווים בדיוק בגודלם','כי הם פועלים על שני גופים שונים','כי הם לא פועלים באותו זמן','כי אחד מהם תמיד חזק יותר'],a:1,s:`כוחות יכולים להתבטל רק אם הם פועלים על אותו גוף. כל אחד מכוחות הזוג מופיע בתרשים הכוחות של גוף אחר.`},
+ {l:'a',t:'num',q:`שני מחליקים עומדים על קרח חלק. מחליק A, שמסתו ${m('50 kg')}, דוחף את מחליק B, שמסתו ${m('75 kg')}, בכוח של ${m('150 N')}. מה גודל התאוצה של A בזמן הדחיפה?`,a:3,u:'m/s²',s:`לפי החוק השלישי B מפעיל על A כוח של ${m('150 N')} בכיוון ההפוך.<br>${m(`<i>a</i><sub>A</sub> = ${fr('150','50')} = 3 m/s<sup>2</sup>`)}. התאוצה של B קטנה יותר: ${m(`${fr('150','75')} = 2 m/s<sup>2</sup>`)}.`},
+ {l:'a',t:'num',q:`שני ארגזים צמודים על משטח חלק: ${m('<i>m</i><sub>1</sub> = 2 kg')} ו־${m('<i>m</i><sub>2</sub> = 8 kg')}. כוח אופקי של ${m('50 N')} דוחף את ארגז 1 לכיוון ארגז 2. מה גודל כוח המגע בין הארגזים?`,a:40,u:'N',s:`${m(`<i>a</i> = ${fr('50','2 + 8')} = 5 m/s<sup>2</sup>`)}.<br>כוח המגע מאיץ את ארגז 2: ${m('8·5 = 40 N')}.`},
+ {l:'a',t:'num',q:`אותם ארגזים, אבל עכשיו הכוח של ${m('50 N')} דוחף את ארגז 2 לכיוון ארגז 1. מה גודל כוח המגע?`,a:10,u:'N',s:`התאוצה לא השתנתה, ${m('5 m/s<sup>2</sup>')}. עכשיו כוח המגע מאיץ את ארגז 1, הקל: ${m('2·5 = 10 N')}.`},
+ {l:'a',t:'mc',q:`סוס מושך עגלה, והעגלה מושכת את הסוס בכוח שווה והפוך. איך בכל זאת העגלה מתחילה לנוע?`,o:['הסוס מושך קצת יותר חזק ממה שהעגלה מושכת אותו','שני הכוחות פועלים על גופים שונים. על העגלה פועל כוח המשיכה של הסוס, והוא גדול מהכוחות שמתנגדים לה','החוק השלישי לא נכון כשהגופים מאיצים','העגלה מתחילה למשוך רק אחרי שהסוס כבר נע'],a:1,s:`בודקים כל גוף לחוד. על העגלה: הסוס מושך קדימה, והחיכוך מתנגד. אם המשיכה גדולה יותר, העגלה מאיצה. על הסוס: העגלה מושכת אחורה, והקרקע דוחפת אותו קדימה (חיכוך). הכוחות של הזוג אף פעם לא נמצאים באותו תרשים.`}
+ ]},
+{id:'weight',title:'כוח הכובד והכוח הנורמלי',sub:'מסה, משקל, ומה שמראה המשקל במעלית',
+ intro:[
+ `<b>כוח הכובד</b> הוא הכוח שבו כדור הארץ מושך כל גוף. כיוונו כלפי מטה וגודלו ${m('<i>mg</i>')}. הוא פועל תמיד, גם כשהגוף באוויר וגם כשהוא מאיץ.`,
+ `<b>מסה ומשקל הם שני דברים שונים.</b> המסה, בקילוגרמים, היא תכונה של הגוף ואינה תלויה במקום. המשקל הוא כוח, בניוטונים, והוא תלוי ב־${m('<i>g</i>')}. על הירח המסה של אסטרונאוט לא משתנה, אבל המשקל שלו קטן פי 6 בערך.`,
+ `<b>הכוח הנורמלי</b> ${m('<i>N</i>')} הוא הכוח שמשטח מפעיל על גוף שנוגע בו. הוא תמיד ניצב למשטח ודוחף את הגוף החוצה ממנו.`,
+ `לנורמל <b>אין נוסחה</b> משלו. הוא גדול בדיוק כמה שצריך, ומוצאים אותו מהחוק השני. רק במקרה הפשוט, גוף על משטח אופקי בלי כוחות אנכיים נוספים ובלי תאוצה אנכית, יוצא ${m('<i>N</i> = <i>mg</i>')}.`,
+ `משקל (מאזני קפיץ) מראה את הכוח הנורמלי, לא את כוח הכובד. במעלית שתאוצתה ${m('<i>a</i>')} (ציר כלפי מעלה): ${m('<i>N</i> − <i>mg</i> = <i>ma</i>')}, ולכן ${m('<i>N</i> = <i>m</i>(<i>g</i> + <i>a</i>)')}. בנפילה חופשית ${m('<i>a</i> = −<i>g</i>')} ו־${m('<i>N</i> = 0')}: זו תחושת חוסר המשקל.`],
+ formulas:[[`<i>F</i> = <i>mg</i>`,'גודל כוח הכובד'],[`<i>N</i> − <i>mg</i> = <i>ma</i>`,'החוק השני בציר האנכי (ציר כלפי מעלה)'],[`<i>N</i> = <i>m</i>(<i>g</i> + <i>a</i>)`,'הנורמל במעלית שתאוצתה <i>a</i>']],
+ trap:[`הנורמל תמיד שווה ל־mg?`,`לא. הנורמל שווה ל־${m('<i>mg</i>')} רק על משטח אופקי, בלי כוחות אנכיים נוספים ובלי תאוצה אנכית. כשלוחצים על הגוף מלמעלה הנורמל גדל, כשמושכים אותו כלפי מעלה הוא קטן, על מדרון הוא ${m(`<i>mg</i> cos${th}`)}, ובמעלית מאיצה הוא ${m('<i>m</i>(<i>g</i> + <i>a</i>)')}. תמיד מוצאים אותו מהמשוואה של החוק השני.`],
+ ex:{given:[`אדם שמסתו ${m('60 kg')} עומד על משקל בתוך מעלית`,`${m('<i>g</i> = 10 m/s<sup>2</sup>')}, הציר כלפי מעלה`],ask:[`מה מראה המשקל (בניוטונים) בכל אחד מהמצבים?`,`א. המעלית במנוחה, או נעה במהירות קבועה`,`ב. המעלית מאיצה כלפי מעלה בתאוצה ${m('2 m/s<sup>2</sup>')}`,`ג. המעלית עולה ומאטה, וגודל התאוצה ${m('2 m/s<sup>2</sup>')}`,`ד. כבל המעלית נקרע והיא נופלת חופשית`],
+  steps:[
+  `<b>המשוואה הכללית.</b> על האדם פועלים ${m('<i>N</i>')} כלפי מעלה ו־${m('<i>mg</i> = 600 N')} כלפי מטה: ${M('<i>N</i> − <i>mg</i> = <i>ma</i> &nbsp;⟹&nbsp; <i>N</i> = <i>m</i>(<i>g</i> + <i>a</i>)')}`,
+  `<b>סעיף א.</b> ${m('<i>a</i> = 0')}: ${m('<i>N</i> = 60·10 = 600 N')}. אין הבדל בין מנוחה למהירות קבועה.`,
+  `<b>סעיף ב.</b> ${m('<i>a</i> = +2')}: ${m('<i>N</i> = 60·(10 + 2) = 720 N')}.`,
+  `<b>סעיף ג.</b> המעלית נעה מעלה ומאטה, ולכן התאוצה כלפי מטה, ${m('<i>a</i> = −2')}: ${m('<i>N</i> = 60·(10 − 2) = 480 N')}.`,
+  `<b>סעיף ד.</b> ${m('<i>a</i> = −10')}: ${m('<i>N</i> = 60·(10 − 10) = 0')}. האדם והמשקל נופלים יחד, והוא לא לוחץ עליו.`],
+  check:`תאוצה כלפי מעלה מגדילה את הקריאה, ותאוצה כלפי מטה מקטינה אותה. כיוון התנועה עצמו לא משנה: בסעיף ג המעלית עולה, והקריאה קטנה מ־${m('<i>mg</i>')}.`},
+ qs:[
+ {l:'b',t:'num',q:`מה גודל כוח הכובד שפועל על גוף שמסתו ${m('5 kg')}?`,a:50,u:'N',s:`${m('<i>mg</i> = 5·10 = 50 N')}.`},
+ {l:'b',t:'mc',q:`אסטרונאוט טס מכדור הארץ אל הירח. מה קורה למסה שלו ולמשקל שלו?`,o:['המסה קטנה והמשקל לא משתנה','המסה לא משתנה והמשקל קטן','שניהם קטנים','שניהם לא משתנים'],a:1,s:`המסה היא תכונה של הגוף. המשקל ${m('<i>mg</i>')} תלוי ב־${m('<i>g</i>')}, שעל הירח קטן פי 6 בערך.`},
+ {l:'b',t:'num',q:`ארגז שמסתו ${m('8 kg')} מונח על רצפה אופקית. לוחצים עליו מלמעלה בכוח אנכי של ${m('20 N')}. מה גודל הכוח הנורמלי?`,a:100,u:'N',s:`שיווי משקל בציר האנכי: ${m('<i>N</i> = <i>mg</i> + 20 = 80 + 20 = 100 N')}.`},
+ {l:'b',t:'num',q:`אדם שמסתו ${m('70 kg')} עומד על משקל במעלית שעולה במהירות קבועה של ${m('3 m/s')}. מה מראה המשקל, בניוטונים?`,a:700,u:'N',s:`מהירות קבועה פירושה ${m('<i>a</i> = 0')}, ולכן ${m('<i>N</i> = <i>mg</i> = 700 N')}. המהירות עצמה לא משפיעה.`},
+ {l:'a',t:'num',q:`אדם שמסתו ${m('50 kg')} עומד על משקל במעלית שמאיצה כלפי <b>מטה</b> בתאוצה של ${m('2 m/s<sup>2</sup>')}. מה מראה המשקל?`,a:400,u:'N',s:`ציר כלפי מעלה, ${m('<i>a</i> = −2')}: ${m('<i>N</i> = 50·(10 − 2) = 400 N')}.`},
+ {l:'a',t:'num',q:`אדם שמסתו ${m('75 kg')} עומד על משקל במעלית, והמשקל מראה ${m('900 N')}. מה תאוצת המעלית? (ציר כלפי מעלה, עם סימן)`,a:2,u:'m/s²',s:`${m('<i>N</i> − <i>mg</i> = <i>ma</i>')}: ${m('900 − 750 = 75<i>a</i>')}, ולכן ${m('<i>a</i> = +2 m/s<sup>2</sup>')}, כלפי מעלה. אי אפשר לדעת מכאן אם המעלית עולה או יורדת.`},
+ {l:'a',t:'num',q:`ארגז שמסתו ${m('10 kg')} מונח על רצפה. מושכים אותו כלפי מעלה בחוט אנכי בכוח של ${m('40 N')}, והוא נשאר על הרצפה. מה גודל הכוח הנורמלי?`,a:60,u:'N',s:`שיווי משקל: ${m('<i>N</i> + 40 = 100')}, ולכן ${m('<i>N</i> = 60 N')}. החוט נושא חלק מהמשקל.`},
+ {l:'a',t:'mc',q:`מעלית יורדת, ומאטה לקראת עצירה בקומת הקרקע. איך הקריאה במשקל משתווה ל־${m('<i>mg</i>')}?`,o:['קטנה מ־mg','שווה ל־mg','גדולה מ־mg','אפס'],a:2,s:`המעלית נעה מטה ומאטה, ולכן התאוצה שלה כלפי <b>מעלה</b>. לפי ${m('<i>N</i> = <i>m</i>(<i>g</i> + <i>a</i>)')} עם ${m('<i>a</i>')} חיובי, הקריאה גדולה מ־${m('<i>mg</i>')}.`}
+ ]},
+{id:'spring',title:'הכוח האלסטי וחוק הוק',sub:'קפיץ מפעיל כוח שיחסי להתארכות שלו',
+ intro:[
+ `קפיץ שנמתח או נדחס מפעיל כוח על הגוף שמחובר אליו. הכוח הזה, <b>הכוח האלסטי</b>, פועל תמיד בכיוון שמחזיר את הקפיץ לאורך הרפוי שלו.`,
+ `<b>חוק הוק:</b> ${m(`${Fsp} = <i>k</i>${dl}`)}. גודל הכוח יחסי ל־${m(dl)}, שהיא השינוי באורך הקפיץ ביחס לאורכו הרפוי: ${m(`${dl} = <i>ℓ</i> − <i>ℓ</i><sub>0</sub>`)}.`,
+ `${m('<i>k</i>')} הוא <b>קבוע הקפיץ</b>, ביחידות ${m('N/m')}. קפיץ קשיח הוא קפיץ שהקבוע שלו גדול: צריך כוח גדול כדי למתוח אותו במעט.`,
+ `גרף הכוח האלסטי כפונקציה של ההתארכות הוא קו ישר שעובר בראשית, והשיפוע שלו שווה ל־${m('<i>k</i>')}.`,
+ `כשגוף תלוי במנוחה על קפיץ אנכי, הכוח האלסטי מאזן את כוח הכובד: ${m(`<i>k</i>${dl} = <i>mg</i>`)}. על העיקרון הזה בנוי מד־כוח (דינמומטר).`],
+ formulas:[[`${Fsp} = <i>k</i>${dl}`,'חוק הוק: גודל הכוח האלסטי'],[`${dl} = <i>ℓ</i> − <i>ℓ</i><sub>0</sub>`,'ההתארכות: האורך פחות האורך הרפוי'],[`<i>k</i>${dl} = <i>mg</i>`,'גוף תלוי במנוחה על קפיץ']],
+ trap:[`מציבים בחוק הוק את אורך הקפיץ?`,`לא. מציבים את <b>ההתארכות</b> ${m(dl)}, כלומר כמה השתנה האורך ביחס לאורך הרפוי. קפיץ שאורכו הרפוי ${m('20 cm')} ונמתח לאורך ${m('25 cm')} התארך ב־${m('5 cm')} בלבד. וזוכרים להמיר למטרים: ${m('5 cm = 0.05 m')}.`],
+ ex:{given:[`קפיץ שאורכו הרפוי ${m('20 cm')} תלוי אנכית`,`תולים עליו משקולת של ${m('0.5 kg')}, ובמנוחה אורכו ${m('25 cm')}`],ask:[`א. מה קבוע הקפיץ?`,`ב. מה יהיה אורך הקפיץ אם יתלו עליו ${m('0.8 kg')}?`,`ג. איזו מסה תמתח את הקפיץ לאורך של ${m('32 cm')}?`],
+  steps:[
+  `<b>סעיף א.</b> ההתארכות: ${m(`${dl} = 25 − 20 = 5 cm = 0.05 m`)}. בשיווי משקל ${m(`<i>k</i>${dl} = <i>mg</i>`)}: ${M(`<i>k</i> = ${fr('<i>mg</i>',dl)} = ${fr('0.5·10','0.05')} = 100 N/m`)}`,
+  `<b>סעיף ב.</b> ${M(`${dl} = ${fr('<i>mg</i>','<i>k</i>')} = ${fr('0.8·10','100')} = 0.08 m = 8 cm`)} האורך: ${m('20 + 8 = 28 cm')}.`,
+  `<b>סעיף ג.</b> ${m(`${dl} = 32 − 20 = 12 cm = 0.12 m`)}. ${M(`<i>m</i> = ${fr(`<i>k</i>${dl}`,'<i>g</i>')} = ${fr('100·0.12','10')} = 1.2 kg`)}`],
+  check:`ההתארכות יחסית למסה: ${m('0.5 kg')} נותנים ${m('5 cm')}, ${m('0.8 kg')} נותנים ${m('8 cm')}, ${m('1.2 kg')} נותנים ${m('12 cm')}. כל ${m('0.1 kg')} מוסיף סנטימטר אחד.`},
+ qs:[
+ {l:'b',t:'num',q:`קפיץ שהקבוע שלו ${m('200 N/m')} נמתח ב־${m('5 cm')}. מה גודל הכוח האלסטי?`,a:10,u:'N',s:`${m(`${Fsp} = <i>k</i>${dl} = 200·0.05 = 10 N`)}.`},
+ {l:'b',t:'num',q:`כוח של ${m('6 N')} מותח קפיץ ב־${m('3 cm')}. מה קבוע הקפיץ?`,a:200,u:'N/m',s:`${m(`<i>k</i> = ${fr(Fsp,dl)} = ${fr('6','0.03')} = 200 N/m`)}.`},
+ {l:'b',t:'mc',q:`מה מייצג השיפוע של גרף הכוח האלסטי כפונקציה של ההתארכות?`,o:['את האורך הרפוי של הקפיץ','את קבוע הקפיץ','את המסה שתלויה על הקפיץ','את אורך הקפיץ'],a:1,s:`${m(`${Fsp} = <i>k</i>${dl}`)} היא משוואה של קו ישר דרך הראשית, שהשיפוע שלו ${m('<i>k</i>')}.`},
+ {l:'b',t:'num',q:`תולים משקולת של ${m('0.2 kg')} על קפיץ שהקבוע שלו ${m('50 N/m')}. בכמה סנטימטרים מתארך הקפיץ?`,a:4,u:'cm',s:`${m(`${dl} = ${fr('<i>mg</i>','<i>k</i>')} = ${fr('2','50')} = 0.04 m = 4 cm`)}.`},
+ {l:'a',t:'num',q:`קפיץ שאורכו הרפוי ${m('15 cm')} והקבוע שלו ${m('80 N/m')} תלוי אנכית. מה אורכו כשתלויה עליו במנוחה משקולת של ${m('0.4 kg')}? (בסנטימטרים)`,a:20,u:'cm',s:`${m(`${dl} = ${fr('0.4·10','80')} = 0.05 m = 5 cm`)}.<br>האורך: ${m('15 + 5 = 20 cm')}.`},
+ {l:'a',t:'num',q:`גוף שמסתו ${m('2 kg')} מונח על משטח אופקי חלק ומחובר לקפיץ אופקי שהקבוע שלו ${m('100 N/m')}. מותחים את הקפיץ ב־${m('10 cm')} ומשחררים. מה תאוצת הגוף ברגע השחרור?`,a:5,u:'m/s²',s:`הכוח האלסטי הוא הכוח האופקי היחיד: ${m(`${Fsp} = 100·0.1 = 10 N`)}.<br>${m(`<i>a</i> = ${fr('10','2')} = 5 m/s<sup>2</sup>`)}. כשהקפיץ מתקצר הכוח קטן, ולכן התאוצה לא קבועה.`},
+ {l:'a',t:'num',q:`גוף שמסתו ${m('1 kg')} תלוי על קפיץ שהקבוע שלו ${m('250 N/m')}, בתוך מעלית שמאיצה כלפי מעלה בתאוצה של ${m('2.5 m/s<sup>2</sup>')}. הגוף במנוחה ביחס למעלית. בכמה סנטימטרים הקפיץ מתוח?`,a:5,u:'cm',s:`הגוף מאיץ יחד עם המעלית: ${m(`<i>k</i>${dl} − <i>mg</i> = <i>ma</i>`)}.<br>${m(`<i>k</i>${dl} = 1·(10 + 2.5) = 12.5 N`)}, ולכן ${m(`${dl} = ${fr('12.5','250')} = 0.05 m = 5 cm`)}. במעלית במנוחה ההתארכות הייתה רק ${m('4 cm')}.`}
+ ]},
+{id:'friction',title:'כוח החיכוך',sub:'חיכוך סטטי שמתאים את עצמו, וחיכוך קינטי קבוע',
+ intro:[
+ `<b>חיכוך</b> הוא כוח שמשטח מפעיל על גוף שנוגע בו. הוא מקביל למשטח, ומתנגד להחלקה של המשטחים זה על זה, או לנטייה שלהם להחליק.`,
+ `<b>חיכוך סטטי</b> פועל כשאין החלקה. הגודל שלו לא קבוע: הוא שווה בדיוק למה שנדרש כדי למנוע החלקה, עד לערך מרבי. לכן כותבים אותו כאי־שוויון: ${m(`<i>f</i><sub>s</sub> ≤ ${mus}<i>N</i>`)}.`,
+ `<b>חיכוך קינטי</b> פועל כשהגוף מחליק. הגודל שלו קבוע, ${m(`<i>f</i><sub>k</sub> = ${muk}<i>N</i>`)}, והכיוון שלו מנוגד לכיוון ההחלקה.`,
+ `${m(mus)} ו־${m(muk)} הם <b>מקדמי החיכוך</b>, מספרים בלי יחידות שתלויים בזוג המשטחים. בדרך כלל ${m(`${muk} &lt; ${mus}`)}: קל יותר להמשיך להחליק גוף מאשר להתחיל להזיז אותו.`,
+ `בנוסחאות מופיע <b>הכוח הנורמלי</b> ${m('<i>N</i>')}, לא ${m('<i>mg</i>')}. לפני שמחשבים חיכוך מוצאים את הנורמל מהמשוואה בציר שניצב למשטח.`],
+ formulas:[[`<i>f</i><sub>s</sub> ≤ ${mus}<i>N</i>`,'חיכוך סטטי: גדול כפי הנדרש, עד למקסימום'],[`<i>f</i><sub>s,max</sub> = ${mus}<i>N</i>`,'החיכוך הסטטי המרבי: על סף ההחלקה'],[`<i>f</i><sub>k</sub> = ${muk}<i>N</i>`,'חיכוך קינטי: קבוע, נגד כיוון ההחלקה']],
+ trap:[`החיכוך הסטטי שווה תמיד ל־μₛN?`,`לא. ${m(`${mus}<i>N</i>`)} הוא רק הערך <b>המרבי</b>. אם דוחפים ארגז כבד בכוח של ${m('10 N')} והוא לא זז, החיכוך הסטטי הוא בדיוק ${m('10 N')}, גם אם המקסימום האפשרי הוא ${m('50 N')}. את החיכוך הסטטי מוצאים מתנאי שיווי המשקל, ורק אחר כך בודקים שהוא לא עובר את המקסימום.`],
+ ex:{given:[`ארגז שמסתו ${m('10 kg')} מונח על רצפה אופקית`,`${m(`${mus} = 0.5`)}, ${m(`${muk} = 0.4`)}. מושכים את הארגז בכוח אופקי ${m('<i>F</i>')}`],ask:[`א. מה כוח החיכוך כאשר ${m('<i>F</i> = 30 N')}?`,`ב. מה הכוח המזערי שיזיז את הארגז?`,`ג. מה תאוצת הארגז כאשר ${m('<i>F</i> = 70 N')}?`,`ד. כשמהירות הארגז ${m('6 m/s')} מפסיקים למשוך. איזה מרחק הוא עובר עד שנעצר?`],
+  steps:[
+  `<b>הנורמל.</b> בציר האנכי אין תאוצה: ${m('<i>N</i> = <i>mg</i> = 100 N')}. מכאן ${m(`<i>f</i><sub>s,max</sub> = 0.5·100 = 50 N`)} ו־${m(`<i>f</i><sub>k</sub> = 0.4·100 = 40 N`)}.`,
+  `<b>סעיף א.</b> ${m('30 N')} קטן מהמקסימום ${m('50 N')}, ולכן הארגז נשאר במנוחה, והחיכוך הסטטי מאזן את ${m('<i>F</i>')}: ${m('<i>f</i><sub>s</sub> = 30 N')}.`,
+  `<b>סעיף ב.</b> הארגז זז כש־${m('<i>F</i>')} עובר את החיכוך הסטטי המרבי: ${m('<i>F</i> = 50 N')}.`,
+  `<b>סעיף ג.</b> הארגז מחליק, והחיכוך קינטי: ${M(`<i>F</i> − <i>f</i><sub>k</sub> = <i>ma</i> &nbsp;⟹&nbsp; <i>a</i> = ${fr('70 − 40','10')} = 3 m/s<sup>2</sup>`)}`,
+  `<b>סעיף ד.</b> עכשיו פועל בציר האופקי רק החיכוך הקינטי: ${m(`<i>a</i> = −${fr('40','10')} = −4 m/s<sup>2</sup>`)}. ${M(`0 = 6<sup>2</sup> + 2·(−4)·Δ<i>x</i> &nbsp;⟹&nbsp; Δ<i>x</i> = 4.5 m`)}`],
+  check:`בסעיף ד התאוצה היא ${m(`−${muk}<i>g</i> = −4 m/s<sup>2</sup>`)}, והיא לא תלויה במסת הארגז. בסימולציה אפשר לראות את הקפיצה של החיכוך מ־${m('50 N')} ל־${m('40 N')} ברגע שהארגז מתחיל להחליק.`},
+ qs:[
+ {l:'b',t:'num',q:`ארגז שמסתו ${m('20 kg')} מחליק על רצפה אופקית. מקדם החיכוך הקינטי ${m('0.3')}. מה גודל כוח החיכוך?`,a:60,u:'N',s:`${m('<i>N</i> = <i>mg</i> = 200 N')}, ${m(`<i>f</i><sub>k</sub> = ${muk}<i>N</i> = 0.3·200 = 60 N`)}.`},
+ {l:'b',t:'num',q:`ארגז שמסתו ${m('5 kg')} מונח על רצפה, ומקדם החיכוך הסטטי ${m('0.6')}. דוחפים אותו בכוח אופקי של ${m('12 N')}, והוא לא זז. מה גודל כוח החיכוך?`,a:12,u:'N',s:`הארגז במנוחה, ולכן החיכוך הסטטי מאזן את הדחיפה: ${m('12 N')}. המקסימום האפשרי, ${m('0.6·50 = 30 N')}, לא רלוונטי כאן.`},
+ {l:'b',t:'mc',q:`מה כיוון כוח החיכוך הקינטי שפועל על גוף שמחליק על משטח?`,o:['בכיוון התנועה של הגוף','מנוגד לכיוון ההחלקה של הגוף על המשטח','ניצב למשטח','תמיד כלפי מטה'],a:1,s:`החיכוך הקינטי מקביל למשטח ומתנגד להחלקה.`},
+ {l:'b',t:'num',q:`ארגז שמסתו ${m('8 kg')} מונח על רצפה אופקית, ומקדם החיכוך הסטטי ${m('0.5')}. מה הכוח האופקי המזערי שדרוש כדי להזיז אותו?`,a:40,u:'N',s:`${m(`<i>f</i><sub>s,max</sub> = ${mus}<i>N</i> = 0.5·80 = 40 N`)}.`},
+ {l:'a',t:'num',q:`דיסקית מחליקה על קרח במהירות התחלתית של ${m('8 m/s')} ונעצרת אחרי ${m('40 m')}. מה מקדם החיכוך הקינטי בינה לבין הקרח?`,a:.08,u:'',s:`<b>קינמטיקה:</b> ${m('0 = 8<sup>2</sup> + 2<i>a</i>·40')}, ולכן ${m('<i>a</i> = −0.8 m/s<sup>2</sup>')}.<br><b>דינמיקה:</b> הכוח האופקי היחיד הוא החיכוך: ${m(`${muk}<i>mg</i> = <i>m</i>|<i>a</i>|`)}, ולכן ${m(`${muk} = ${fr('0.8','10')} = 0.08`)}. המסה מצטמצמת.`},
+ {l:'a',t:'num',q:`מושכים ארגז שמסתו ${m('10 kg')} על רצפה אופקית בכוח של ${m('50 N')}, שיוצר זווית של ${m('37°')} מעל האופק. מקדם החיכוך הקינטי ${m('0.2')}. מה תאוצת הארגז? (${s37})`,a:2.6,u:'m/s²',s:`<b>אנכי:</b> ${m('<i>N</i> + 50·0.6 = 100')}, ולכן ${m('<i>N</i> = 70 N')}. הכוח המשופע מקטין את הנורמל.<br><b>חיכוך:</b> ${m('<i>f</i><sub>k</sub> = 0.2·70 = 14 N')}.<br><b>אופקי:</b> ${m('50·0.8 − 14 = 10<i>a</i>')}, ולכן ${m('<i>a</i> = 2.6 m/s<sup>2</sup>')}.`},
+ {l:'a',t:'num',q:`מכונית נוסעת במהירות ${m('20 m/s')} על כביש אופקי. מקדם החיכוך הסטטי בין הצמיגים לכביש ${m('0.8')}. מה מרחק הבלימה המזערי, בלי שהגלגלים יחליקו?`,a:25,u:'m',s:`הכוח הבולם הגדול ביותר הוא החיכוך הסטטי המרבי: ${m(`${mus}<i>mg</i> = <i>m</i>|<i>a</i>|`)}, ולכן ${m('|<i>a</i>| = 0.8·10 = 8 m/s<sup>2</sup>')}.<br>${m(`Δ<i>x</i> = ${fr('20<sup>2</sup>','2·8')} = 25 m`)}.`},
+ {l:'a',t:'mc',q:`ארגז מונח על רצפת משאית. המשאית מאיצה קדימה, והארגז לא מחליק. מה כיוון כוח החיכוך שפועל על הארגז?`,o:['קדימה, בכיוון התאוצה','אחורה, נגד כיוון התנועה','לא פועל עליו חיכוך','כלפי מעלה'],a:0,s:`הארגז מאיץ קדימה יחד עם המשאית, ולכן השקול עליו פונה קדימה. הכוח האופקי היחיד שפועל עליו הוא החיכוך הסטטי מרצפת המשאית, ולכן הוא פונה <b>קדימה</b>. החיכוך מתנגד להחלקה של הארגז אחורה ביחס למשאית.`}
+ ]},
+{id:'incline',title:'מישור משופע',sub:'צירים לאורך המדרון, ופירוק של כוח הכובד',
+ intro:[
+ `על מישור משופע הגוף נע לאורך המדרון. לכן בוחרים <b>ציר x לאורך המדרון</b> וציר y ניצב לו. כך התאוצה כולה בציר x, ובציר y השקול אפס.`,
+ `בצירים האלה הנורמל והחיכוך כבר מונחים על הצירים, ורק את <b>כוח הכובד</b> צריך לפרק. הרכיב שלאורך המדרון, במורד, הוא ${m(`<i>mg</i> sin${th}`)}. הרכיב שניצב למדרון הוא ${m(`<i>mg</i> cos${th}`)}.`,
+ `מהציר הניצב: ${m(`<i>N</i> = <i>mg</i> cos${th}`)} (כשאין כוחות נוספים בציר הזה). ככל שהמדרון תלול יותר, הנורמל קטן יותר.`,
+ `<b>מדרון חלק:</b> ${m(`<i>a</i> = <i>g</i> sin${th}`)}, במורד המדרון. התאוצה לא תלויה במסה.`,
+ `<b>עם חיכוך:</b> גוף שמחליק במורד מאיץ ב־${m(`<i>a</i> = <i>g</i>(sin${th} − ${muk}cos${th})`)}. גוף שעולה במעלה המדרון מאט חזק יותר, כי גם רכיב הכובד וגם החיכוך פונים במורד. גוף שמונח על המדרון נשאר במנוחה כל עוד ${m(`tan${th} ≤ ${mus}`)}.`],
+ formulas:[[`<i>mg</i> sin${th}`,'רכיב כוח הכובד לאורך המדרון'],[`<i>N</i> = <i>mg</i> cos${th}`,'הכוח הנורמלי'],[`<i>a</i> = <i>g</i> sin${th}`,'תאוצה על מדרון חלק'],[`<i>a</i> = <i>g</i>(sin${th} − ${muk}cos${th})`,'החלקה במורד מדרון עם חיכוך'],[`tan${th} = ${mus}`,'הזווית שבה גוף מתחיל להחליק']],
+ trap:[`גם על מדרון הנורמל שווה ל־mg?`,`לא. על מדרון הנורמל מאזן רק את הרכיב של כוח הכובד שניצב למדרון, ולכן ${m(`<i>N</i> = <i>mg</i> cos${th}`)}, פחות מ־${m('<i>mg</i>')}. מכאן שגם החיכוך על מדרון קטן יותר מאשר על משטח אופקי: ${m(`<i>f</i><sub>k</sub> = ${muk}<i>mg</i> cos${th}`)}.`],
+ ex:{given:[`ארגז שמסתו ${m('2 kg')} משוחרר ממנוחה על מדרון שזוויתו ${m('37°')}`,`${m(`${mus} = 0.4`)}, ${m(`${muk} = 0.25`)}, ${s37}`],ask:[`א. האם הארגז יחליק?`,`ב. מה הכוח הנורמלי ומה כוח החיכוך?`,`ג. מה תאוצת הארגז?`,`ד. מה מהירותו אחרי שהחליק ${m('2 m')} לאורך המדרון?`],
+  steps:[
+  `<b>סעיף א.</b> ${m('tan37° = 0.75')}, וזה גדול מ־${m(`${mus} = 0.4`)}. החיכוך הסטטי לא מסוגל להחזיק את הארגז, והוא מחליק.`,
+  `<b>סעיף ב.</b> ציר y ניצב למדרון: ${M('<i>N</i> = <i>mg</i> cos37° = 20·0.8 = 16 N')} ${M(`<i>f</i><sub>k</sub> = ${muk}<i>N</i> = 0.25·16 = 4 N`)} החיכוך פונה במעלה המדרון.`,
+  `<b>סעיף ג.</b> ציר x במורד המדרון: ${M(`<i>mg</i> sin37° − <i>f</i><sub>k</sub> = <i>ma</i> &nbsp;⟹&nbsp; <i>a</i> = ${fr('12 − 4','2')} = 4 m/s<sup>2</sup>`)}`,
+  `<b>סעיף ד.</b> ${M(`<i>v</i><sup>2</sup> = 0 + 2·4·2 = 16 &nbsp;⟹&nbsp; <i>v</i> = 4 m/s`)}`],
+  check:`לפי הנוסחה הכללית: ${m('<i>a</i> = 10·(0.6 − 0.25·0.8) = 4 m/s<sup>2</sup>')}. על מדרון חלק התאוצה הייתה ${m('6 m/s<sup>2</sup>')}, כך שהחיכוך הקטין אותה.`},
+ qs:[
+ {l:'b',t:'num',q:`גוף שמסתו ${m('5 kg')} נמצא על מדרון שזוויתו ${m('30°')}. מה גודל הרכיב של כוח הכובד לאורך המדרון?`,a:25,u:'N',s:`${m(`<i>mg</i> sin30° = 50·0.5 = 25 N`)}.`},
+ {l:'b',t:'num',q:`גוף שמסתו ${m('4 kg')} נמצא על מדרון שזוויתו ${m('60°')}. מה גודל הכוח הנורמלי?`,a:20,u:'N',s:`${m(`<i>N</i> = <i>mg</i> cos60° = 40·0.5 = 20 N`)}.`},
+ {l:'b',t:'num',q:`מה תאוצת גוף שמחליק על מדרון חלק שזוויתו ${m('30°')}?`,a:5,u:'m/s²',s:`${m(`<i>a</i> = <i>g</i> sin30° = 10·0.5 = 5 m/s<sup>2</sup>`)}.`},
+ {l:'b',t:'mc',q:`שני גופים שמסותיהם שונות מחליקים על אותו מדרון חלק. מה נכון?`,o:['הגוף הכבד מאיץ יותר','הגוף הקל מאיץ יותר','לשניהם אותה תאוצה','זה תלוי באורך המדרון'],a:2,s:`${m(`<i>a</i> = <i>g</i> sin${th}`)}. המסה מצטמצמת: כוח גדול יותר פועל על מסה גדולה יותר באותו יחס.`},
+ {l:'a',t:'num',q:`גוף מונח על לוח. מגדילים בהדרגה את זווית הלוח, והגוף מתחיל להחליק כשהזווית מגיעה ל־${m('35°')}. מה מקדם החיכוך הסטטי?`,a:.7,u:'',s:`על סף ההחלקה ${m(`<i>mg</i> sin${th} = ${mus}<i>mg</i> cos${th}`)}, ולכן ${m(`${mus} = tan35° = 0.70`)}.`},
+ {l:'a',t:'num',q:`גוף נשלח במעלה מדרון חלק שזוויתו ${m('30°')}, במהירות התחלתית של ${m('10 m/s')}. איזה מרחק הוא עובר לאורך המדרון עד שנעצר לרגע?`,a:10,u:'m',s:`ציר במעלה המדרון: ${m('<i>a</i> = −<i>g</i> sin30° = −5 m/s<sup>2</sup>')}.<br>${m(`0 = 10<sup>2</sup> − 2·5·Δ<i>x</i>`)}, ולכן ${m('Δ<i>x</i> = 10 m')}.`},
+ {l:'a',t:'num',q:`גוף מחליק במורד מדרון שזוויתו ${m('53°')}. מקדם החיכוך הקינטי ${m('0.5')}. מה תאוצתו? (${m('sin53° = 0.8')}, ${m('cos53° = 0.6')})`,a:5,u:'m/s²',s:`${m(`<i>a</i> = <i>g</i>(sin${th} − ${muk}cos${th}) = 10·(0.8 − 0.5·0.6) = 5 m/s<sup>2</sup>`)}.`},
+ {l:'a',t:'num',q:`מושכים גוף שמסתו ${m('3 kg')} במעלה מדרון חלק שזוויתו ${m('30°')}, <b>במהירות קבועה</b>, בכוח שמקביל למדרון. מה גודל הכוח?`,a:15,u:'N',s:`מהירות קבועה, ולכן השקול לאורך המדרון אפס: ${m('<i>F</i> = <i>mg</i> sin30° = 30·0.5 = 15 N')}. זה רק חצי מהמשקל: זה היתרון של מישור משופע.`}
+ ]},
+{id:'tension',title:'מתיחות ומערכות גופים',sub:'חוט שמקשר בין גופים: אותה מתיחות ואותו גודל תאוצה',
+ intro:[
+ `חוט מתוח מושך את הגוף שקשור אליו בכוח שנקרא <b>מתיחות</b>, ${m('<i>T</i>')}. הכוח פועל לאורך החוט, ותמיד מושך. חוט לא יכול לדחוף.`,
+ `בשאלות מניחים <b>חוט אידיאלי</b> (חסר מסה, לא מתארך) ו<b>גלגלת אידיאלית</b> (חסרת מסה וחיכוך). מכאן שתי מסקנות: המתיחות שווה לכל אורך החוט, ולכל הגופים שקשורים בו יש אותו גודל תאוצה.`,
+ `<b>שיטת הפתרון:</b> מציירים תרשים כוחות נפרד לכל גוף. לכל גוף בוחרים ציר בכיוון התנועה שלו, וכותבים את החוק השני. מקבלים שתי משוואות עם שני נעלמים, ${m('<i>a</i>')} ו־${m('<i>T</i>')}. כשמחברים את המשוואות, המתיחות מצטמצמת.`,
+ `<b>בדיקה מהירה:</b> מתייחסים לכל המערכת כאל גוף אחד. התאוצה שווה לסכום הכוחות החיצוניים שלאורך כיוון התנועה, חלקי סכום המסות.`,
+ `כשגוף תלוי מאיץ כלפי מטה, המתיחות בחוט <b>קטנה</b> מכוח הכובד שלו. הן שוות רק כשהתאוצה אפס.`],
+ formulas:[[`<i>m</i><sub>2</sub><i>g</i> − <i>T</i> = <i>m</i><sub>2</sub><i>a</i>`,'הגוף התלוי (ציר כלפי מטה)'],[`<i>T</i> − <i>f</i> = <i>m</i><sub>1</sub><i>a</i>`,'הגוף שעל השולחן'],[`<i>a</i> = ${fr('<i>m</i><sub>2</sub><i>g</i> − <i>f</i>','<i>m</i><sub>1</sub> + <i>m</i><sub>2</sub>')}`,'מתקבל מחיבור שתי המשוואות'],[`<i>a</i> = ${fr('(<i>m</i><sub>2</sub> − <i>m</i><sub>1</sub>)<i>g</i>','<i>m</i><sub>1</sub> + <i>m</i><sub>2</sub>')}`,'שני גופים תלויים משני צידי גלגלת']],
+ trap:[`המתיחות שווה למשקל של הגוף התלוי?`,`רק כשהמערכת במנוחה או נעה במהירות קבועה. אם הגוף התלוי מאיץ כלפי מטה, השקול עליו פונה מטה, ולכן ${m('<i>T</i> &lt; <i>m</i><sub>2</sub><i>g</i>')}. טעות נפוצה היא להציב ${m('<i>T</i> = <i>m</i><sub>2</sub><i>g</i>')} במשוואה של הגוף שעל השולחן, ולקבל תאוצה גדולה מדי.`],
+ ex:{given:[`גוף 1, שמסתו ${m('3 kg')}, מונח על שולחן אופקי. ${m(`${muk} = 0.2`)}`,`הוא קשור בחוט, דרך גלגלת בקצה השולחן, לגוף 2 תלוי שמסתו ${m('2 kg')}`,`המערכת משוחררת ממנוחה ומתחילה לנוע`],ask:[`א. מה תאוצת המערכת?`,`ב. מה המתיחות בחוט?`,`ג. מה מהירות הגופים אחרי שגוף 2 ירד ${m('1.4 m')}?`],
+  steps:[
+  `<b>גוף 1.</b> אנכי: ${m('<i>N</i> = <i>m</i><sub>1</sub><i>g</i> = 30 N')}, ולכן ${m('<i>f</i><sub>k</sub> = 0.2·30 = 6 N')}. אופקי, ציר לכיוון הגלגלת: ${M('<i>T</i> − 6 = 3<i>a</i>')}`,
+  `<b>גוף 2.</b> ציר כלפי מטה: ${M('20 − <i>T</i> = 2<i>a</i>')}`,
+  `<b>סעיף א.</b> מחברים את שתי המשוואות, והמתיחות מצטמצמת: ${M(`20 − 6 = 5<i>a</i> &nbsp;⟹&nbsp; <i>a</i> = 2.8 m/s<sup>2</sup>`)}`,
+  `<b>סעיף ב.</b> מציבים במשוואה של גוף 2: ${M('<i>T</i> = 20 − 2·2.8 = 14.4 N')}`,
+  `<b>סעיף ג.</b> ${M('<i>v</i><sup>2</sup> = 0 + 2·2.8·1.4 = 7.84 &nbsp;⟹&nbsp; <i>v</i> = 2.8 m/s')}`],
+  check:`במשוואה של גוף 1: ${m('14.4 − 6 = 8.4 N = 3·2.8')}. המתיחות (${m('14.4 N')}) קטנה מכוח הכובד על גוף 2 (${m('20 N')}), כצפוי כשהוא מאיץ מטה.`},
+ qs:[
+ {l:'b',t:'num',q:`שני גופים, ${m('2 kg')} ו־${m('3 kg')}, קשורים זה לזה בחוט ומונחים על משטח אופקי חלק. מושכים את הגוף של ${m('3 kg')} בכוח אופקי של ${m('20 N')}, כך שהחוט מתוח. מה תאוצת הגופים?`,a:4,u:'m/s²',s:`שני הגופים נעים יחד: ${m(`<i>a</i> = ${fr('20','2 + 3')} = 4 m/s<sup>2</sup>`)}.`},
+ {l:'b',t:'num',q:`בהמשך לשאלה הקודמת: מה המתיחות בחוט שבין שני הגופים?`,a:8,u:'N',s:`החוט הוא הכוח האופקי היחיד על הגוף של ${m('2 kg')}: ${m('<i>T</i> = 2·4 = 8 N')}.`},
+ {l:'b',t:'mc',q:`חוט אידיאלי עובר על גלגלת אידיאלית, ובכל קצה שלו קשור גוף. מה נכון לגבי המתיחות בשני צידי הגלגלת?`,o:['היא שווה בשני הצדדים','היא גדולה יותר בצד של הגוף הכבד','היא גדולה יותר בצד של הגוף הקל','היא שווה רק כשהמערכת במנוחה'],a:0,s:`בחוט אידיאלי ובגלגלת אידיאלית המתיחות שווה לכל אורך החוט, גם כשהמערכת מאיצה.`},
+ {l:'b',t:'num',q:`גוף שמסתו ${m('4 kg')} תלוי במנוחה על חוט אנכי. מה המתיחות בחוט?`,a:40,u:'N',s:`שיווי משקל: ${m('<i>T</i> = <i>mg</i> = 40 N')}.`},
+ {l:'a',t:'num',q:`שני גופים, ${m('3 kg')} ו־${m('2 kg')}, תלויים משני צידיה של גלגלת אידיאלית ומשוחררים. מה גודל התאוצה שלהם?`,a:2,u:'m/s²',s:`${m(`<i>a</i> = ${fr('(3 − 2)·10','3 + 2')} = 2 m/s<sup>2</sup>`)}. הכבד יורד והקל עולה.`},
+ {l:'a',t:'num',q:`בהמשך לשאלה הקודמת: מה המתיחות בחוט?`,a:24,u:'N',s:`לגוף הקל, ציר כלפי מעלה: ${m('<i>T</i> − 20 = 2·2')}, ולכן ${m('<i>T</i> = 24 N')}. בדיקה בגוף הכבד: ${m('30 − 24 = 6 N = 3·2')}. המתיחות נמצאת בין שני המשקלים.`},
+ {l:'a',t:'num',q:`גוף שמסתו ${m('4 kg')} מונח על שולחן אופקי <b>חלק</b>, וקשור בחוט דרך גלגלת לגוף תלוי שמסתו ${m('1 kg')}. מה המתיחות בחוט בזמן התנועה?`,a:8,u:'N',s:`${m(`<i>a</i> = ${fr('1·10','4 + 1')} = 2 m/s<sup>2</sup>`)}.<br>החוט הוא הכוח האופקי היחיד על הגוף שעל השולחן: ${m('<i>T</i> = 4·2 = 8 N')}, פחות ממשקל הגוף התלוי (${m('10 N')}).`},
+ {l:'a',t:'num',q:`מעלית שמסתה ${m('500 kg')} תלויה על כבל, ומאיצה כלפי מעלה בתאוצה של ${m('1.5 m/s<sup>2</sup>')}. מה המתיחות בכבל?`,a:5750,u:'N',s:`ציר כלפי מעלה: ${m('<i>T</i> − <i>mg</i> = <i>ma</i>')}, ולכן ${m('<i>T</i> = 500·(10 + 1.5) = 5750 N')}.`}
+ ]}
+];
+
+/* ---------- solving tips per topic ---------- */
+const TIPS={
+force:[
+ `<b>מתחילים מתרשים כוחות:</b> מציירים את הגוף, ולכל כוח חץ שיוצא ממנו, עם שם. לכל כוח שואלים "מי מפעיל אותו?". אם אין תשובה, הכוח לא קיים.`,
+ `<b>בוחרים צירים</b> לפני שמפרקים. בחירה טובה היא כזו שרוב הכוחות מונחים בה על הצירים.`,
+ `<b>סימן הרכיב נקבע לפי הכיוון:</b> רכיב שפונה לכיוון השלילי של הציר מקבל מינוס.`,
+ `<b>שמים לב מאיפה נמדדת הזווית.</b> אם היא נמדדת מציר x, הרכיב בציר x הוא עם cos. אם היא נמדדת מציר y, התפקידים מתחלפים.`,
+ `<b>בדיקה:</b> גודל השקול של שני כוחות נמצא תמיד בין ההפרש שלהם לסכום שלהם.`],
+law1:[
+ `<b>מילות מפתח:</b> "במנוחה", "במהירות קבועה", "בשיווי משקל". כולן מתורגמות ל־${m(`${SF} = 0`)}.`,
+ `<b>שתי משוואות:</b> ${m(`${SF}<sub>x</sub> = 0`)} ו־${m(`${SF}<sub>y</sub> = 0`)}. לכן אפשר למצוא לכל היותר שני כוחות לא ידועים.`,
+ `<b>גוף שתלוי בכמה חוטים:</b> את תרשים הכוחות מציירים על נקודת הקשר, שם נפגשים כל החוטים.`,
+ `<b>בודקים מאיפה נמדדת הזווית:</b> מהאופק, מהתקרה או מהאנך. זה קובע איפה sin ואיפה cos.`,
+ `<b>מהירות קבועה היא לא "כוח קבוע".</b> אם המהירות קבועה, הכוחות מאוזנים.`],
+law2:[
+ `<b>סדר העבודה:</b> תרשים כוחות, בחירת ציר בכיוון התאוצה, משוואת ${m(`${SF} = <i>ma</i>`)} בכל ציר, ואז פתרון.`,
+ `<b>בצד שמאל של המשוואה כותבים רק כוחות אמיתיים.</b> ${m('<i>ma</i>')} הוא לא כוח, ולא מציירים אותו בתרשים.`,
+ `<b>כוח בכיוון הציר מקבל פלוס,</b> וכוח נגד כיוון הציר מקבל מינוס.`,
+ `<b>שאלה שמשלבת תנועה וכוחות:</b> התאוצה היא הגשר. מהכוחות לתאוצה ומשם לקינמטיקה, או להפך.`,
+ `<b>כוח שפועל בזווית:</b> מפרקים אותו. הרכיב שלאורך כיוון התנועה מאיץ, והרכיב הניצב משנה את הנורמל.`,
+ `<b>כשהכוחות משתנים באמצע התנועה,</b> מחלקים לשלבים. לכל שלב תאוצה משלו.`],
+law3:[
+ `<b>מנסחים במילים:</b> "הכוח ש־א מפעיל על ב". הכוח השני בזוג מתקבל מהחלפת א ו־ב.`,
+ `<b>שני כוחות שפועלים על אותו גוף אינם זוג</b> של החוק השלישי, גם אם הם שווים והפוכים.`,
+ `<b>גופים צמודים:</b> את התאוצה מוצאים מהמערכת כולה, ואת כוח המגע מתרשים כוחות של אחד הגופים בלבד.`,
+ `<b>בוחרים את הגוף הנוח:</b> כדי למצוא כוח מגע, כותבים את החוק השני לגוף שפועלים עליו פחות כוחות.`,
+ `<b>כוחות שווים, תאוצות שונות:</b> אחרי שמצאתם את הכוח, מחלקים במסה של כל גוף בנפרד.`],
+weight:[
+ `<b>כוח הכובד נמצא בכל תרשים כוחות,</b> תמיד כלפי מטה, תמיד ${m('<i>mg</i>')}, גם כשהגוף מאיץ.`,
+ `<b>את הנורמל לא מנחשים.</b> כותבים את החוק השני בציר שניצב למשטח, ופותרים.`,
+ `<b>"מה מראה המשקל?"</b> פירושו "מה גודל הכוח הנורמלי?".`,
+ `<b>במעלית קובעים קודם את כיוון התאוצה,</b> לא את כיוון התנועה. "עולה ומאטה" פירושו תאוצה כלפי מטה.`,
+ `<b>כוח אנכי נוסף</b> (לחיצה מלמעלה, משיכה בחוט, רכיב אנכי של כוח משופע) משנה את הנורמל.`],
+spring:[
+ `<b>ממירים סנטימטרים למטרים</b> לפני שמציבים בחוק הוק, כי ${m('<i>k</i>')} נתון ב־${m('N/m')}.`,
+ `<b>מבחינים בין אורך להתארכות.</b> אם נתון אורך הקפיץ, מחסרים ממנו את האורך הרפוי.`,
+ `<b>גוף תלוי במנוחה:</b> ${m(`<i>k</i>${dl} = <i>mg</i>`)}. אם הגוף מאיץ, כותבים חוק שני מלא.`,
+ `<b>מגרף של כוח כפונקציה של התארכות:</b> קבוע הקפיץ הוא השיפוע. בוחרים שתי נקודות רחוקות על הקו.`,
+ `<b>שאלות יחס:</b> ההתארכות יחסית לכוח. כוח כפול נותן התארכות כפולה.`],
+friction:[
+ `<b>קודם קובעים אם הגוף מחליק.</b> אם כן, החיכוך קינטי, ${m(`${muk}<i>N</i>`)}. אם לא, החיכוך סטטי, ומוצאים אותו משיווי משקל.`,
+ `<b>לא בטוחים?</b> מניחים שהגוף במנוחה, מחשבים איזה חיכוך נדרש, ומשווים למקסימום ${m(`${mus}<i>N</i>`)}.`,
+ `<b>מוצאים את N לפני החיכוך.</b> כוח שפועל בזווית משנה את הנורמל, ולכן גם את החיכוך.`,
+ `<b>כיוון החיכוך:</b> נגד ההחלקה, או נגד הכיוון שבו הגוף היה מחליק בלי חיכוך. זה לא תמיד נגד כיוון התנועה של הגוף.`,
+ `<b>גוף שמחליק ונעצר על משטח אופקי:</b> ${m(`|<i>a</i>| = ${muk}<i>g</i>`)}, בלי תלות במסה.`,
+ `<b>"הכוח המזערי להזזה"</b> ו"על סף ההחלקה" פירושם שהחיכוך הסטטי בערכו המרבי.`],
+incline:[
+ `<b>צירים:</b> x לאורך המדרון ו־y ניצב לו. רק את כוח הכובד צריך לפרק.`,
+ `<b>sin לאורך המדרון, cos בניצב לו.</b> בדיקה: כשהזווית אפס, אין רכיב לאורך המדרון, ואכן ${m('sin0° = 0')}.`,
+ `<b>מציינים במפורש את הכיוון החיובי</b> של ציר x: במורד או במעלה המדרון.`,
+ `<b>כיוון החיכוך תלוי בכיוון התנועה:</b> גוף שיורד מרגיש חיכוך במעלה המדרון, וגוף שעולה מרגיש חיכוך במורד.`,
+ `<b>עלייה ואחריה ירידה על מדרון עם חיכוך:</b> שתי תאוצות שונות, ולכן שני שלבים נפרדים.`,
+ `<b>האם הגוף יחליק?</b> משווים את ${m(`tan${th}`)} ל־${m(mus)}.`],
+tension:[
+ `<b>תרשים כוחות נפרד לכל גוף.</b> לא מציירים את כל המערכת בתרשים אחד.`,
+ `<b>לכל גוף ציר בכיוון התנועה שלו.</b> כך לשני הגופים אותה תאוצה, באותו סימן.`,
+ `<b>אותה אות T בשתי המשוואות.</b> מחברים אותן, והמתיחות מצטמצמת.`,
+ `<b>לא מציבים ${m('<i>T</i> = <i>mg</i>')}</b> לגוף תלוי שמאיץ.`,
+ `<b>בדיקה:</b> התאוצה שווה לסכום הכוחות החיצוניים לאורך התנועה, חלקי המסה הכוללת. אחר כך מציבים את ${m('<i>a</i>')} בשתי המשוואות ומוודאים שמתקבלת אותה מתיחות.`,
+ `<b>אם יש חיכוך סטטי,</b> בודקים קודם אם המערכת בכלל זזה.`]
+};
+
+/* ---------- rendering ---------- */
+const app=document.getElementById('app');
+function topicStats(t){const b=t.qs.filter(q=>q.l==='b'),a=t.qs.filter(q=>q.l==='a');const s=l=>l.filter(q=>solved[t.id+'-'+t.qs.indexOf(q)]).length;return{b:b.length,a:a.length,sb:s(b),sa:s(a)}}
+function home(){
+  app.innerHTML=`<div class="wrap"><section class="hero"><div><div class="eyebrow">פיזיקה 5 יח״ל · מכניקה · דינמיקה</div><h1>כוחות וחוקי <span class="p">ניוטון</span></h1><p class="lead">יחידת לימוד בדינמיקה: שקול כוחות, שלושת חוקי ניוטון, כובד ונורמל, קפיץ, חיכוך, מישור משופע ומערכות גופים. בכל נושא יש הסבר קצר, סימולציה עם תרשים כוחות, דוגמה פתורה צעד אחר צעד, ושאלות תרגול בשתי רמות: בסיסית ומתקדמת.</p><div class="cta"><a class="btn pri" href="#force">להתחיל משקול כוחות</a><a class="btn" href="#formulas">דף הנוסחאות</a></div></div>
+  <figure class="hfig"><div class="stage"><canvas style="cursor:ns-resize" aria-label="ארגז על מישור משופע עם הכוחות שפועלים עליו"></canvas><span class="hint">גררו למעלה ולמטה כדי לשנות את הזווית</span></div><figcaption>ארגז על מישור משופע. כוח הכובד (כחול) מתפרק לרכיב לאורך המדרון ולרכיב ניצב לו. הנורמל בירוק, והחיכוך בכתום.</figcaption></figure></section>
+  <div class="secth"><h2>הנושאים לפי סדר הלימוד</h2><span>ההתקדמות נשמרת בדפדפן הזה</span></div>
+  <div class="tg">${T.map((t,i)=>{const s=topicStats(t);return `<a class="tc" href="#${t.id}"><span class="tn">${i+1}</span><b>${t.title}</b><span class="ts">${t.sub}</span><span class="pg"><span>בסיסיות <em>${s.sb}/${s.b}</em></span><span>מתקדמות <em>${s.sa}/${s.a}</em></span></span></a>`}).join('')}</div></div>`;
+  const st={th:30,m:2,us:.3,uk:.2},cv=app.querySelector('canvas');const c=Canvas(cv,(ctx,t,o)=>inclDraw(ctx,t,o,st,true));
+  let dr=false;const mv=e=>{const r=cv.getBoundingClientRect();st.th=Math.round(Math.max(5,Math.min(55,60*(1-(e.clientY-r.top)/r.height))));c.draw()};
+  cv.addEventListener('pointerdown',e=>{dr=true;cv.setPointerCapture(e.pointerId);mv(e);e.preventDefault()});cv.addEventListener('pointermove',e=>dr&&mv(e));cv.addEventListener('pointerup',()=>dr=false);cv.addEventListener('pointercancel',()=>dr=false);
+}
+function formulas(){
+  const rows=[
+  ['גודל כוח הכבידה',`<i>F</i> = <i>mg</i>`,'weight'],
+  ['חוק הוק (גודל הכוח האלסטי)',`${Fsp} = <i>k</i>${dl}`,'spring'],
+  ['גודל כוח החיכוך הסטטי',`<i>f</i><sub>s</sub> ≤ ${mus}<i>N</i>`,'friction'],
+  ['גודל כוח החיכוך הקינטי',`<i>f</i><sub>k</sub> = ${muk}<i>N</i>`,'friction'],
+  ['החוק השני של ניוטון',`Σ${vec('F')} = <i>m</i>${vec('a')}`,'law2'],
+  ['החוק השלישי של ניוטון',`${vec('F')}<sub>1,2</sub> = −${vec('F')}<sub>2,1</sub>`,'law3']];
+  const tt=id=>T.find(t=>t.id===id).title;
+  app.innerHTML=`<div class="wrap"><div class="th"><a class="crumb" href="#">כל הנושאים</a><h1>דף הנוסחאות</h1><p>הנוסחאות של "דינמיקה" כפי שהן מופיעות בדף "נוסחאות ונתונים בפיזיקה" לבחינת הבגרות, עם קישור לנושא שבו משתמשים בכל אחת.</p></div>
+  <div class="tscroll"><table class="ftab"><tbody>${rows.map(r=>`<tr><td>${r[0]}<small><a href="#${r[2]}">← ${tt(r[2])}</a></small></td><td class="fx">${M(r[1])}</td></tr>`).join('')}</tbody></table></div>
+  <div class="secth"><h2>תוצאות שכדאי לזכור</h2><span>נובעות מהנוסחאות שלמעלה, ואינן מופיעות בדף</span></div>
+  <div class="fgrid" style="margin-top:14px"><div class="fc">${M(`${SF} = 0`)}<small>החוק הראשון: מנוחה או מהירות קבועה</small></div><div class="fc">${M(`<i>N</i> = <i>m</i>(<i>g</i> + <i>a</i>)`)}<small>הנורמל במעלית (ציר כלפי מעלה)</small></div><div class="fc">${M(`<i>N</i> = <i>mg</i> cos${th}`)}<small>הנורמל על מישור משופע</small></div><div class="fc">${M(`<i>a</i> = <i>g</i> sin${th}`)}<small>תאוצה על מדרון חלק</small></div><div class="fc">${M(`<i>a</i> = <i>g</i>(sin${th} − ${muk}cos${th})`)}<small>החלקה במורד מדרון עם חיכוך</small></div><div class="fc">${M(`tan${th} = ${mus}`)}<small>הזווית שבה גוף מתחיל להחליק</small></div><div class="fc">${M('<i>g</i> = 10 m/s<sup>2</sup>')}<small>בחישובים ביחידה הזו (ערך מדויק יותר: 9.8)</small></div><div class="fc">${M('sin37° = 0.6 , cos37° = 0.8')}<small>ובהתאמה ${m('sin53° = 0.8')}, ${m('cos53° = 0.6')}</small></div></div></div>`;
+}
+let curTab='learn';
+function topic(id,tab){
+  const i=T.findIndex(t=>t.id===id),t=T[i];curTab=tab||'learn';
+  const tabs=[['learn','הסבר'],['sim','סימולציה'],['ex','דוגמה פתורה'],['qs','תרגול']];
+  app.innerHTML=`<div class="wrap"><div class="th"><a class="crumb" href="#">כל הנושאים</a><h1>${i+1}. ${t.title}</h1><p>${t.sub}</p></div>
+  <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button class="tab" role="tab" data-t="${k}" aria-selected="${k===curTab}">${l}</button>`).join('')}</div>
+  <div class="panel" id="panel"></div>
+  <nav class="pn">${i>0?`<a class="btn" href="#${T[i-1].id}">→ ${T[i-1].title}</a>`:'<span></span>'}${i<T.length-1?`<a class="btn pri" href="#${T[i+1].id}">${T[i+1].title} ←</a>`:`<a class="btn pri" href="#formulas">לדף הנוסחאות ←</a>`}</nav></div>`;
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{curTab=b.dataset.t;app.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===b));panel(t,curTab)});
+  panel(t,curTab);
+}
+function panel(t,tab,preset){
+  killScenes();const p=document.getElementById('panel');
+  if(tab==='learn'){p.innerHTML=`<div class="prose">${t.intro.map(x=>`<p>${x}</p>`).join('')}</div>${t.formulas.length?`<div><h2>הנוסחאות בנושא</h2><div class="fgrid">${t.formulas.map(f=>`<div class="fc">${M(f[0])}<small>${f[1]}</small></div>`).join('')}</div></div>`:''}${TIPS[t.id]?`<div class="tips"><h2>טיפים לפתרון</h2><ul>${TIPS[t.id].map(x=>`<li>${x}</li>`).join('')}</ul></div>`:''}<div class="trap"><h2>${t.trap[0]}</h2><p>${t.trap[1]}</p></div><div><button class="btn pri" data-go="sim">לסימולציה ←</button></div>`}
+  if(tab==='sim'){p.innerHTML='<div class="panel" style="padding:0" id="simhost"></div>';SIMS[t.id](p.querySelector('#simhost'),preset)}
+  if(tab==='ex'){const e=t.ex;p.innerHTML=`<article class="ex"><div class="gf"><div><h3>נתונים</h3>${e.given.map(g=>`<p>${g}</p>`).join('')}</div><div><h3>מבוקש</h3>${e.ask.map(g=>`<p>${g}</p>`).join('')}</div></div><div><h3>פתרון</h3><ol class="steps">${e.steps.map(s=>`<li>${s}</li>`).join('')}</ol></div><div class="chk"><h3>בדיקה</h3><p>${e.check}</p></div></article><div><button class="btn pri" data-pre="1">פתיחת הדוגמה בסימולציה ←</button></div>`}
+  if(tab==='qs')practice(t,p);
+  p.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>setTab(t,b.dataset.go));
+  p.querySelectorAll('[data-pre]').forEach(b=>b.onclick=()=>setTab(t,'sim',true));
+}
+function setTab(t,k,preset){curTab=k;app.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x.dataset.t===k));panel(t,k,preset);document.querySelector('.tabs').scrollIntoView({block:'nearest'})}
+function practice(t,p){
+  const lv=[['b','שאלות בסיסיות','הבנת המושגים והצבה ישירה'],['a','שאלות מתקדמות','ברמת בגרות, משלבות כמה רעיונות']];
+  p.innerHTML=`<div class="score" id="score"></div>`+lv.map(([l,h,s])=>`<section class="panel" style="padding:0;gap:14px" data-l="${l}"><div class="lvl"><h2>${h}</h2><span>${s}</span></div></section>`).join('')+`<p class="note">בשאלות חישוב כותבים מספר בלבד, עם סימן מינוס כשצריך, למשל <span class="mx">37.5</span> או <span class="mx">0.08</span>. תשובה נחשבת נכונה בטווח של 3%. בכל השאלות <span class="mx"><i>g</i> = 10 m/s<sup>2</sup></span>, <span class="mx">sin37° = 0.6</span> ו־<span class="mx">cos37° = 0.8</span>.</p>`;
+  const upd=()=>{const s=topicStats(t);p.querySelector('#score').innerHTML=`נפתרו: בסיסיות ${s.sb}/${s.b} · מתקדמות ${s.sa}/${s.a}`};upd();
+  const n={b:0,a:0};
+  t.qs.forEach((q,qi)=>{const id=t.id+'-'+qi;n[q.l]++;const box=el(`<div class="q ${q.l==='a'?'adv':''}"><div class="qn"><span>${q.l==='a'?'מתקדמת':'בסיסית'} ${n[q.l]}</span><span class="st ${solved[id]?'ok':''}">${solved[id]?'✓ נפתרה':''}</span></div><p>${q.q}</p>${q.fig?q.fig():''}</div>`);
+    const st=box.querySelector('.st');const good=()=>{markSolved(id);st.textContent='✓ נפתרה';st.classList.add('ok');upd()};
+    const sol=el(`<div class="sol" hidden><b>פתרון</b><p>${q.s}</p></div>`);
+    if(q.t==='mc'){const o=el('<div class="opts"></div>');const fb=el('<div class="fb" hidden></div>');q.o.forEach((txt,k)=>{const b=el(`<button class="opt">${txt}</button>`);b.onclick=()=>{o.querySelectorAll('.opt').forEach((x,j)=>{x.disabled=true;if(j===q.a)x.classList.add('ok')});if(k===q.a){fb.className='fb ok';fb.textContent='נכון.';good()}else{b.classList.add('no');fb.className='fb no';fb.textContent='לא נכון. התשובה הנכונה מסומנת בירוק.'}fb.hidden=false;sol.hidden=false};o.appendChild(b)});box.append(o,fb,sol)}
+    else{const fid='a'+id;const row=el(`<div class="ansrow"><label class="tip" for="${fid}">התשובה שלכם:</label><input id="${fid}" inputmode="decimal" autocomplete="off"><span class="u">${q.u}</span><button class="btn sm pri">בדיקה</button><button class="btn sm">הצגת פתרון</button></div>`);const fb=el('<div class="fb" hidden></div>');const[inp]=row.querySelectorAll('input');const[chk,show]=row.querySelectorAll('button');
+      const check=()=>{const v=parseNum(inp.value);fb.hidden=false;if(isNaN(v)){fb.className='fb';fb.textContent='לא הצלחנו לקרוא את המספר. נסו למשל 12.5 או ‎−6.';return}const ok=Math.abs(v-q.a)<=Math.abs(q.a)*.03+1e-12;if(ok){fb.className='fb ok';fb.innerHTML='נכון. ';good();sol.hidden=false}else{const sign=Math.sign(v)!==Math.sign(q.a)&&v!==0;fb.className='fb no';fb.textContent=sign?'הסימן לא נכון. בדקו את כיוון הציר ואת כיווני הכוחות.':Math.abs(Math.log10(Math.abs(v/q.a))%1)<.02&&(Math.abs(v/q.a)>5||Math.abs(v/q.a)<.2)?'הספרות נכונות אבל סדר הגודל לא. בדקו את היחידות.':'עדיין לא. נסו שוב, או פתחו את הפתרון.'}};
+      chk.onclick=check;inp.addEventListener('keydown',e=>{if(e.key==='Enter')check()});show.onclick=()=>{sol.hidden=!sol.hidden};box.append(row,fb,sol)}
+    p.querySelector(`[data-l="${q.l}"]`).appendChild(box)});
+}
+function route(){killScenes();const h=location.hash.replace('#','');document.getElementById('nav-f').toggleAttribute('aria-current',h==='formulas');document.getElementById('nav-home').toggleAttribute('aria-current',!h);
+  if(T.some(t=>t.id===h))topic(h);else if(h==='formulas')formulas();else home();window.scrollTo(0,0)}
+addEventListener('hashchange',route);route();
+
+</script>
+</body></html>

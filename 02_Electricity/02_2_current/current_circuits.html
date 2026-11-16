@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>זרם חשמלי ומעגלים</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700;800&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+<style>
+/* layout: a circuits bench page. sticky bar, one reading column, a circuit diagram with live meter readings at the centre of each topic. red = current arrows and curves, copper = readings and UI accent. */
+:root{
+  --bg:#f2f4f7; --paper:#ffffff; --soft:#eef1f5; --ink:#17202c; --mut:#5a6576; --line:#d8dee7; --grid:#e9edf3;
+  --pos:#cf3328; --neg:#2860c4; --acc:#a85a14; --acc-ink:#ffffff; --fieldln:#3a4557;
+  --ok:#14713f; --ok-bg:#e2f3e9; --no:#b3261e; --no-bg:#fbe7e5; --warn:#7a4a00; --warn-bg:#fff2d6;
+  --shadow:0 1px 2px rgba(23,32,44,.05),0 8px 24px rgba(23,32,44,.07);
+  --fd:"Secular One","Assistant",system-ui,sans-serif;
+  --fb:"Assistant","Arial Hebrew",system-ui,sans-serif;
+  --fm:"STIX Two Text","Cambria Math","Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0d1117; --paper:#151b24; --soft:#1b2330; --ink:#e6ebf2; --mut:#9aa5b6; --line:#2a3342; --grid:#1c2431;
+  --pos:#ff6a5c; --neg:#6aa1ff; --acc:#f0a14a; --acc-ink:#1a1206; --fieldln:#b7c2d4;
+  --ok:#5fd394; --ok-bg:#122b1d; --no:#ff8b80; --no-bg:#371816; --warn:#f2c46e; --warn-bg:#2e240f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0d1117; --paper:#151b24; --soft:#1b2330; --ink:#e6ebf2; --mut:#9aa5b6; --line:#2a3342; --grid:#1c2431;
+  --pos:#ff6a5c; --neg:#6aa1ff; --acc:#f0a14a; --acc-ink:#1a1206; --fieldln:#b7c2d4;
+  --ok:#5fd394; --ok-bg:#122b1d; --no:#ff8b80; --no-bg:#371816; --warn:#f2c46e; --warn-bg:#2e240f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.7 var(--fb);-webkit-text-size-adjust:100%;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1040px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--fd);font-weight:400;line-height:1.2;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px;border-radius:6px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--paper);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:8px;min-height:56px}
+.brand{text-decoration:none;margin-inline-end:auto;display:flex;align-items:center;gap:10px;font:400 1.3rem/1 var(--fd)}
+.brand i{display:inline-flex;gap:3px}
+.brand i b{width:12px;height:12px;border-radius:50%;display:block}
+.nl{font-weight:700;font-size:.95rem;text-decoration:none;padding:8px 12px;border-radius:999px}
+.nl:hover,.nl[aria-current]{background:var(--soft)}
+.btn{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 16px;font-weight:700;font-size:.95rem;line-height:1.3;display:inline-flex;align-items:center;gap:6px;min-height:40px;text-decoration:none}
+.btn:hover{border-color:var(--mut)}
+.btn.pri{background:var(--acc);border-color:transparent;color:var(--acc-ink)}
+.btn.sm{min-height:34px;padding:5px 12px;font-size:.88rem}
+.btn.pos{color:var(--pos)} .btn.neg{color:var(--neg)}
+
+/* home */
+.hero{display:grid;grid-template-columns:1fr 1.05fr;gap:32px;align-items:center;padding-block:34px 20px}
+.eyebrow{font-size:.85rem;font-weight:700;letter-spacing:.04em;color:var(--acc)}
+.hero h1{font-size:clamp(2.3rem,6vw,3.6rem);margin-block:6px 12px}
+.hero h1 .p{color:var(--pos)} .hero h1 .n{color:var(--neg)}
+.lead{font-size:1.1rem;color:var(--mut);max-width:32em}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.hfig{margin:0;min-width:0}
+.hfig .stage canvas{height:300px}
+.hfig figcaption{font-size:.86rem;color:var(--mut);margin-top:8px}
+.secth{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-top:22px;flex-wrap:wrap}
+.secth h2{font-size:1.6rem}
+.secth span{color:var(--mut);font-size:.92rem}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:14px}
+.tc{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-content:start;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0;transition:border-color .15s,transform .15s}
+.tc:hover{border-color:var(--acc);transform:translateY(-2px)}
+.tn{font:400 1.5rem/1.1 var(--fd);color:var(--acc);font-variant-numeric:tabular-nums}
+.tc b{font-size:1.08rem;line-height:1.35}
+.tc .ts{grid-column:2;color:var(--mut);font-size:.9rem;line-height:1.45}
+.tc .pg{grid-column:2;margin-top:8px;font-size:.8rem;color:var(--mut);display:flex;gap:10px;flex-wrap:wrap}
+.pg em{font-style:normal;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* topic */
+.th{padding-block:24px 12px}
+.crumb{font-size:.88rem;font-weight:700;color:var(--acc);text-decoration:none}
+.th h1{font-size:clamp(1.9rem,5vw,2.7rem);margin-block:4px 4px}
+.th p{color:var(--mut);font-size:1.05rem}
+.tabs{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:5;background:var(--bg);display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:12px 16px;font-weight:700;color:var(--mut);border-bottom:3px solid transparent;white-space:nowrap;flex:1 0 auto;min-height:46px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--acc)}
+.panel{padding-block:22px 8px;display:grid;gap:22px;min-width:0}
+.prose{max-width:66ch;display:grid;gap:12px;font-size:1.05rem}
+.prose p,.ex p,.q p,.sol p,.trap p{min-width:0;overflow-wrap:anywhere}
+.panel h2{font-size:1.3rem}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:10px}
+.fc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 10px 10px;text-align:center;min-width:0;display:grid;gap:4px;align-content:center}
+.fc small{color:var(--mut);font-size:.86rem;line-height:1.45}
+.trap{background:var(--warn-bg);border-radius:14px;padding:16px 18px;max-width:72ch;display:grid;gap:6px}
+.trap h2{font-size:1.1rem;color:var(--warn)}
+.tips{background:var(--paper);border:1px solid var(--line);border-inline-start:4px solid var(--acc);border-radius:14px;padding:16px 18px;max-width:72ch;display:grid;gap:8px}
+.tips h2{font-size:1.1rem;color:var(--acc)}
+.tips ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.tips li{position:relative;padding-inline-start:22px;min-width:0;overflow-wrap:anywhere}
+.tips li::before{content:"";position:absolute;inset-inline-start:2px;top:.62em;width:9px;height:9px;border-radius:50%;border:2px solid var(--acc)}
+
+/* lab */
+.stage{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow)}
+.stage canvas{display:block;width:100%;height:380px;touch-action:none;cursor:grab}
+.stage canvas.g{height:190px;cursor:default;border-top:1px solid var(--line)}
+.hint{position:absolute;inset-inline-end:10px;top:8px;font-size:.78rem;color:var(--mut);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:1px 10px;pointer-events:none;max-width:calc(100% - 20px)}
+.simbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.simbar .lab{font-size:.88rem;color:var(--mut);font-weight:600}
+.tgl{display:inline-flex;align-items:center;gap:6px;font-size:.92rem;font-weight:600;border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--paper);cursor:pointer}
+.tgl input{accent-color:var(--acc);margin:0}
+.ctls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 26px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:baseline;min-width:0}
+.ctl .cl{font-size:.95rem;font-weight:600}
+.ctl output{font-weight:700;font-variant-numeric:tabular-nums;color:var(--acc);direction:ltr;unicode-bidi:isolate}
+.ctl input{grid-column:1/-1;width:100%;accent-color:var(--acc);height:30px;margin:0}
+.outs{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.outs div{background:var(--soft);border-radius:10px;padding:8px 12px;min-width:0}
+.outs dt{font-size:.82rem;color:var(--mut);line-height:1.4}
+.outs dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums;font-size:1.02rem;direction:ltr;text-align:right;font-family:var(--fm)}
+.note{font-size:.9rem;color:var(--mut);max-width:72ch}
+
+/* example */
+.ex{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;max-width:80ch}
+.ex h3,.qn{font:700 .82rem/1.3 var(--fb);letter-spacing:.06em;color:var(--acc)}
+.gf{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gf>div{background:var(--soft);border-radius:10px;padding:10px 14px;min-width:0;display:grid;gap:4px}
+.steps{margin:0;padding-inline-start:1.4em;display:grid;gap:12px}
+.steps li{min-width:0}
+.steps li::marker{font-family:var(--fd);color:var(--acc)}
+.chk{background:var(--ok-bg);border-radius:10px;padding:10px 14px;display:grid;gap:4px}
+.chk h3{color:var(--ok)}
+
+/* practice */
+.lvl{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:6px}
+.lvl h2{font-size:1.25rem}
+.lvl span{color:var(--mut);font-size:.9rem}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:12px;max-width:80ch}
+.q.adv{border-inline-start:4px solid var(--acc)}
+.qn{display:flex;justify-content:space-between;gap:8px}
+.qn .st{letter-spacing:0;font-weight:700}
+.qn .st.ok{color:var(--ok)}
+.opts{display:grid;gap:8px}
+.opt{display:block;width:100%;text-align:start;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);line-height:1.5}
+.opt:hover:not([disabled]){border-color:var(--acc)}
+.opt[disabled]{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg);font-weight:700}
+.opt.no{border-color:var(--no);background:var(--no-bg);color:var(--mut)}
+.fb{font-size:.97rem;padding:10px 14px;border-radius:10px;background:var(--soft)}
+.fb.ok{background:var(--ok-bg)} .fb.no{background:var(--no-bg)}
+.ansrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ansrow input{width:10em;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);font-variant-numeric:tabular-nums;font-size:1rem;direction:ltr;text-align:left}
+.ansrow .u{color:var(--mut);font-weight:600;direction:ltr;unicode-bidi:isolate}
+.tip{font-size:.84rem;color:var(--mut)}
+.sol{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:.98rem;display:grid;gap:8px}
+.fig{max-width:360px;width:100%;overflow-x:auto}
+.fig svg{display:block;width:100%;height:auto}
+.score{font-weight:700;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pn{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-block:18px;margin-top:10px}
+
+/* formulas */
+.ftab{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ftab td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.ftab td.fx{text-align:center;width:46%}
+.ftab small{display:block;color:var(--mut);font-size:.85rem}
+.ftab a{font-size:.84rem;font-weight:700;color:var(--acc);text-decoration:none}
+.tscroll{overflow-x:auto}
+.foot{color:var(--mut);font-size:.86rem;padding-block:24px 34px;border-top:1px solid var(--line);margin-top:30px}
+
+/* math */
+.mx{font-family:var(--fm);font-size:1.08em;direction:ltr;unicode-bidi:isolate;display:inline-block;line-height:1.3;white-space:nowrap}
+.mx i{font-style:italic}
+.mx.fx{display:block;text-align:center;font-size:1.3rem;overflow-x:auto;overflow-y:hidden;padding:6px 2px;max-width:100%}
+.mx sup,.mx sub{font-size:.68em;line-height:0}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;font-size:.95em}
+.fr>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .25em .08em}
+.fr>span:last-child{padding:.08em .25em 0}
+.pq{color:var(--pos);font-weight:700} .nq{color:var(--neg);font-weight:700}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr;gap:18px;padding-block:22px 10px}
+  .gf{grid-template-columns:1fr}
+  .stage canvas{height:320px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+html,body{margin:0;padding:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+.stage canvas.trk{height:150px;cursor:default}
+.stage canvas.trk.tall{height:230px}
+.stage canvas.g{height:230px}
+.hint{font-size:.76rem}
+.btn.ex{height:auto;min-height:36px;padding-block:7px;white-space:normal;text-align:start;line-height:1.4}
+.btn.ex>span{display:block}
+.btn.ex bdi{white-space:nowrap}
+.vc{position:relative;display:inline-block}
+.vc::after{content:"→";position:absolute;left:0;right:0;top:-.58em;text-align:center;font-size:.62em;font-style:normal;line-height:1}
+.ftab .mx.fx{padding-top:14px}
+.btn.sm.pri .mx{color:inherit}
+</style></head><body>
+<div dir="rtl" lang="he">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="#"><i aria-hidden="true"><b style="background:var(--pos)"></b><b style="background:var(--neg)"></b></i>זרם חשמלי ומעגלים</a>
+  <a class="nl" href="#" id="nav-home">נושאים</a>
+  <a class="nl" href="#formulas" id="nav-f">נוסחאות</a>
+</div></header>
+<main id="app"></main>
+<footer class="wrap foot">יחידת לימוד במעגלי זרם ישר, פיזיקה 5 יח״ל. הסימונים לפי דף "נוסחאות ונתונים בפיזיקה". מכשירי המדידה אידיאליים, ואת ההתנגדות של חוטי החיבור מזניחים.</footer>
+</div>
+<script>
+document.documentElement.lang='he';document.documentElement.dir='rtl';
+const G=10;
+const m=s=>`<span class="mx">${s}</span>`;
+const M=s=>`<div class="mx fx">${s}</div>`;
+const fr=(a,b)=>`<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const ov=s=>`<span style="text-decoration:overline">${s}</span>`;
+const mus='<i>μ</i><sub>s</sub>',muk='<i>μ</i><sub>k</sub>',SF='Σ<i>F</i>',Fsp='<i>F</i><sub>sp</sub>',dl='Δ<i>ℓ</i>',th='<i>θ</i>',vec=x=>`<span class="vc"><i>${x}</i></span>`;
+const v0='<i>v</i><sub>0</sub>', x0='<i>x</i><sub>0</sub>', y0='<i>y</i><sub>0</sub>', half=fr('1','2');
+const sq=s=>`${s}<sup>2</sup>`;
+
+/* ---------- number formatting ---------- */
+function fmt(x,d=3){
+  if(!isFinite(x))return '—'; if(Math.abs(x)<1e-30)return '0';
+  const a=Math.abs(x);
+  if(a>=1e4||a<1e-2){let e=Math.floor(Math.log10(a));let mn=+(x/10**e).toPrecision(d);if(Math.abs(mn)>=10){mn=+(mn/10).toPrecision(d);e++}return (String(mn)+'·10<sup>'+e+'</sup>').replace(/-/g,'−')}
+  return String(+x.toPrecision(d)).replace('-','−');
+}
+function parseNum(s){
+  if(!s)return NaN; s=s.trim().replace(/[−–]/g,'-').replace(/\s/g,'').replace(/,/g,'.');
+  s=s.replace(/(?:\*|x|×|·)10\^?\(?(-?\d+)\)?/i,'e$1').replace(/^10\^\(?(-?\d+)\)?$/,'1e$1');
+  return /^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)?parseFloat(s):NaN;
+}
+/* ---------- storage ---------- */
+let solved={};
+try{solved=JSON.parse(localStorage.getItem('cur-solved')||'{}')||{}}catch(e){solved={}}
+function markSolved(id){solved[id]=1;try{localStorage.setItem('cur-solved',JSON.stringify(solved))}catch(e){}}
+
+/* ---------- canvas helpers ---------- */
+function tok(){const cs=getComputedStyle(document.documentElement);const g=n=>cs.getPropertyValue(n).trim();return{paper:g('--paper'),ink:g('--ink'),mut:g('--mut'),line:g('--line'),grid:g('--grid'),pos:g('--pos'),neg:g('--neg'),acc:g('--acc'),fl:g('--fieldln'),ok:g('--ok'),soft:g('--soft')}}
+function arrow(ctx,x1,y1,x2,y2,col,w=2,head=8){const a=Math.atan2(y2-y1,x2-x1),L=Math.hypot(x2-x1,y2-y1);if(L<2)return;ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2-Math.cos(a)*head*.6,y2-Math.sin(a)*head*.6);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-head*Math.cos(a-.42),y2-head*Math.sin(a-.42));ctx.lineTo(x2-head*Math.cos(a+.42),y2-head*Math.sin(a+.42));ctx.closePath();ctx.fill()}
+function font(ctx,sz,w=700){ctx.font=`${w} ${sz}px Assistant, system-ui, sans-serif`}
+const nf=v=>String(+(+v).toFixed(6)).replace('-','−');
+const sg=(v,d=3)=>(v>0?'+':'')+fmt(v,d);
+function niceStep(r,n){const raw=r/n,p=10**Math.floor(Math.log10(raw)),f=raw/p;return(f<1.5?1:f<3.5?2:f<7.5?5:10)*p}
+
+let scenes=[],anims=[];
+function killScenes(){scenes.forEach(s=>s.ro&&s.ro.disconnect());scenes=[];anims.forEach(a=>a.stop());anims=[]}
+const themeMQ=matchMedia('(prefers-color-scheme: dark)');
+const redrawAll=()=>scenes.forEach(s=>s.draw());
+themeMQ.addEventListener&&themeMQ.addEventListener('change',redrawAll);
+new MutationObserver(redrawAll).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+function Canvas(cv,drawFn){
+  const o={cv,ctx:cv.getContext('2d'),W:0,H:0,draw(){if(!o.W)return;const c=o.ctx;c.setTransform(o.dpr,0,0,o.dpr,0,0);c.direction='ltr';const t=tok();c.fillStyle=t.paper;c.fillRect(0,0,o.W,o.H);drawFn(c,t,o)}};
+  o.resize=()=>{const r=cv.getBoundingClientRect();if(!r.width)return;o.dpr=Math.min(2,devicePixelRatio||1);o.W=r.width;o.H=r.height;cv.width=Math.round(r.width*o.dpr);cv.height=Math.round(r.height*o.dpr);o.onResize&&o.onResize();o.draw()};
+  o.ro=new ResizeObserver(o.resize);o.ro.observe(cv);scenes.push(o);return o;
+}
+
+/* ---------- DOM builders ---------- */
+const el=(h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild};
+let uid=0;
+function slider(host,label,min,max,step,val,show,on){const id='s'+(++uid);const n=el(`<div class="ctl"><label class="cl" for="${id}">${label}</label><output for="${id}"></output><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"></div>`);const inp=n.querySelector('input'),out=n.querySelector('output');const f=()=>{out.innerHTML=show(+inp.value);on(+inp.value)};inp.addEventListener('input',f);out.innerHTML=show(val);host.appendChild(n);return{set(v){inp.value=v;out.innerHTML=show(v)},el:inp}}
+function outs(host,items){const dl=el(`<dl class="outs"></dl>`);const ref={};for(const[k,lab]of items){const d=el(`<div><dt>${lab}</dt><dd>—</dd></div>`);dl.appendChild(d);ref[k]=d.querySelector('dd')}host.appendChild(dl);return(k,v)=>{ref[k].innerHTML=v}}
+function toggle(host,label,val,on){const id='t'+(++uid);const n=el(`<label class="tgl" for="${id}"><input type="checkbox" id="${id}" ${val?'checked':''}>${label}</label>`);n.querySelector('input').addEventListener('change',e=>on(e.target.checked));host.appendChild(n);return n.querySelector('input')}
+
+
+const exBtn=(host,txt,fn,preset)=>{const b=el(`<div class="simbar"><button class="btn sm ex"><span>${txt}</span></button></div>`);b.firstElementChild.onclick=fn;host.appendChild(b);if(preset)fn()};
+const note=(host,h)=>host.appendChild(el(`<p class="note">${h}</p>`));
+const u=h=>`<bdi dir="ltr">${h}</bdi>`,rt=h=>`<bdi dir="rtl">${h}</bdi>`;
+
+/* play / pause / scrub. o:{unit,rate(),loop} */
+function Runner(host,tmaxFn,onT,o={}){
+  const bar=el(`<div class="simbar"><button class="btn sm pri" data-a="play">▶ הפעלה</button><button class="btn sm" data-a="reset">⟲ חזרה להתחלה</button></div>`);
+  const ctl=el('<div class="ctls"></div>');host.append(bar,ctl);
+  const R={t:0,playing:false,raf:0,last:0,bar};const pb=bar.querySelector('[data-a=play]');
+  const sl=slider(ctl,'הזמן t (אפשר לגרור)',0,1000,1,0,v=>fmt(v/1000*tmaxFn(),3)+(o.unit||' s'),v=>{R.pause();R.t=v/1000*tmaxFn();onT()});
+  R.sync=()=>{const tm=tmaxFn();if(R.t>tm)R.t=tm;sl.set(Math.round(R.t/tm*1000))};
+  R.pause=()=>{R.playing=false;cancelAnimationFrame(R.raf);pb.textContent='▶ הפעלה'};R.stop=R.pause;
+  const step=ts=>{if(!R.playing)return;if(!document.body.contains(bar)){R.pause();return}const dt=Math.min(.05,(ts-R.last)/1000);R.last=ts;const tm=tmaxFn();R.t+=dt*(o.rate?o.rate():tm/8);if(R.t>=tm){if(o.loop)R.t-=tm;else{R.t=tm;onT();R.pause();return}}onT();R.raf=requestAnimationFrame(step)};
+  R.play=()=>{if(R.t>=tmaxFn()-1e-9)R.t=0;R.playing=true;R.last=performance.now();pb.textContent='⏸ עצירה';R.raf=requestAnimationFrame(step)};
+  pb.onclick=()=>{if(R.playing){R.pause();onT()}else R.play()};
+  bar.querySelector('[data-a=reset]').onclick=()=>{R.pause();R.t=0;onT()};
+  anims.push(R);return R;
+}
+
+/* plot of y(x) inside rectangle R. o:{x0,x1,xl,name,series:[{f,col,dash,lab}],mark,rings,vline,ymin,ymax,fix} */
+function plot(ctx,t,R,o){
+  const l=R.x+46,r=R.x+R.w-14,top=R.y+28,bot=R.y+R.h-24,N=260;let lo=0,hi=0;
+  if(o.ymin!==undefined){lo=o.ymin;hi=o.ymax}
+  if(!o.fix)for(const s of o.series)for(let i=0;i<=N;i++){const v=s.f(o.x0+(o.x1-o.x0)*i/N);if(isFinite(v)){if(v<lo)lo=v;if(v>hi)hi=v}}
+  if(hi-lo<1e-12)hi=lo+1;const stp=niceStep(hi-lo,R.h<210?3:5);lo=Math.floor(lo/stp+1e-9)*stp;hi=Math.ceil(hi/stp-1e-9)*stp;
+  const X=x=>l+(x-o.x0)/(o.x1-o.x0)*(r-l),Y=v=>bot-(v-lo)/(hi-lo)*(bot-top);
+  font(ctx,11,600);ctx.lineWidth=1;ctx.textAlign='right';
+  for(let v=lo;v<=hi+stp/2;v+=stp){ctx.strokeStyle=t.grid;ctx.beginPath();ctx.moveTo(l,Y(v));ctx.lineTo(r,Y(v));ctx.stroke();ctx.fillStyle=t.mut;ctx.fillText(nf(v),l-5,Y(v)+4)}
+  const xs=niceStep(o.x1-o.x0,(r-l)<260?4:7);font(ctx,12,700);const xw=ctx.measureText(o.xl).width+16;font(ctx,11,600);ctx.textAlign='center';
+  for(let v=Math.ceil(o.x0/xs-1e-9)*xs;v<=o.x1+1e-9;v+=xs){ctx.strokeStyle=t.grid;ctx.beginPath();ctx.moveTo(X(v),top);ctx.lineTo(X(v),bot);ctx.stroke();if(X(v)>l+8&&X(v)<r-xw){ctx.fillStyle=t.mut;ctx.fillText(nf(v),X(v),bot+16)}}
+  ctx.strokeStyle=t.mut;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(l,top-8);ctx.lineTo(l,bot);ctx.moveTo(l,Y(0));ctx.lineTo(r,Y(0));ctx.stroke();
+  if(o.vline!==undefined){ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(X(o.vline),top-6);ctx.lineTo(X(o.vline),bot);ctx.stroke();ctx.setLineDash([])}
+  font(ctx,12,700);ctx.fillStyle=t.ink;ctx.textAlign='left';ctx.fillText(o.name,l+6,R.y+15);ctx.textAlign='right';ctx.fillStyle=t.mut;ctx.fillText(o.xl,r,bot+16);
+  ctx.save();ctx.beginPath();ctx.rect(l-1,top-10,r-l+3,bot-top+20);ctx.clip();
+  for(const s of o.series){ctx.strokeStyle=t[s.col];ctx.lineWidth=s.dash?1.6:2.6;ctx.setLineDash(s.dash?[6,5]:[]);ctx.beginPath();let pen=false;for(let i=0;i<=N;i++){const x=o.x0+(o.x1-o.x0)*i/N,v=s.f(x);if(!isFinite(v)){pen=false;continue}pen?ctx.lineTo(X(x),Y(v)):ctx.moveTo(X(x),Y(v));pen=true}ctx.stroke();ctx.setLineDash([]);
+    if(s.lab){const xe=o.x0+(o.x1-o.x0)*(s.at||.93),v=s.f(xe);if(isFinite(v)){font(ctx,12,800);ctx.fillStyle=t[s.col];ctx.textAlign='center';ctx.fillText(s.lab,X(xe),Y(v)+(s.below?16:-8))}}}
+  ctx.restore();
+  if(o.rings)for(const x of o.rings)for(const s of o.series){if(s.dash)continue;const v=s.f(x);if(!isFinite(v))continue;ctx.strokeStyle=t[s.col];ctx.lineWidth=2;ctx.fillStyle=t.paper;ctx.beginPath();ctx.arc(X(x),Y(v),5,0,7);ctx.fill();ctx.stroke()}
+  if(o.mark!==undefined)for(const s of o.series){if(s.dash)continue;const v=s.f(o.mark);if(!isFinite(v))continue;ctx.fillStyle=t[s.col];ctx.strokeStyle=t.paper;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(X(o.mark),Y(v),5.5,0,7);ctx.fill();ctx.stroke()}
+  return{X,Y,l,r,top,bot};
+}
+
+
+/* ---------- circuit drawing helpers ---------- */
+const QE=1.6e-19,OHM=' Ω';
+const geo=cv=>({L:Math.max(48,cv.W/2-200),R:Math.min(cv.W-48,cv.W/2+200),T:64,B:cv.H-46});
+function wire(ctx,t,pts){ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke()}
+function lab(ctx,t,s,x,y,col,al='center',sz=12){font(ctx,sz,800);ctx.fillStyle=t[col]||col;ctx.textAlign=al;ctx.fillText(s,x,y)}
+function resH(ctx,t,cx,cy,name,val,w=56){ctx.fillStyle=t.soft;ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.fillRect(cx-w/2,cy-11,w,22);ctx.strokeRect(cx-w/2,cy-11,w,22);lab(ctx,t,name,cx,cy-18,'ink');if(val)lab(ctx,t,val,cx,cy+27,'acc',undefined,11)}
+function resV(ctx,t,cx,cy,name,val,side=1){ctx.fillStyle=t.soft;ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.fillRect(cx-11,cy-28,22,56);ctx.strokeRect(cx-11,cy-28,22,56);const al=side>0?'left':'right';lab(ctx,t,name,cx+side*18,cy-3,'ink',al);if(val)lab(ctx,t,val,cx+side*18,cy+13,'acc',al,11)}
+/* battery on a vertical wire; plus terminal up when up=true */
+function batV(ctx,t,cx,cy,name,up=true,side=-1){const d=up?-1:1;ctx.fillStyle=t.paper;ctx.fillRect(cx-4,cy-6,8,12);ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx-15,cy+d*6);ctx.lineTo(cx+15,cy+d*6);ctx.stroke();ctx.lineWidth=4.5;ctx.beginPath();ctx.moveTo(cx-8,cy-d*6);ctx.lineTo(cx+8,cy-d*6);ctx.stroke();
+  lab(ctx,t,'+',cx-side*22,cy+d*9+4,'pos');lab(ctx,t,name,cx+side*22,cy+4,'ink',side>0?'left':'right')}
+function meter(ctx,t,cx,cy,ch,val,dy=-22){ctx.fillStyle=t.paper;ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,14,0,7);ctx.fill();ctx.stroke();font(ctx,13,800);ctx.fillStyle=t.ink;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(ch,cx,cy+1);ctx.textBaseline='alphabetic';if(val)lab(ctx,t,val,cx,cy+dy,'acc',undefined,11)}
+function cur(ctx,t,x,y,dx,dy,name){arrow(ctx,x-dx*13,y-dy*13,x+dx*13,y+dy*13,t.pos,2.6,8);if(name)lab(ctx,t,name,x+(dy?17:0),y+(dx?-9:4),'pos',dy?'left':'center')}
+function node(ctx,t,x,y,name,dy=-10){ctx.fillStyle=t.ink;ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();if(name)lab(ctx,t,name,x,y+dy,'mut')}
+const A_=v=>fmt(v)+' A',V_=v=>fmt(v)+' V',W_=v=>fmt(v)+' W',O_=v=>fmt(v)+' Ω';
+/* static circuit sim scaffold */
+function CSim(host,o){
+  host.innerHTML=`<div class="stage"><canvas style="cursor:default${o.h?';height:'+o.h+'px':''}" aria-label="${o.aria}"></canvas>${o.gdraw?`<canvas class="g" aria-label="${o.ariaG}"></canvas>`:''}${o.hint?`<span class="hint">${o.hint}</span>`:''}</div>${o.bar?'<div class="simbar"></div>':''}<div class="ctls"></div>`;
+  const[c1,c2]=host.querySelectorAll('canvas');const bar=host.querySelector('.simbar'),ctls=host.querySelector('.ctls');const set=outs(host,o.outs);let top,g;
+  top=Canvas(c1,(ctx,t,cv)=>{o.draw(ctx,t,cv,set);g&&g.draw()});
+  if(c2)g=Canvas(c2,(ctx,t,cv)=>o.gdraw(ctx,t,cv));
+  return{bar,ctls,set,redraw:()=>top.draw()};
+}
+/* battery with internal resistance on the left branch, load on the right, voltmeter across the terminals */
+function emfDraw(ctx,t,cv,st,I){const{L,R,T,B}=geo(cv),my=(T+B)/2,xm=(L+R)/2;
+  wire(ctx,t,[[L,B],[L,T],[R,T],[R,B],[L,B]]);wire(ctx,t,[[xm,T],[xm,B]]);
+  ctx.setLineDash([5,4]);ctx.strokeStyle=t.acc;ctx.lineWidth=1.5;ctx.strokeRect(L-34,T+14,68,B-T-28);ctx.setLineDash([]);
+  resV(ctx,t,L,my-42,'r',O_(st.r),1);batV(ctx,t,L,my+46,'ε',true,1);
+  resV(ctx,t,R,my,'R',st.R>0?O_(st.R):'0',-1);meter(ctx,t,xm,my,'V');lab(ctx,t,V_(st.E-st.r*I),xm+20,my+4,'acc','left',11);meter(ctx,t,(xm+R)/2,T,'A',A_(I));
+  node(ctx,t,L,T,'a',-10);node(ctx,t,L,B,'b',20);if(I>1e-9)cur(ctx,t,(L+xm)/2,T,1,0,'I')}
+
+/* ---------- simulations ---------- */
+const SIMS={
+current(host,preset){
+  const st={I:2};
+  host.innerHTML=`<div class="stage"><canvas style="cursor:default;height:190px" aria-label="תיל מוליך שבו נעים אלקטרונים, והזרם המוסכם בכיוון ההפוך"></canvas><canvas class="g" aria-label="גרף המטען שעבר בחתך התיל כפונקציה של הזמן"></canvas><span class="hint">כחול: אלקטרונים · אדום: כיוון הזרם המוסכם</span></div>`;
+  const[c1,c2]=host.querySelectorAll('canvas');let top,g;
+  const run=Runner(host,()=>10,()=>{run.sync();top.draw()},{unit:' s',rate:()=>1});
+  const ctls=el('<div class="ctls"></div>');host.appendChild(ctls);
+  const set=outs(host,[['i','עוצמת הזרם I'],['t','הזמן שעבר'],['q','המטען שעבר בחתך Δq = IΔt'],['n','מספר האלקטרונים שעברו']]);
+  top=Canvas(c1,(ctx,t,cv)=>{const x1=20,x2=cv.W-20,cy=cv.H/2+12,h=30,w=x2-x1;
+    ctx.fillStyle=t.soft;ctx.strokeStyle=t.mut;ctx.lineWidth=1.5;ctx.fillRect(x1,cy-h,w,2*h);ctx.strokeRect(x1,cy-h,w,2*h);
+    ctx.setLineDash([5,4]);ctx.strokeStyle=t.ink;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cv.W/2,cy-h-8);ctx.lineTo(cv.W/2,cy+h+8);ctx.stroke();ctx.setLineDash([]);
+    ctx.save();ctx.beginPath();ctx.rect(x1,cy-h,w,2*h);ctx.clip();ctx.fillStyle=t.neg;const n=Math.max(10,Math.round(w/34));for(let i=0;i<n;i++)for(let j=0;j<3;j++){const x=x1+((((i+(j%2)*.5)/n*w-run.t*st.I*16)%w)+w)%w,y=cy-h+(j+.5)*2*h/3;ctx.beginPath();ctx.arc(x,y,4.2,0,7);ctx.fill()}ctx.restore();
+    if(st.I>0){arrow(ctx,cv.W/2-50,cy-h-22,cv.W/2+50,cy-h-22,t.pos,3,10);lab(ctx,t,'I',cv.W/2+62,cy-h-18,'pos',undefined,13);arrow(ctx,cv.W/2+40,cy+h+20,cv.W/2-40,cy+h+20,t.neg,2,8);lab(ctx,t,'e⁻',cv.W/2-54,cy+h+24,'neg')}
+    const q=st.I*run.t;set('i',A_(st.I));set('t',fmt(run.t)+' s');set('q',fmt(q)+' C');set('n',q?fmt(q/QE):'0');g&&g.draw()});
+  g=Canvas(c2,(ctx,t,cv)=>plot(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{x0:0,x1:10,xl:'t (s)',name:'Δq (C)',series:[{f:x=>st.I*x,col:'pos'}],mark:run.t,ymin:0,ymax:50,fix:true}));
+  const s=slider(ctls,'עוצמת הזרם I',0,5,.1,st.I,v=>fmt(v)+' A',v=>{st.I=v;run.sync();top.draw()});
+  exBtn(host,`טעינת הדוגמה: ${u('I = 2 A')}`,()=>{st.I=2;s.set(2);run.pause();run.t=5;run.sync();top.draw()},preset);
+  note(host,'הקו המקווקו מסמן חתך של התיל. האלקטרונים נעים שמאלה, והזרם המוסכם מכוון ימינה, בכיוון ההפוך לתנועתם. בגרף, שיפוע הקו הוא עוצמת הזרם: זרם גדול יותר נותן קו תלול יותר. מהירות האלקטרונים בציור מוגזמת מאוד: בתיל אמיתי הם זוחלים בשברירי מילימטר לשנייה.');
+},
+ohm(host,preset){
+  const st={V:6,R:12,lamp:false},a=.12,I=()=>st.lamp?st.V/(st.R*(1+a*st.V)):st.V/st.R,Im=()=>st.lamp?12/(st.R*(1+a*12)):12/st.R;
+  const S=CSim(host,{bar:true,h:300,aria:'מעגל חשמלי עם מקור מתח, נגד, אמפרמטר ווולטמטר',ariaG:'גרף המתח על הרכיב כפונקציה של הזרם',
+    outs:[['v','קריאת הוולטמטר V'],['i','קריאת האמפרמטר I'],['r','היחס V / I'],['s','סוג הרכיב']],
+    draw(ctx,t,cv,set){const{L,R,T,B}=geo(cv),my=(T+B)/2,xr=R-Math.min(90,(R-L)*.28);
+      wire(ctx,t,[[L,B],[L,T],[xr,T],[xr,B],[L,B]]);wire(ctx,t,[[xr,T],[R,T],[R,B],[xr,B]]);
+      batV(ctx,t,L,my,'V',true,1);meter(ctx,t,(L+xr)/2,T,'A',A_(I()));resV(ctx,t,xr,my,st.lamp?'נורה':'R','',-1);meter(ctx,t,R,my,'V');lab(ctx,t,V_(st.V),R-20,my+4,'acc','right',11);
+      node(ctx,t,xr,T);node(ctx,t,xr,B);if(st.V>0)cur(ctx,t,L+(xr-L)*.22,T,1,0,'I');
+      set('v',V_(st.V));set('i',A_(I()));set('r',st.V>0?O_(st.V/I()):'—');set('s',rt(st.lamp?'לא אוהמי: ההתנגדות גדלה עם המתח':'אוהמי: ההתנגדות קבועה'))},
+    gdraw(ctx,t,cv){const R0=st.R;plot(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{x0:0,x1:Im(),xl:'I (A)',name:'V (V)',series:[{f:x=>st.lamp?(a*x*R0<.999?x*R0/(1-a*x*R0):NaN):x*R0,col:'pos'}],mark:I(),ymin:0,ymax:12,fix:true})}});
+  const tg=toggle(S.bar,'נורת להט במקום נגד',false,v=>{st.lamp=v;S.redraw()});
+  const s=[slider(S.ctls,'מתח המקור V',0,12,.5,st.V,v=>v+' V',v=>{st.V=v;S.redraw()}),slider(S.ctls,'התנגדות הנגד R (לנורה: כשהיא קרה)',2,50,1,st.R,v=>v+' Ω',v=>{st.R=v;S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('V = 6 V')}, ${u('R = 12 Ω')}`,()=>{Object.assign(st,{V:6,R:12,lamp:false});tg.checked=false;s[0].set(6);s[1].set(12);S.redraw()},preset);
+  note(host,'האמפרמטר מחובר בטור לנגד, והוולטמטר במקביל לו. שנו את המתח: בנגד היחס V/I נשאר קבוע, והגרף הוא קו ישר דרך הראשית ששיפועו R. עברו לנורת להט: הנימה מתחממת, ההתנגדות שלה גדלה, והגרף מתעקם.');
+},
+resist(host,preset){
+  const MAT=[['נחושת',1.7e-8],['אלומיניום',2.7e-8],['טונגסטן',5.6e-8],['ניכרום',1.1e-6]];
+  const st={m:3,l:2,A:.5},R=()=>MAT[st.m][1]*st.l/(st.A*1e-6);
+  const S=CSim(host,{bar:true,h:170,aria:'תיל מוליך שאפשר לשנות את האורך, את העובי ואת החומר שלו',ariaG:'גרף התנגדות התיל כפונקציה של אורכו',
+    outs:[['p','ההתנגדות הסגולית ρ'],['a','שטח החתך A'],['r','התנגדות התיל R'],['l','התנגדות ליחידת אורך λ']],
+    draw(ctx,t,cv,set){const x1=30,w=(cv.W-60)*st.l/10,h=8+Math.sqrt(st.A)*24,cy=cv.H/2+8;
+      ctx.fillStyle=t.acc;ctx.globalAlpha=.25+.18*st.m;ctx.fillRect(x1,cy-h/2,w,h);ctx.globalAlpha=1;ctx.strokeStyle=t.ink;ctx.lineWidth=2;ctx.strokeRect(x1,cy-h/2,w,h);
+      ctx.beginPath();ctx.ellipse(x1+w,cy,Math.max(3,h*.18),h/2,0,0,7);ctx.fillStyle=t.soft;ctx.fill();ctx.stroke();
+      ctx.strokeStyle=t.mut;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x1,cy+h/2+14);ctx.lineTo(x1+w,cy+h/2+14);ctx.moveTo(x1,cy+h/2+9);ctx.lineTo(x1,cy+h/2+19);ctx.moveTo(x1+w,cy+h/2+9);ctx.lineTo(x1+w,cy+h/2+19);ctx.stroke();lab(ctx,t,'ℓ = '+fmt(st.l)+' m',x1+w/2,cy+h/2+30,'mut');lab(ctx,t,'A',x1+w+16,cy+4,'mut');
+      set('p',fmt(MAT[st.m][1])+' Ω·m');set('a',fmt(st.A*1e-6)+' m²');set('r',O_(R()));set('l',fmt(R()/st.l)+' Ω/m')},
+    gdraw(ctx,t,cv){plot(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{x0:0,x1:10,xl:'ℓ (m)',name:'R (Ω)',series:[{f:x=>MAT[st.m][1]*x/(st.A*1e-6),col:'pos'}],mark:st.l})}});
+  const bs=MAT.map(([n],i)=>{const b=el(`<button class="btn sm">${n}</button>`);b.onclick=()=>{st.m=i;mark();S.redraw()};S.bar.appendChild(b);return b});const mark=()=>bs.forEach((b,i)=>b.classList.toggle('pri',i===st.m));mark();
+  const s=[slider(S.ctls,'אורך התיל ℓ',.5,10,.5,st.l,v=>fmt(v)+' m',v=>{st.l=v;S.redraw()}),slider(S.ctls,'שטח החתך A',.1,2,.1,st.A,v=>fmt(v)+' mm²',v=>{st.A=v;S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ניכרום, ${u('ℓ = 2 m')}, ${u('A = 0.5 mm²')}`,()=>{Object.assign(st,{m:3,l:2,A:.5});s[0].set(2);s[1].set(.5);mark();S.redraw()},preset);
+  note(host,'ההתנגדות יחסית לאורך התיל, ולכן הגרף הוא קו ישר דרך הראשית. השיפוע שלו הוא ההתנגדות ליחידת אורך, λ. תיל עבה יותר נותן קו מתון יותר. שימו לב להבדל העצום בין נחושת, שממנה עושים חוטי חשמל, לבין ניכרום, שממנו עושים גופי חימום.');
+},
+series(host,preset){
+  const st={E:12,R:[4,8,12]},RT=()=>st.R[0]+st.R[1]+st.R[2],I=()=>st.E/RT();
+  const S=CSim(host,{h:300,aria:'מקור מתח ושלושה נגדים שמחוברים בטור',
+    outs:[['rt','ההתנגדות השקולה'],['i','הזרם במעגל'],['v1','המתח על R₁'],['v2','המתח על R₂'],['v3','המתח על R₃'],['sv','סכום המתחים']],
+    draw(ctx,t,cv,set){const{L,R,T,B}=geo(cv),my=(T+B)/2,w=Math.min(56,(R-L)/5);
+      wire(ctx,t,[[L,B],[L,T],[R,T],[R,B],[L,B]]);batV(ctx,t,L,my,'ε',true,1);
+      st.R.forEach((r,i)=>resH(ctx,t,L+(R-L)*(i+1)/4,T,'R'+'₁₂₃'[i],V_(I()*r),w));
+      cur(ctx,t,(L+R)/2,B,-1,0,'I');lab(ctx,t,A_(I()),(L+R)/2,B+22,'acc',undefined,11);
+      set('rt',O_(RT()));set('i',A_(I()));st.R.forEach((r,i)=>set('v'+(i+1),V_(I()*r)));set('sv',V_(I()*RT()))}});
+  const s=[slider(S.ctls,'מתח המקור ε',1,24,1,st.E,v=>v+' V',v=>{st.E=v;S.redraw()}),...[0,1,2].map(i=>slider(S.ctls,'ההתנגדות R'+'₁₂₃'[i],1,20,1,st.R[i],v=>v+' Ω',v=>{st.R[i]=v;S.redraw()}))];
+  exBtn(host,`טעינת הדוגמה: ${u('ε = 12 V')}, ${u('4 Ω')}, ${u('8 Ω')}, ${u('12 Ω')}`,()=>{st.E=12;st.R=[4,8,12];[12,4,8,12].forEach((v,i)=>s[i].set(v));S.redraw()},preset);
+  note(host,'המקור אידיאלי, בלי התנגדות פנימית. אותו זרם עובר בכל הנגדים, והמתח מתחלק ביניהם ביחס להתנגדויות: הנגד הגדול מקבל את המתח הגדול. סכום המתחים שווה תמיד למתח המקור.');
+},
+parallel(host,preset){
+  const st={E:12,R1:6,R2:12,R3:2},Rp=()=>st.R1*st.R2/(st.R1+st.R2),I=()=>st.E/(Rp()+st.R3);
+  const S=CSim(host,{h:320,aria:'מקור מתח, שני נגדים במקביל ונגד שלישי בטור אליהם',
+    outs:[['rp','ההתנגדות השקולה של R₁ ו־R₂'],['rt','ההתנגדות השקולה הכוללת'],['i','הזרם הכולל I'],['vp','המתח על הנגדים המקבילים'],['i1','הזרם ב־R₁'],['i2','הזרם ב־R₂']],
+    draw(ctx,t,cv,set){const{L,R,T,B}=geo(cv),my=(T+B)/2,xm=L+(R-L)*.62,x3=L+(R-L)*.3,Vp=I()*Rp();
+      wire(ctx,t,[[L,B],[L,T],[R,T],[R,B],[L,B]]);wire(ctx,t,[[xm,T],[xm,B]]);batV(ctx,t,L,my,'ε',true,1);
+      if(st.R3>0)resH(ctx,t,x3,T,'R₃',V_(I()*st.R3),Math.min(56,(R-L)/5));
+      resV(ctx,t,xm,my,'R₁',A_(Vp/st.R1),-1);resV(ctx,t,R,my,'R₂',A_(Vp/st.R2),-1);node(ctx,t,xm,T);node(ctx,t,xm,B);
+      cur(ctx,t,L+(R-L)*.1,T,1,0,'I');cur(ctx,t,xm,T+22,0,1,'');cur(ctx,t,R,T+22,0,1,'');lab(ctx,t,'I₁',xm+12,T+26,'pos','left');lab(ctx,t,'I₂',R+12,T+26,'pos','left');
+      set('rp',O_(Rp()));set('rt',O_(Rp()+st.R3));set('i',A_(I()));set('vp',V_(Vp));set('i1',A_(Vp/st.R1));set('i2',A_(Vp/st.R2))}});
+  const s=[slider(S.ctls,'מתח המקור ε',1,24,1,st.E,v=>v+' V',v=>{st.E=v;S.redraw()}),slider(S.ctls,'ההתנגדות R₁',1,30,1,st.R1,v=>v+' Ω',v=>{st.R1=v;S.redraw()}),slider(S.ctls,'ההתנגדות R₂',1,30,1,st.R2,v=>v+' Ω',v=>{st.R2=v;S.redraw()}),slider(S.ctls,'ההתנגדות R₃ שבטור (0: בלי נגד)',0,20,1,st.R3,v=>v+' Ω',v=>{st.R3=v;S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('ε = 12 V')}, ${u('R₁ = 6 Ω')}, ${u('R₂ = 12 Ω')}, ${u('R₃ = 2 Ω')}`,()=>{Object.assign(st,{E:12,R1:6,R2:12,R3:2});[12,6,12,2].forEach((v,i)=>s[i].set(v));S.redraw()},preset);
+  note(host,'המקור אידיאלי. על שני הנגדים המקבילים יש אותו מתח, והזרם הכולל מתפצל ביניהם ביחס הפוך להתנגדויות: בנגד הקטן עובר הזרם הגדול. ההתנגדות השקולה שלהם קטנה מכל אחד מהם. אפסו את R₃ כדי לקבל חיבור מקבילי טהור.');
+},
+emf(host,preset){
+  const st={E:12,r:1,R:5},I=()=>st.E/(st.R+st.r);
+  const S=CSim(host,{h:300,aria:'סוללה עם התנגדות פנימית שמחוברת לנגד חיצוני',ariaG:'גרף מתח ההדקים כפונקציה של הזרם',hint:'המלבן המקווקו: הסוללה',
+    outs:[['i','הזרם במעגל I'],['v','מתח ההדקים V = ε − rI'],['d','מפל המתח הפנימי rI'],['k','זרם הקצר ε / r']],
+    draw(ctx,t,cv,set){emfDraw(ctx,t,cv,st,I());set('i',A_(I()));set('v',V_(st.E-st.r*I()));set('d',V_(st.r*I()));set('k',A_(st.E/st.r))},
+    gdraw(ctx,t,cv){plot(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{x0:0,x1:st.E/st.r,xl:'I (A)',name:'V (V)',series:[{f:x=>st.E-st.r*x,col:'pos'}],mark:I(),ymin:0,ymax:st.E,fix:true})}});
+  const s=[slider(S.ctls,'הכא״מ ε',1,24,1,st.E,v=>v+' V',v=>{st.E=v;S.redraw()}),slider(S.ctls,'ההתנגדות הפנימית r',.1,3,.1,st.r,v=>fmt(v)+' Ω',v=>{st.r=v;S.redraw()}),slider(S.ctls,'ההתנגדות החיצונית R',0,20,.5,st.R,v=>fmt(v)+' Ω',v=>{st.R=v;S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('ε = 12 V')}, ${u('r = 1 Ω')}, ${u('R = 5 Ω')}`,()=>{Object.assign(st,{E:12,r:1,R:5});[12,1,5].forEach((v,i)=>s[i].set(v));S.redraw()},preset);
+  note(host,'הוולטמטר מודד את המתח בין הדקי הסוללה, a ו־b. הקטינו את R: הזרם גדל, מפל המתח הפנימי גדל, ומתח ההדקים יורד. בגרף הנקודה נעה לאורך קו ישר ששיפועו ‎−r: הוא מתחיל ב־ε (מעגל פתוח) ומגיע לאפס בזרם הקצר.');
+},
+kirchhoff(host,preset){
+  const st={E1:12,E2:10,R1:3,R2:4,R3:2};
+  const sol=()=>{const V=(st.E1/st.R1+st.E2/st.R2)/(1/st.R1+1/st.R2+1/st.R3);return{V,I1:(st.E1-V)/st.R1,I2:(st.E2-V)/st.R2,I3:V/st.R3}};
+  const S=CSim(host,{h:340,aria:'מעגל עם שני מקורות מתח, שלושה ענפים ושני צמתים',hint:'החצים: כיווני הזרמים בפועל',
+    outs:[['i1','I₁ (חיובי: כלפי מעלה בענף השמאלי)'],['i2','I₂ (חיובי: כלפי מעלה בענף הימני)'],['i3','I₃ (כלפי מטה בענף האמצעי)'],['n','חוק הצומת ב־A: I₁ + I₂'],['v','המתח בין A ל־B'],['l','לולאה שמאלית: I₁R₁ + I₃R₃']],
+    draw(ctx,t,cv,set){const{L,R,T,B}=geo(cv),my=(T+B)/2,xm=(L+R)/2,q=sol(),z=v=>Math.abs(v)<1e-9;
+      wire(ctx,t,[[L,B],[L,T],[R,T],[R,B],[L,B]]);wire(ctx,t,[[xm,T],[xm,B]]);
+      resV(ctx,t,L,my-44,'R₁','',1);batV(ctx,t,L,my+50,'ε₁',true,1);resV(ctx,t,R,my-44,'R₂','',-1);batV(ctx,t,R,my+50,'ε₂',true,-1);resV(ctx,t,xm,my,'R₃','',1);
+      node(ctx,t,xm,T,'A',-12);node(ctx,t,xm,B,'B',22);
+      if(!z(q.I1))cur(ctx,t,(L+xm)/2,T,Math.sign(q.I1),0,'I₁');if(!z(q.I2))cur(ctx,t,(xm+R)/2,T,-Math.sign(q.I2),0,'I₂');if(!z(q.I3))cur(ctx,t,xm,T+24,0,1,'');lab(ctx,t,'I₃',xm+12,T+28,'pos','left');
+      const s=v=>(v>=0?'+':'−')+fmt(Math.abs(v))+' A';set('i1',s(q.I1));set('i2',s(q.I2));set('i3',A_(q.I3));set('n',fmt(q.I1+q.I2)+' A = I₃');set('v',V_(q.V));set('l',fmt(q.I1*st.R1+q.I3*st.R3)+' V = ε₁')}});
+  const s=[slider(S.ctls,'הכא״מ ε₁',0,24,1,st.E1,v=>v+' V',v=>{st.E1=v;S.redraw()}),slider(S.ctls,'הכא״מ ε₂',0,24,1,st.E2,v=>v+' V',v=>{st.E2=v;S.redraw()}),slider(S.ctls,'ההתנגדות R₁',1,10,1,st.R1,v=>v+' Ω',v=>{st.R1=v;S.redraw()}),slider(S.ctls,'ההתנגדות R₂',1,10,1,st.R2,v=>v+' Ω',v=>{st.R2=v;S.redraw()}),slider(S.ctls,'ההתנגדות R₃',1,10,1,st.R3,v=>v+' Ω',v=>{st.R3=v;S.redraw()})];
+  const load=a=>{[st.E1,st.E2,st.R1,st.R2,st.R3]=a;a.forEach((v,i)=>s[i].set(v));S.redraw()};
+  exBtn(host,`טעינת הדוגמה: ${u('ε₁ = 12 V')}, ${u('ε₂ = 10 V')}, ${u('R₁ = 3 Ω')}, ${u('R₂ = 4 Ω')}, ${u('R₃ = 2 Ω')}`,()=>load([12,10,3,4,2]),preset);
+  note(host,'שני המקורות אידיאליים, וההדק החיובי של כל אחד פונה כלפי מעלה. הקטינו את ε₂ בהדרגה: בנקודה מסוימת I₂ מתאפס, ואחריה הוא מחליף כיוון. אז המקור החזק דוחף זרם דרך המקור החלש, נגד הכא״מ שלו, כמו בטעינת סוללה.');
+},
+power(host,preset){
+  const st={V:230,R:23,t:3},I=()=>st.V/st.R,P=()=>st.V*st.V/st.R;
+  const S=CSim(host,{h:280,aria:'מכשיר חשמלי שמחובר למקור מתח',ariaG:'גרף ההספק כפונקציה של המתח',
+    outs:[['i','הזרם I = V / R'],['p','ההספק P = VI'],['w','האנרגיה בזמן הפעולה, בג׳אול'],['k','האנרגיה בקילוואט־שעה']],
+    draw(ctx,t,cv,set){const{L,R,T,B}=geo(cv),my=(T+B)/2;wire(ctx,t,[[L,B],[L,T],[R,T],[R,B],[L,B]]);batV(ctx,t,L,my,'V',true,1);resV(ctx,t,R,my,'R',W_(P()),-1);meter(ctx,t,(L+R)/2,T,'A',A_(I()));if(st.V>0)cur(ctx,t,L+(R-L)*.2,T,1,0,'I');
+      set('i',A_(I()));set('p',W_(P()));set('w',fmt(P()*st.t*60)+' J');set('k',fmt(P()*st.t/60/1000)+' kWh')},
+    gdraw(ctx,t,cv){plot(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{x0:0,x1:240,xl:'V (V)',name:'P (W)',series:[{f:x=>x*x/st.R,col:'pos'}],mark:st.V})}});
+  const s=[slider(S.ctls,'המתח V',0,240,5,st.V,v=>v+' V',v=>{st.V=v;S.redraw()}),slider(S.ctls,'ההתנגדות R',5,500,1,st.R,v=>v+' Ω',v=>{st.R=v;S.redraw()}),slider(S.ctls,'זמן הפעולה',1,120,1,st.t,v=>v+' min',v=>{st.t=v;S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: קומקום, ${u('V = 230 V')}, ${u('R = 23 Ω')}, ${u('3 min')}`,()=>{Object.assign(st,{V:230,R:23,t:3});[230,23,3].forEach((v,i)=>s[i].set(v));S.redraw()},preset);
+  note(host,'בהתנגדות קבועה ההספק יחסי לריבוע המתח, ולכן הגרף הוא פרבולה: חצי מהמתח נותן רק רבע מההספק. הקטינו את ההתנגדות בלי לשנות את המתח: הזרם גדל, וגם ההספק.');
+},
+eff(host,preset){
+  const st={E:12,r:2,R:4},I=()=>st.E/(st.R+st.r),PR=R=>st.E*st.E*R/((R+st.r)**2);
+  const S=CSim(host,{h:300,aria:'סוללה עם התנגדות פנימית שמחוברת לנגד חיצוני',ariaG:'גרף ההספק בנגד החיצוני כפונקציה של התנגדותו',hint:'המלבן המקווקו: הסוללה',
+    outs:[['i','הזרם I'],['pt','ההספק הכולל של המקור εI'],['pr','ההספק המועיל, בנגד החיצוני'],['pi','ההספק שמתבזבז בסוללה I²r'],['e','הנצילות']],
+    draw(ctx,t,cv,set){emfDraw(ctx,t,cv,st,I());set('i',A_(I()));set('pt',W_(st.E*I()));set('pr',W_(PR(st.R)));set('pi',W_(I()*I()*st.r));set('e',fmt(st.R/(st.R+st.r)*100)+'%')},
+    gdraw(ctx,t,cv){plot(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{x0:0,x1:20,xl:'R (Ω)',name:'P (W)',series:[{f:PR,col:'pos'}],mark:st.R,vline:st.r})}});
+  const s=[slider(S.ctls,'הכא״מ ε',1,24,1,st.E,v=>v+' V',v=>{st.E=v;S.redraw()}),slider(S.ctls,'ההתנגדות הפנימית r',.5,5,.5,st.r,v=>fmt(v)+' Ω',v=>{st.r=v;S.redraw()}),slider(S.ctls,'ההתנגדות החיצונית R',0,20,.5,st.R,v=>fmt(v)+' Ω',v=>{st.R=v;S.redraw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('ε = 12 V')}, ${u('r = 2 Ω')}, ${u('R = 4 Ω')}`,()=>{Object.assign(st,{E:12,r:2,R:4});[12,2,4].forEach((v,i)=>s[i].set(v));S.redraw()},preset);
+  note(host,'הקו המקווקו בגרף מסמן את R = r. שם ההספק בנגד החיצוני הוא הגדול ביותר, אבל הנצילות היא רק 50%: חצי מהאנרגיה מתבזבז בתוך הסוללה. הגדילו את R: הנצילות עולה ומתקרבת ל־100%, אבל ההספק המועיל יורד.');
+}
+};
+
+
+/* ---------- content ---------- */
+const e10=(a,e)=>`${a}·10<sup>${String(e).replace('-','−')}</sup>`;
+const eps='<i>ε</i>',RT='<i>R</i><sub>T</sub>',Vab='<i>V</i><sub>ab</sub>',rho='<i>ρ</i>',ell='<i>ℓ</i>',eta='<i>η</i>',cE=m(`<i>e</i> = ${e10('1.6',-19)} C`);
+const R1='<i>R</i><sub>1</sub>',R2='<i>R</i><sub>2</sub>',R3='<i>R</i><sub>3</sub>',I1='<i>I</i><sub>1</sub>',I2='<i>I</i><sub>2</sub>',I3='<i>I</i><sub>3</sub>';
+const T=[
+{id:'current',title:'זרם חשמלי',sub:'קצב המעבר של מטען דרך חתך המוליך',
+ intro:[
+ `<b>זרם חשמלי</b> הוא תנועה מסודרת של מטענים. <b>עוצמת הזרם</b> היא כמות המטען שעוברת דרך חתך של המוליך ביחידת זמן: ${m(`<i>I</i> = ${fr('Δ<i>q</i>','Δ<i>t</i>')}`)}.`,
+ `יחידת הזרם היא אמפר: ${m('1 A = 1 C/s')}. זרם של אמפר אחד פירושו שבכל שנייה עובר בחתך מטען של קולון אחד, כלומר ${m(e10('6.25',18))} אלקטרונים.`,
+ `<b>כיוון הזרם המוסכם</b> הוא הכיוון שבו היו נעים מטענים חיוביים: במעגל החיצוני, מההדק החיובי של המקור אל ההדק השלילי. במתכת נעים בפועל האלקטרונים, והם נעים בכיוון ההפוך לכיוון הזרם.`,
+ `כשהזרם לא קבוע, עוצמת הזרם הרגעית היא ${m(`<i>I</i> = ${fr('<i>dq</i>','<i>dt</i>')}`)}: השיפוע של גרף המטען כפונקציה של הזמן. ולהפך, השטח שמתחת לגרף הזרם כפונקציה של הזמן שווה למטען שעבר.`,
+ `מטען לא נוצר ולא נעלם בדרך. לכן בזרם קבוע, <b>אותו זרם</b> עובר בכל חתך של ענף שאין בו הסתעפויות, לפני כל רכיב ואחריו.`],
+ formulas:[[`<i>I</i> = ${fr('Δ<i>q</i>','Δ<i>t</i>')}`,'זרם ממוצע'],[`<i>I</i> = ${fr('<i>dq</i>','<i>dt</i>')}`,'זרם רגעי: שיפוע גרף המטען כפונקציה של הזמן'],[`Δ<i>q</i> = <i>I</i>Δ<i>t</i>`,'המטען שעבר בזרם קבוע'],[`<i>n</i> = ${fr('Δ<i>q</i>','<i>e</i>')}`,'מספר האלקטרונים שעברו']],
+ trap:[`הנורה "צורכת" זרם?`,`לא. הזרם שנכנס לנורה שווה בדיוק לזרם שיוצא ממנה: אותם אלקטרונים ממשיכים הלאה במעגל. מה שהנורה צורכת הוא <b>אנרגיה</b>: האלקטרונים מאבדים בה אנרגיה חשמלית, שהופכת לאור ולחום. הזרם לא נחלש לאורך המעגל.`],
+ ex:{given:[`בתיל זורם זרם קבוע של ${m('2 A')}`,cE],ask:[`א. כמה מטען עובר בחתך התיל במשך ${m('5 s')}?`,`ב. כמה אלקטרונים עוברים בחתך בזמן הזה?`,`ג. כמה זמן נדרש כדי שיעבור מטען של ${m('36 C')}?`,`ד. הזרם מכוון ימינה. לאן נעים האלקטרונים?`],
+  steps:[
+  `<b>סעיף א.</b> ${M('Δ<i>q</i> = <i>I</i>Δ<i>t</i> = 2·5 = 10 C')}`,
+  `<b>סעיף ב.</b> ${M(`<i>n</i> = ${fr('Δ<i>q</i>','<i>e</i>')} = ${fr('10',e10('1.6',-19))} = ${e10('6.25',19)}`)}`,
+  `<b>סעיף ג.</b> ${M(`Δ<i>t</i> = ${fr('Δ<i>q</i>','<i>I</i>')} = ${fr('36','2')} = 18 s`)}`,
+  `<b>סעיף ד.</b> האלקטרונים שליליים, ולכן הם נעים בכיוון ההפוך לכיוון הזרם המוסכם: שמאלה.`],
+  check:`בסימולציה אפשר להריץ את הזמן עד ${m('5 s')} ולראות שהמטען שעבר הוא ${m('10 C')}. מספר האלקטרונים עצום, ולכן הזרם נראה לנו רציף.`},
+ qs:[
+ {l:'b',t:'num',q:`דרך חתך של תיל עובר מטען של ${m('30 C')} במשך דקה אחת. מה עוצמת הזרם?`,a:.5,u:'A',s:`${m(`<i>I</i> = ${fr('Δ<i>q</i>','Δ<i>t</i>')} = ${fr('30','60')} = 0.5 A`)}.`},
+ {l:'b',t:'num',q:`בתיל זורם זרם קבוע של ${m('0.2 A')}. כמה מטען עובר בחתך התיל במשך 5 דקות?`,a:60,u:'C',s:`${m('Δ<i>q</i> = <i>I</i>Δ<i>t</i> = 0.2·300 = 60 C')}. את הזמן ממירים לשניות.`},
+ {l:'b',t:'mc',q:`למה שווה אמפר אחד?`,o:['קולון כפול שנייה','קולון לשנייה','וולט לשנייה','ג׳אול לקולון'],a:1,s:`${m(`<i>I</i> = ${fr('Δ<i>q</i>','Δ<i>t</i>')}`)}, ולכן ${m('1 A = 1 C/s')}.`},
+ {l:'b',t:'mc',q:`מה כיוון הזרם המוסכם במעגל החיצוני, שמחוץ למקור המתח?`,o:['מההדק השלילי אל ההדק החיובי','מההדק החיובי אל ההדק השלילי','בכיוון התנועה של האלקטרונים','הכיוון מתחלף כל הזמן'],a:1,s:`הזרם המוסכם מכוון כמו תנועה של מטענים חיוביים: מההדק החיובי, דרך המעגל, אל ההדק השלילי. האלקטרונים נעים בכיוון ההפוך.`},
+ {l:'a',t:'num',q:`בתיל זורם זרם של ${m('3.2 A')}. כמה אלקטרונים עוברים בחתך התיל בכל שנייה? (${cE})`,a:2e19,u:'',s:`בכל שנייה עובר מטען של ${m('3.2 C')}: ${m(`<i>n</i> = ${fr('3.2',e10('1.6',-19))} = ${e10('2',19)}`)}.`},
+ {l:'a',t:'num',q:`על סוללה של טלפון כתוב ${m('2000 mAh')}: היא יכולה לספק זרם של ${m('2000 mA')} במשך שעה. כמה מטען עובר במעגל בזמן הזה?`,a:7200,u:'C',s:`${m('Δ<i>q</i> = <i>I</i>Δ<i>t</i> = 2 A·3600 s = 7200 C')}. מיליאמפר־שעה היא יחידה של מטען.`},
+ {l:'a',t:'num',q:`הזרם בתיל גדל בקצב קבוע מאפס ל־${m('4 A')} במשך ${m('10 s')}. כמה מטען עבר בחתך התיל בזמן הזה?`,a:20,u:'C',s:`המטען הוא השטח שמתחת לגרף הזרם כפונקציה של הזמן, כאן שטח של משולש: ${m(`${half}·10·4 = 20 C`)}. אפשר גם דרך הזרם הממוצע, ${m('2 A')}.`},
+ {l:'a',t:'mc',q:`נורה מחוברת לסוללה. מודדים את הזרם בתיל לפני הנורה ואת הזרם בתיל אחריה. מה מצפים למצוא?`,o:['הזרם אחרי הנורה קטן יותר, כי הנורה צרכה חלק ממנו','הזרם אחרי הנורה גדול יותר','שני הזרמים שווים','אחרי הנורה אין זרם'],a:2,s:`מטען לא מצטבר בנורה ולא נעלם בה, ולכן אותו זרם נכנס ויוצא. הנורה צורכת אנרגיה, לא זרם.`}
+ ]},
+{id:'ohm',title:'חוק אוהם',sub:'מתח, זרם והתנגדות',
+ intro:[
+ `כדי שיזרום זרם ברכיב, צריך מתח בין הקצוות שלו. <b>ההתנגדות</b> של הרכיב היא היחס בין המתח לזרם: ${m(`<i>R</i> = ${fr('<i>V</i>','<i>I</i>')}`)}. היחידה היא אוהם, ${m('1 Ω = 1 V/A')}.`,
+ `<b>חוק אוהם:</b> במוליך מתכתי שהטמפרטורה שלו קבועה, ההתנגדות קבועה, ולכן המתח יחסי לזרם: ${m('<i>V</i> = <i>RI</i>')}. רכיב כזה נקרא <b>רכיב אוהמי</b>, או נגד.`,
+ `הגרף של המתח כפונקציה של הזרם ברכיב אוהמי הוא קו ישר שעובר בראשית, והשיפוע שלו שווה להתנגדות.`,
+ `יש רכיבים <b>לא אוהמיים</b>, שההתנגדות שלהם משתנה. בנורת להט, למשל, הנימה מתחממת כשהזרם גדל, וההתנגדות שלה עולה. הגרף שלה עקום. גם ברכיב כזה אפשר לחשב ${m(`${fr('<i>V</i>','<i>I</i>')}`)} בכל נקודה, אבל היחס אינו קבוע.`,
+ `<b>מדידה:</b> אמפרמטר מחברים בטור לרכיב, כדי שאותו זרם יעבור בשניהם. וולטמטר מחברים במקביל לרכיב. מניחים שהמכשירים אידיאליים: לאמפרמטר אין התנגדות, ובוולטמטר לא עובר זרם.`],
+ formulas:[[`<i>V</i> = <i>RI</i>`,'חוק אוהם'],[`<i>R</i> = ${fr('<i>V</i>','<i>I</i>')}`,'הגדרת ההתנגדות'],[`<i>I</i> = ${fr('<i>V</i>','<i>R</i>')}`,'הזרם ברכיב שהמתח עליו <i>V</i>']],
+ trap:[`חוק אוהם הוא הנוסחה R = V/I?`,`לא בדיוק. ${m(`<i>R</i> = ${fr('<i>V</i>','<i>I</i>')}`)} היא <b>ההגדרה</b> של התנגדות, והיא נכונה לכל רכיב. חוק אוהם אומר משהו נוסף: שבמוליכים מסוימים היחס הזה <b>קבוע</b>, ולא תלוי במתח. נורת להט מקיימת את ההגדרה, אבל לא את חוק אוהם.`],
+ ex:{given:[`כשמחברים נגד למתח של ${m('6 V')}, זורם בו זרם של ${m('0.5 A')}`,`בנורת להט נמדד: זרם של ${m('0.2 A')} במתח ${m('2 V')}, וזרם של ${m('0.4 A')} במתח ${m('6 V')}`],ask:[`א. מה התנגדות הנגד?`,`ב. איזה זרם יזרום בנגד במתח של ${m('9 V')}?`,`ג. איזה מתח דרוש כדי שיזרום בנגד זרם של ${m('0.2 A')}?`,`ד. האם הנורה היא רכיב אוהמי?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`<i>R</i> = ${fr('<i>V</i>','<i>I</i>')} = ${fr('6','0.5')} = 12 Ω`)}`,
+  `<b>סעיף ב.</b> ההתנגדות קבועה: ${M(`<i>I</i> = ${fr('<i>V</i>','<i>R</i>')} = ${fr('9','12')} = 0.75 A`)}`,
+  `<b>סעיף ג.</b> ${M('<i>V</i> = <i>RI</i> = 12·0.2 = 2.4 V')}`,
+  `<b>סעיף ד.</b> מחשבים את היחס בשתי המדידות: ${m(`${fr('2','0.2')} = 10 Ω`)} ו־${m(`${fr('6','0.4')} = 15 Ω`)}. ההתנגדות לא קבועה, ולכן הנורה אינה רכיב אוהמי.`],
+  check:`בנגד, מתח גדול פי 1.5 נתן זרם גדול פי 1.5. בנורה, מתח גדול פי 3 נתן זרם גדול רק פי 2, כי הנימה התחממה וההתנגדות שלה עלתה.`},
+ qs:[
+ {l:'b',t:'num',q:`נגד של ${m('4 Ω')} מחובר למתח של ${m('12 V')}. מה הזרם בנגד?`,a:3,u:'A',s:`${m(`<i>I</i> = ${fr('<i>V</i>','<i>R</i>')} = ${fr('12','4')} = 3 A`)}.`},
+ {l:'b',t:'num',q:`בנגד של ${m('1 kΩ')} זורם זרם של ${m('0.02 A')}. מה המתח על הנגד?`,a:20,u:'V',s:`${m('<i>V</i> = <i>RI</i> = 1000·0.02 = 20 V')}.`},
+ {l:'b',t:'mc',q:`מה מייצג השיפוע של גרף המתח כפונקציה של הזרם, ברכיב אוהמי?`,o:['את הזרם','את ההתנגדות','את ההספק','את המטען'],a:1,s:`${m('<i>V</i> = <i>RI</i>')} היא משוואה של קו ישר דרך הראשית, שהשיפוע שלו ${m('<i>R</i>')}.`},
+ {l:'b',t:'mc',q:`איך מחברים אמפרמטר כדי למדוד את הזרם בנגד?`,o:['בטור לנגד','במקביל לנגד','במקביל למקור המתח','אין חשיבות לאופן החיבור'],a:0,s:`האמפרמטר מחובר בטור, כדי שהזרם שעובר בנגד יעבור גם בו. וולטמטר מחברים במקביל.`},
+ {l:'a',t:'num',q:`מכשיר חשמלי מחובר למתח הרשת, ${m('230 V')}, וזורם בו זרם של ${m('0.5 A')}. מה ההתנגדות שלו?`,a:460,u:'Ω',s:`${m(`<i>R</i> = ${fr('230','0.5')} = 460 Ω`)}.`},
+ {l:'a',t:'num',q:`הגרף של המתח כפונקציה של הזרם בנגד הוא קו ישר דרך הראשית, שעובר בנקודה ${m('(0.2 A, 3 V)')}. מה הזרם בנגד כשהמתח עליו ${m('5 V')}?`,a:.333,u:'A',s:`${m(`<i>R</i> = ${fr('3','0.2')} = 15 Ω`)}.<br>${m(`<i>I</i> = ${fr('5','15')} ≈ 0.33 A`)}.`},
+ {l:'a',t:'mc',q:`מכפילים את המתח על נורת להט. מה קורה לזרם בנורה?`,o:['גדל בדיוק פי 2','גדל פחות מפי 2','גדל יותר מפי 2','לא משתנה'],a:1,s:`כשהמתח גדל הנימה מתחממת, וההתנגדות שלה גדלה. לכן הזרם ${m(`${fr('<i>V</i>','<i>R</i>')}`)} גדל פחות מפי 2.`},
+ {l:'a',t:'num',q:`נגד של ${m('50 Ω')} מחובר למקור מתח. מגדילים את המתח מ־${m('5 V')} ל־${m('8 V')}. בכמה גדל הזרם?`,a:.06,u:'A',s:`${m(`Δ<i>I</i> = ${fr('Δ<i>V</i>','<i>R</i>')} = ${fr('8 − 5','50')} = 0.06 A`)}.`}
+ ]},
+{id:'resist',title:'התנגדות של מוליך',sub:'במה תלויה ההתנגדות של תיל',
+ intro:[
+ `ההתנגדות של תיל תלויה בשלושה דברים: באורך שלו, בשטח החתך שלו ובחומר שממנו הוא עשוי: ${m(`<i>R</i> = ${rho}${fr(ell,'<i>A</i>')}`)}.`,
+ `תיל <b>ארוך</b> יותר מתנגד יותר: ההתנגדות יחסית לאורך ${m(ell)}. תיל <b>עבה</b> יותר מתנגד פחות: ההתנגדות יחסית הפוך לשטח החתך ${m('<i>A</i>')}.`,
+ `${m(rho)} היא <b>ההתנגדות הסגולית</b>, תכונה של החומר. היחידות שלה ${m('Ω·m')}. למוליכים טובים כמו נחושת היא קטנה מאוד, ולחומרים שמשמשים בגופי חימום, כמו ניכרום, היא גדולה פי עשרות.`,
+ `לתיל מסוים נוח להגדיר <b>התנגדות ליחידת אורך</b>, ${m(`<i>λ</i> = ${fr(rho,'<i>A</i>')}`)}, ביחידות ${m('Ω/m')}. אז ${m(`<i>R</i> = <i>λ</i>${ell}`)}.`,
+ `בחישובים שמים לב ליחידות של שטח החתך: ${m(`1 mm<sup>2</sup> = 10<sup>−6</sup> m<sup>2</sup>`)}. בתיל שחתכו עגול ${m(`<i>A</i> = π<i>r</i><sup>2</sup>`)}, ולכן קוטר כפול פירושו שטח חתך גדול פי 4.`],
+ formulas:[[`<i>R</i> = ${rho}${fr(ell,'<i>A</i>')} = <i>λ</i>${ell}`,'התנגדות של מוליך'],[`<i>λ</i> = ${fr(rho,'<i>A</i>')}`,'התנגדות ליחידת אורך'],[`<i>A</i> = π<i>r</i><sup>2</sup>`,'שטח החתך של תיל עגול'],[`1 mm<sup>2</sup> = 10<sup>−6</sup> m<sup>2</sup>`,'המרת יחידות של שטח']],
+ trap:[`תיל עבה פי 2, התנגדות קטנה פי 2?`,`תלוי מה פירוש "עבה פי 2". אם שטח החתך גדול פי 2, ההתנגדות אכן קטנה פי 2. אבל אם <b>הקוטר</b> גדול פי 2, שטח החתך גדול פי 4, וההתנגדות קטנה פי 4. בשאלות בודקים תמיד אם נתון קוטר, רדיוס או שטח חתך.`],
+ ex:{given:[`תיל ניכרום שאורכו ${m('2 m')} ושטח החתך שלו ${m('0.5 mm<sup>2</sup>')}`,`ההתנגדות הסגולית של ניכרום ${m(e10('1.1',-6)+' Ω·m')}, ושל נחושת ${m(e10('1.7',-8)+' Ω·m')}`],ask:[`א. מה התנגדות התיל?`,`ב. מה ההתנגדות שלו ליחידת אורך?`,`ג. איזה אורך של אותו תיל נותן התנגדות של ${m('11 Ω')}?`,`ד. מה הייתה ההתנגדות של תיל נחושת באותן מידות?`],
+  steps:[
+  `<b>סעיף א.</b> ממירים את שטח החתך: ${m(`0.5 mm<sup>2</sup> = ${e10('0.5',-6)} m<sup>2</sup>`)}. ${M(`<i>R</i> = ${rho}${fr(ell,'<i>A</i>')} = ${e10('1.1',-6)}·${fr('2',e10('0.5',-6))} = 4.4 Ω`)}`,
+  `<b>סעיף ב.</b> ${M(`<i>λ</i> = ${fr('<i>R</i>',ell)} = ${fr('4.4','2')} = 2.2 Ω/m`)}`,
+  `<b>סעיף ג.</b> ${M(`${ell} = ${fr('<i>R</i>','<i>λ</i>')} = ${fr('11','2.2')} = 5 m`)}`,
+  `<b>סעיף ד.</b> ${M(`<i>R</i> = ${e10('1.7',-8)}·${fr('2',e10('0.5',-6))} = 0.068 Ω`)}`],
+  check:`ההתנגדות של תיל הנחושת קטנה פי 65 בערך, כמו היחס בין ההתנגדויות הסגוליות. לכן חוטי חיבור עושים מנחושת, ואת ההתנגדות שלהם מזניחים בדרך כלל.`},
+ qs:[
+ {l:'b',t:'num',q:`מה ההתנגדות של תיל נחושת שאורכו ${m('100 m')} ושטח החתך שלו ${m('1 mm<sup>2</sup>')}? (${m(`${rho} = ${e10('1.7',-8)} Ω·m`)})`,a:1.7,u:'Ω',s:`${m(`<i>R</i> = ${e10('1.7',-8)}·${fr('100',e10('1',-6))} = 1.7 Ω`)}.`},
+ {l:'b',t:'mc',q:`מאריכים תיל פי 3, בלי לשנות את העובי ואת החומר. מה קורה להתנגדות שלו?`,o:['גדלה פי 3','קטנה פי 3','גדלה פי 9','לא משתנה'],a:0,s:`ההתנגדות יחסית לאורך: אורך גדול פי 3 נותן התנגדות גדולה פי 3.`},
+ {l:'b',t:'mc',q:`מחליפים תיל בתיל אחר, מאותו חומר ובאותו אורך, ששטח החתך שלו גדול פי 2. מה קורה להתנגדות?`,o:['גדלה פי 2','קטנה פי 2','קטנה פי 4','לא משתנה'],a:1,s:`ההתנגדות יחסית הפוך לשטח החתך.`},
+ {l:'b',t:'num',q:`ההתנגדות ליחידת אורך של תיל היא ${m('0.5 Ω/m')}. מה ההתנגדות של קטע שאורכו ${m('8 m')}?`,a:4,u:'Ω',s:`${m(`<i>R</i> = <i>λ</i>${ell} = 0.5·8 = 4 Ω`)}.`},
+ {l:'a',t:'num',q:`תיל א ותיל ב עשויים מאותו חומר. האורך של תיל ב גדול פי 2 מזה של תיל א, והקוטר שלו גדול פי 2. מה היחס בין ההתנגדות של תיל ב להתנגדות של תיל א?`,a:.5,u:'',s:`קוטר גדול פי 2 נותן שטח חתך גדול פי 4.<br>${m(`<i>R</i> ∝ ${fr(ell,'<i>A</i>')}`)}: ${m(`${fr('2','4')} = 0.5`)}. ההתנגדות של תיל ב היא חצי מזו של תיל א.`},
+ {l:'a',t:'num',q:`לתיל שאורכו ${m('5 m')} ושטח החתך שלו ${m('0.2 mm<sup>2</sup>')} יש התנגדות של ${m('10 Ω')}. מה ההתנגדות הסגולית של החומר?`,a:4e-7,u:'Ω·m',s:`${m(`${rho} = ${fr('<i>RA</i>',ell)} = ${fr(`10·${e10('0.2',-6)}`,'5')} = ${e10('4',-7)} Ω·m`)}.`},
+ {l:'a',t:'num',q:`תיל שההתנגדות שלו ${m('8 Ω')} נחתך לשני חלקים שווים, ומחברים את שני החלקים במקביל. מה ההתנגדות השקולה?`,a:2,u:'Ω',s:`לכל חצי חצי מהאורך, ולכן התנגדות של ${m('4 Ω')}. שני נגדים של ${m('4 Ω')} במקביל: ${m('2 Ω')}. אפשר גם לחשוב על זה כתיל שאורכו חצי ושטח החתך שלו כפול.`},
+ {l:'a',t:'num',q:`מותחים תיל שההתנגדות שלו ${m('5 Ω')} עד שאורכו גדל פי 2. נפח התיל לא משתנה. מה ההתנגדות שלו אחרי המתיחה?`,a:20,u:'Ω',s:`הנפח ${m(`<i>A</i>${ell}`)} קבוע, ולכן כשהאורך גדל פי 2 שטח החתך קטן פי 2.<br>${m(`<i>R</i> ∝ ${fr(ell,'<i>A</i>')}`)}: גדל פי ${m('2·2 = 4')}, כלומר ${m('20 Ω')}.`}
+ ]},
+{id:'series',title:'חיבור נגדים בטור',sub:'אותו זרם, והמתח מתחלק',
+ intro:[
+ `נגדים מחוברים <b>בטור</b> כשהם מחוברים זה אחרי זה, בלי הסתעפויות. לזרם יש רק דרך אחת לעבור.`,
+ `לכן <b>אותו זרם</b> עובר בכל הנגדים. המתח הכולל מתחלק ביניהם: ${m('<i>V</i> = <i>V</i><sub>1</sub> + <i>V</i><sub>2</sub> + …')}.`,
+ `<b>ההתנגדות השקולה</b> היא סכום ההתנגדויות: ${m(`${RT} = Σ<i>R</i><sub>i</sub>`)}. היא תמיד גדולה מכל אחד מהנגדים. אפשר להחליף את כל הנגדים בנגד אחד כזה, בלי שהזרם מהמקור ישתנה.`,
+ `המתח על כל נגד הוא ${m('<i>V</i><sub>i</sub> = <i>IR</i><sub>i</sub>')}, ולכן המתח מתחלק <b>ביחס ישר להתנגדויות</b>: על הנגד הגדול נופל המתח הגדול. זה העיקרון של מחלק מתח.`,
+ `לחיבור בטור יש חיסרון מעשי: אם רכיב אחד מתנתק או נשרף, המעגל נקטע והזרם נפסק בכל הרכיבים.`],
+ formulas:[[`${RT} = Σ<i>R</i><sub>i</sub>`,'התנגדות שקולה של נגדים בטור'],[`<i>I</i> = ${fr(eps,RT)}`,'הזרם במעגל, עם מקור אידיאלי'],[`<i>V</i><sub>i</sub> = <i>IR</i><sub>i</sub>`,'המתח על כל נגד'],[`${fr('<i>V</i><sub>1</sub>','<i>V</i><sub>2</sub>')} = ${fr(R1,R2)}`,'המתח מתחלק ביחס להתנגדויות']],
+ trap:[`הנגד הראשון מקבל יותר זרם?`,`לא. בחיבור בטור הזרם זהה בכל הנגדים, בלי קשר לסדר שלהם ולגודל שלהם. הזרם לא "נחלש" אחרי שעבר בנגד. מה ששונה מנגד לנגד הוא המתח: על נגד גדול יותר נופל מתח גדול יותר.`],
+ ex:{given:[`שלושה נגדים, ${m('4 Ω')}, ${m('8 Ω')} ו־${m('12 Ω')}, מחוברים בטור`,`המעגל מחובר למקור אידיאלי של ${m('12 V')}`],ask:[`א. מה ההתנגדות השקולה?`,`ב. מה הזרם במעגל?`,`ג. מה המתח על כל נגד?`,`ד. מה סכום המתחים?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`${RT} = 4 + 8 + 12 = 24 Ω`)}`,
+  `<b>סעיף ב.</b> ${M(`<i>I</i> = ${fr(eps,RT)} = ${fr('12','24')} = 0.5 A`)}`,
+  `<b>סעיף ג.</b> אותו זרם בכל הנגדים: ${M('<i>V</i><sub>1</sub> = 0.5·4 = 2 V &nbsp;,&nbsp; <i>V</i><sub>2</sub> = 0.5·8 = 4 V &nbsp;,&nbsp; <i>V</i><sub>3</sub> = 0.5·12 = 6 V')}`,
+  `<b>סעיף ד.</b> ${m('2 + 4 + 6 = 12 V')}, בדיוק מתח המקור.`],
+  check:`המתחים מתחלקים ביחס ${m('1 : 2 : 3')}, כמו ההתנגדויות. על הנגד הגדול ביותר נופל חצי ממתח המקור, כי ההתנגדות שלו היא חצי מההתנגדות הכוללת.`},
+ qs:[
+ {l:'b',t:'num',q:`שלושה נגדים, ${m('10 Ω')}, ${m('20 Ω')} ו־${m('30 Ω')}, מחוברים בטור. מה ההתנגדות השקולה?`,a:60,u:'Ω',s:`${m(`${RT} = 10 + 20 + 30 = 60 Ω`)}.`},
+ {l:'b',t:'num',q:`נגד של ${m('100 Ω')} ונגד של ${m('200 Ω')} מחוברים בטור למקור אידיאלי של ${m('9 V')}. מה הזרם במעגל?`,a:.03,u:'A',s:`${m(`<i>I</i> = ${fr('9','100 + 200')} = 0.03 A`)}.`},
+ {l:'b',t:'mc',q:`מה משותף לכל הנגדים שמחוברים בטור?`,o:['המתח','הזרם','ההספק','ההתנגדות'],a:1,s:`יש רק דרך אחת לזרם, ולכן אותו זרם עובר בכל הנגדים.`},
+ {l:'b',t:'num',q:`בהמשך לשאלה על הנגדים של ${m('100 Ω')} ו־${m('200 Ω')}: מה המתח על הנגד של ${m('200 Ω')}?`,a:6,u:'V',s:`${m('<i>V</i> = <i>IR</i> = 0.03·200 = 6 V')}. שני שלישים מהמתח, כי זה שני שלישים מההתנגדות.`},
+ {l:'a',t:'num',q:`נורה מיועדת לפעול במתח של ${m('6 V')} ובזרם של ${m('0.5 A')}. רוצים להפעיל אותה ממקור אידיאלי של ${m('9 V')}. איזה נגד צריך לחבר בטור אליה?`,a:6,u:'Ω',s:`על הנגד צריך ליפול המתח העודף, ${m('9 − 6 = 3 V')}, באותו זרם: ${m(`<i>R</i> = ${fr('3','0.5')} = 6 Ω`)}.`},
+ {l:'a',t:'num',q:`נגד של ${m('3 kΩ')} ונגד של ${m('1 kΩ')} מחוברים בטור למקור אידיאלי של ${m('12 V')}. מה המתח על הנגד של ${m('1 kΩ')}?`,a:3,u:'V',s:`הנגד הוא רבע מההתנגדות הכוללת, ולכן נופל עליו רבע מהמתח: ${m(`12·${fr('1','3 + 1')} = 3 V`)}.`},
+ {l:'a',t:'num',q:`שלושה נגדים זהים מחוברים בטור למקור אידיאלי של ${m('18 V')}, והזרם במעגל ${m('0.2 A')}. מה ההתנגדות של כל נגד?`,a:30,u:'Ω',s:`${m(`${RT} = ${fr('18','0.2')} = 90 Ω`)}, ולכן כל נגד ${m('30 Ω')}.`},
+ {l:'a',t:'mc',q:`מוסיפים נגד נוסף בטור למעגל שמחובר למקור אידיאלי. מה קורה לזרם במעגל?`,o:['גדל','קטן','לא משתנה','מתאפס'],a:1,s:`ההתנגדות השקולה גדלה, והמתח של המקור לא משתנה. לכן הזרם ${m(`${fr(eps,RT)}`)} קטן.`}
+ ]},
+{id:'parallel',title:'חיבור נגדים במקביל',sub:'אותו מתח, והזרם מתפצל',
+ intro:[
+ `נגדים מחוברים <b>במקביל</b> כששני הקצוות של כל אחד מהם מחוברים לאותן שתי נקודות. הזרם מגיע לצומת ומתפצל בין הענפים.`,
+ `לכן על כל הנגדים יש <b>אותו מתח</b>. הזרם הכולל הוא סכום הזרמים בענפים: ${m(`<i>I</i> = ${I1} + ${I2} + …`)}.`,
+ `<b>ההתנגדות השקולה:</b> ${m(`${fr('1',RT)} = Σ${fr('1','<i>R</i><sub>i</sub>')}`)}. היא תמיד <b>קטנה</b> מהנגד הקטן ביותר, כי כל ענף נוסף פותח לזרם דרך נוספת.`,
+ `שני מקרים שימושיים: לשני נגדים ${m(`${RT} = ${fr(`${R1}${R2}`,`${R1} + ${R2}`)}`)}, ול־${m('<i>n</i>')} נגדים זהים ${m(`${RT} = ${fr('<i>R</i>','<i>n</i>')}`)}.`,
+ `הזרם מתחלק <b>ביחס הפוך להתנגדויות</b>: בענף שההתנגדות שלו קטנה עובר הזרם הגדול. ב<b>מעגל מעורב</b> מצמצמים שלב אחרי שלב: מחליפים כל קבוצה של נגדים בנגד השקול שלה, עד שנשאר נגד אחד.`],
+ formulas:[[`${fr('1',RT)} = Σ${fr('1','<i>R</i><sub>i</sub>')}`,'התנגדות שקולה של נגדים במקביל'],[`${RT} = ${fr(`${R1}${R2}`,`${R1} + ${R2}`)}`,'שני נגדים במקביל'],[`${RT} = ${fr('<i>R</i>','<i>n</i>')}`,'<i>n</i> נגדים זהים במקביל'],[`${fr(I1,I2)} = ${fr(R2,R1)}`,'הזרם מתחלק ביחס הפוך להתנגדויות']],
+ trap:[`מוסיפים נגד, אז ההתנגדות גדלה?`,`בחיבור בטור כן. בחיבור במקביל להפך: כל נגד שמוסיפים במקביל <b>מקטין</b> את ההתנגדות השקולה, כי הוא פותח לזרם דרך נוספת. לכן כשמחברים עוד ועוד מכשירים לאותו שקע, הזרם הכולל גדל, עד שהמפסק קופץ.`],
+ ex:{given:[`נגד של ${m('6 Ω')} ונגד של ${m('12 Ω')} מחוברים במקביל`,`בטור אליהם מחובר נגד של ${m('2 Ω')}, וכל המעגל מחובר למקור אידיאלי של ${m('12 V')}`],ask:[`א. מה ההתנגדות השקולה של שני הנגדים המקבילים?`,`ב. מה ההתנגדות השקולה של כל המעגל?`,`ג. מה הזרם שיוצא מהמקור?`,`ד. מה המתח על הנגדים המקבילים, ומה הזרם בכל אחד מהם?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`<i>R</i><sub>12</sub> = ${fr('6·12','6 + 12')} = ${fr('72','18')} = 4 Ω`)}`,
+  `<b>סעיף ב.</b> הנגד השקול מחובר בטור לנגד של ${m('2 Ω')}: ${M(`${RT} = 4 + 2 = 6 Ω`)}`,
+  `<b>סעיף ג.</b> ${M(`<i>I</i> = ${fr('12','6')} = 2 A`)}`,
+  `<b>סעיף ד.</b> המתח על הצירוף המקבילי: ${m('<i>V</i> = <i>IR</i><sub>12</sub> = 2·4 = 8 V')}. ${M(`${I1} = ${fr('8','6')} ≈ 1.33 A &nbsp;,&nbsp; ${I2} = ${fr('8','12')} ≈ 0.67 A`)}`],
+  check:`סכום הזרמים בענפים ${m('1.33 + 0.67 = 2 A')}, כמו הזרם הכולל. בנגד הקטן עובר זרם גדול פי 2. המתחים: ${m('8 V')} על הצירוף המקבילי ו־${m('2·2 = 4 V')} על הנגד שבטור, יחד ${m('12 V')}.`},
+ qs:[
+ {l:'b',t:'num',q:`נגד של ${m('6 Ω')} ונגד של ${m('3 Ω')} מחוברים במקביל. מה ההתנגדות השקולה?`,a:2,u:'Ω',s:`${m(`${RT} = ${fr('6·3','6 + 3')} = 2 Ω`)}. קטנה משני הנגדים.`},
+ {l:'b',t:'num',q:`ארבעה נגדים של ${m('100 Ω')} מחוברים במקביל. מה ההתנגדות השקולה?`,a:25,u:'Ω',s:`${m(`${RT} = ${fr('<i>R</i>','<i>n</i>')} = ${fr('100','4')} = 25 Ω`)}.`},
+ {l:'b',t:'mc',q:`מה משותף לכל הנגדים שמחוברים במקביל?`,o:['הזרם','המתח','ההספק','המטען שעובר בהם'],a:1,s:`שני הקצוות של כל הנגדים מחוברים לאותן שתי נקודות, ולכן על כולם אותו מתח.`},
+ {l:'b',t:'num',q:`נגד של ${m('6 Ω')} ונגד של ${m('3 Ω')} מחוברים במקביל למקור אידיאלי של ${m('12 V')}. מה הזרם הכולל שיוצא מהמקור?`,a:6,u:'A',s:`${m(`${fr('12','6')} + ${fr('12','3')} = 2 + 4 = 6 A`)}. אפשר גם דרך ההתנגדות השקולה: ${m(`${fr('12','2')} = 6 A`)}.`},
+ {l:'a',t:'num',q:`נגד של ${m('10 Ω')} ונגד של ${m('15 Ω')} מחוברים במקביל, ובטור אליהם נגד של ${m('4 Ω')}. מה ההתנגדות השקולה של המעגל?`,a:10,u:'Ω',s:`הצירוף המקבילי: ${m(`${fr('10·15','25')} = 6 Ω`)}. בטור עם ${m('4 Ω')}: ${m('6 + 4 = 10 Ω')}.`},
+ {l:'a',t:'num',q:`מחברים את המעגל מהשאלה הקודמת למקור אידיאלי של ${m('20 V')}. מה הזרם בנגד של ${m('10 Ω')}?`,a:1.2,u:'A',s:`הזרם הכולל: ${m(`${fr('20','10')} = 2 A`)}. המתח על הצירוף המקבילי: ${m('2·6 = 12 V')}.<br>הזרם בנגד של ${m('10 Ω')}: ${m(`${fr('12','10')} = 1.2 A`)}.`},
+ {l:'a',t:'num',q:`זרם כולל של ${m('3 A')} מתפצל בין שני נגדים שמחוברים במקביל, ${m('2 Ω')} ו־${m('4 Ω')}. מה הזרם בנגד של ${m('2 Ω')}?`,a:2,u:'A',s:`הזרם מתחלק ביחס הפוך להתנגדויות, ${m('2 : 1')}. בנגד הקטן עוברים שני שלישים מהזרם: ${m('2 A')}.`},
+ {l:'a',t:'mc',q:`שתי נורות זהות מחוברות במקביל למקור אידיאלי. אחת הנורות נשרפת. מה קורה לנורה השנייה?`,o:['היא נכבית','היא מאירה חזק יותר','היא מאירה כמו קודם','היא מאירה חלש יותר'],a:2,s:`המתח על הנורה שנשארה שווה עדיין למתח המקור, ולכן הזרם בה וההספק שלה לא השתנו. רק הזרם הכולל מהמקור קטן. זו הסיבה שמכשירים בבית מחוברים במקביל.`}
+ ]},
+{id:'emf',title:'כא״מ והתנגדות פנימית',sub:'מתח ההדקים של מקור מתח אמיתי',
+ intro:[
+ `<b>הכוח האלקטרו־מניע</b> (כא״מ) של מקור מתח, ${m(eps)}, הוא האנרגיה שהמקור מספק לכל קולון שעובר דרכו. היחידה היא וולט. הכא״מ שווה למתח בין הדקי המקור כשלא זורם בו זרם.`,
+ `למקור אמיתי יש גם <b>התנגדות פנימית</b> ${m('<i>r</i>')}. אפשר לתאר אותו כמקור אידיאלי שמחובר בטור לנגד קטן שנמצא בתוכו.`,
+ `כשמחברים למקור נגד חיצוני ${m('<i>R</i>')}, ההתנגדות הכוללת היא ${m('<i>R</i> + <i>r</i>')}, והזרם הוא ${m(`<i>I</i> = ${fr(eps,'<i>R</i> + <i>r</i>')}`)}.`,
+ `<b>מתח ההדקים</b>, המתח שמודדים בין הדקי המקור, קטן מהכא״מ במפל המתח שעל ההתנגדות הפנימית: ${m(`${Vab} = ${eps} − <i>rI</i>`)}. זה גם המתח על הנגד החיצוני, ${m('<i>IR</i>')}.`,
+ `ככל שהזרם גדול יותר, מתח ההדקים קטן יותר. הגרף של מתח ההדקים כפונקציה של הזרם הוא קו ישר: הוא חותך את ציר המתח ב־${m(eps)}, השיפוע שלו ${m('−<i>r</i>')}, והוא מגיע לאפס ב<b>זרם הקצר</b> ${m(`${fr(eps,'<i>r</i>')}`)}.`],
+ formulas:[[`${Vab} = ${eps} − <i>rI</i>`,'מתח ההדקים של מקור'],[`<i>I</i> = ${fr(eps,'<i>R</i> + <i>r</i>')}`,'הזרם במעגל עם נגד חיצוני <i>R</i>'],[`<i>I</i><sub>קצר</sub> = ${fr(eps,'<i>r</i>')}`,'זרם הקצר: כשההתנגדות החיצונית אפס']],
+ trap:[`מתח ההדקים שווה תמיד לכא״מ?`,`רק כשלא זורם זרם, כלומר במעגל פתוח. ברגע שזורם זרם, חלק מהמתח "נופל" על ההתנגדות הפנימית, ומתח ההדקים קטן מהכא״מ. לכן סוללה ישנה, שההתנגדות הפנימית שלה גדלה, מראה מתח תקין כשמודדים אותה לבד, ובכל זאת לא מצליחה להפעיל מכשיר.`],
+ ex:{given:[`סוללה שהכא״מ שלה ${m('12 V')} וההתנגדות הפנימית שלה ${m('1 Ω')}`,`מחברים אליה נגד חיצוני של ${m('5 Ω')}`],ask:[`א. מה הזרם במעגל?`,`ב. מה מתח ההדקים?`,`ג. מה מפל המתח על ההתנגדות הפנימית?`,`ד. מה זרם הקצר של הסוללה?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`<i>I</i> = ${fr(eps,'<i>R</i> + <i>r</i>')} = ${fr('12','5 + 1')} = 2 A`)}`,
+  `<b>סעיף ב.</b> ${M(`${Vab} = ${eps} − <i>rI</i> = 12 − 1·2 = 10 V`)}`,
+  `<b>סעיף ג.</b> ${m('<i>rI</i> = 1·2 = 2 V')}.`,
+  `<b>סעיף ד.</b> ${M(`<i>I</i><sub>קצר</sub> = ${fr(eps,'<i>r</i>')} = ${fr('12','1')} = 12 A`)}`],
+  check:`מתח ההדקים שווה גם למתח על הנגד החיצוני: ${m('<i>IR</i> = 2·5 = 10 V')}. הכא״מ מתחלק בין הנגד החיצוני (${m('10 V')}) להתנגדות הפנימית (${m('2 V')}), כמו בכל חיבור בטור.`},
+ qs:[
+ {l:'b',t:'num',q:`סוללה שהכא״מ שלה ${m('9 V')} וההתנגדות הפנימית שלה ${m('0.5 Ω')} מחוברת לנגד של ${m('4 Ω')}. מה הזרם במעגל?`,a:2,u:'A',s:`${m(`<i>I</i> = ${fr('9','4 + 0.5')} = 2 A`)}.`},
+ {l:'b',t:'num',q:`בהמשך לשאלה הקודמת: מה מתח ההדקים של הסוללה?`,a:8,u:'V',s:`${m(`${Vab} = 9 − 0.5·2 = 8 V`)}. אפשר גם ${m('<i>IR</i> = 2·4 = 8 V')}.`},
+ {l:'b',t:'mc',q:`מה מראה וולטמטר אידיאלי שמחובר להדקי סוללה, כשהסוללה לא מחוברת לשום דבר אחר?`,o:['אפס','את הכא״מ של הסוללה','פחות מהכא״מ','יותר מהכא״מ'],a:1,s:`בוולטמטר אידיאלי לא זורם זרם, ולכן אין מפל מתח על ההתנגדות הפנימית: ${m(`${Vab} = ${eps}`)}.`},
+ {l:'b',t:'num',q:`מה זרם הקצר של סוללה שהכא״מ שלה ${m('1.5 V')} וההתנגדות הפנימית שלה ${m('0.3 Ω')}?`,a:5,u:'A',s:`${m(`${fr(eps,'<i>r</i>')} = ${fr('1.5','0.3')} = 5 A`)}.`},
+ {l:'a',t:'num',q:`וולטמטר אידיאלי שמחובר להדקי סוללה מראה ${m('12 V')} במעגל פתוח. כשמחברים לסוללה נגד של ${m('10 Ω')}, הוא מראה ${m('10 V')}. מה ההתנגדות הפנימית של הסוללה?`,a:2,u:'Ω',s:`הכא״מ ${m('12 V')}. הזרם: ${m(`<i>I</i> = ${fr('10','10')} = 1 A`)}.<br>מפל המתח הפנימי ${m('12 − 10 = 2 V')}, ולכן ${m(`<i>r</i> = ${fr('2','1')} = 2 Ω`)}.`},
+ {l:'a',t:'num',q:`הגרף של מתח ההדקים של סוללה כפונקציה של הזרם עובר בנקודות ${m('(0.5 A, 5.5 V)')} ו־${m('(2 A, 4 V)')}. מה הכא״מ של הסוללה?`,a:6,u:'V',s:`השיפוע: ${m(`${fr('4 − 5.5','2 − 0.5')} = −1`)}, ולכן ${m('<i>r</i> = 1 Ω')}.<br>${m(`${eps} = ${Vab} + <i>rI</i> = 5.5 + 1·0.5 = 6 V`)}.`},
+ {l:'a',t:'num',q:`שתי סוללות זהות, לכל אחת כא״מ של ${m('1.5 V')} והתנגדות פנימית של ${m('0.2 Ω')}, מחוברות בטור זו לזו ולנגד של ${m('2.6 Ω')}. מה הזרם במעגל?`,a:1,u:'A',s:`הכא״מים מתחברים, וגם ההתנגדויות הפנימיות: ${m(`<i>I</i> = ${fr('1.5 + 1.5','2.6 + 0.2 + 0.2')} = 1 A`)}.`},
+ {l:'a',t:'num',q:`לסוללה כא״מ של ${m('6 V')} והתנגדות פנימית של ${m('1 Ω')}. כשמחברים אליה נגד, מתח ההדקים הוא ${m('4.5 V')}. מה ההתנגדות של הנגד?`,a:3,u:'Ω',s:`מפל המתח הפנימי ${m('6 − 4.5 = 1.5 V')}, ולכן ${m(`<i>I</i> = ${fr('1.5','1')} = 1.5 A`)}.<br>${m(`<i>R</i> = ${fr(Vab,'<i>I</i>')} = ${fr('4.5','1.5')} = 3 Ω`)}.`}
+ ]},
+{id:'kirchhoff',title:'חוקי קירכהוף',sub:'חוק הזרמים וחוק המתחים, למעגלים שאי אפשר לצמצם',
+ intro:[
+ `כשבמעגל יש יותר ממקור אחד בענפים שונים, אי אפשר לצמצם אותו לנגד שקול אחד. במקרה כזה משתמשים בשני <b>חוקי קירכהוף</b>.`,
+ `<b>חוק הזרמים</b> (חוק הצומת): סכום הזרמים שנכנסים לצומת שווה לסכום הזרמים שיוצאים ממנו, ${m('Σ<i>I</i> = 0')}. זה ביטוי לשימור המטען: מטען לא מצטבר בצומת.`,
+ `<b>חוק המתחים</b> (חוק הלולאה): בכל לולאה סגורה, סכום הכא״מים שווה לסכום מפלי המתח על הנגדים, ${m(`Σ${eps} = Σ<i>IR</i>`)}. זה ביטוי לשימור האנרגיה: מטען שהשלים הקפה חוזר לאותו פוטנציאל.`,
+ `<b>שיטת העבודה:</b> מסמנים זרם בכל ענף ובוחרים לו כיוון, גם בלי לדעת מראש מה הכיוון הנכון. כותבים את חוק הצומת, ובוחרים לולאות וכיוון הקפה לכל אחת. כא״מ נכנס עם סימן חיובי אם עוברים במקור מההדק השלילי אל החיובי, ו־${m('<i>IR</i>')} נכנס עם סימן חיובי אם כיוון ההקפה הוא כיוון הזרם שסימנו.`,
+ `פותרים את מערכת המשוואות. אם זרם יוצא <b>שלילי</b>, הכיוון האמיתי שלו הפוך לכיוון שסימנו, והגודל נכון.`],
+ formulas:[[`Σ<i>I</i> = 0`,'חוק הזרמים: נכנסים לצומת = יוצאים מהצומת'],[`Σ${eps} = Σ<i>IR</i>`,'חוק המתחים: לאורך כל לולאה סגורה']],
+ trap:[`יצא זרם שלילי, אז טעיתי?`,`לא. זרם שלילי אומר רק שהכיוון שבחרתם לזרם בענף הזה הפוך לכיוון האמיתי. הגודל נכון, ואין צורך לפתור מחדש. זה קורה למשל כשמקור חזק דוחף זרם דרך מקור חלש, נגד הכא״מ שלו. חשוב רק לא לשנות את הסימון באמצע הפתרון.`],
+ ex:{given:[`מעגל עם שלושה ענפים בין הצומת A (למעלה) לצומת B (למטה)`,`ענף שמאלי: מקור ${m(`${eps}<sub>1</sub> = 12 V`)} ונגד ${m(`${R1} = 3 Ω`)}. ענף ימני: מקור ${m(`${eps}<sub>2</sub> = 10 V`)} ונגד ${m(`${R2} = 4 Ω`)}. ענף אמצעי: נגד ${m(`${R3} = 2 Ω`)}`,`המקורות אידיאליים, וההדק החיובי של כל אחד פונה לכיוון A`],ask:[`א. מהן משוואות קירכהוף של המעגל?`,`ב. מה הזרם בכל ענף?`,`ג. מה המתח בין A ל־B?`],
+  steps:[
+  `<b>סימון.</b> ${m(I1)} עולה בענף השמאלי אל A, ${m(I2)} עולה בענף הימני אל A, ו־${m(I3)} יורד בענף האמצעי מ־A אל B.`,
+  `<b>סעיף א.</b> חוק הצומת ב־A: ${M(`${I1} + ${I2} = ${I3}`)} הלולאה השמאלית: ${M(`12 = 3${I1} + 2${I3}`)} הלולאה הימנית: ${M(`10 = 4${I2} + 2${I3}`)}`,
+  `<b>סעיף ב.</b> מהלולאות: ${m(`${I1} = ${fr(`12 − 2${I3}`,'3')}`)} ו־${m(`${I2} = ${fr(`10 − 2${I3}`,'4')}`)}. מציבים בחוק הצומת, ומכפילים ב־12: ${M(`4(12 − 2${I3}) + 3(10 − 2${I3}) = 12${I3} &nbsp;⟹&nbsp; 78 = 26${I3} &nbsp;⟹&nbsp; ${I3} = 3 A`)} ומכאן ${m(`${I1} = 2 A`)} ו־${m(`${I2} = 1 A`)}.`,
+  `<b>סעיף ג.</b> לאורך הענף האמצעי: ${M(`<i>V</i><sub>AB</sub> = ${I3}${R3} = 3·2 = 6 V`)}`],
+  check:`אותו מתח מתקבל לאורך הענף השמאלי: ${m('12 − 2·3 = 6 V')}, ולאורך הענף הימני: ${m('10 − 1·4 = 6 V')}. כל הזרמים יצאו חיוביים, ולכן הכיוונים שסומנו נכונים.`},
+ qs:[
+ {l:'b',t:'num',q:`לצומת נכנסים שני זרמים, ${m('2 A')} ו־${m('3 A')}. מהצומת יוצאים שני זרמים, ואחד מהם ${m('1.5 A')}. מה הזרם השני שיוצא?`,a:3.5,u:'A',s:`נכנסים = יוצאים: ${m('2 + 3 = 1.5 + <i>I</i>')}, ולכן ${m('<i>I</i> = 3.5 A')}.`},
+ {l:'b',t:'mc',q:`איזה חוק שימור עומד מאחורי חוק הזרמים של קירכהוף?`,o:['שימור האנרגיה','שימור המטען','שימור התנע','שימור המסה'],a:1,s:`מטען לא נוצר, לא נעלם ולא מצטבר בצומת. לכן כל המטען שנכנס לצומת גם יוצא ממנו.`},
+ {l:'b',t:'mc',q:`איזה חוק שימור עומד מאחורי חוק המתחים של קירכהוף?`,o:['שימור האנרגיה','שימור המטען','שימור התנע','שימור הזרם'],a:0,s:`מטען שמשלים הקפה בלולאה חוזר לאותה נקודה ולאותו פוטנציאל. האנרגיה שקיבל מהמקורות שווה לאנרגיה שאיבד בנגדים.`},
+ {l:'b',t:'num',q:`בלולאה אחת מחוברים בטור שני מקורות אידיאליים, ${m('12 V')} ו־${m('4 V')}, כשהם מנוגדים זה לזה, ונגדים שההתנגדות הכוללת שלהם ${m('4 Ω')}. מה גודל הזרם בלולאה?`,a:2,u:'A',s:`הכא״מים מנוגדים, ולכן הם מתחסרים: ${m(`<i>I</i> = ${fr('12 − 4','4')} = 2 A`)}, בכיוון שקובע המקור החזק.`},
+ {l:'a',t:'num',q:`במעגל של הדוגמה הפתורה משנים את הנתונים: ${m(`${eps}<sub>1</sub> = 10 V`)}, ${m(`${R1} = 2 Ω`)}, ${m(`${eps}<sub>2</sub> = 5 V`)}, ${m(`${R2} = 2 Ω`)}, ${m(`${R3} = 4 Ω`)}. מה הזרם ${m(I3)} בענף האמצעי?`,a:1.5,u:'A',s:`${m(`10 = 2${I1} + 4${I3}`)}, ${m(`5 = 2${I2} + 4${I3}`)}, ${m(`${I1} + ${I2} = ${I3}`)}.<br>מחברים את שתי משוואות הלולאה: ${m(`15 = 2(${I1} + ${I2}) + 8${I3} = 10${I3}`)}, ולכן ${m(`${I3} = 1.5 A`)}.`},
+ {l:'a',t:'num',q:`בהמשך לשאלה הקודמת: מה הזרם ${m(I2)} בענף הימני? (חיובי: כלפי מעלה, אל A. כתבו עם סימן)`,a:-.5,u:'A',s:`${m(`5 = 2${I2} + 4·1.5`)}, ולכן ${m(`${I2} = −0.5 A`)}. הסימן השלילי אומר שהזרם בענף הימני יורד מ־A: המקור החזק דוחף זרם דרך המקור החלש, נגד הכא״מ שלו.`},
+ {l:'a',t:'num',q:`בהמשך לאותו מעגל: מה המתח בין A ל־B?`,a:6,u:'V',s:`${m(`<i>V</i><sub>AB</sub> = ${I3}${R3} = 1.5·4 = 6 V`)}. בדיקה בענף השמאלי: ${m(`${I1} = 2 A`)}, ו־${m('10 − 2·2 = 6 V')}.`},
+ {l:'a',t:'num',q:`סוללה של ${m('12 V')} וסוללה של ${m('6 V')}, לכל אחת התנגדות פנימית של ${m('1 Ω')}, מחוברות בלולאה אחת כשהן מנוגדות זו לזו, יחד עם נגד של ${m('4 Ω')}. מה מתח ההדקים של הסוללה של ${m('6 V')}?`,a:7,u:'V',s:`${m(`<i>I</i> = ${fr('12 − 6','4 + 1 + 1')} = 1 A`)}.<br>הזרם עובר בסוללה החלשה נגד הכא״מ שלה (היא נטענת), ולכן מתח ההדקים שלה <b>גדול</b> מהכא״מ: ${m(`${eps} + <i>rI</i> = 6 + 1·1 = 7 V`)}.`}
+ ]},
+{id:'power',title:'עבודה והספק חשמלי',sub:'כמה אנרגיה צורך רכיב, ובאיזה קצב',
+ intro:[
+ `כשמטען ${m('<i>q</i>')} עובר ברכיב שהמתח עליו ${m('<i>V</i>')}, הוא מאבד אנרגיה חשמלית בשיעור ${m('<i>W</i> = <i>qV</i>')}. האנרגיה הזו הופכת בנגד לחום, בנורה לאור ולחום, ובמנוע לעבודה מכנית.`,
+ `<b>ההספק</b> הוא קצב המרת האנרגיה: ${m(`<i>P</i> = ${fr('<i>W</i>','<i>t</i>')} = <i>V</i><sub>AB</sub><i>I</i>`)}. היחידה היא ואט, ${m('1 W = 1 J/s = 1 V·A')}.`,
+ `בנגד אפשר להציב את חוק אוהם ולקבל שתי צורות נוספות: ${m(`<i>P</i> = <i>I</i><sup>2</sup><i>R</i> = ${fr('<i>V</i><sup>2</sup>','<i>R</i>')}`)}. בוחרים את הצורה לפי מה שידוע: את הראשונה כשהזרם משותף (חיבור בטור), ואת השנייה כשהמתח משותף (חיבור במקביל).`,
+ `<b>האנרגיה</b> שנצרכת בזמן ${m('<i>t</i>')} היא ${m('<i>W</i> = <i>Pt</i>')}. חברת החשמל מודדת אותה בקילוואט־שעה: ${m(`1 kWh = 1000 W·3600 s = ${e10('3.6',6)} J`)}.`,
+ `על מכשיר חשמלי רשומים המתח שבו הוא אמור לפעול וההספק שלו במתח הזה. מהם אפשר למצוא את ההתנגדות שלו: ${m(`<i>R</i> = ${fr('<i>V</i><sup>2</sup>','<i>P</i>')}`)}.`],
+ formulas:[[`<i>P</i> = <i>V</i><sub>AB</sub><i>I</i>`,'הספק חשמלי'],[`<i>P</i> = <i>I</i><sup>2</sup><i>R</i> = ${fr('<i>V</i><sup>2</sup>','<i>R</i>')}`,'הספק בנגד'],[`<i>W</i> = <i>Pt</i>`,'האנרגיה שנצרכת בזמן <i>t</i>'],[`1 kWh = ${e10('3.6',6)} J`,'קילוואט־שעה']],
+ trap:[`נגד גדול יותר מתחמם יותר?`,`תלוי בחיבור. <b>בטור</b> הזרם משותף, ${m('<i>P</i> = <i>I</i><sup>2</sup><i>R</i>')}, ולכן הנגד הגדול מפתח הספק גדול יותר. <b>במקביל</b> המתח משותף, ${m(`<i>P</i> = ${fr('<i>V</i><sup>2</sup>','<i>R</i>')}`)}, ולכן דווקא הנגד הקטן מפתח הספק גדול יותר. לפני שעונים, בודקים מה משותף לשני הנגדים.`],
+ ex:{given:[`קומקום חשמלי שההתנגדות של גוף החימום שלו ${m('23 Ω')}`,`הוא מחובר למתח הרשת, ${m('230 V')}`],ask:[`א. מה הזרם בקומקום?`,`ב. מה ההספק שלו?`,`ג. כמה אנרגיה הוא צורך בשלוש דקות, בג׳אול?`,`ד. כמה זה בקילוואט־שעה?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`<i>I</i> = ${fr('<i>V</i>','<i>R</i>')} = ${fr('230','23')} = 10 A`)}`,
+  `<b>סעיף ב.</b> ${M('<i>P</i> = <i>VI</i> = 230·10 = 2300 W')}`,
+  `<b>סעיף ג.</b> שלוש דקות הן ${m('180 s')}: ${M(`<i>W</i> = <i>Pt</i> = 2300·180 = ${e10('4.14',5)} J`)}`,
+  `<b>סעיף ד.</b> ${M(`<i>W</i> = 2.3 kW·${fr('3','60')} h = 0.115 kWh`)}`],
+  check:`לפי הצורות האחרות: ${m('<i>I</i><sup>2</sup><i>R</i> = 10<sup>2</sup>·23 = 2300 W')}, ו־${m(`${fr('<i>V</i><sup>2</sup>','<i>R</i>')} = ${fr('230<sup>2</sup>','23')} = 2300 W`)}. המרה: ${m(`0.115·${e10('3.6',6)} = ${e10('4.14',5)} J`)}.`},
+ qs:[
+ {l:'b',t:'num',q:`ברכיב שהמתח עליו ${m('12 V')} זורם זרם של ${m('2 A')}. מה ההספק החשמלי של הרכיב?`,a:24,u:'W',s:`${m('<i>P</i> = <i>VI</i> = 12·2 = 24 W')}.`},
+ {l:'b',t:'num',q:`בנגד של ${m('10 Ω')} זורם זרם של ${m('3 A')}. מה ההספק שמתפתח בנגד?`,a:90,u:'W',s:`${m('<i>P</i> = <i>I</i><sup>2</sup><i>R</i> = 3<sup>2</sup>·10 = 90 W')}.`},
+ {l:'b',t:'num',q:`נורה שההספק שלה ${m('60 W')} דולקת במשך 5 שעות. כמה אנרגיה היא צורכת, בקילוואט־שעה?`,a:.3,u:'kWh',s:`${m('<i>W</i> = <i>Pt</i> = 0.06 kW·5 h = 0.3 kWh')}.`},
+ {l:'b',t:'mc',q:`איזו מהיחידות הבאות היא יחידה של אנרגיה?`,o:['ואט','קילוואט','קילוואט־שעה','אמפר'],a:2,s:`קילוואט־שעה הוא הספק כפול זמן, כלומר אנרגיה. ואט וקילוואט הן יחידות של הספק.`},
+ {l:'a',t:'num',q:`על נורה רשום ${m('230 V')}, ${m('100 W')}. מה ההתנגדות של הנורה כשהיא פועלת במתח הזה?`,a:529,u:'Ω',s:`${m(`<i>R</i> = ${fr('<i>V</i><sup>2</sup>','<i>P</i>')} = ${fr('230<sup>2</sup>','100')} = 529 Ω`)}.`},
+ {l:'a',t:'num',q:`מחברים את הנורה מהשאלה הקודמת למתח של ${m('115 V')}. מה ההספק שלה עכשיו, בהנחה שההתנגדות שלה לא משתנה?`,a:25,u:'W',s:`ההספק יחסי לריבוע המתח. חצי מהמתח נותן רבע מההספק: ${m(`${fr('115<sup>2</sup>','529')} = 25 W`)}.`},
+ {l:'a',t:'num',q:`נגד של ${m('10 Ω')} ונגד של ${m('20 Ω')} מחוברים בטור למקור אידיאלי של ${m('30 V')}. מה ההספק שמתפתח בנגד של ${m('20 Ω')}?`,a:20,u:'W',s:`${m(`<i>I</i> = ${fr('30','10 + 20')} = 1 A`)}.<br>${m('<i>P</i> = <i>I</i><sup>2</sup><i>R</i> = 1<sup>2</sup>·20 = 20 W')}. בנגד של ${m('10 Ω')} מתפתחים רק ${m('10 W')}.`},
+ {l:'a',t:'mc',q:`על נורה אחת רשום ${m('230 V')}, ${m('40 W')}, ועל נורה שנייה ${m('230 V')}, ${m('100 W')}. מחברים את שתיהן <b>בטור</b> למתח של ${m('230 V')}. איזו נורה תאיר חזק יותר?`,o:['הנורה של 100 W','הנורה של 40 W','שתיהן יאירו באותה עוצמה','אף אחת לא תאיר'],a:1,s:`${m(`<i>R</i> = ${fr('<i>V</i><sup>2</sup>','<i>P</i>')}`)}: לנורה של ${m('40 W')} יש התנגדות <b>גדולה</b> יותר. בטור הזרם משותף, ו־${m('<i>P</i> = <i>I</i><sup>2</sup><i>R</i>')}, ולכן דווקא היא מפתחת הספק גדול יותר ומאירה חזק יותר.`}
+ ]},
+{id:'eff',title:'נצילות',sub:'איזה חלק מההספק מנוצל למטרה',
+ intro:[
+ `אף מכשיר לא הופך את כל האנרגיה החשמלית שהוא מקבל לאנרגיה מועילה. חלק ממנה תמיד מתבזבז, בדרך כלל כחום. <b>הנצילות</b> היא החלק המנוצל: ${m(`${eta} = ${fr('<i>P</i><sub>eff</sub>','<i>P</i><sub>in</sub>')}`)}.`,
+ `${m('<i>P</i><sub>in</sub>')} הוא ההספק המושקע, ו־${m('<i>P</i><sub>eff</sub>')} הוא ההספק המנוצל. הנצילות היא מספר בין 0 ל־1, ונהוג לכתוב אותה באחוזים. אפשר לחשב אותה גם כיחס של אנרגיות, באותו פרק זמן.`,
+ `<b>במנוע חשמלי</b> ההספק המושקע הוא ${m('<i>VI</i>')}, וההספק המנוצל הוא ההספק המכני, למשל ${m(`${fr('<i>mgh</i>','<i>t</i>')}`)} בהרמת משא. <b>בקומקום</b> האנרגיה המנוצלת היא החום שעבר למים.`,
+ `<b>במעגל עם סוללה</b> שיש לה התנגדות פנימית, המקור מספק הספק ${m(`${eps}<i>I</i>`)}. ההספק המנוצל הוא ההספק בנגד החיצוני, ${m('<i>I</i><sup>2</sup><i>R</i>')}, והשאר מתבזבז בתוך הסוללה. מכאן ${m(`${eta} = ${fr('<i>R</i>','<i>R</i> + <i>r</i>')}`)}.`,
+ `ההספק בנגד החיצוני הוא הגדול ביותר כאשר ${m('<i>R</i> = <i>r</i>')}, אבל אז הנצילות היא רק 50%. נצילות גבוהה מתקבלת כש־${m('<i>R</i>')} גדול בהרבה מ־${m('<i>r</i>')}.`],
+ formulas:[[`${eta} = ${fr('<i>P</i><sub>eff</sub>','<i>P</i><sub>in</sub>')}`,'נצילות'],[`${eta} = ${fr('<i>R</i>','<i>R</i> + <i>r</i>')}`,'נצילות של מעגל עם התנגדות פנימית'],[`<i>P</i><sub>R</sub> = ${fr(`${eps}<sup>2</sup><i>R</i>`,'(<i>R</i> + <i>r</i>)<sup>2</sup>')}`,'ההספק בנגד החיצוני'],[`<i>P</i><sub>max</sub> = ${fr(`${eps}<sup>2</sup>`,'4<i>r</i>')}`,'ההספק המרבי בנגד החיצוני, כאשר <i>R</i> = <i>r</i>']],
+ trap:[`הספק מרבי פירושו נצילות מרבית?`,`לא. אלה שני דברים שונים, והם אפילו מתנגשים. ההספק בנגד החיצוני מרבי כאשר ${m('<i>R</i> = <i>r</i>')}, ואז חצי מהאנרגיה מתבזבז בסוללה. הנצילות מתקרבת ל־100% כש־${m('<i>R</i>')} גדול מאוד, אבל אז הזרם קטן וההספק המועיל קטן.`],
+ ex:{given:[`סוללה שהכא״מ שלה ${m('12 V')} וההתנגדות הפנימית שלה ${m('2 Ω')}`,`היא מחוברת לנגד חיצוני של ${m('4 Ω')}`],ask:[`א. מה הזרם, ומה ההספק בנגד החיצוני?`,`ב. מה ההספק הכולל שהמקור מספק?`,`ג. מה הנצילות?`,`ד. באיזו התנגדות חיצונית ההספק בנגד יהיה מרבי, ומה יהיו אז ההספק והנצילות?`],
+  steps:[
+  `<b>סעיף א.</b> ${m(`<i>I</i> = ${fr('12','4 + 2')} = 2 A`)}. ${M('<i>P</i><sub>R</sub> = <i>I</i><sup>2</sup><i>R</i> = 2<sup>2</sup>·4 = 16 W')}`,
+  `<b>סעיף ב.</b> ${M(`<i>P</i><sub>in</sub> = ${eps}<i>I</i> = 12·2 = 24 W`)}`,
+  `<b>סעיף ג.</b> ${M(`${eta} = ${fr('16','24')} = 0.667 = 66.7%`)}`,
+  `<b>סעיף ד.</b> ההספק מרבי כאשר ${m('<i>R</i> = <i>r</i> = 2 Ω')}. אז ${m(`<i>I</i> = ${fr('12','4')} = 3 A`)}: ${M('<i>P</i><sub>R</sub> = 3<sup>2</sup>·2 = 18 W &nbsp;,&nbsp; <i>P</i><sub>in</sub> = 12·3 = 36 W')} והנצילות ${m(`${fr('18','36')} = 50%`)}.`],
+  check:`לפי הנוסחה: ${m(`${eta} = ${fr('<i>R</i>','<i>R</i> + <i>r</i>')} = ${fr('4','6')} = 66.7%`)}. ההספק שמתבזבז בסוללה בסעיף א: ${m('<i>I</i><sup>2</sup><i>r</i> = 8 W')}, ואכן ${m('16 + 8 = 24 W')}.`},
+ qs:[
+ {l:'b',t:'num',q:`מכשיר צורך הספק חשמלי של ${m('200 W')}, וההספק המנוצל שלו ${m('150 W')}. מה הנצילות, באחוזים?`,a:75,u:'%',s:`${m(`${eta} = ${fr('150','200')} = 0.75 = 75%`)}.`},
+ {l:'b',t:'num',q:`מנוע חשמלי שהנצילות שלו ${m('80%')} צורך הספק חשמלי של ${m('500 W')}. מה ההספק המכני שהוא מספק?`,a:400,u:'W',s:`${m(`<i>P</i><sub>eff</sub> = ${eta}<i>P</i><sub>in</sub> = 0.8·500 = 400 W`)}. שאר ${m('100 W')} הופכים לחום.`},
+ {l:'b',t:'mc',q:`מה נכון לגבי הנצילות של מכשיר חשמלי?`,o:['היא יכולה להיות גדולה מ־100%','היא תמיד קטנה מ־100% או שווה לו','היא תמיד 50%','היא תלויה רק במתח'],a:1,s:`לפי שימור האנרגיה, האנרגיה המנוצלת לא יכולה להיות גדולה מהאנרגיה המושקעת.`},
+ {l:'b',t:'num',q:`סוללה שהכא״מ שלה ${m('10 V')} וההתנגדות הפנימית שלה ${m('1 Ω')} מחוברת לנגד של ${m('4 Ω')}. מה נצילות המעגל, באחוזים?`,a:80,u:'%',s:`${m(`${eta} = ${fr('<i>R</i>','<i>R</i> + <i>r</i>')} = ${fr('4','5')} = 80%`)}.`},
+ {l:'a',t:'num',q:`מנוע חשמלי מחובר למתח של ${m('12 V')}, וזורם בו זרם של ${m('2 A')}. הוא מרים משא שמסתו ${m('1.2 kg')} לגובה של ${m('3 m')} במשך ${m('2 s')}, במהירות קבועה. מה נצילות המנוע, באחוזים? (${m('<i>g</i> = 10 m/s<sup>2</sup>')})`,a:75,u:'%',s:`<b>מושקע:</b> ${m('<i>P</i><sub>in</sub> = <i>VI</i> = 24 W')}.<br><b>מנוצל:</b> ${m(`<i>P</i><sub>eff</sub> = ${fr('<i>mgh</i>','<i>t</i>')} = ${fr('1.2·10·3','2')} = 18 W`)}.<br>${m(`${eta} = ${fr('18','24')} = 75%`)}.`},
+ {l:'a',t:'num',q:`קומקום שההספק שלו ${m('2000 W')} מחמם ${m('1 kg')} מים מ־${m('20°C')} ל־${m('100°C')} במשך ${m('200 s')}. כדי לחמם ${m('1 kg')} מים במעלה אחת דרושים ${m('4200 J')}. מה נצילות הקומקום, באחוזים?`,a:84,u:'%',s:`<b>מנוצל:</b> ${m(`4200·1·80 = ${e10('3.36',5)} J`)}.<br><b>מושקע:</b> ${m(`<i>Pt</i> = 2000·200 = ${e10('4',5)} J`)}.<br>${m(`${eta} = ${fr('3.36','4')} = 84%`)}.`},
+ {l:'a',t:'num',q:`לסוללה כא״מ של ${m('12 V')} והתנגדות פנימית של ${m('3 Ω')}. מה ההספק המרבי שאפשר לקבל ממנה בנגד חיצוני?`,a:12,u:'W',s:`ההספק מרבי כאשר ${m('<i>R</i> = <i>r</i> = 3 Ω')}: ${m(`<i>P</i><sub>max</sub> = ${fr(`${eps}<sup>2</sup>`,'4<i>r</i>')} = ${fr('144','12')} = 12 W`)}.`},
+ {l:'a',t:'num',q:`לסוללה התנגדות פנימית של ${m('1 Ω')}. איזה נגד חיצוני צריך לחבר אליה כדי שנצילות המעגל תהיה ${m('90%')}?`,a:9,u:'Ω',s:`${m(`${fr('<i>R</i>','<i>R</i> + 1')} = 0.9`)}, ולכן ${m('<i>R</i> = 0.9<i>R</i> + 0.9')}, כלומר ${m('<i>R</i> = 9 Ω')}.`}
+ ]}
+];
+
+/* ---------- solving tips per topic ---------- */
+const TIPS={
+current:[
+ `<b>ממירים את הזמן לשניות</b> לפני שמציבים: דקה היא ${m('60 s')}, ושעה היא ${m('3600 s')}.`,
+ `<b>מיליאמפר:</b> ${m(`1 mA = 10<sup>−3</sup> A`)}.`,
+ `<b>מגרף של מטען כפונקציה של הזמן:</b> הזרם הוא השיפוע. <b>מגרף של זרם כפונקציה של הזמן:</b> המטען הוא השטח שמתחת לגרף.`,
+ `<b>מספר אלקטרונים:</b> מחלקים את המטען ב־${m(`${e10('1.6',-19)} C`)}.`,
+ `<b>באותו ענף אותו זרם,</b> לפני כל רכיב ואחריו.`],
+ohm:[
+ `<b>שלוש צורות לאותו קשר:</b> ${m('<i>V</i> = <i>RI</i>')}, ${m(`<i>I</i> = ${fr('<i>V</i>','<i>R</i>')}`)}, ${m(`<i>R</i> = ${fr('<i>V</i>','<i>I</i>')}`)}. בוחרים לפי הגודל המבוקש.`,
+ `<b>המתח והזרם חייבים להתייחס לאותו רכיב.</b> לא מציבים את מתח המקור עם הזרם של נגד מסוים, אלא אם זה אותו מתח.`,
+ `<b>יחידות:</b> ${m('1 kΩ = 1000 Ω')}, ${m('1 mA = 0.001 A')}.`,
+ `<b>מגרף של מתח כפונקציה של זרם:</b> ההתנגדות היא השיפוע. בוחרים נקודה רחוקה מהראשית, כדי לדייק.`,
+ `<b>גרף עקום</b> פירושו רכיב לא אוהמי. מחשבים ${m(`${fr('<i>V</i>','<i>I</i>')}`)} בנקודה שעליה שואלים.`],
+resist:[
+ `<b>ממירים את שטח החתך למטרים רבועים:</b> ${m(`1 mm<sup>2</sup> = 10<sup>−6</sup> m<sup>2</sup>`)}.`,
+ `<b>כשנתון קוטר:</b> מחשבים רדיוס, ואז ${m('<i>A</i> = π<i>r</i><sup>2</sup>')}.`,
+ `<b>שאלות "פי כמה":</b> כותבים ${m(`<i>R</i> ∝ ${fr(ell,'<i>A</i>')}`)}, ובודקים מה קרה לאורך ומה קרה לשטח החתך.`,
+ `<b>תיל שנמתח או נלחץ:</b> הנפח נשמר, ולכן כשהאורך גדל שטח החתך קטן באותו יחס.`,
+ `<b>ההתנגדות הסגולית תלויה רק בחומר.</b> חיתוך או קיפול של התיל לא משנים אותה.`],
+series:[
+ `<b>מזהים חיבור בטור:</b> אין הסתעפות בין הנגדים, ולכן אותו זרם עובר בכולם.`,
+ `<b>סדר העבודה:</b> התנגדות שקולה, אחר כך הזרם, ואחר כך המתח על כל נגד.`,
+ `<b>בדיקה:</b> סכום המתחים על הנגדים שווה למתח המקור.`,
+ `<b>מחלק מתח:</b> המתח על נגד הוא החלק שלו בהתנגדות הכוללת, כפול מתח המקור.`,
+ `<b>נגד מגן לנורה:</b> על הנגד צריך ליפול המתח העודף, באותו זרם שדרוש לנורה.`],
+parallel:[
+ `<b>מזהים חיבור במקביל:</b> שני הקצוות של הנגדים מחוברים לאותן שתי נקודות.`,
+ `<b>לשני נגדים:</b> מכפלה חלקי סכום. <b>בדיקה:</b> התוצאה קטנה מהנגד הקטן.`,
+ `<b>מעגל מעורב:</b> מצמצמים מבפנים החוצה, ומשרטטים מחדש את המעגל אחרי כל צמצום.`,
+ `<b>אחרי שמצאו את הזרם הכולל חוזרים אחורה:</b> מוצאים את המתח על הצירוף המקבילי, וממנו את הזרם בכל ענף.`,
+ `<b>בדיקה:</b> סכום הזרמים בענפים שווה לזרם שנכנס לצומת.`],
+emf:[
+ `<b>ההתנגדות הפנימית היא נגד בטור</b> בתוך הסוללה. מוסיפים אותה להתנגדות הכוללת.`,
+ `<b>"מעגל פתוח"</b> פירושו זרם אפס, ואז מתח ההדקים שווה לכא״מ.`,
+ `<b>שתי מדידות של מתח ההדקים וזרם</b> נותנות שתי משוואות, ומהן מוצאים את הכא״מ ואת ההתנגדות הפנימית.`,
+ `<b>מגרף של מתח ההדקים כפונקציה של הזרם:</b> נקודת החיתוך עם ציר המתח היא הכא״מ, והשיפוע הוא מינוס ההתנגדות הפנימית.`,
+ `<b>מתח ההדקים שווה גם למתח על המעגל החיצוני.</b> משתמשים בצורה שנוחה יותר.`],
+kirchhoff:[
+ `<b>מסמנים על השרטוט</b> זרם וכיוון בכל ענף, לפני שכותבים משוואה.`,
+ `<b>מספר המשוואות שווה למספר הזרמים הלא ידועים.</b> למעגל עם שני צמתים ושלושה ענפים: משוואת צומת אחת ושתי משוואות לולאה.`,
+ `<b>בלולאה בוחרים כיוון הקפה ונצמדים אליו.</b> כא״מ חיובי כשעוברים במקור מהמינוס לפלוס. מפל מתח חיובי כשההקפה בכיוון הזרם.`,
+ `<b>זרם שלילי</b> פירושו כיוון הפוך לזה שסומן. לא משנים את הסימון באמצע.`,
+ `<b>בדיקה:</b> מחשבים את המתח בין שני הצמתים לאורך כל אחד מהענפים. צריך להתקבל אותו ערך.`,
+ `<b>מתח בין שתי נקודות:</b> הולכים מנקודה לנקודה לאורך מסלול כלשהו, ומסכמים כא״מים ומפלי מתח עם הסימנים.`],
+power:[
+ `<b>בוחרים את הצורה לפי הנתונים:</b> ${m('<i>VI</i>')}, ${m('<i>I</i><sup>2</sup><i>R</i>')} או ${m(`${fr('<i>V</i><sup>2</sup>','<i>R</i>')}`)}.`,
+ `<b>בטור משווים לפי ${m('<i>I</i><sup>2</sup><i>R</i>')},</b> כי הזרם משותף. <b>במקביל משווים לפי ${m(`${fr('<i>V</i><sup>2</sup>','<i>R</i>')}`)},</b> כי המתח משותף.`,
+ `<b>אנרגיה בג׳אול:</b> הספק בוואט כפול זמן בשניות. <b>אנרגיה בקילוואט־שעה:</b> הספק בקילוואט כפול זמן בשעות.`,
+ `<b>נתוני היצרן</b> (מתח והספק) נותנים את ההתנגדות: ${m(`<i>R</i> = ${fr('<i>V</i><sup>2</sup>','<i>P</i>')}`)}. אם המכשיר מחובר למתח אחר, ההתנגדות נשארת וההספק משתנה.`,
+ `<b>בדיקה:</b> סכום ההספקים בכל הנגדים שווה להספק שהמקור מספק.`],
+eff:[
+ `<b>מזהים מה מושקע ומה מנוצל</b> לפני שמציבים. המושקע הוא בדרך כלל ההספק החשמלי, ${m('<i>VI</i>')}.`,
+ `<b>אפשר לעבוד עם אנרגיות במקום הספקים,</b> בתנאי שהן מתייחסות לאותו פרק זמן.`,
+ `<b>הנצילות היא מספר בלי יחידות.</b> כדי לקבל אחוזים מכפילים ב־100.`,
+ `<b>הרמת משא במהירות קבועה:</b> ההספק המנוצל הוא ${m(`${fr('<i>mgh</i>','<i>t</i>')}`)}, או ${m('<i>mgv</i>')}.`,
+ `<b>בסוללה עם התנגדות פנימית:</b> ${m(`${eta} = ${fr('<i>R</i>','<i>R</i> + <i>r</i>')}`)}, וזה שווה גם ליחס בין מתח ההדקים לכא״מ.`,
+ `<b>"הספק מרבי בנגד החיצוני"</b> מתורגם ל־${m('<i>R</i> = <i>r</i>')}.`]
+};
+
+/* ---------- rendering ---------- */
+const app=document.getElementById('app');
+function topicStats(t){const b=t.qs.filter(q=>q.l==='b'),a=t.qs.filter(q=>q.l==='a');const s=l=>l.filter(q=>solved[t.id+'-'+t.qs.indexOf(q)]).length;return{b:b.length,a:a.length,sb:s(b),sa:s(a)}}
+function home(){
+  app.innerHTML=`<div class="wrap"><section class="hero"><div><div class="eyebrow">פיזיקה 5 יח״ל · חשמל ומגנטיות · זרם חשמלי</div><h1>זרם חשמלי <span class="p">ומעגלים</span></h1><p class="lead">יחידת לימוד במעגלי זרם ישר: זרם, חוק אוהם, התנגדות של מוליך, חיבור בטור ובמקביל, כא״מ והתנגדות פנימית, חוקי קירכהוף, הספק ונצילות. בכל נושא יש הסבר קצר, סימולציה של מעגל, דוגמה פתורה צעד אחר צעד, ושאלות תרגול בשתי רמות: בסיסית ומתקדמת.</p><div class="cta"><a class="btn pri" href="#current">להתחיל מזרם חשמלי</a><a class="btn" href="#formulas">דף הנוסחאות</a></div></div>
+  <figure class="hfig"><div class="stage"><canvas style="cursor:ns-resize" aria-label="סוללה עם התנגדות פנימית שמחוברת לנגד חיצוני, עם אמפרמטר ווולטמטר"></canvas><span class="hint">גררו למעלה ולמטה כדי לשנות את R</span></div><figcaption>סוללה (במלבן המקווקו) שמחוברת לנגד חיצוני. כשמקטינים את ההתנגדות החיצונית הזרם גדל, ומתח ההדקים שמראה הוולטמטר יורד.</figcaption></figure></section>
+  <div class="secth"><h2>הנושאים לפי סדר הלימוד</h2><span>ההתקדמות נשמרת בדפדפן הזה</span></div>
+  <div class="tg">${T.map((t,i)=>{const s=topicStats(t);return `<a class="tc" href="#${t.id}"><span class="tn">${i+1}</span><b>${t.title}</b><span class="ts">${t.sub}</span><span class="pg"><span>בסיסיות <em>${s.sb}/${s.b}</em></span><span>מתקדמות <em>${s.sa}/${s.a}</em></span></span></a>`}).join('')}</div></div>`;
+  const cv=app.querySelector('canvas'),st={E:12,r:1,R:5};const c=Canvas(cv,(ctx,t,o)=>emfDraw(ctx,t,o,st,st.E/(st.R+st.r)));
+  let dr=false;const mv=e=>{const r=cv.getBoundingClientRect();st.R=Math.round(Math.max(0,Math.min(20,20*(1-(e.clientY-r.top)/r.height)))*2)/2;c.draw()};
+  cv.addEventListener('pointerdown',e=>{dr=true;cv.setPointerCapture(e.pointerId);mv(e);e.preventDefault()});cv.addEventListener('pointermove',e=>dr&&mv(e));cv.addEventListener('pointerup',()=>dr=false);cv.addEventListener('pointercancel',()=>dr=false);
+}
+function formulas(){
+  const rows=[
+  ['זרם ממוצע',`<i>I</i> = ${fr('Δ<i>q</i>','Δ<i>t</i>')}`,'current'],
+  ['זרם רגעי',`<i>I</i> = ${fr('<i>dq</i>','<i>dt</i>')}`,'current'],
+  ['חוק אוהם',`<i>V</i> = <i>RI</i>`,'ohm'],
+  ['התנגדות של מוליך',`<i>R</i> = ${rho}${fr(ell,'<i>A</i>')} = <i>λ</i>${ell}`,'resist'],
+  ['התנגדות שקולה של נגדים המחוברים בטור',`${RT} = Σ<i>R</i><sub>i</sub>`,'series'],
+  ['התנגדות שקולה של נגדים המחוברים במקביל',`${fr('1',RT)} = Σ${fr('1','<i>R</i><sub>i</sub>')}`,'parallel'],
+  ['הספק חשמלי',`<i>P</i> = <i>V</i><sub>AB</sub><i>I</i>`,'power'],
+  ['נצילות',`${eta} = ${fr('<i>P</i><sub>eff</sub>','<i>P</i><sub>in</sub>')}`,'eff'],
+  ['מתח הדקים',`${Vab} = ${eps} − <i>rI</i>`,'emf'],
+  ['חוקי קירכהוף: חוק הזרמים',`Σ<i>I</i> = 0`,'kirchhoff'],
+  ['חוקי קירכהוף: חוק המתחים',`Σ${eps} = Σ<i>IR</i>`,'kirchhoff']];
+  const tt=id=>T.find(t=>t.id===id).title;
+  app.innerHTML=`<div class="wrap"><div class="th"><a class="crumb" href="#">כל הנושאים</a><h1>דף הנוסחאות</h1><p>הנוסחאות של "זרם חשמלי" כפי שהן מופיעות בדף "נוסחאות ונתונים בפיזיקה" לבחינת הבגרות, עם קישור לנושא שבו משתמשים בכל אחת.</p></div>
+  <div class="tscroll"><table class="ftab"><tbody>${rows.map(r=>`<tr><td>${r[0]}<small><a href="#${r[2]}">← ${tt(r[2])}</a></small></td><td class="fx">${M(r[1])}</td></tr>`).join('')}</tbody></table></div>
+  <div class="secth"><h2>תוצאות שכדאי לזכור</h2><span>נובעות מהנוסחאות שלמעלה, ואינן מופיעות בדף</span></div>
+  <div class="fgrid" style="margin-top:14px"><div class="fc">${M(`<i>I</i> = ${fr(eps,'<i>R</i> + <i>r</i>')}`)}<small>הזרם במעגל עם התנגדות פנימית</small></div><div class="fc">${M(`${RT} = ${fr(`${R1}${R2}`,`${R1} + ${R2}`)}`)}<small>שני נגדים במקביל</small></div><div class="fc">${M(`<i>P</i> = <i>I</i><sup>2</sup><i>R</i> = ${fr('<i>V</i><sup>2</sup>','<i>R</i>')}`)}<small>הספק בנגד</small></div><div class="fc">${M('<i>W</i> = <i>Pt</i>')}<small>האנרגיה שנצרכת בזמן <i>t</i></small></div><div class="fc">${M(`${eta} = ${fr('<i>R</i>','<i>R</i> + <i>r</i>')}`)}<small>נצילות של מעגל עם התנגדות פנימית</small></div><div class="fc">${M(`1 kWh = ${e10('3.6',6)} J`)}<small>קילוואט־שעה</small></div><div class="fc">${M(`<i>e</i> = ${e10('1.6',-19)} C`)}<small>המטען היסודי</small></div></div></div>`;
+}
+let curTab='learn';
+function topic(id,tab){
+  const i=T.findIndex(t=>t.id===id),t=T[i];curTab=tab||'learn';
+  const tabs=[['learn','הסבר'],['sim','סימולציה'],['ex','דוגמה פתורה'],['qs','תרגול']];
+  app.innerHTML=`<div class="wrap"><div class="th"><a class="crumb" href="#">כל הנושאים</a><h1>${i+1}. ${t.title}</h1><p>${t.sub}</p></div>
+  <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button class="tab" role="tab" data-t="${k}" aria-selected="${k===curTab}">${l}</button>`).join('')}</div>
+  <div class="panel" id="panel"></div>
+  <nav class="pn">${i>0?`<a class="btn" href="#${T[i-1].id}">→ ${T[i-1].title}</a>`:'<span></span>'}${i<T.length-1?`<a class="btn pri" href="#${T[i+1].id}">${T[i+1].title} ←</a>`:`<a class="btn pri" href="#formulas">לדף הנוסחאות ←</a>`}</nav></div>`;
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{curTab=b.dataset.t;app.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===b));panel(t,curTab)});
+  panel(t,curTab);
+}
+function panel(t,tab,preset){
+  killScenes();const p=document.getElementById('panel');
+  if(tab==='learn'){p.innerHTML=`<div class="prose">${t.intro.map(x=>`<p>${x}</p>`).join('')}</div>${t.formulas.length?`<div><h2>הנוסחאות בנושא</h2><div class="fgrid">${t.formulas.map(f=>`<div class="fc">${M(f[0])}<small>${f[1]}</small></div>`).join('')}</div></div>`:''}${TIPS[t.id]?`<div class="tips"><h2>טיפים לפתרון</h2><ul>${TIPS[t.id].map(x=>`<li>${x}</li>`).join('')}</ul></div>`:''}<div class="trap"><h2>${t.trap[0]}</h2><p>${t.trap[1]}</p></div><div><button class="btn pri" data-go="sim">לסימולציה ←</button></div>`}
+  if(tab==='sim'){p.innerHTML='<div class="panel" style="padding:0" id="simhost"></div>';SIMS[t.id](p.querySelector('#simhost'),preset)}
+  if(tab==='ex'){const e=t.ex;p.innerHTML=`<article class="ex"><div class="gf"><div><h3>נתונים</h3>${e.given.map(g=>`<p>${g}</p>`).join('')}</div><div><h3>מבוקש</h3>${e.ask.map(g=>`<p>${g}</p>`).join('')}</div></div><div><h3>פתרון</h3><ol class="steps">${e.steps.map(s=>`<li>${s}</li>`).join('')}</ol></div><div class="chk"><h3>בדיקה</h3><p>${e.check}</p></div></article><div><button class="btn pri" data-pre="1">פתיחת הדוגמה בסימולציה ←</button></div>`}
+  if(tab==='qs')practice(t,p);
+  p.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>setTab(t,b.dataset.go));
+  p.querySelectorAll('[data-pre]').forEach(b=>b.onclick=()=>setTab(t,'sim',true));
+}
+function setTab(t,k,preset){curTab=k;app.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x.dataset.t===k));panel(t,k,preset);document.querySelector('.tabs').scrollIntoView({block:'nearest'})}
+function practice(t,p){
+  const lv=[['b','שאלות בסיסיות','הבנת המושגים והצבה ישירה'],['a','שאלות מתקדמות','ברמת בגרות, משלבות כמה רעיונות']];
+  p.innerHTML=`<div class="score" id="score"></div>`+lv.map(([l,h,s])=>`<section class="panel" style="padding:0;gap:14px" data-l="${l}"><div class="lvl"><h2>${h}</h2><span>${s}</span></div></section>`).join('')+`<p class="note">בשאלות חישוב אפשר לכתוב מספרים כמו <span class="mx">2e19</span> או <span class="mx">4*10^-7</span>, ומספר שלילי עם סימן מינוס. תשובה נחשבת נכונה בטווח של 3%.</p>`;
+  const upd=()=>{const s=topicStats(t);p.querySelector('#score').innerHTML=`נפתרו: בסיסיות ${s.sb}/${s.b} · מתקדמות ${s.sa}/${s.a}`};upd();
+  const n={b:0,a:0};
+  t.qs.forEach((q,qi)=>{const id=t.id+'-'+qi;n[q.l]++;const box=el(`<div class="q ${q.l==='a'?'adv':''}"><div class="qn"><span>${q.l==='a'?'מתקדמת':'בסיסית'} ${n[q.l]}</span><span class="st ${solved[id]?'ok':''}">${solved[id]?'✓ נפתרה':''}</span></div><p>${q.q}</p>${q.fig?q.fig():''}</div>`);
+    const st=box.querySelector('.st');const good=()=>{markSolved(id);st.textContent='✓ נפתרה';st.classList.add('ok');upd()};
+    const sol=el(`<div class="sol" hidden><b>פתרון</b><p>${q.s}</p></div>`);
+    if(q.t==='mc'){const o=el('<div class="opts"></div>');const fb=el('<div class="fb" hidden></div>');q.o.forEach((txt,k)=>{const b=el(`<button class="opt">${txt}</button>`);b.onclick=()=>{o.querySelectorAll('.opt').forEach((x,j)=>{x.disabled=true;if(j===q.a)x.classList.add('ok')});if(k===q.a){fb.className='fb ok';fb.textContent='נכון.';good()}else{b.classList.add('no');fb.className='fb no';fb.textContent='לא נכון. התשובה הנכונה מסומנת בירוק.'}fb.hidden=false;sol.hidden=false};o.appendChild(b)});box.append(o,fb,sol)}
+    else{const fid='a'+id;const row=el(`<div class="ansrow"><label class="tip" for="${fid}">התשובה שלכם:</label><input id="${fid}" inputmode="decimal" autocomplete="off"><span class="u">${q.u}</span><button class="btn sm pri">בדיקה</button><button class="btn sm">הצגת פתרון</button></div>`);const fb=el('<div class="fb" hidden></div>');const[inp]=row.querySelectorAll('input');const[chk,show]=row.querySelectorAll('button');
+      const check=()=>{const v=parseNum(inp.value);fb.hidden=false;if(isNaN(v)){fb.className='fb';fb.textContent='לא הצלחנו לקרוא את המספר. נסו למשל 12.5 או ‎−6.';return}const ok=Math.abs(v-q.a)<=Math.abs(q.a)*.03+1e-12;if(ok){fb.className='fb ok';fb.innerHTML='נכון. ';good();sol.hidden=false}else{const sign=Math.sign(v)!==Math.sign(q.a)&&v!==0;fb.className='fb no';fb.textContent=sign?'הסימן לא נכון. בדקו את כיוון הזרם שסימנתם.':Math.abs(Math.log10(Math.abs(v/q.a))%1)<.02&&(Math.abs(v/q.a)>5||Math.abs(v/q.a)<.2)?'הספרות נכונות אבל סדר הגודל לא. בדקו את היחידות.':'עדיין לא. נסו שוב, או פתחו את הפתרון.'}};
+      chk.onclick=check;inp.addEventListener('keydown',e=>{if(e.key==='Enter')check()});show.onclick=()=>{sol.hidden=!sol.hidden};box.append(row,fb,sol)}
+    p.querySelector(`[data-l="${q.l}"]`).appendChild(box)});
+}
+function route(){killScenes();const h=location.hash.replace('#','');document.getElementById('nav-f').toggleAttribute('aria-current',h==='formulas');document.getElementById('nav-home').toggleAttribute('aria-current',!h);
+  if(T.some(t=>t.id===h))topic(h);else if(h==='formulas')formulas();else home();window.scrollTo(0,0)}
+addEventListener('hashchange',route);route();
+
+</script>
+</body></html>

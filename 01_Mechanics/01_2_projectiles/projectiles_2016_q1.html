@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בונה הפתרון - בגרות 2016 שאלה 1 (גרם מדרגות)</title>
+<style>
+  :root {
+    --primary: #4c1d95;
+    --secondary: #7c3aed;
+    --bg: #f5f3ff;
+    --card: #ffffff;
+    --text: #1e293b;
+    --border: #ddd6fe;
+  }
+  * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body { background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.6; }
+  .container { max-width: 960px; margin: 0 auto; }
+  header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 20px 25px; border-radius: 12px; margin-bottom: 20px; }
+  header h1 { margin: 0 0 8px 0; font-size: 1.6rem; }
+  .problem-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+  .tab-btn { background: #ede9fe; border: 1px solid #c4b5fd; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; color: var(--primary); }
+  .tab-btn.active { background: var(--secondary); color: white; }
+  .tab-content { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .tab-content.active { display: block; }
+  .step-card { border-right: 4px solid var(--secondary); background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: none; }
+  .step-card.visible { display: block; }
+  .step-title { font-weight: bold; color: var(--primary); margin-bottom: 8px; }
+  .math { direction: ltr; display: inline-block; background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; }
+  .math-block { direction: ltr; text-align: left; background: #1e293b; color: #f8fafc; padding: 12px 16px; border-radius: 8px; font-family: 'Courier New', monospace; margin: 10px 0; }
+  .controls { display: flex; gap: 10px; margin-top: 15px; }
+  .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+  .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+  .final-ans { background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 10px; }
+  .svg-box { text-align: center; margin: 15px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>מרכז הפיזיקה 5 יח"ל | בונה הפתרון[cite: 1]</h1>
+    <p>בגרות 2016, שאלה 1 — זריקה אופקית וקפיצה על גרם מדרגות</p>
+  </header>
+
+  <div class="problem-box">
+    <strong>נתוני השאלה:</strong> גרם בן 5 מדרגות זהות.<br>
+    גובה כל מדרגה: <span class="math">L = 18 cm = 0.18 m</span> | עומק (רוחב) כל מדרגה: <span class="math">D = 20 cm = 0.20 m</span>.<br>
+    הכדור נזרק מקצה מדרגה 1 ופוגע <strong>באמצע מדרגה 4</strong>, ממשיך במהירות אופקית <span class="math">v₀</span> (ומהירות אנכית אפס) ופוגע בקרקע בנקודה B.
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab('tabA')">סעיף א'</button>
+    <button class="tab-btn" onclick="openTab('tabB')">סעיף ב'</button>
+    <button class="tab-btn" onclick="openTab('tabC')">סעיף ג'</button>
+    <button class="tab-btn" onclick="openTab('tabD')">סעיף ד'</button>
+    <button class="tab-btn" onclick="openTab('tabE')">סעיף ה'</button>
+  </div>
+
+  <!-- סעיף א -->
+  <div id="tabA" class="tab-content active">
+    <h3>סעיף א': חישוב המהירות ההתחלתית v₀</h3>
+    <div id="tabA-steps">
+      <div class="step-card visible">
+        <div class="step-title">שלב 1: קביעת ההעתק האנכי והאופקי עד אמצע מדרגה 4</div>
+        נספור את המדרגות עד מדרגה 4:
+        <ul>
+          <li><strong>גובה הירידה (<span class="math">Δy₁</span>):</strong> הכדור יורד את גובהן של מדרגות 1, 2 ו-3: <span class="math">Δy₁ = 3 · L = 3 · 0.18 = 0.54 m</span>.</li>
+          <li><strong>מרחק אופקי (<span class="math">Δx₁</span>):</strong> הכדור עובר את רוחב מדרגות 2, 3 ועוד חצי מדרגה 4: <span class="math">Δx₁ = 2.5 · D = 2.5 · 0.20 = 0.50 m</span>.</li>
+        </ul>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 2: חישוב זמן הנפילה <span class="math">t₁</span></div>
+        <div class="math-block">Δy₁ = ½ · g · t₁²  ⟹  0.54 = 5 · t₁²  ⟹  t₁ = √0.108 = 0.3286 s</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 3: חישוב המהירות האופקית <span class="math">v₀</span></div>
+        <div class="math-block">v₀ = Δx₁ / t₁ = 0.50 / 0.3286 = 1.52 m/s</div>
+        <div class="final-ans">תשובה סופית: המהירות ההתחלתית שהוענקה לכדור היא v₀ = 1.52 m/s.</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="nextStep('tabA')">הצג שלב הבא ◄</button>
+      <button class="btn btn-outline" onclick="showAll('tabA')">הצג פתרון מלא</button>
+    </div>
+  </div>
+
+  <!-- סעיף ב -->
+  <div id="tabB" class="tab-content">
+    <h3>סעיף ב': האם במהלך הפגיעה במדרגה 4 הייתה לכדור תאוצה?</h3>
+    <div id="tabB-steps">
+      <div class="step-card visible">
+        <div class="step-title">ניתוח השינוי במהירות וביטוי התאוצה</div>
+        לפני הפגיעה במדרגה 4, לכדור היה רכיב מהירות אנכי כלפי מטה (<span class="math">vy ≠ 0</span>).<br>
+        במהלך הפגיעה, הרכיב האנכי של המהירות התאפס (<span class="math">Δvy ≠ 0</span>) בפרק זמן קצר <span class="math">Δt</span>.<br>
+        מכיוון ש- <span class="math">a = Δv / Δt ≠ 0</span> (המדרגה הפעילה כוח נורמלי כלפי מעלה ששינה את וקטור המהירות), הייתה לכדור תאוצה כלפי מעלה במהלך ההתנגשות.
+        <div class="final-ans">קביעה סופית: כן, במהלך הפגיעה במדרגה 4 הייתה לכדור תאוצה (כלפי מעלה).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- סעיף ג -->
+  <div id="tabC" class="tab-content">
+    <h3>סעיף ג': חישוב אורך הקטע AB</h3>
+    <div id="tabC-steps">
+      <div class="step-card visible">
+        <div class="step-title">שלב 1: חישוב זמן התנועה מאמצע מדרגה 4 עד הקרקע (<span class="math">t₂</span>)</div>
+        הכדור נמצא בגובה של 2 מדרגות מעל הקרקע (מדרגות 4 ו-5):
+        <div class="math-block">Δy₂ = 2 · L = 2 · 0.18 = 0.36 m</div>
+        נחשב את זמן הנפילה <span class="math">t₂</span> (כאשר <span class="math">v₀y = 0</span>):
+        <div class="math-block">0.36 = 5 · t₂²  ⟹  t₂ = √0.072 = 0.2683 s</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 2: חישוב המרחק האופקי הכולל מאמצע מדרגה 4 (<span class="math">Δx₂</span>)</div>
+        <div class="math-block">Δx₂ = v₀ · t₂ = 1.5215 · 0.2683 = 0.408 m = 40.8 cm</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">שלב 3: חיסור המרחק עד נקודה A לקבלת אורך הקטע AB</div>
+        נקודה A נמצאת בקצה הימני של מדרגה 4. המרחק האופקי מאמצע מדרגה 4 עד נקודה A הוא חצי מדרגה (<span class="math">0.5 · D = 0.10 m = 10 cm</span>):
+        <div class="math-block">AB = Δx₂ - 0.5 · D = 0.408 - 0.10 = 0.308 m  (30.8 cm)</div>
+        <div class="final-ans">תשובה סופית: אורך הקטע AB הוא 0.308 m (או 30.8 cm).</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="nextStep('tabC')">הצג שלב הבא ◄</button>
+      <button class="btn btn-outline" onclick="showAll('tabC')">הצג פתרון מלא</button>
+    </div>
+  </div>
+
+  <!-- סעיף ד -->
+  <div id="tabD" class="tab-content">
+    <h3>סעיף ד': גרף הרכיב האנכי של המהירות כפונקציה של הזמן vy(t)</h3>
+    <div id="tabD-steps">
+      <div class="step-card visible">
+        <div class="step-title">הסבר וערכים מספריים (ציר y חיובי כלפי מטה)</div>
+        <ul>
+          <li><strong>קטע ראשון (<span class="math">0 ≤ t ≤ 0.33 s</span>):</strong> נפילה חופשית ממנוחה עד מדרגה 4. המהירות האנכית עולה מ-0 עד <span class="math">vy₁ = 10 · 0.3286 = 3.29 m/s</span>.</li>
+          <li><strong>רגע הפגיעה (<span class="math">t = 0.33 s</span>):</strong> המהירות האנכית מתאפסת רגעית (<span class="math">vy = 0</span>).</li>
+          <li><strong>קטע שני (<span class="math">0.33 s ≤ t ≤ 0.60 s</span>):</strong> נפילה חופשית נוספת במשך <span class="math">0.268 s</span> (סה"כ זמן <span class="math">0.597 s</span>) עד מהירות <span class="math">vy₂ = 10 · 0.2683 = 2.68 m/s</span>.</li>
+        </ul>
+        <div class="svg-box">
+          <svg width="420" height="220" viewBox="0 0 420 220">
+            <line x1="50" y1="180" x2="390" y2="180" stroke="#1e293b" stroke-width="2"/>
+            <line x1="50" y1="180" x2="50" y2="20" stroke="#1e293b" stroke-width="2"/>
+            <text x="395" y="185" font-size="13" font-weight="bold">t(s)</text>
+            <text x="10" y="25" font-size="13" font-weight="bold">vy(m/s)</text>
+            <!-- שנתות -->
+            <text x="15" y="55" font-size="11">3.29</text>
+            <text x="15" y="80" font-size="11">2.68</text>
+            <text x="180" y="198" font-size="11">0.33</text>
+            <text x="315" y="198" font-size="11">0.60</text>
+            <!-- קו ראשון -->
+            <line x1="50" y1="180" x2="195" y2="50" stroke="#7c3aed" stroke-width="2.5"/>
+            <line x1="195" y1="50" x2="195" y2="180" stroke="#94a3b8" stroke-dasharray="4,4"/>
+            <!-- קו שני (מקביל לקו הראשון) -->
+            <line x1="195" y1="180" x2="325" y2="75" stroke="#7c3aed" stroke-width="2.5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- סעיף ה -->
+  <div id="tabE" class="tab-content">
+    <h3>סעיף ה': השוואת זמן ההגעה לקרקע בזריקה שמאלה (תרשים 2)</h3>
+    <div id="tabE-steps">
+      <div class="step-card visible">
+        <div class="step-title">ניתוח משך התנועה בשתי הזריקות</div>
+        בשתי הזריקות הכדור יורד בסופו של דבר את אותו גובה אנכי כולל (<span class="math">5L</span>).<br>
+        <ul>
+          <li><strong>בזריקה ימינה (תרשים 1):</strong> הכדור פוגע במדרגה 4, מהירותו האנכית מתאפסת רגעית, והוא מתחיל ליפול מחדש ממהירות אנכית אפס.</li>
+          <li><strong>בזריקה שמאלה (תרשים 2):</strong> הכדור נופל נפילה חופשית רציפה ללא עצירה באמצע. לכן, בכל גובה מתחת למדרגה 4 מהירותו האנכית גדולה יותר מאשר בזריקה ימינה.</li>
+        </ul>
+        <div class="final-ans">קביעה סופית: הזמן עד הפגיעה בקרקע אינו זהה — בזריקה שמאלה זמן התנועה קצר יותר.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    event.target.classList.add('active');
+  }
+  function nextStep(tabId) {
+    const steps = document.querySelectorAll(`#${tabId}-steps .step-card`);
+    for (let i = 0; i < steps.length; i++) {
+      if (!steps[i].classList.contains('visible')) {
+        steps[i].classList.add('visible');
+        break;
+      }
+    }
+  }
+  function showAll(tabId) {
+    document.querySelectorAll(`#${tabId}-steps .step-card`).forEach(el => el.classList.add('visible'));
+  }
+</script>
+</body>
+</html>

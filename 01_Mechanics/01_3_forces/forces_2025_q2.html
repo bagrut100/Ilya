@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>בונה הפתרון - בגרות 2025 שאלה 2 — גוף על מישור משופע</title>
+
+<style>
+  :root {
+    --primary: #1e3a8a;
+    --secondary: #2563eb;
+    --accent: #f59e0b;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --border: #cbd5e1;
+    --success: #16a34a;
+    --danger: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 14px; line-height: 1.55; }
+  .math, .var { font-family: 'Times New Roman', Georgia, serif; font-style: italic; direction: ltr; display: inline-block; unicode-bidi: isolate; }
+  .num, .unit-ltr { font-family: 'Courier New', monospace; direction: ltr; display: inline-block; unicode-bidi: isolate; font-weight: 700; }
+  .container { max-width: 1020px; margin: 0 auto; }
+  header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; padding: 18px 20px; border-radius: 14px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(30,58,138,0.18); }
+  .header-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+  header h1 { margin: 0; font-size: 1.35rem; }
+  header p { margin: 4px 0 0; opacity: 0.92; font-size: 0.92rem; }
+  .header-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .h-btn { background: rgba(255,255,255,0.16); color: #fff; border: 1px solid rgba(255,255,255,0.35); padding: 8px 13px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+  .h-btn:hover { background: rgba(255,255,255,0.28); }
+  .h-btn-accent { background: var(--accent); color: #0f172a; border-color: var(--accent); }
+  .h-btn-accent:hover { background: #fbbf24; }
+
+  /* Filter Nav Banner inside questions */
+  .filter-nav-bar { display: none; background: #eff6ff; border: 1px solid #93c5fd; border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .filter-nav-bar.active { display: flex; }
+  .fnav-links { display: flex; gap: 8px; }
+  .fnav-btn { background: var(--secondary); color: #fff; border: none; padding: 6px 12px; border-radius: 7px; font-weight: 700; cursor: pointer; text-decoration: none; font-size: 0.85rem; }
+  .fnav-btn.disabled { background: #cbd5e1; pointer-events: none; color: #64748b; }
+
+  /* Problem Box */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.04); }
+  .problem-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 16px; align-items: center; }
+  @media (max-width: 768px) { .problem-grid { grid-template-columns: 1fr; } }
+  .svg-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; text-align: center; overflow-x: auto; }
+  .given-list { margin: 8px 0; padding-right: 20px; }
+  .given-list li { margin-bottom: 5px; }
+
+  /* Tabs */
+  .tabs { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+  .tab-btn { background: #e2e8f0; border: 2px solid transparent; padding: 10px 15px; border-radius: 10px; font-weight: 700; cursor: pointer; color: var(--text); font-size: 0.95rem; transition: 0.15s; flex: 1 1 auto; text-align: center; }
+  .tab-btn.active { background: var(--primary); color: #fff; }
+  .tab-btn.done { border-color: var(--success); background: #dcfce7; color: #14532d; }
+  .tab-btn.done.active { background: var(--success); color: #fff; }
+
+  /* 3-Step Builder */
+  .step-box { border: 1px solid #cbd5e1; border-right: 5px solid var(--secondary); border-radius: 10px; padding: 15px; margin-bottom: 14px; background: #f8fafc; }
+  .step-box.locked { opacity: 0.55; pointer-events: none; }
+  .step-box.completed { border-right-color: var(--success); background: #f0fdf4; }
+  .step-header { font-weight: 800; color: var(--primary); margin-bottom: 10px; font-size: 1.02rem; display: flex; justify-content: space-between; align-items: center; }
+  .formula-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+  .f-option { background: #fff; border: 2px solid #cbd5e1; border-radius: 9px; padding: 10px; cursor: pointer; text-align: center; font-weight: 700; transition: 0.15s; direction: ltr; font-family: 'Times New Roman', serif; font-size: 1.05rem; }
+  .f-option:hover { border-color: var(--secondary); background: #eff6ff; }
+  .f-option.selected-wrong { border-color: var(--danger); background: #fef2f2; color: var(--danger); }
+  .f-option.selected-right { border-color: var(--success); background: #dcfce7; color: #14532d; }
+
+  /* Expression Builder */
+  .expr-display { direction: ltr; text-align: left; background: #0f172a; color: #38bdf8; font-family: 'Courier New', monospace; font-size: 1.15rem; font-weight: 700; padding: 12px 14px; border-radius: 9px; min-height: 48px; margin-bottom: 10px; letter-spacing: 0.5px; word-break: break-all; }
+  .token-bank { display: flex; flex-wrap: wrap; gap: 7px; direction: ltr; margin-bottom: 10px; }
+  .tok-btn { background: #fff; border: 1.5px solid #94a3b8; border-radius: 8px; padding: 8px 13px; font-family: 'Times New Roman', serif; font-size: 1.05rem; font-weight: 700; cursor: pointer; min-width: 44px; }
+  .tok-btn:hover { background: #e0f2fe; border-color: var(--secondary); }
+  .tok-op { background: #e2e8f0; font-family: 'Courier New', monospace; }
+  .tok-ctrl { background: #fee2e2; border-color: #fca5a5; color: #991b1b; font-family: system-ui, sans-serif; font-size: 0.88rem; }
+
+  /* Keypad & Units */
+  .num-unit-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; margin-bottom: 10px; }
+  .num-screen { direction: ltr; background: #0f172a; color: #4ade80; font-family: 'Courier New', monospace; font-size: 1.25rem; font-weight: 700; padding: 10px 14px; border-radius: 9px; min-width: 190px; flex: 1; display: flex; align-items: center; justify-content: space-between; }
+  .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-width: 320px; direction: ltr; margin-bottom: 10px; }
+  .kp-btn { background: #fff; border: 1.5px solid #94a3b8; border-radius: 8px; padding: 11px 6px; font-size: 1.05rem; font-weight: 700; cursor: pointer; font-family: 'Courier New', monospace; }
+  .kp-btn:hover { background: #eff6ff; }
+  .kp-btn.op { background: #e2e8f0; }
+  .unit-choices { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+  .u-btn { background: #fff; border: 2px solid #94a3b8; border-radius: 8px; padding: 9px 14px; font-family: 'Courier New', monospace; font-weight: 700; cursor: pointer; direction: ltr; font-size: 0.98rem; }
+  .u-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  .action-btn { background: var(--secondary); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.95rem; }
+  .action-btn:hover { background: var(--primary); }
+  .feedback { margin-top: 9px; padding: 10px 12px; border-radius: 8px; font-weight: 600; display: none; }
+  .feedback.err { display: block; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+  .feedback.ok { display: block; background: #dcfce7; border: 1px solid #86efac; color: #14532d; }
+
+  /* Grid-paper Notebook Solution (עיצוב פתרון.jpg) */
+  .notebook-wrap { display: none; margin-top: 16px; border: 2px solid #1e3a8a; border-radius: 10px; overflow: hidden; background-color: #ffffff;
+    background-image: linear-gradient(to right, #dbeafe 1px, transparent 1px), linear-gradient(to bottom, #dbeafe 1px, transparent 1px);
+    background-size: 22px 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+  .notebook-wrap.visible { display: block; animation: fadeIn 0.35s ease; }
+  .nb-title { text-align: center; color: #b91c1c; font-weight: 900; font-size: 1.15rem; padding: 10px; border-bottom: 2px solid #1e3a8a; background: rgba(255,255,255,0.75); }
+  .nb-grid { display: grid; grid-template-columns: 36% 64%; }
+  @media (max-width: 680px) { .nb-grid { grid-template-columns: 1fr; } }
+  .nb-right { border-left: 2.5px solid #1e3a8a; display: flex; flex-direction: column; justify-content: space-between; padding: 12px 14px; background: rgba(255,255,255,0.45); }
+  .nb-given-sec { padding-bottom: 12px; }
+  .nb-find-sec { border-top: 2px solid #1e3a8a; padding-top: 10px; margin-top: 10px; }
+  .nb-sec-head { color: #1e3a8a; font-weight: 800; font-size: 1.05rem; margin-bottom: 6px; text-decoration: underline; }
+  .nb-left { padding: 12px 16px; background: rgba(255,255,255,0.45); }
+  .nb-step { margin-bottom: 12px; }
+  .nb-step-lbl { font-weight: 800; color: #0f172a; margin-bottom: 3px; }
+  .nb-math { direction: ltr; text-align: left; font-family: 'Times New Roman', serif; font-size: 1.08rem; background: rgba(255,255,255,0.85); padding: 5px 10px; border-radius: 6px; border: 1px solid #bfdbfe; display: inline-block; margin-top: 2px; }
+  .nb-final { background: #fef08a; border: 2px solid #eab308; padding: 7px 12px; border-radius: 7px; font-weight: 800; color: #0f172a; display: inline-block; direction: ltr; }
+
+  /* Summary Box */
+  .summary-panel { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-top: 18px; }
+  .summary-text { width: 100%; height: 95px; font-family: monospace; font-size: 0.88rem; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin: 8px 0; }
+
+  /* Tri-State Filter Modal */
+  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.65); z-index: 9999; align-items: center; justify-content: center; padding: 14px; }
+  .modal-backdrop.open { display: flex; }
+  .modal-card { background: #fff; width: 100%; max-width: 760px; max-height: 90vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 35px rgba(0,0,0,0.25); }
+  .modal-head { background: var(--primary); color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+  .modal-head h2 { margin: 0; font-size: 1.15rem; }
+  .modal-close { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+  .modal-tabs { display: flex; background: #f1f5f9; border-bottom: 1px solid #cbd5e1; }
+  .m-tab { flex: 1; padding: 11px; border: none; background: none; font-weight: 700; cursor: pointer; color: #475569; border-bottom: 3px solid transparent; }
+  .m-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #fff; }
+  .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
+  .tsf-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: 0.15s; user-select: none; }
+  .tsf-item:hover { border-color: #94a3b8; }
+  .tsf-item.state-must { background: #dcfce7; border-color: #16a34a; color: #14532d; }
+  .tsf-item.state-forbid { background: #ffe4e6; border-color: #e11d48; color: #881337; }
+  .tsf-item.state-forbid .tsf-name { text-decoration: line-through; }
+  .tsf-badge { padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 0.82rem; background: #e2e8f0; color: #334155; }
+  .state-must .tsf-badge { background: #16a34a; color: #fff; }
+  .state-forbid .tsf-badge { background: #e11d48; color: #fff; }
+  .modal-foot { padding: 12px 18px; border-top: 1px solid #cbd5e1; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .matching-list { margin-top: 12px; border-top: 1px dashed #cbd5e1; padding-top: 10px; }
+  .match-link { display: block; padding: 7px 10px; background: #f1f5f9; border-radius: 7px; margin-bottom: 5px; text-decoration: none; color: var(--primary); font-weight: 700; font-size: 0.9rem; }
+  .match-link:hover { background: #dbeafe; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="header-top">
+      <div>
+        <h1>מרכז הפיזיקה 5 יח"ל | בונה הפתרון</h1>
+        <p>בגרות 2025 שאלה 2 — גוף על מישור משופע</p>
+      </div>
+      <div class="header-actions">
+        <a href="index.html" class="h-btn">🏠 כל השאלות</a>
+        <button class="h-btn h-btn-accent" onclick="openTsfModal()">🔍 סינון נושאים / מיומנויות</button>
+        <button class="h-btn" onclick="randomizeParams()">🎲 שאלה חדשה (מספרים חדשים)</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="filter-nav-bar" class="filter-nav-bar">
+    <span id="fnav-info" style="font-weight:800;color:#1e3a8a;"></span>
+    <div class="fnav-links">
+      <a id="fnav-prev" class="fnav-btn" href="#">◄ הקודמת בסינון</a>
+      <a id="fnav-next" class="fnav-btn" href="#">הבאה בסינון ►</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="problem-grid">
+      <div id="problem-statement-box">
+        
+<strong>נתוני השאלה (בגרות 2025, שאלה 2):</strong><br>
+גוף קטן שמסתו <span class="math">m</span> מונח בגובה <span class="math">h</span> על מישור משופע שזוויתו <span class="math">α</span>. מקדם החיכוך הסטטי <span class="math">μ_s</span> והקינטי <span class="math">μ_k</span>.<br>
+בסעיף ד': <span class="math">h = 0.3 m</span>, <span class="math">α₃ = 22°</span>, <span class="math">μ_k = 0.24</span>.
+
+      </div>
+      <div class="svg-box">
+        
+<svg id="svg-2025q2" width="350" height="220" viewBox="0 0 350 220">
+  <defs>
+    <marker id="aB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb"/></marker>
+    <marker id="aR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#dc2626"/></marker>
+    <marker id="aG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a"/></marker>
+  </defs>
+  <!-- מישור משופע -->
+  <polygon points="40,185 300,185 300,75" fill="#f1f5f9" stroke="#0f172a" stroke-width="2"/>
+  <text x="85" y="178" font-family="Times New Roman" font-style="italic" font-size="14">α</text>
+  <!-- גוף m מסובב -->
+  <g transform="translate(185, 111) rotate(-22.9)">
+    <rect class="body-box" x="-22" y="-14" width="44" height="28" rx="3" fill="#dbeafe" stroke="#1e3a8a" stroke-width="2"/>
+    <text x="0" y="5" text-anchor="middle" font-family="Times New Roman" font-style="italic" font-weight="bold" font-size="15">m</text>
+  </g>
+  <!-- כוחות ממרכז המסה (185, 111) -->
+  <!-- mg אנכי מטה -->
+  <line class="force-shaft" x1="185" y1="111" x2="185" y2="178" stroke="#dc2626" stroke-width="2.2" marker-end="url(#aR)"/>
+  <!-- N ניצב למשטח -->
+  <line class="force-shaft" x1="185" y1="111" x2="161" y2="54" stroke="#2563eb" stroke-width="2.2" marker-end="url(#aB)"/>
+  <!-- fk ממרכז המסה במעלה המישור -->
+  <line class="force-shaft" x1="185" y1="111" x2="238" y2="88" stroke="#16a34a" stroke-width="2.2" marker-end="url(#aG)"/>
+  <g id="labels-layer-2025q2"></g>
+</svg>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs" id="subq-tabs"></div>
+  <div id="subq-panes"></div>
+
+  <div class="summary-panel">
+    <strong>📋 סיכום תהליך העבודה של התלמיד (להעתקה / שליחה למורה):</strong>
+    <textarea id="student-summary" class="summary-text" readonly></textarea>
+    <button class="action-btn" onclick="copySummary()">העתק סיכום ללוח</button>
+  </div>
+</div>
+
+
+<div id="tsf-modal" class="modal-backdrop" onclick="if(event.target===this)closeTsfModal()">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>🔍 סינון מתקדם תלת-מצבי (יכול / ✓ חייב / ⊘ אסור)</h2>
+      <button class="modal-close" onclick="closeTsfModal()">&times;</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="m-tab active" data-tab="topics" onclick="switchTsfTab('topics')">נושאים</button>
+      <button class="m-tab" data-tab="skills" onclick="switchTsfTab('skills')">מיומנויות</button>
+      <button class="m-tab" data-tab="years" onclick="switchTsfTab('years')">שנים</button>
+    </div>
+    <div id="tsf-modal-body" class="modal-body"></div>
+    <div class="modal-foot">
+      <span id="tsf-match-count" style="font-weight:800;color:#1e3a8a;"></span>
+      <div style="display:flex;gap:8px;">
+        <button class="action-btn" style="background:#64748b;" onclick="resetTsfFilters()">איפוס סינון</button>
+        <button class="action-btn" onclick="closeTsfModal()">סגור והחל</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+const TSF_DATA = [
+  {
+    id: "q1_bounce",
+    file: "forces_bounce.html",
+    title: "שאלה 1 — כדור מנתר משולחן (ניתוח גרפי והתנגדות אוויר)",
+    year: "מאגר / מתכונת",
+    topics: ["קינמטיקה במימד אחד", "זריקה אנכית"],
+    skills: ["ניתוח גרף מהירות-זמן v(t)", "שרטוט וניתוח גרף מקום-זמן x(t)/y(t)", "הסבר איכותי ונימוק פיזיקלי"]
+  },
+  {
+    id: "q2_atwood",
+    file: "forces_atwood.html",
+    title: "שאלה 2 — מכונת אטווד (פסילת ביטויים ומציאת יחס מסות)",
+    year: "מאגר / מתכונת",
+    topics: ["דינמיקה (חוקי ניוטון)"],
+    skills: ["בדיקת יחידות ומקרי קצה", "תרשים כוחות והחוק השני של ניוטון", "מערכת גופים קשורים"]
+  },
+  {
+    id: "2025_q2",
+    file: "forces_2025_q2.html",
+    title: "בגרות 2025 שאלה 2 — גוף על מישור משופע (חיכוך סטטי וקינטי)",
+    year: "2025",
+    topics: ["דינמיקה (חוקי ניוטון)"],
+    skills: ["תרשים כוחות והחוק השני של ניוטון", "פירוק כוחות במערכת צירים משופעת", "ניתוח גרף תאוצה-זמן"]
+  },
+  {
+    id: "2024_q2",
+    file: "forces_2024_q2.html",
+    title: "בגרות 2024 שאלה 2 — ניסוי משיכת תיבה עם חיכוך (ניתוח ליניארי)",
+    year: "2024",
+    topics: ["דינמיקה (חוקי ניוטון)"],
+    skills: ["תרשים כוחות והחוק השני של ניוטון", "ניתוח ליניארי ושיפוע גרף", "סף תנועה וחיכוך סטטי"]
+  },
+  {
+    id: "2023_q1",
+    file: "forces_2023_q1.html",
+    title: "בגרות 2023 שאלה 1 — תנועה על מישור משופע חלק ועם חיכוך",
+    year: "2023",
+    topics: ["קינמטיקה במימד אחד", "דינמיקה (חוקי ניוטון)"],
+    skills: ["ניתוח גרף מהירות-זמן v(t)", "פירוק כוחות במערכת צירים משופעת", "הסבר איכותי ונימוק פיזיקלי"]
+  },
+  {
+    id: "2023_q2",
+    file: "forces_2023_q2.html",
+    title: "בגרות 2023 שאלה 2 — שני גופים קשורים אנכית וחיישן מתיחות",
+    year: "2023",
+    topics: ["דינמיקה (חוקי ניוטון)"],
+    skills: ["תרשים כוחות והחוק השני של ניוטון", "מערכת גופים קשורים", "ניתוח גרף כוח-זמן"]
+  },
+  {
+    id: "2022_q2",
+    file: "forces_2022_q2.html",
+    title: "בגרות 2022 שאלה 2 — שלושה ניסויים עם מסילה חלקה ותיבה",
+    year: "2022",
+    topics: ["דינמיקה (חוקי ניוטון)"],
+    skills: ["תרשים כוחות והחוק השני של ניוטון", "מערכת גופים קשורים", "פירוק כוחות במערכת צירים משופעת"]
+  },
+  {
+    id: "2021_q2",
+    file: "forces_2021_q2.html",
+    title: "בגרות 2021 שאלה 2 — מערכת גלגלת אנכית (חוק שלישי של ניוטון)",
+    year: "2021",
+    topics: ["דינמיקה (חוקי ניוטון)"],
+    skills: ["תרשים כוחות והחוק השני של ניוטון", "מערכת גופים קשורים", "הסבר איכותי ונימוק פיזיקלי"]
+  },
+  {
+    id: "2020_q1",
+    file: "forces_2020_q1.html",
+    title: "בגרות 2020 שאלה 1 — נחיתה רכה של החללית 'בראשית' על הירח",
+    year: "2020",
+    topics: ["קינמטיקה במימד אחד", "דינמיקה (חוקי ניוטון)"],
+    skills: ["ניתוח גרף מהירות-זמן v(t)", "תרשים כוחות והחוק השני של ניוטון", "שרטוט וניתוח גרף מקום-זמן x(t)/y(t)"]
+  }
+];
+
+const TAXONOMY_TOPICS = [
+  { name: "קינמטיקה במימד אחד", desc: "תנועה שוות מהירות ושוות תאוצה, ניתוח גרפי x(t), v(t), a(t)" },
+  { name: "זריקה אנכית", desc: "נפילה חופשית וזריקה אנכית מעלה/מטה בהשפעת כוח הכובד" },
+  { name: "דינמיקה (חוקי ניוטון)", desc: "תרשימי כוחות, החוק הראשון, השני והשלישי של ניוטון, חיכוך ומערכות גופים" },
+  { name: "זריקות/בליסטיקה", desc: "זריקה אופקית ומשופעת במישור" },
+  { name: "תנועה מעגלית קצובה", desc: "תאוצה רדיאלית, כוח צנטריפטלי, תדירות וזמן מחזור" },
+  { name: "עבודה ואנרגיה", desc: "אנרגיה קינטית, פוטנציאלית ושימור אנרגיה מכנית" },
+  { name: "מתקף ותנע", desc: "שימור תנע והתנגשויות" },
+  { name: "כבידה (גרוויטציה)", desc: "חוק הכבידה האוניברסלי, תנועת לוויינים וחוקי קפלר" }
+];
+
+const ALL_SKILLS = Array.from(new Set(TSF_DATA.flatMap(q => q.skills)));
+const ALL_YEARS = Array.from(new Set(TSF_DATA.map(q => q.year)));
+
+let tsfState = JSON.parse(localStorage.getItem('bagrut_tsf_state_b2') || '{"topics":{},"skills":{},"years":{}}');
+let currentModalTab = 'topics';
+
+function saveTsfState() {
+  localStorage.setItem('bagrut_tsf_state_b2', JSON.stringify(tsfState));
+}
+
+function getFilteredQuestions() {
+  return TSF_DATA.filter(q => {
+    for (const [t, st] of Object.entries(tsfState.topics || {})) {
+      if (st === 'must' && !q.topics.includes(t)) return false;
+      if (st === 'forbid' && q.topics.includes(t)) return false;
+    }
+    for (const [s, st] of Object.entries(tsfState.skills || {})) {
+      if (st === 'must' && !q.skills.includes(s)) return false;
+      if (st === 'forbid' && q.skills.includes(s)) return false;
+    }
+    for (const [y, st] of Object.entries(tsfState.years || {})) {
+      if (st === 'must' && q.year !== y) return false;
+      if (st === 'forbid' && q.year === y) return false;
+    }
+    return true;
+  });
+}
+
+function hasActiveFilters() {
+  return ['topics','skills','years'].some(cat => Object.values(tsfState[cat] || {}).some(v => v === 'must' || v === 'forbid'));
+}
+
+function openTsfModal() {
+  document.getElementById('tsf-modal').classList.add('open');
+  renderTsfModal();
+}
+function closeTsfModal() {
+  document.getElementById('tsf-modal').classList.remove('open');
+}
+function switchTsfTab(tab) {
+  currentModalTab = tab;
+  document.querySelectorAll('.m-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  renderTsfModal();
+}
+function cycleTsfItem(cat, key) {
+  const cur = (tsfState[cat] && tsfState[cat][key]) || 'may';
+  const next = cur === 'may' ? 'must' : (cur === 'must' ? 'forbid' : 'may');
+  if (!tsfState[cat]) tsfState[cat] = {};
+  if (next === 'may') delete tsfState[cat][key];
+  else tsfState[cat][key] = next;
+  saveTsfState();
+  renderTsfModal();
+  if (typeof onTsfUpdated === 'function') onTsfUpdated();
+}
+function resetTsfFilters() {
+  tsfState = { topics: {}, skills: {}, years: {} };
+  saveTsfState();
+  renderTsfModal();
+  if (typeof onTsfUpdated === 'function') onTsfUpdated();
+}
+
+function renderTsfModal() {
+  const body = document.getElementById('tsf-modal-body');
+  if (!body) return;
+  let items = [];
+  if (currentModalTab === 'topics') {
+    items = TAXONOMY_TOPICS.map(t => ({ key: t.name, label: t.name, sub: t.desc, count: TSF_DATA.filter(q => q.topics.includes(t.name)).length }));
+  } else if (currentModalTab === 'skills') {
+    items = ALL_SKILLS.map(s => ({ key: s, label: s, sub: '', count: TSF_DATA.filter(q => q.skills.includes(s)).length }));
+  } else {
+    items = ALL_YEARS.map(y => ({ key: y, label: 'שנת בחינה: ' + y, sub: '', count: TSF_DATA.filter(q => q.year === y).length }));
+  }
+  const catMap = tsfState[currentModalTab] || {};
+  let html = items.map(it => {
+    const st = catMap[it.key] || 'may';
+    const cls = st === 'must' ? 'state-must' : (st === 'forbid' ? 'state-forbid' : '');
+    const badge = st === 'must' ? '✓ חייב' : (st === 'forbid' ? '⊘ אסור' : '• יכול');
+    return `<div class="tsf-item ${cls}" onclick="cycleTsfItem('${currentModalTab}', '${it.key.replace(/'/g, "\'")}')">
+      <div>
+        <div class="tsf-name" style="font-weight:700;">${it.label} <span style="font-size:0.8rem;color:#64748b;">(${it.count} שאלות)</span></div>
+        ${it.sub ? `<div style="font-size:0.82rem;color:#475569;">${it.sub}</div>` : ''}
+      </div>
+      <span class="tsf-badge">${badge}</span>
+    </div>`;
+  }).join('');
+
+  const matched = getFilteredQuestions();
+  html += `<div class="matching-list">
+    <div style="font-weight:800;margin-bottom:6px;color:#1e3a8a;">שאלות תואמות לסינון הנוכחי (${matched.length} מתוך ${TSF_DATA.length}):</div>
+    ${matched.map(m => `<a class="match-link" href="${m.file}">${m.title}</a>`).join('') || '<div style="color:#dc2626;">אין שאלות התואמות לכל תנאי הסינון.</div>'}
+  </div>`;
+  body.innerHTML = html;
+  const cntEl = document.getElementById('tsf-match-count');
+  if (cntEl) cntEl.textContent = `${matched.length} שאלות תואמות`;
+}
+
+function initInQuestionNav(currentId) {
+  const bar = document.getElementById('filter-nav-bar');
+  if (!bar) return;
+  const active = hasActiveFilters();
+  const matched = getFilteredQuestions();
+  if (!active && matched.length === TSF_DATA.length) {
+    bar.classList.remove('active');
+    return;
+  }
+  bar.classList.add('active');
+  const idx = matched.findIndex(q => q.id === currentId);
+  const info = document.getElementById('fnav-info');
+  const prevBtn = document.getElementById('fnav-prev');
+  const nextBtn = document.getElementById('fnav-next');
+  if (idx === -1) {
+    info.textContent = `שאלה זו אינה כלולה בסינון (${matched.length} תואמות)`;
+    prevBtn.classList.add('disabled');
+    if (matched.length > 0) { nextBtn.href = matched[0].file; nextBtn.classList.remove('disabled'); }
+    else nextBtn.classList.add('disabled');
+  } else {
+    info.textContent = `סינון פעיל: שאלה ${idx + 1} מתוך ${matched.length}`;
+    if (idx > 0) { prevBtn.href = matched[idx - 1].file; prevBtn.classList.remove('disabled'); }
+    else prevBtn.classList.add('disabled');
+    if (idx < matched.length - 1) { nextBtn.href = matched[idx + 1].file; nextBtn.classList.remove('disabled'); }
+    else nextBtn.classList.add('disabled');
+  }
+}
+
+/* Runtime SVG Vector Label & Arrow Collision Resolver */
+function resolveSvgCollisions(svgId) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  const labels = Array.from(svg.querySelectorAll('.vec-label'));
+  const lines = Array.from(svg.querySelectorAll('line.force-shaft, line.axis-line'));
+  const bodyRects = Array.from(svg.querySelectorAll('.body-box'));
+  const placedBoxes = [];
+
+  function distToSegment(px, py, x1, y1, x2, y2) {
+    const l2 = (x2 - x1)**2 + (y2 - y1)**2;
+    if (l2 === 0) return Math.hypot(px - x1, py - y1);
+    let t = ((px - x1)*(x2 - x1) + (py - y1)*(y2 - y1)) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(px - (x1 + t*(x2 - x1)), py - (y1 + t*(y2 - y1)));
+  }
+
+  labels.forEach(g => {
+    let baseX = parseFloat(g.dataset.x || 0);
+    let baseY = parseFloat(g.dataset.y || 0);
+    const nx = parseFloat(g.dataset.nx || 0);
+    const ny = parseFloat(g.dataset.ny || -1);
+    let curX = baseX, curY = baseY;
+
+    for (let iter = 0; iter < 14; iter++) {
+      g.setAttribute('transform', `translate(${curX.toFixed(1)}, ${curY.toFixed(1)})`);
+      const bb = g.getBBox();
+      const cx = curX + bb.x + bb.width / 2;
+      const cy = curY + bb.y + bb.height / 2;
+      let collision = false;
+
+      for (const ln of lines) {
+        const x1 = parseFloat(ln.getAttribute('x1')), y1 = parseFloat(ln.getAttribute('y1'));
+        const x2 = parseFloat(ln.getAttribute('x2')), y2 = parseFloat(ln.getAttribute('y2'));
+        if (distToSegment(cx, cy, x1, y1, x2, y2) < 16) { collision = true; break; }
+      }
+      if (!collision) {
+        for (const br of bodyRects) {
+          const bx = parseFloat(br.getAttribute('x')), by = parseFloat(br.getAttribute('y'));
+          const bw = parseFloat(br.getAttribute('width')), bh = parseFloat(br.getAttribute('height'));
+          if (cx > bx - 8 && cx < bx + bw + 8 && cy > by - 8 && cy < by + bh + 8) { collision = true; break; }
+        }
+      }
+      if (!collision) {
+        for (const pb of placedBoxes) {
+          if (Math.abs(cx - pb.cx) < (bb.width + pb.w)/2 + 6 && Math.abs(cy - pb.cy) < (bb.height + pb.h)/2 + 6) {
+            collision = true; break;
+          }
+        }
+      }
+      if (!collision) {
+        placedBoxes.push({ cx, cy, w: bb.width, h: bb.height });
+        break;
+      }
+      curX += nx * 7;
+      curY += ny * 7;
+    }
+    // Add crisp white pill behind text
+    const oldPill = g.querySelector('rect.lbl-pill');
+    if (oldPill) oldPill.remove();
+    const bb = g.getBBox();
+    const pill = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    pill.setAttribute('class', 'lbl-pill');
+    pill.setAttribute('x', (bb.x - 4).toFixed(1));
+    pill.setAttribute('y', (bb.y - 3).toFixed(1));
+    pill.setAttribute('width', (bb.width + 8).toFixed(1));
+    pill.setAttribute('height', (bb.height + 6).toFixed(1));
+    pill.setAttribute('rx', '4');
+    pill.setAttribute('fill', 'rgba(255,255,255,0.94)');
+    g.insertBefore(pill, g.firstChild);
+  });
+}
+
+/* Helper to build exact vector label with centered arrow directly above main letter */
+function makeVecLabelSVG(id, letter, sub, x, y, nx, ny, color="#0f172a", isMg=false) {
+  if (isMg) {
+    return `<g id="${id}" class="vec-label" data-x="${x}" data-y="${y}" data-nx="${nx}" data-ny="${ny}" transform="translate(${x},${y})">
+      <text x="-8" y="0" text-anchor="middle" font-family="Times New Roman, serif" font-style="italic" font-weight="700" font-size="16" fill="${color}" style="direction:ltr;unicode-bidi:isolate;">m</text>
+      <text x="5" y="0" text-anchor="middle" font-family="Times New Roman, serif" font-style="italic" font-weight="700" font-size="16" fill="${color}" style="direction:ltr;unicode-bidi:isolate;">g</text>
+      <line x1="0" y1="-13" x2="10" y2="-13" stroke="${color}" stroke-width="1.4"/>
+      <polygon points="10,-13 7,-15.2 7,-10.8" fill="${color}"/>
+    </g>`;
+  }
+  const subHtml = sub ? `<tspan dy="4" font-size="11" font-style="normal">${sub}</tspan>` : '';
+  return `<g id="${id}" class="vec-label" data-x="${x}" data-y="${y}" data-nx="${nx}" data-ny="${ny}" transform="translate(${x},${y})">
+    <text x="0" y="0" text-anchor="middle" font-family="Times New Roman, serif" font-style="italic" font-weight="700" font-size="16" fill="${color}" style="direction:ltr;unicode-bidi:isolate;">${letter}${subHtml}</text>
+    <line x1="-6" y1="-15" x2="6" y2="-15" stroke="${color}" stroke-width="1.4"/>
+    <polygon points="6,-15 3,-17.2 3,-12.8" fill="${color}"/>
+  </g>`;
+}
+</script>
+
+<script>
+const PROBLEM_CONFIG = {
+  id: "2025_q2",
+  title: "בגרות 2025 שאלה 2 — גוף על מישור משופע",
+  params: { h: 0.3, alpha: 22, muk: 0.24, g: 10.0 },
+  subquestions: [
+    {
+      id: "bc",
+      label: "סעיפים ב'-ג' (חיכוך סטטי וסף תנועה)",
+      title: "סעיפים ב'-ג': הקטנת זווית במנוחה וזווית סף תנועה α₂",
+      prompt: "כאשר מקטינים את הזווית (α₁ < α₀), גודל כוח החיכוך הסטטי קטן (כי f_s = mg·sinα). מהו הביטוי לזווית סף התנועה α₂ (tan α₂)?",
+      symbolicOnly: true,
+      formulas: [
+        { label: "f_s ≤ μ_s · N", correct: true },
+        { label: "f_k = μ_k · N", correct: false, hint: "במצב של סף תנועה הגוף עדיין במנוחה ופועל חיכוך סטטי מרבי." }
+      ],
+      tokens: ["mus"],
+      targetExpr: "mus",
+      getNotebook: () => ({
+        given: `סף תנועה: f_s,max = μ_s · N`,
+        find: `ביטוי עבור α₂ (דרך tan α₂)`,
+        formula: `ΣF = 0 ; f_s,max = μ_s · N`,
+        derivation: `ציר y: N = mg·cosα₂ ; ציר x: mg·sinα₂ = μ_s·mg·cosα₂`,
+        substitution: `חלוקה ב-mg·cosα₂ נותנת: tan(α₂) = μ_s`,
+        finalAns: `α₂ = arctan(μ_s)`
+      })
+    },
+    {
+      id: "d",
+      label: "סעיף ד' (מהירות בתחתית המישור)",
+      title: "סעיף ד': חישוב גודל מהירות הגוף בהגיעו לתחתית המישור",
+      prompt: "נתון h = 0.3 m, α₃ = 22°, μ_k = 0.24. חשבו את גודל מהירות הגוף בתחתית המישור המשופע (שימו לב: אורך המדרון הוא Δx = h / sin α₃).",
+      formulas: [
+        { label: "v² = v₀² + 2a(x - x₀)", correct: true },
+        { label: "x = x₀ + v₀t + ½at²", correct: false, hint: "זמן הירידה אינו נתון, לכן עדיפה נוסחת מהירות-מקום." }
+      ],
+      tokens: ["√(", "2", "*", "g", "*", "h", "*", "(", "1", "-", "muk", "/", "tan(", "alpha", ")", ")", ")"],
+      targetExpr: "√(2 * g * h * (1 - muk / tan(alpha)))",
+      unitChoices: ["m/s", "m/s^2", "J", "m"],
+      targetUnit: "m/s",
+      getTargetValue: () => {
+        const p = PROBLEM_CONFIG.params;
+        const rad = p.alpha * Math.PI / 180;
+        const a = p.g * (Math.sin(rad) - p.muk * Math.cos(rad));
+        const dx = p.h / Math.sin(rad);
+        return Math.sqrt(2 * a * dx);
+      },
+      getNotebook: () => {
+        const p = PROBLEM_CONFIG.params;
+        const rad = p.alpha * Math.PI / 180;
+        const a = p.g * (Math.sin(rad) - p.muk * Math.cos(rad));
+        const dx = p.h / Math.sin(rad);
+        const v = Math.sqrt(2 * a * dx);
+        return {
+          given: `h = ${p.h} m, α₃ = ${p.alpha}°, μ_k = ${p.muk}, v₀ = 0, g = ${p.g} m/s²`,
+          find: `v = ?`,
+          formula: `ΣF = ma ; f_k = μ_k N ; v² = v₀² + 2aΔx`,
+          derivation: `a = g(sinα₃ - μ_k cosα₃) ; Δx = h / sinα₃ ; v = √(2aΔx)`,
+          substitution: `a = ${a.toFixed(3)} m/s² ; Δx = ${dx.toFixed(3)} m ; v = √(2 · ${a.toFixed(3)} · ${dx.toFixed(3)})`,
+          finalAns: `v = ${v.toFixed(2)} m/s`
+        };
+      }
+    },
+    {
+      id: "e",
+      label: "סעיף ה' (גרף תאוצה בעלייה ובירידה)",
+      title: "סעיף ה': קביעת התרשים הנכון של גודל התאוצה בעלייה ובירידה",
+      prompt: "מעניקים לגוף מהירות התחלתית במעלה המישור המשופע. איזה תרשים מבין 1–3 מתאר נכון את גודל התאוצה |a| כפונקציה של הזמן?",
+      skipBuilderAndNumeric: true,
+      formulas: [
+        { label: "תרשים 3: a_u > a_d (בעלייה רכיב הכובד והחיכוך פועלים יחד במורד המישור)", correct: true },
+        { label: "תרשים 1: a_d > a_u", correct: false, hint: "בירידה החיכוך מנוגד לכיוון התנועה ומקטין את שקול הכוחות, לכן a_d < a_u." },
+        { label: "תרשים 2: a_u = a_d", correct: false, hint: "החיכוך משנה כיוון בין עלייה לירידה, לכן גודלי התאוצה שונים." }
+      ],
+      getNotebook: () => ({
+        given: `תנועה עם חיכוך קינטי במעלה ובמורד המישור`,
+        find: `השוואת a_u ו-a_d ובחירת תרשים`,
+        formula: `ΣF = ma`,
+        derivation: `בעלייה: a_u = g(sinα + μ_k cosα) ; בירידה: a_d = g(sinα - μ_k cosα)`,
+        substitution: `מכיוון ש-μ_k > 0 מתקיים a_u > a_d`,
+        finalAns: `תרשים 3 (a_u > a_d)`
+      })
+    }
+  ]
+};
+
+function buildPanes() {
+  const panesEl = document.getElementById('subq-panes');
+  panesEl.innerHTML = PROBLEM_CONFIG.subquestions.map((sq, idx) => {
+    const formulasHtml = sq.formulas.map((f, fi) =>
+      `<div class="f-option" onclick="checkFormula('${sq.id}', ${fi})">${f.label}</div>`
+    ).join('');
+
+    const tokensHtml = (sq.tokens || []).map(tk => {
+      const isOp = ['+','-','*','/','(',')','^2','√('].includes(tk);
+      return `<button class="tok-btn ${isOp?'tok-op':''}" onclick="addToken('${sq.id}', '${tk}')">${tk}</button>`;
+    }).join('');
+
+    const unitsHtml = (sq.unitChoices || []).map(u =>
+      `<button class="u-btn" onclick="selectUnit('${sq.id}', '${u}', this)">${u}</button>`
+    ).join('');
+
+    const nb = sq.getNotebook();
+
+    return `<div class="card subq-pane" id="pane-${sq.id}" style="display:${idx===0?'block':'none'}">
+      <h3 style="margin-top:0;color:#1e3a8a;">${sq.title}</h3>
+      <p>${sq.prompt}</p>
+
+      <!-- Step 1: Formula -->
+      <div class="step-box" id="s1-${sq.id}">
+        <div class="step-header"><span>שלב 1: בחירת נוסחה / עיקרון מתוך דף הנוסחאות</span></div>
+        <div class="formula-grid" id="fgrid-${sq.id}">${formulasHtml}</div>
+        <div class="feedback" id="fb-f-${sq.id}"></div>
+      </div>
+
+      <!-- Step 2: Algebraic Expression -->
+      ${sq.skipBuilderAndNumeric ? '' : `
+      <div class="step-box locked" id="s2-${sq.id}">
+        <div class="step-header"><span>שלב 2: בניית הביטוי האלגברי הסופי (פרמטרית)</span></div>
+        <div class="expr-display" id="expr-disp-${sq.id}" data-tokens="[]">בנה את הביטוי כאן...</div>
+        <div class="token-bank">
+          ${tokensHtml}
+          <button class="tok-btn tok-ctrl" onclick="popToken('${sq.id}')">⌫ מחק</button>
+          <button class="tok-btn tok-ctrl" onclick="clearTokens('${sq.id}')">נקה הכל</button>
+        </div>
+        <button class="action-btn" onclick="checkExpression('${sq.id}')">בדיקת ביטוי אלגברי ✓</button>
+        <div class="feedback" id="fb-e-${sq.id}"></div>
+      </div>`}
+
+      <!-- Step 3: Numeric & Unit -->
+      ${(sq.skipBuilderAndNumeric || sq.symbolicOnly) ? '' : `
+      <div class="step-box locked" id="s3-${sq.id}">
+        <div class="step-header"><span>שלב 3: חישוב מספרי (יחידות SI) ובחירת יחידת מידה</span></div>
+        <div class="num-unit-row">
+          <div class="num-screen">
+            <span style="font-size:0.8rem;color:#94a3b8;">ערך מספרי:</span>
+            <span id="num-scr-${sq.id}" data-val="">0</span>
+          </div>
+          <div class="unit-choices" id="units-${sq.id}" data-selected="">
+            <span style="font-weight:700;font-size:0.9rem;">בחר יחידה:</span>
+            ${unitsHtml}
+          </div>
+        </div>
+        <div class="keypad">
+          ${['7','8','9','DEL','4','5','6','C','1','2','3','±','0','.','E',''].map(k =>
+            k ? `<button class="kp-btn ${['DEL','C','±','E'].includes(k)?'op':''}" onclick="kpPress('${sq.id}','${k}')">${k==='E'?'×10^':k}</button>` : '<div></div>'
+          ).join('')}
+        </div>
+        <button class="action-btn" onclick="checkNumericAndUnit('${sq.id}')">בדיקת תשובה ויחידות ✓</button>
+        <div class="feedback" id="fb-n-${sq.id}"></div>
+      </div>`}
+
+      <!-- Formal Grid-Paper Notebook Solution -->
+      <div class="notebook-wrap" id="nb-${sq.id}">
+        <div class="nb-title">עיצוב חובה של פתרון במחברת (דף משבצות)</div>
+        <div class="nb-grid">
+          <div class="nb-right">
+            <div class="nb-given-sec">
+              <div class="nb-sec-head">נתונים (SI):</div>
+              <div>${nb.given}</div>
+            </div>
+            <div class="nb-find-sec">
+              <div class="nb-sec-head">צריך למצוא:</div>
+              <div>${nb.find}</div>
+            </div>
+          </div>
+          <div class="nb-left">
+            <div class="nb-step"><div class="nb-step-lbl">1. נוסחה מקורית מדף נוסחאות:</div><div class="nb-math">${nb.formula}</div></div>
+            <div class="nb-step"><div class="nb-step-lbl">2. פיתוח ביטוי הנדרש:</div><div class="nb-math">${nb.derivation}</div></div>
+            <div class="nb-step"><div class="nb-step-lbl">3. הצבת מספרים וחישוב:</div><div class="nb-math">${nb.substitution}</div></div>
+            <div class="nb-step"><div class="nb-step-lbl">4. כתיבת תשובה כולל יחידות:</div><div class="nb-final">${nb.finalAns}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function onTsfUpdated() {
+  initInQuestionNav("2025_q2");
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderTabs();
+  buildPanes();
+  updateSummaryBox();
+  initInQuestionNav("2025_q2");
+  
+(function render2025Labels() {
+  const layer = document.getElementById('labels-layer-2025q2');
+  layer.innerHTML =
+    makeVecLabelSVG('lbl-N25', 'N', '', 150, 42, -0.4, -1, '#2563eb') +
+    makeVecLabelSVG('lbl-fk25', 'f', 'k', 252, 82, 1, -0.4, '#16a34a') +
+    makeVecLabelSVG('lbl-mg25', 'm', '', 205, 175, 1, 0, '#dc2626', true);
+  resolveSvgCollisions('svg-2025q2');
+})();
+function randomizeParams() {
+  PROBLEM_CONFIG.params.h = +(0.25 + Math.random() * 0.5).toFixed(2);
+  PROBLEM_CONFIG.params.alpha = Math.floor(20 + Math.random() * 14);
+  PROBLEM_CONFIG.params.muk = +(0.15 + Math.random() * 0.15).toFixed(2);
+  APP_STATE.completedSteps = {}; APP_STATE.mistakes = 0;
+  buildPanes(); renderTabs(); updateSummaryBox();
+  alert('נוצרו נתונים חדשים לתרגול!');
+}
+
+});
+</script>
+
+<script>
+const APP_STATE = {
+  mistakes: 0,
+  completedSteps: {},
+  currentExpr: [],
+  currentNumStr: "",
+  selectedUnit: ""
+};
+
+function renderTabs() {
+  const tabsEl = document.getElementById('subq-tabs');
+  tabsEl.innerHTML = PROBLEM_CONFIG.subquestions.map((sq, i) => {
+    const isDone = APP_STATE.completedSteps[sq.id];
+    return `<button class="tab-btn ${i===0?'active':''} ${isDone?'done':''}" id="tabbtn-${sq.id}" onclick="selectSubQ('${sq.id}')">${sq.label} ${isDone?'✓':''}</button>`;
+  }).join('');
+}
+
+function selectSubQ(sqId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('tabbtn-' + sqId);
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.subq-pane').forEach(p => p.style.display = 'none');
+  const pane = document.getElementById('pane-' + sqId);
+  if (pane) pane.style.display = 'block';
+}
+
+function checkFormula(sqId, optIdx) {
+  const sq = PROBLEM_CONFIG.subquestions.find(s => s.id === sqId);
+  const opt = sq.formulas[optIdx];
+  const fb = document.getElementById(`fb-f-${sqId}`);
+  const btns = document.querySelectorAll(`#fgrid-${sqId} .f-option`);
+  btns.forEach(b => b.classList.remove('selected-wrong'));
+
+  if (opt.correct) {
+    btns[optIdx].classList.add('selected-right');
+    fb.className = 'feedback ok';
+    fb.innerHTML = '✓ מצוין! זוהי הנוסחה המתאימה מדף הנוסחאות.';
+    document.getElementById(`s1-${sqId}`).classList.add('completed');
+    if (sq.skipBuilderAndNumeric) {
+      finishSubQuestion(sqId);
+    } else {
+      document.getElementById(`s2-${sqId}`).classList.remove('locked');
+    }
+  } else {
+    APP_STATE.mistakes++;
+    updateSummaryBox();
+    btns[optIdx].classList.add('selected-wrong');
+    fb.className = 'feedback err';
+    fb.innerHTML = '✗ ' + (opt.hint || 'נוסחה זו אינה מתאימה לשלב זה. בדוק אילו גדלים נתונים ומה נדרש למצוא.');
+  }
+}
+
+function addToken(sqId, tok) {
+  const disp = document.getElementById(`expr-disp-${sqId}`);
+  let arr = JSON.parse(disp.dataset.tokens || '[]');
+  arr.push(tok);
+  disp.dataset.tokens = JSON.stringify(arr);
+  disp.textContent = arr.join(' ');
+}
+function popToken(sqId) {
+  const disp = document.getElementById(`expr-disp-${sqId}`);
+  let arr = JSON.parse(disp.dataset.tokens || '[]');
+  arr.pop();
+  disp.dataset.tokens = JSON.stringify(arr);
+  disp.textContent = arr.join(' ') || 'בנה את הביטוי כאן...';
+}
+function clearTokens(sqId) {
+  const disp = document.getElementById(`expr-disp-${sqId}`);
+  disp.dataset.tokens = '[]';
+  disp.textContent = 'בנה את הביטוי כאן...';
+}
+
+function normalizeExpr(str) {
+  return str.replace(/\s+/g, '')
+    .replace(/×/g, '*').replace(/·/g, '*')
+    .replace(/÷/g, '/').replace(/−/g, '-');
+}
+
+function evalMathExpr(exprStr, scope) {
+  try {
+    let s = normalizeExpr(exprStr);
+    // Support sqrt(...)
+    s = s.replace(/√\(/g, 'Math.sqrt(');
+    s = s.replace(/sin\(/g, 'Math.sin(Math.PI/180*');
+    s = s.replace(/cos\(/g, 'Math.cos(Math.PI/180*');
+    s = s.replace(/tan\(/g, 'Math.tan(Math.PI/180*');
+    s = s.replace(/\^2/g, '**2');
+    // Insert implicit multiplication between number and variable/paren
+    s = s.replace(/(\d)([a-zA-Z(])/g, '$1*$2');
+    s = s.replace(/(\))([a-zA-Z0-9(])/g, '$1*$2');
+    const keys = Object.keys(scope);
+    const vals = Object.values(scope);
+    const fn = new Function(...keys, `return (${s});`);
+    return fn(...vals);
+  } catch (e) {
+    return NaN;
+  }
+}
+
+function checkExpression(sqId) {
+  const sq = PROBLEM_CONFIG.subquestions.find(s => s.id === sqId);
+  const disp = document.getElementById(`expr-disp-${sqId}`);
+  const arr = JSON.parse(disp.dataset.tokens || '[]');
+  const userStr = arr.join('');
+  const fb = document.getElementById(`fb-e-${sqId}`);
+
+  if (!userStr) {
+    fb.className = 'feedback err';
+    fb.textContent = 'אנא הרכב ביטוי אלגברי בעזרת הכפתורים.';
+    return;
+  }
+
+  // Test equivalence on 3 distinct test scopes
+  const testScopes = [
+    { g: 9.8, m: 2.3, m1: 4.1, m2: 1.7, mA: 3.4, mB: 1.9, M: 5.2, F: 14.5, F1: 38.0, T: 11.2, h: 0.75, dy: 0.42, dt: 0.16, t: 1.3, v0: 4.5, v: 8.2, a: 2.4, mu: 0.28, muk: 0.22, mus: 0.35, alpha: 27, gm: 1.62 },
+    { g: 10.2, m: 5.1, m1: 6.3, m2: 2.4, mA: 4.8, mB: 2.1, M: 7.4, F: 22.0, F1: 51.0, T: 15.8, h: 1.35, dy: 0.88, dt: 0.24, t: 2.1, v0: 7.1, v: 12.4, a: 3.7, mu: 0.41, muk: 0.31, mus: 0.48, alpha: 34, gm: 1.71 }
+  ];
+
+  let ok = true;
+  for (const sc of testScopes) {
+    const uVal = evalMathExpr(userStr, sc);
+    const tVal = evalMathExpr(sq.targetExpr, sc);
+    if (!isFinite(uVal) || !isFinite(tVal) || Math.abs(uVal - tVal) > 1e-3 * Math.max(1, Math.abs(tVal))) {
+      ok = false; break;
+    }
+  }
+
+  if (ok) {
+    fb.className = 'feedback ok';
+    fb.textContent = '✓ כל הכבוד! הביטוי האלגברי שקול מתמטית ונכון.';
+    document.getElementById(`s2-${sqId}`).classList.add('completed');
+    if (sq.symbolicOnly) {
+      finishSubQuestion(sqId);
+    } else {
+      document.getElementById(`s3-${sqId}`).classList.remove('locked');
+    }
+  } else {
+    APP_STATE.mistakes++;
+    updateSummaryBox();
+    fb.className = 'feedback err';
+    fb.textContent = '✗ הביטוי אינו שקול לביטוי הנכון. בדוק סימנים, סוגריים, שברים או שורשים.';
+  }
+}
+
+function kpPress(sqId, ch) {
+  const scr = document.getElementById(`num-scr-${sqId}`);
+  let cur = scr.dataset.val || '';
+  if (ch === 'C') cur = '';
+  else if (ch === 'DEL') cur = cur.slice(0, -1);
+  else if (ch === '±') cur = cur.startsWith('-') ? cur.slice(1) : '-' + cur;
+  else if (ch === 'E') { if (!cur.includes('e')) cur += (cur === '' || cur === '-' ? '1e' : 'e'); }
+  else cur += ch;
+  scr.dataset.val = cur;
+  scr.textContent = cur || '0';
+}
+
+function selectUnit(sqId, unitVal, btnEl) {
+  document.querySelectorAll(`#units-${sqId} .u-btn`).forEach(b => b.classList.remove('active'));
+  btnEl.classList.add('active');
+  document.getElementById(`units-${sqId}`).dataset.selected = unitVal;
+}
+
+function checkNumericAndUnit(sqId) {
+  const sq = PROBLEM_CONFIG.subquestions.find(s => s.id === sqId);
+  const scr = document.getElementById(`num-scr-${sqId}`);
+  const raw = scr.dataset.val || '';
+  const unitSel = document.getElementById(`units-${sqId}`).dataset.selected || '';
+  const fb = document.getElementById(`fb-n-${sqId}`);
+
+  const numVal = parseFloat(raw);
+  if (isNaN(numVal)) {
+    fb.className = 'feedback err';
+    fb.textContent = 'אנא הזן ערך מספרי בעזרת לוח המקשים.';
+    return;
+  }
+  if (!unitSel) {
+    fb.className = 'feedback err';
+    fb.textContent = 'חובה לבחור יחידת מידה מתאימה מתוך הרשימה!';
+    return;
+  }
+
+  const target = sq.getTargetValue();
+  const tol = Math.max(0.02 * Math.abs(target), 1e-4);
+  const numOk = Math.abs(numVal - target) <= tol;
+  const unitOk = (unitSel === sq.targetUnit);
+
+  if (numOk && unitOk) {
+    fb.className = 'feedback ok';
+    fb.textContent = '✓ תשובה מספרית ויחידות מידה מדויקות! עיין בתבנית הפתרון הרשמית למחברת למטה.';
+    document.getElementById(`s3-${sqId}`).classList.add('completed');
+    finishSubQuestion(sqId);
+  } else {
+    APP_STATE.mistakes++;
+    updateSummaryBox();
+    fb.className = 'feedback err';
+    if (!numOk && !unitOk) fb.textContent = '✗ גם הערך המספרי וגם יחידת המידה שגויים. בדוק הצבה ויחידות SI.';
+    else if (!numOk) fb.textContent = '✗ יחידת המידה נכונה, אך הערך המספרי אינו בטווח הדיוק (2%). בדוק חישוב.';
+    else fb.textContent = '✗ הערך המספרי נכון, אך יחידת המידה שנבחרה שגויה!';
+  }
+}
+
+function finishSubQuestion(sqId) {
+  APP_STATE.completedSteps[sqId] = true;
+  renderTabs();
+  selectSubQ(sqId);
+  const nb = document.getElementById(`nb-${sqId}`);
+  if (nb) nb.classList.add('visible');
+  updateSummaryBox();
+}
+
+function updateSummaryBox() {
+  const ta = document.getElementById('student-summary');
+  if (!ta) return;
+  const total = PROBLEM_CONFIG.subquestions.length;
+  const done = Object.keys(APP_STATE.completedSteps).length;
+  ta.value = `שאלה: ${PROBLEM_CONFIG.title}\nסעיפים שהושלמו: ${done} מתוך ${total}\nמספר שגיאות: ${APP_STATE.mistakes}\nתאריך: ${new Date().toLocaleDateString('he-IL')}`;
+}
+
+function copySummary() {
+  const ta = document.getElementById('student-summary');
+  ta.select();
+  document.execCommand('copy');
+  alert('סיכום התהליך הועתק ללוח!');
+}
+</script>
+
+</body>
+</html>

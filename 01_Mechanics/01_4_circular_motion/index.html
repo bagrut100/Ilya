@@ -1,115 +1,65 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>תנועה מעגלית - מכניקה</title>
-    <style>
-        :root {
-            --bg-color: #0f1115;
-            --card-bg: #ffffff;
-            --text-main: #1a1a1a;
-            --text-secondary: #555555;
-            --accent-blue: #0070f3;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        body {
-            background-color: var(--bg-color);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            width: 100%;
-            max-width: 900px;
-        }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #60a5fa;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .header-section {
-            text-align: center;
-            padding: 10px 0 30px;
-        }
-        .header-section h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        .header-section p {
-            color: #a0aec0;
-            font-size: 1.1rem;
-        }
-        .card {
-            background: var(--card-bg);
-            color: var(--text-main);
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 450px;
-            margin: 0 auto;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-        }
-        .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-        .card h2 {
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-        }
-        .card p {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            margin-bottom: 25px;
-            line-height: 1.4;
-        }
-        .card-btn {
-            display: inline-block;
-            width: 100%;
-            padding: 12px 24px;
-            background-color: var(--accent-blue);
-            color: #fff;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: opacity 0.2s;
-        }
-        .card-btn:hover {
-            opacity: 0.9;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תנועה מעגלית</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:#0f172a;font-family:Heebo,system-ui,sans-serif;padding:24px 16px 60px}
+.wrap{max-width:1100px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.9rem;color:#64748b}
+.top a{color:#7C3AED;font-weight:700;text-decoration:none}
+h1{text-align:center;font-size:1.9rem;margin:18px 0 6px}
+.sub{text-align:center;color:#475569;margin:0 0 22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 10px}
+.chips button{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:6px 14px;font:700 .85rem Heebo,sans-serif;cursor:pointer}
+.chips button.on{background:#7C3AED;border-color:#7C3AED;color:#fff}
+.grp{margin:30px 0 0}
+.grp h2{font-size:1.25rem;border-right:5px solid;padding-right:10px;margin:0 0 14px}
+.cnt{color:#64748b;font-weight:500;font-size:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;color:#0f172a;text-decoration:none;box-shadow:0 2px 6px rgba(15,23,42,.06);transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(15,23,42,.12)}
+.pill{align-self:flex-start;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px}
+.card b{font-size:1.08rem;line-height:1.35}
+.desc{font-size:.9rem;color:#475569;line-height:1.5;flex:1}
+.topic{font-size:.8rem;color:#64748b}
+.open{font-size:.88rem;font-weight:700}
+.empty{background:#fff;border:1px dashed #cbd5e1;border-radius:14px;padding:28px;text-align:center;color:#64748b;margin-top:24px}
+</style>
 </head>
 <body>
-    <div class="container">
-        <a href="../index.html" class="back-link">← חזרה למכניקה</a>
+<div class="wrap">
+<div class="top"><a href="../index.html">← חזרה למכניקה</a><span>ראשי / מכניקה / תנועה מעגלית</span><a href="../../catalog.html">כל החומרים</a></div>
+<h1>תנועה מעגלית</h1>
+<p class="sub">דינמיקה של תנועה מעגלית</p>
 
-        <div class="header-section">
-            <h1>תנועה מעגלית</h1>
-            <p>סימולציות וחומרי תרגול בנושא תנועה מעגלית קצובה ודינמיקה</p>
-        </div>
-
-        <div class="card">
-            <div class="card-icon">🎡</div>
-            <h2>דינמיקה של תנועה מעגלית</h2>
-            <p>סימולציה אינטראקטיבית לחקר כוחות, תאוצה רדיאלית ומהירות בתנועה מעגלית.</p>
-            <a href="circular_motion_dynamics.html" class="card-btn">הפעל סימולציה</a>
-        </div>
-    </div>
+<section class="grp"><h2 style="color:#7C3AED;border-color:#7C3AED">סימולציות <span class="cnt">(1)</span></h2>
+<div class="grid">
+<a class="card" href="circular_motion_dynamics.html" data-year="" data-topic="01_Mechanics/01_4_circular_motion" style="border-top:4px solid #7C3AED"><span class="pill" style="background:#E6F1FB;color:#0C447C">סימולציה</span><b>תנועה מעגלית: דינמיקה</b><span class="desc">כוחות, שקול הכוחות, תאוצה ומהירות בתנועה מעגלית, עם ערכים בזמן אמת.</span><span class="open" style="color:#7C3AED">הפעל סימולציה ←</span></a>
+</div></section>
+<section class="grp"><h2 style="color:#7C3AED;border-color:#7C3AED">סיכומים PDF <span class="cnt">(1)</span></h2>
+<div class="grid">
+<a class="card" href="01_7_circular_motion.pdf" target="_blank" data-year="" data-topic="01_Mechanics/01_4_circular_motion" style="border-top:4px solid #7C3AED"><span class="pill" style="background:#FAEEDA;color:#633806">סיכום PDF</span><b>תנועה מעגלית</b><span class="desc">סיכום שיעור בקובץ PDF.</span><span class="open" style="color:#7C3AED">פתח PDF ←</span></a>
+</div></section>
+</div>
+<script>
+var st={topic:'all',year:'all'};
+function setF(k,v,btn){
+  st[k]=v;
+  btn.parentNode.querySelectorAll('button').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  document.querySelectorAll('.card').forEach(function(el){
+    var ok=(st.topic==='all'||el.dataset.topic===st.topic)&&(st.year==='all'||el.dataset.year===st.year);
+    el.style.display=ok?'':'none';
+  });
+  document.querySelectorAll('.grp').forEach(function(g){
+    var any=Array.prototype.some.call(g.querySelectorAll('.card'),function(e){return e.style.display!=='none';});
+    g.style.display=any?'':'none';
+  });
+}
+</script>
 </body>
 </html>

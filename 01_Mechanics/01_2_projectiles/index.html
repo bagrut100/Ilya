@@ -1,77 +1,75 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>זריקות - מכניקה</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root { --bg-color: #0b0e14; --card-bg: #ffffff; --text-main: #111827; --text-secondary: #4b5563; --accent-blue: #0070f3; --accent-red: #ef4444; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', system-ui, sans-serif; }
-        body { background-color: var(--bg-color); background-image: radial-gradient(circle at 50% 0%, #172033 0%, #0b0e14 60%); color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 25px 20px 60px; }
-        .container { width: 100%; max-width: 960px; }
-        .top-nav { display: flex; justify-content: space-between; margin-bottom: 24px; }
-        .back-link { color: #60a5fa; text-decoration: none; font-weight: 700; }
-        .breadcrumbs { color: #94a3b8; font-size: 0.9rem; }
-        .header-section { text-align: center; padding: 10px 0 36px; }
-        .header-section h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
-        .header-section p { color: #94a3b8; font-size: 1.05rem; }
-        .cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-        .card { background: var(--card-bg); color: var(--text-main); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 12px 30px rgba(0,0,0,0.25); transition: transform 0.25s; border-top: 5px solid var(--accent-blue); }
-        .card:hover { transform: translateY(-6px); }
-        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
-        .icon-box { width: 52px; height: 52px; border-radius: 14px; background: #eff6ff; color: var(--accent-blue); display: flex; align-items: center; justify-content: center; }
-        .icon-box svg { width: 26px; height: 26px; stroke-width: 2; }
-        .badge { font-size: 0.78rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; }
-        .card h2 { font-size: 1.35rem; margin-bottom: 8px; }
-        .card p { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
-        .card-btn { display: flex; align-items: center; justify-content: center; padding: 12px 20px; border-radius: 10px; background-color: var(--accent-blue); color: #fff; font-weight: 700; text-decoration: none; }
-        .theme-pdf { border-top-color: var(--accent-red); }
-        .theme-pdf .icon-box { background: #fef2f2; color: var(--accent-red); }
-        .theme-pdf .badge { background: #fef2f2; color: #b91c1c; }
-        .theme-pdf .card-btn { background-color: var(--accent-red); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>זריקה ובליסטיקה</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:#0f172a;font-family:Heebo,system-ui,sans-serif;padding:24px 16px 60px}
+.wrap{max-width:1100px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.9rem;color:#64748b}
+.top a{color:#EA580C;font-weight:700;text-decoration:none}
+h1{text-align:center;font-size:1.9rem;margin:18px 0 6px}
+.sub{text-align:center;color:#475569;margin:0 0 22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 10px}
+.chips button{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:6px 14px;font:700 .85rem Heebo,sans-serif;cursor:pointer}
+.chips button.on{background:#EA580C;border-color:#EA580C;color:#fff}
+.grp{margin:30px 0 0}
+.grp h2{font-size:1.25rem;border-right:5px solid;padding-right:10px;margin:0 0 14px}
+.cnt{color:#64748b;font-weight:500;font-size:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;color:#0f172a;text-decoration:none;box-shadow:0 2px 6px rgba(15,23,42,.06);transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(15,23,42,.12)}
+.pill{align-self:flex-start;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px}
+.card b{font-size:1.08rem;line-height:1.35}
+.desc{font-size:.9rem;color:#475569;line-height:1.5;flex:1}
+.topic{font-size:.8rem;color:#64748b}
+.open{font-size:.88rem;font-weight:700}
+.empty{background:#fff;border:1px dashed #cbd5e1;border-radius:14px;padding:28px;text-align:center;color:#64748b;margin-top:24px}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="top-nav">
-            <a href="../index.html" class="back-link">← חזרה למכניקה</a>
-            <span class="breadcrumbs">ראשי / מכניקה / זריקות</span>
-        </div>
-        <div class="header-section">
-            <h1>זריקות</h1>
-            <p>סימולציות אינטראקטיביות וסיכומי שיעור בנושא תנועה בשדה כבידה</p>
-        </div>
-        <div class="cards-container">
-            <div class="card">
-                <div>
-                    <div class="card-top">
-                        <div class="icon-box">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19c3-11 11-11 14 0"/><circle cx="17" cy="19" r="2"/></svg>
-                        </div>
-                        <span class="badge">סימולציה</span>
-                    </div>
-                    <h2>סימולציית זריקות</h2>
-                    <p>חקר זריקה אופקית ומשופעת: טווח, גובה שיא, רכיבי מהירות וזווית שיגור.</p>
-                </div>
-                <a href="projectile_sim_he.html" class="card-btn">הפעל סימולציה ←</a>
-            </div>
-            <div class="card theme-pdf">
-                <div>
-                    <div class="card-top">
-                        <div class="icon-box">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                        </div>
-                        <span class="badge">PDF סיכום</span>
-                    </div>
-                    <h2>תנועה במישור וזריקות</h2>
-                    <p>דף סיכום, נוסחאות ודוגמאות פתורות לתנועה דו-ממדית (01-3).</p>
-                </div>
-                <a href="01_3_projective_motion.pdf" target="_blank" class="card-btn">פתח קובץ PDF ←</a>
-            </div>
-        </div>
-    </div>
+<div class="wrap">
+<div class="top"><a href="../index.html">← חזרה למכניקה</a><span>ראשי / מכניקה / זריקה ובליסטיקה</span><a href="../../catalog.html">כל החומרים</a></div>
+<h1>זריקה ובליסטיקה</h1>
+<p class="sub">תנועה בשדה הכובד: סימולציה ובונה פתרון לשאלות בגרות</p>
+<div class="chips"><button class="on" onclick="setF('year','all',this)">כל השנים</button><button onclick="setF('year','2025',this)">2025</button><button onclick="setF('year','2021',this)">2021</button><button onclick="setF('year','2017',this)">2017</button><button onclick="setF('year','2016',this)">2016</button><button onclick="setF('year','2004',this)">2004</button><button onclick="setF('year','2001',this)">2001</button><button onclick="setF('year','1993',this)">1993</button></div>
+<section class="grp"><h2 style="color:#EA580C;border-color:#EA580C">סימולציות <span class="cnt">(1)</span></h2>
+<div class="grid">
+<a class="card" href="projectiles_simulation.html" data-year="" data-topic="01_Mechanics/01_2_projectiles" style="border-top:4px solid #EA580C"><span class="pill" style="background:#E6F1FB;color:#0C447C">סימולציה</span><b>תנועת גוף בשדה הכובד</b><span class="desc">סימולציה של תנועת גוף בשדה הכובד.</span><span class="open" style="color:#EA580C">הפעל סימולציה ←</span></a>
+</div></section>
+<section class="grp"><h2 style="color:#EA580C;border-color:#EA580C">בונה פתרון <span class="cnt">(7)</span></h2>
+<div class="grid">
+<a class="card" href="projectiles_2025_q1.html" data-year="2025" data-topic="01_Mechanics/01_2_projectiles" style="border-top:4px solid #EA580C"><span class="pill" style="background:#EEEDFE;color:#3C3489">בונה פתרון · בגרות 2025 · שאלה 1</span><b>הטלת כידון</b><span class="desc">בונים את הפתרון צעד אחר צעד: רכיבי המהירות, משוואות התנועה וחישוב.</span><span class="open" style="color:#EA580C">כנסו לבונה הפתרון ←</span></a>
+<a class="card" href="projectiles_2021_q3.html" data-year="2021" data-topic="01_Mechanics/01_2_projectiles" style="border-top:4px solid #EA580C"><span class="pill" style="background:#EEEDFE;color:#3C3489">בונה פתרון · בגרות 2021 · שאלה 3</span><b>ניסוי זריקה אופקית</b><span class="desc">בונים את הפתרון צעד אחר צעד: רכיבי המהירות, משוואות התנועה וחישוב.</span><span class="open" style="color:#EA580C">כנסו לבונה הפתרון ←</span></a>
+<a class="card" href="projectiles_2017_q1.html" data-year="2017" data-topic="01_Mechanics/01_2_projectiles" style="border-top:4px solid #EA580C"><span class="pill" style="background:#EEEDFE;color:#3C3489">בונה פתרון · בגרות 2017 · שאלה 1</span><b>בעיטת פננקה בכדורגל</b><span class="desc">בונים את הפתרון צעד אחר צעד: רכיבי המהירות, משוואות התנועה וחישוב.</span><span class="open" style="color:#EA580C">כנסו לבונה הפתרון ←</span></a>
+<a class="card" href="projectiles_2016_q1.html" data-year="2016" data-topic="01_Mechanics/01_2_projectiles" style="border-top:4px solid #EA580C"><span class="pill" style="background:#EEEDFE;color:#3C3489">בונה פתרון · בגרות 2016 · שאלה 1</span><b>גרם מדרגות</b><span class="desc">בונים את הפתרון צעד אחר צעד: רכיבי המהירות, משוואות התנועה וחישוב.</span><span class="open" style="color:#EA580C">כנסו לבונה הפתרון ←</span></a>
+<a class="card" href="projectiles_2004_q1.html" data-year="2004" data-topic="01_Mechanics/01_2_projectiles" style="border-top:4px solid #EA580C"><span class="pill" style="background:#EEEDFE;color:#3C3489">בונה פתרון · בגרות 2004 · שאלה 1</span><b>חץ ותפוח</b><span class="desc">בונים את הפתרון צעד אחר צעד: רכיבי המהירות, משוואות התנועה וחישוב.</span><span class="open" style="color:#EA580C">כנסו לבונה הפתרון ←</span></a>
+<a class="card" href="projectiles_2001_q2.html" data-year="2001" data-topic="01_Mechanics/01_2_projectiles" style="border-top:4px solid #EA580C"><span class="pill" style="background:#EEEDFE;color:#3C3489">בונה פתרון · בגרות 2001 · שאלה 2</span><b>כדור פורח</b><span class="desc">בונים את הפתרון צעד אחר צעד: רכיבי המהירות, משוואות התנועה וחישוב.</span><span class="open" style="color:#EA580C">כנסו לבונה הפתרון ←</span></a>
+<a class="card" href="projectiles_1993_q1.html" data-year="1993" data-topic="01_Mechanics/01_2_projectiles" style="border-top:4px solid #EA580C"><span class="pill" style="background:#EEEDFE;color:#3C3489">בונה פתרון · בגרות 1993 · שאלה 1</span><b>צילום סטרובוסקופי</b><span class="desc">בונים את הפתרון צעד אחר צעד: רכיבי המהירות, משוואות התנועה וחישוב.</span><span class="open" style="color:#EA580C">כנסו לבונה הפתרון ←</span></a>
+</div></section>
+<section class="grp"><h2 style="color:#EA580C;border-color:#EA580C">סיכומים PDF <span class="cnt">(1)</span></h2>
+<div class="grid">
+<a class="card" href="01_3_projective_motion.pdf" target="_blank" data-year="" data-topic="01_Mechanics/01_2_projectiles" style="border-top:4px solid #EA580C"><span class="pill" style="background:#FAEEDA;color:#633806">סיכום PDF</span><b>זריקה אופקית ומשופעת</b><span class="desc">סיכום שיעור בקובץ PDF.</span><span class="open" style="color:#EA580C">פתח PDF ←</span></a>
+</div></section>
+</div>
+<script>
+var st={topic:'all',year:'all'};
+function setF(k,v,btn){
+  st[k]=v;
+  btn.parentNode.querySelectorAll('button').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  document.querySelectorAll('.card').forEach(function(el){
+    var ok=(st.topic==='all'||el.dataset.topic===st.topic)&&(st.year==='all'||el.dataset.year===st.year);
+    el.style.display=ok?'':'none';
+  });
+  document.querySelectorAll('.grp').forEach(function(g){
+    var any=Array.prototype.some.call(g.querySelectorAll('.card'),function(e){return e.style.display!=='none';});
+    g.style.display=any?'':'none';
+  });
+}
+</script>
 </body>
 </html>

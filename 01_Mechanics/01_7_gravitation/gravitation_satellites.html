@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>כבידה ולוויינים</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700;800&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+<style>
+/* layout: a gravitation bench page. sticky bar, one reading column, an orbit or a radial plot at the centre of each topic. blue = the central body, red = the satellite and its curves, copper = gravity force and UI accent. */
+:root{
+  --bg:#f2f4f7; --paper:#ffffff; --soft:#eef1f5; --ink:#17202c; --mut:#5a6576; --line:#d8dee7; --grid:#e9edf3;
+  --pos:#cf3328; --neg:#2860c4; --acc:#a85a14; --acc-ink:#ffffff; --fieldln:#3a4557;
+  --ok:#14713f; --ok-bg:#e2f3e9; --no:#b3261e; --no-bg:#fbe7e5; --warn:#7a4a00; --warn-bg:#fff2d6;
+  --shadow:0 1px 2px rgba(23,32,44,.05),0 8px 24px rgba(23,32,44,.07);
+  --fd:"Secular One","Assistant",system-ui,sans-serif;
+  --fb:"Assistant","Arial Hebrew",system-ui,sans-serif;
+  --fm:"STIX Two Text","Cambria Math","Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0d1117; --paper:#151b24; --soft:#1b2330; --ink:#e6ebf2; --mut:#9aa5b6; --line:#2a3342; --grid:#1c2431;
+  --pos:#ff6a5c; --neg:#6aa1ff; --acc:#f0a14a; --acc-ink:#1a1206; --fieldln:#b7c2d4;
+  --ok:#5fd394; --ok-bg:#122b1d; --no:#ff8b80; --no-bg:#371816; --warn:#f2c46e; --warn-bg:#2e240f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0d1117; --paper:#151b24; --soft:#1b2330; --ink:#e6ebf2; --mut:#9aa5b6; --line:#2a3342; --grid:#1c2431;
+  --pos:#ff6a5c; --neg:#6aa1ff; --acc:#f0a14a; --acc-ink:#1a1206; --fieldln:#b7c2d4;
+  --ok:#5fd394; --ok-bg:#122b1d; --no:#ff8b80; --no-bg:#371816; --warn:#f2c46e; --warn-bg:#2e240f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.7 var(--fb);-webkit-text-size-adjust:100%;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1040px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--fd);font-weight:400;line-height:1.2;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px;border-radius:6px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--paper);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:8px;min-height:56px}
+.brand{text-decoration:none;margin-inline-end:auto;display:flex;align-items:center;gap:10px;font:400 1.3rem/1 var(--fd)}
+.brand i{display:inline-flex;gap:3px}
+.brand i b{width:12px;height:12px;border-radius:50%;display:block}
+.nl{font-weight:700;font-size:.95rem;text-decoration:none;padding:8px 12px;border-radius:999px}
+.nl:hover,.nl[aria-current]{background:var(--soft)}
+.btn{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 16px;font-weight:700;font-size:.95rem;line-height:1.3;display:inline-flex;align-items:center;gap:6px;min-height:40px;text-decoration:none}
+.btn:hover{border-color:var(--mut)}
+.btn.pri{background:var(--acc);border-color:transparent;color:var(--acc-ink)}
+.btn.sm{min-height:34px;padding:5px 12px;font-size:.88rem}
+.btn.pos{color:var(--pos)} .btn.neg{color:var(--neg)}
+
+/* home */
+.hero{display:grid;grid-template-columns:1fr 1.05fr;gap:32px;align-items:center;padding-block:34px 20px}
+.eyebrow{font-size:.85rem;font-weight:700;letter-spacing:.04em;color:var(--acc)}
+.hero h1{font-size:clamp(2.3rem,6vw,3.6rem);margin-block:6px 12px}
+.hero h1 .p{color:var(--pos)} .hero h1 .n{color:var(--neg)}
+.lead{font-size:1.1rem;color:var(--mut);max-width:32em}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.hfig{margin:0;min-width:0}
+.hfig .stage canvas{height:300px}
+.hfig figcaption{font-size:.86rem;color:var(--mut);margin-top:8px}
+.secth{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-top:22px;flex-wrap:wrap}
+.secth h2{font-size:1.6rem}
+.secth span{color:var(--mut);font-size:.92rem}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:14px}
+.tc{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-content:start;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0;transition:border-color .15s,transform .15s}
+.tc:hover{border-color:var(--acc);transform:translateY(-2px)}
+.tn{font:400 1.5rem/1.1 var(--fd);color:var(--acc);font-variant-numeric:tabular-nums}
+.tc b{font-size:1.08rem;line-height:1.35}
+.tc .ts{grid-column:2;color:var(--mut);font-size:.9rem;line-height:1.45}
+.tc .pg{grid-column:2;margin-top:8px;font-size:.8rem;color:var(--mut);display:flex;gap:10px;flex-wrap:wrap}
+.pg em{font-style:normal;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* topic */
+.th{padding-block:24px 12px}
+.crumb{font-size:.88rem;font-weight:700;color:var(--acc);text-decoration:none}
+.th h1{font-size:clamp(1.9rem,5vw,2.7rem);margin-block:4px 4px}
+.th p{color:var(--mut);font-size:1.05rem}
+.tabs{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:5;background:var(--bg);display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:12px 16px;font-weight:700;color:var(--mut);border-bottom:3px solid transparent;white-space:nowrap;flex:1 0 auto;min-height:46px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--acc)}
+.panel{padding-block:22px 8px;display:grid;gap:22px;min-width:0}
+.prose{max-width:66ch;display:grid;gap:12px;font-size:1.05rem}
+.prose p,.ex p,.q p,.sol p,.trap p{min-width:0;overflow-wrap:anywhere}
+.panel h2{font-size:1.3rem}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:10px}
+.fc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 10px 10px;text-align:center;min-width:0;display:grid;gap:4px;align-content:center}
+.fc small{color:var(--mut);font-size:.86rem;line-height:1.45}
+.trap{background:var(--warn-bg);border-radius:14px;padding:16px 18px;max-width:72ch;display:grid;gap:6px}
+.trap h2{font-size:1.1rem;color:var(--warn)}
+.tips{background:var(--paper);border:1px solid var(--line);border-inline-start:4px solid var(--acc);border-radius:14px;padding:16px 18px;max-width:72ch;display:grid;gap:8px}
+.tips h2{font-size:1.1rem;color:var(--acc)}
+.tips ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.tips li{position:relative;padding-inline-start:22px;min-width:0;overflow-wrap:anywhere}
+.tips li::before{content:"";position:absolute;inset-inline-start:2px;top:.62em;width:9px;height:9px;border-radius:50%;border:2px solid var(--acc)}
+
+/* lab */
+.stage{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow)}
+.stage canvas{display:block;width:100%;height:380px;touch-action:none;cursor:grab}
+.stage canvas.g{height:190px;cursor:default;border-top:1px solid var(--line)}
+.hint{position:absolute;inset-inline-end:10px;top:8px;font-size:.78rem;color:var(--mut);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:1px 10px;pointer-events:none;max-width:calc(100% - 20px)}
+.simbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.simbar .lab{font-size:.88rem;color:var(--mut);font-weight:600}
+.tgl{display:inline-flex;align-items:center;gap:6px;font-size:.92rem;font-weight:600;border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--paper);cursor:pointer}
+.tgl input{accent-color:var(--acc);margin:0}
+.ctls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 26px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:baseline;min-width:0}
+.ctl .cl{font-size:.95rem;font-weight:600}
+.ctl output{font-weight:700;font-variant-numeric:tabular-nums;color:var(--acc);direction:ltr;unicode-bidi:isolate}
+.ctl input{grid-column:1/-1;width:100%;accent-color:var(--acc);height:30px;margin:0}
+.outs{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.outs div{background:var(--soft);border-radius:10px;padding:8px 12px;min-width:0}
+.outs dt{font-size:.82rem;color:var(--mut);line-height:1.4}
+.outs dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums;font-size:1.02rem;direction:ltr;text-align:right;font-family:var(--fm)}
+.note{font-size:.9rem;color:var(--mut);max-width:72ch}
+
+/* example */
+.ex{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;max-width:80ch}
+.ex h3,.qn{font:700 .82rem/1.3 var(--fb);letter-spacing:.06em;color:var(--acc)}
+.gf{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gf>div{background:var(--soft);border-radius:10px;padding:10px 14px;min-width:0;display:grid;gap:4px}
+.steps{margin:0;padding-inline-start:1.4em;display:grid;gap:12px}
+.steps li{min-width:0}
+.steps li::marker{font-family:var(--fd);color:var(--acc)}
+.chk{background:var(--ok-bg);border-radius:10px;padding:10px 14px;display:grid;gap:4px}
+.chk h3{color:var(--ok)}
+
+/* practice */
+.lvl{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:6px}
+.lvl h2{font-size:1.25rem}
+.lvl span{color:var(--mut);font-size:.9rem}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:12px;max-width:80ch}
+.q.adv{border-inline-start:4px solid var(--acc)}
+.qn{display:flex;justify-content:space-between;gap:8px}
+.qn .st{letter-spacing:0;font-weight:700}
+.qn .st.ok{color:var(--ok)}
+.opts{display:grid;gap:8px}
+.opt{display:block;width:100%;text-align:start;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);line-height:1.5}
+.opt:hover:not([disabled]){border-color:var(--acc)}
+.opt[disabled]{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg);font-weight:700}
+.opt.no{border-color:var(--no);background:var(--no-bg);color:var(--mut)}
+.fb{font-size:.97rem;padding:10px 14px;border-radius:10px;background:var(--soft)}
+.fb.ok{background:var(--ok-bg)} .fb.no{background:var(--no-bg)}
+.ansrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ansrow input{width:10em;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);font-variant-numeric:tabular-nums;font-size:1rem;direction:ltr;text-align:left}
+.ansrow .u{color:var(--mut);font-weight:600;direction:ltr;unicode-bidi:isolate}
+.tip{font-size:.84rem;color:var(--mut)}
+.sol{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:.98rem;display:grid;gap:8px}
+.fig{max-width:360px;width:100%;overflow-x:auto}
+.fig svg{display:block;width:100%;height:auto}
+.score{font-weight:700;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pn{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-block:18px;margin-top:10px}
+
+/* formulas */
+.ftab{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ftab td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.ftab td.fx{text-align:center;width:46%}
+.ftab small{display:block;color:var(--mut);font-size:.85rem}
+.ftab a{font-size:.84rem;font-weight:700;color:var(--acc);text-decoration:none}
+.tscroll{overflow-x:auto}
+.foot{color:var(--mut);font-size:.86rem;padding-block:24px 34px;border-top:1px solid var(--line);margin-top:30px}
+
+/* math */
+.mx{font-family:var(--fm);font-size:1.08em;direction:ltr;unicode-bidi:isolate;display:inline-block;line-height:1.3;white-space:nowrap}
+.mx i{font-style:italic}
+.mx.fx{display:block;text-align:center;font-size:1.3rem;overflow-x:auto;overflow-y:hidden;padding:6px 2px;max-width:100%}
+.mx sup,.mx sub{font-size:.68em;line-height:0}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;font-size:.95em}
+.fr>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .25em .08em}
+.fr>span:last-child{padding:.08em .25em 0}
+.pq{color:var(--pos);font-weight:700} .nq{color:var(--neg);font-weight:700}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr;gap:18px;padding-block:22px 10px}
+  .gf{grid-template-columns:1fr}
+  .stage canvas{height:320px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+html,body{margin:0;padding:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+.stage canvas.trk{height:150px;cursor:default}
+.stage canvas.trk.tall{height:230px}
+.stage canvas.g{height:230px}
+.hint{font-size:.76rem}
+.vc{position:relative;display:inline-block}
+.vc::after{content:"→";position:absolute;left:0;right:0;top:-.58em;text-align:center;font-size:.62em;font-style:normal;line-height:1}
+.ftab .mx.fx{padding-top:14px}
+.btn.sm.pri .mx{color:inherit}
+</style></head><body>
+<div dir="rtl" lang="he">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="#"><i aria-hidden="true"><b style="background:var(--pos)"></b><b style="background:var(--neg)"></b></i>כבידה ולוויינים</a>
+  <a class="nl" href="#" id="nav-home">נושאים</a>
+  <a class="nl" href="#formulas" id="nav-f">נוסחאות</a>
+</div></header>
+<main id="app"></main>
+<footer class="wrap foot">יחידת לימוד בכבידה, פיזיקה 5 יח״ל. הסימונים והנתונים לפי דף "נוסחאות ונתונים בפיזיקה". בחישובים: <span class="mx"><i>G</i> = 6.67·10<sup>−11</sup> N·m<sup>2</sup>/kg<sup>2</sup></span>, <span class="mx"><i>M</i><sub>E</sub> = 5.97·10<sup>24</sup> kg</span>, <span class="mx"><i>R</i><sub>E</sub> = 6.38·10<sup>6</sup> m</span>.</footer>
+</div>
+<script>
+document.documentElement.lang='he';document.documentElement.dir='rtl';
+const G=10;
+const m=s=>`<span class="mx">${s}</span>`;
+const M=s=>`<div class="mx fx">${s}</div>`;
+const fr=(a,b)=>`<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const ov=s=>`<span style="text-decoration:overline">${s}</span>`;
+const mus='<i>μ</i><sub>s</sub>',muk='<i>μ</i><sub>k</sub>',SF='Σ<i>F</i>',Fsp='<i>F</i><sub>sp</sub>',dl='Δ<i>ℓ</i>',th='<i>θ</i>',vec=x=>`<span class="vc"><i>${x}</i></span>`;
+const v0='<i>v</i><sub>0</sub>', x0='<i>x</i><sub>0</sub>', y0='<i>y</i><sub>0</sub>', half=fr('1','2');
+const sq=s=>`${s}<sup>2</sup>`;
+
+/* ---------- number formatting ---------- */
+function fmt(x,d=3){
+  if(!isFinite(x))return '—'; if(Math.abs(x)<1e-30)return '0';
+  const a=Math.abs(x);
+  if(a>=1e4||a<1e-2){let e=Math.floor(Math.log10(a));let mn=+(x/10**e).toPrecision(d);if(Math.abs(mn)>=10){mn=+(mn/10).toPrecision(d);e++}return (String(mn)+'·10<sup>'+e+'</sup>').replace(/-/g,'−')}
+  return String(+x.toPrecision(d)).replace('-','−');
+}
+function parseNum(s){
+  if(!s)return NaN; s=s.trim().replace(/[−–]/g,'-').replace(/\s/g,'').replace(/,/g,'.');
+  s=s.replace(/(?:\*|x|×|·)10\^?\(?(-?\d+)\)?/i,'e$1').replace(/^10\^\(?(-?\d+)\)?$/,'1e$1');
+  return /^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)?parseFloat(s):NaN;
+}
+/* ---------- storage ---------- */
+let solved={};
+try{solved=JSON.parse(localStorage.getItem('grav-solved')||'{}')||{}}catch(e){solved={}}
+function markSolved(id){solved[id]=1;try{localStorage.setItem('grav-solved',JSON.stringify(solved))}catch(e){}}
+
+/* ---------- canvas helpers ---------- */
+function tok(){const cs=getComputedStyle(document.documentElement);const g=n=>cs.getPropertyValue(n).trim();return{paper:g('--paper'),ink:g('--ink'),mut:g('--mut'),line:g('--line'),grid:g('--grid'),pos:g('--pos'),neg:g('--neg'),acc:g('--acc'),fl:g('--fieldln'),ok:g('--ok'),soft:g('--soft')}}
+function arrow(ctx,x1,y1,x2,y2,col,w=2,head=8){const a=Math.atan2(y2-y1,x2-x1),L=Math.hypot(x2-x1,y2-y1);if(L<2)return;ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2-Math.cos(a)*head*.6,y2-Math.sin(a)*head*.6);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-head*Math.cos(a-.42),y2-head*Math.sin(a-.42));ctx.lineTo(x2-head*Math.cos(a+.42),y2-head*Math.sin(a+.42));ctx.closePath();ctx.fill()}
+function font(ctx,sz,w=700){ctx.font=`${w} ${sz}px Assistant, system-ui, sans-serif`}
+const nf=v=>String(+(+v).toFixed(6)).replace('-','−');
+const sg=(v,d=3)=>(v>0?'+':'')+fmt(v,d);
+function niceStep(r,n){const raw=r/n,p=10**Math.floor(Math.log10(raw)),f=raw/p;return(f<1.5?1:f<3.5?2:f<7.5?5:10)*p}
+
+let scenes=[],anims=[];
+function killScenes(){scenes.forEach(s=>s.ro&&s.ro.disconnect());scenes=[];anims.forEach(a=>a.stop());anims=[]}
+const themeMQ=matchMedia('(prefers-color-scheme: dark)');
+const redrawAll=()=>scenes.forEach(s=>s.draw());
+themeMQ.addEventListener&&themeMQ.addEventListener('change',redrawAll);
+new MutationObserver(redrawAll).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+function Canvas(cv,drawFn){
+  const o={cv,ctx:cv.getContext('2d'),W:0,H:0,draw(){if(!o.W)return;const c=o.ctx;c.setTransform(o.dpr,0,0,o.dpr,0,0);c.direction='ltr';const t=tok();c.fillStyle=t.paper;c.fillRect(0,0,o.W,o.H);drawFn(c,t,o)}};
+  o.resize=()=>{const r=cv.getBoundingClientRect();if(!r.width)return;o.dpr=Math.min(2,devicePixelRatio||1);o.W=r.width;o.H=r.height;cv.width=Math.round(r.width*o.dpr);cv.height=Math.round(r.height*o.dpr);o.onResize&&o.onResize();o.draw()};
+  o.ro=new ResizeObserver(o.resize);o.ro.observe(cv);scenes.push(o);return o;
+}
+
+/* ---------- DOM builders ---------- */
+const el=(h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild};
+let uid=0;
+function slider(host,label,min,max,step,val,show,on){const id='s'+(++uid);const n=el(`<div class="ctl"><label class="cl" for="${id}">${label}</label><output for="${id}"></output><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"></div>`);const inp=n.querySelector('input'),out=n.querySelector('output');const f=()=>{out.innerHTML=show(+inp.value);on(+inp.value)};inp.addEventListener('input',f);out.innerHTML=show(val);host.appendChild(n);return{set(v){inp.value=v;out.innerHTML=show(v)},el:inp}}
+function outs(host,items){const dl=el(`<dl class="outs"></dl>`);const ref={};for(const[k,lab]of items){const d=el(`<div><dt>${lab}</dt><dd>—</dd></div>`);dl.appendChild(d);ref[k]=d.querySelector('dd')}host.appendChild(dl);return(k,v)=>{ref[k].innerHTML=v}}
+function toggle(host,label,val,on){const id='t'+(++uid);const n=el(`<label class="tgl" for="${id}"><input type="checkbox" id="${id}" ${val?'checked':''}>${label}</label>`);n.querySelector('input').addEventListener('change',e=>on(e.target.checked));host.appendChild(n);return n.querySelector('input')}
+
+
+/* ---------- constants (from the formula sheet) ---------- */
+const GC=6.67e-11,ME=5.97e24,RE=6.38e6,GM=GC*ME,TAU=2*Math.PI;
+const exBtn=(host,txt,fn,preset)=>{const b=el(`<div class="simbar"><button class="btn sm">${txt}</button></div>`);b.firstElementChild.onclick=fn;host.appendChild(b);if(preset)fn()};
+const note=(host,h)=>host.appendChild(el(`<p class="note">${h}</p>`));
+const u=h=>`<bdi dir="ltr">${h}</bdi>`,rt=h=>`<bdi dir="rtl">${h}</bdi>`;
+
+/* play / pause / scrub. o:{unit,rate(),loop} */
+function Runner(host,tmaxFn,onT,o={}){
+  const bar=el(`<div class="simbar"><button class="btn sm pri" data-a="play">▶ הפעלה</button><button class="btn sm" data-a="reset">⟲ חזרה להתחלה</button></div>`);
+  const ctl=el('<div class="ctls"></div>');host.append(bar,ctl);
+  const R={t:0,playing:false,raf:0,last:0,bar};const pb=bar.querySelector('[data-a=play]');
+  const sl=slider(ctl,'הזמן t (אפשר לגרור)',0,1000,1,0,v=>fmt(v/1000*tmaxFn(),3)+(o.unit||' s'),v=>{R.pause();R.t=v/1000*tmaxFn();onT()});
+  R.sync=()=>{const tm=tmaxFn();if(R.t>tm)R.t=tm;sl.set(Math.round(R.t/tm*1000))};
+  R.pause=()=>{R.playing=false;cancelAnimationFrame(R.raf);pb.textContent='▶ הפעלה'};R.stop=R.pause;
+  const step=ts=>{if(!R.playing)return;if(!document.body.contains(bar)){R.pause();return}const dt=Math.min(.05,(ts-R.last)/1000);R.last=ts;const tm=tmaxFn();R.t+=dt*(o.rate?o.rate():tm/8);if(R.t>=tm){if(o.loop)R.t-=tm;else{R.t=tm;onT();R.pause();return}}onT();R.raf=requestAnimationFrame(step)};
+  R.play=()=>{if(R.t>=tmaxFn()-1e-9)R.t=0;R.playing=true;R.last=performance.now();pb.textContent='⏸ עצירה';R.raf=requestAnimationFrame(step)};
+  pb.onclick=()=>{if(R.playing){R.pause();onT()}else R.play()};
+  bar.querySelector('[data-a=reset]').onclick=()=>{R.pause();R.t=0;onT()};
+  anims.push(R);return R;
+}
+
+/* plot of y(x) inside rectangle R. o:{x0,x1,xl,name,series:[{f,col,dash,lab}],mark,rings,vline,ymin,ymax,fix} */
+function plot(ctx,t,R,o){
+  const l=R.x+46,r=R.x+R.w-14,top=R.y+28,bot=R.y+R.h-24,N=260;let lo=0,hi=0;
+  if(o.ymin!==undefined){lo=o.ymin;hi=o.ymax}
+  if(!o.fix)for(const s of o.series)for(let i=0;i<=N;i++){const v=s.f(o.x0+(o.x1-o.x0)*i/N);if(isFinite(v)){if(v<lo)lo=v;if(v>hi)hi=v}}
+  if(hi-lo<1e-12)hi=lo+1;const stp=niceStep(hi-lo,R.h<210?3:5);lo=Math.floor(lo/stp+1e-9)*stp;hi=Math.ceil(hi/stp-1e-9)*stp;
+  const X=x=>l+(x-o.x0)/(o.x1-o.x0)*(r-l),Y=v=>bot-(v-lo)/(hi-lo)*(bot-top);
+  font(ctx,11,600);ctx.lineWidth=1;ctx.textAlign='right';
+  for(let v=lo;v<=hi+stp/2;v+=stp){ctx.strokeStyle=t.grid;ctx.beginPath();ctx.moveTo(l,Y(v));ctx.lineTo(r,Y(v));ctx.stroke();ctx.fillStyle=t.mut;ctx.fillText(nf(v),l-5,Y(v)+4)}
+  const xs=niceStep(o.x1-o.x0,(r-l)<260?4:7);ctx.textAlign='center';
+  for(let v=Math.ceil(o.x0/xs-1e-9)*xs;v<=o.x1+1e-9;v+=xs){ctx.strokeStyle=t.grid;ctx.beginPath();ctx.moveTo(X(v),top);ctx.lineTo(X(v),bot);ctx.stroke();if(X(v)>l+8&&X(v)<r-58){ctx.fillStyle=t.mut;ctx.fillText(nf(v),X(v),bot+16)}}
+  ctx.strokeStyle=t.mut;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(l,top-8);ctx.lineTo(l,bot);ctx.moveTo(l,Y(0));ctx.lineTo(r,Y(0));ctx.stroke();
+  if(o.vline!==undefined){ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(X(o.vline),top-6);ctx.lineTo(X(o.vline),bot);ctx.stroke();ctx.setLineDash([])}
+  font(ctx,12,700);ctx.fillStyle=t.ink;ctx.textAlign='left';ctx.fillText(o.name,l+6,R.y+15);ctx.textAlign='right';ctx.fillStyle=t.mut;ctx.fillText(o.xl,r,bot+16);
+  ctx.save();ctx.beginPath();ctx.rect(l-1,top-10,r-l+3,bot-top+20);ctx.clip();
+  for(const s of o.series){ctx.strokeStyle=t[s.col];ctx.lineWidth=s.dash?1.6:2.6;ctx.setLineDash(s.dash?[6,5]:[]);ctx.beginPath();let pen=false;for(let i=0;i<=N;i++){const x=o.x0+(o.x1-o.x0)*i/N,v=s.f(x);if(!isFinite(v)){pen=false;continue}pen?ctx.lineTo(X(x),Y(v)):ctx.moveTo(X(x),Y(v));pen=true}ctx.stroke();ctx.setLineDash([]);
+    if(s.lab){const xe=o.x0+(o.x1-o.x0)*(s.at||.93),v=s.f(xe);if(isFinite(v)){font(ctx,12,800);ctx.fillStyle=t[s.col];ctx.textAlign='center';ctx.fillText(s.lab,X(xe),Y(v)+(s.below?16:-8))}}}
+  ctx.restore();
+  if(o.rings)for(const x of o.rings)for(const s of o.series){if(s.dash)continue;const v=s.f(x);if(!isFinite(v))continue;ctx.strokeStyle=t[s.col];ctx.lineWidth=2;ctx.fillStyle=t.paper;ctx.beginPath();ctx.arc(X(x),Y(v),5,0,7);ctx.fill();ctx.stroke()}
+  if(o.mark!==undefined)for(const s of o.series){if(s.dash)continue;const v=s.f(o.mark);if(!isFinite(v))continue;ctx.fillStyle=t[s.col];ctx.strokeStyle=t.paper;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(X(o.mark),Y(v),5.5,0,7);ctx.fill();ctx.stroke()}
+  return{X,Y,l,r,top,bot};
+}
+
+/* planet at the left edge, radial axis to the right, aligned with plot() below. o:{rp,arrow,alab,path,plab} */
+function radial(ctx,t,cv,x1,o){
+  const l=46,r=cv.W-14,X=x=>l+x/x1*(r-l),cy=cv.H/2,Rp=X(1)-X(0);
+  ctx.fillStyle=t.soft;ctx.strokeStyle=t.neg;ctx.lineWidth=3;ctx.beginPath();ctx.arc(X(0),cy,Rp,0,7);ctx.fill();ctx.stroke();
+  ctx.setLineDash([3,4]);ctx.strokeStyle=t.mut;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(X(0),cy);ctx.lineTo(r,cy);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=t.mut;ctx.beginPath();ctx.arc(X(0),cy,3,0,7);ctx.fill();font(ctx,12,800);ctx.textAlign='center';ctx.fillText(o.plab||'M',X(0)+Math.min(Rp*.45,60),cy-12);
+  if(o.path){ctx.strokeStyle=t.pos;ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(X(o.path[0]),cy);ctx.lineTo(X(Math.min(o.path[1],x1*1.05)),cy);ctx.stroke()}
+  const px=X(o.rp);
+  if(o.rp>1.02){const yb=cy+30;ctx.strokeStyle=t.mut;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(X(1),yb-5);ctx.lineTo(X(1),yb+5);ctx.moveTo(X(1),yb);ctx.lineTo(px,yb);ctx.moveTo(px,yb-5);ctx.lineTo(px,yb+5);ctx.stroke();if(px-X(1)>20){ctx.fillStyle=t.mut;ctx.fillText('h',(X(1)+px)/2,yb+16)}}
+  const yt=cy-30;ctx.strokeStyle=t.mut;ctx.beginPath();ctx.moveTo(X(0),yt-5);ctx.lineTo(X(0),yt+5);ctx.moveTo(X(0),yt);ctx.lineTo(px,yt);ctx.moveTo(px,yt-5);ctx.lineTo(px,yt+5);ctx.stroke();ctx.fillStyle=t.mut;ctx.fillText('r',(X(0)+px)/2,yt-7);
+  if(o.arrow>3){arrow(ctx,px-11,cy,px-11-o.arrow,cy,t.pos,3,10);if(o.alab){ctx.fillStyle=t.pos;ctx.fillText(o.alab,px-11-o.arrow/2,cy+18)}}
+  ctx.fillStyle=t.ink;ctx.beginPath();ctx.arc(px,cy,8,0,7);ctx.fill();
+  return X}
+function dragR(cv,x1,lo,on){let d=false;const mv=e=>{const r=cv.getBoundingClientRect();on(Math.max(lo,Math.min(x1,(e.clientX-r.left-46)/(r.width-60)*x1)))};
+  cv.addEventListener('pointerdown',e=>{d=true;cv.setPointerCapture(e.pointerId);mv(e);e.preventDefault()});cv.addEventListener('pointermove',e=>d&&mv(e));cv.addEventListener('pointerup',()=>d=false);cv.addEventListener('pointercancel',()=>d=false)}
+
+/* central body with circular orbits. sats:[{r (in R_E), ang, col, lab}] */
+function orbDraw(ctx,t,cv,sats,rmax,vec){
+  const cx=cv.W/2,cy=cv.H/2,sc=(Math.min(cv.W,cv.H)/2-26)/rmax;
+  ctx.fillStyle=t.soft;ctx.strokeStyle=t.neg;ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,sc,0,7);ctx.fill();ctx.stroke();
+  for(const s of sats){ctx.setLineDash([4,5]);ctx.strokeStyle=t.mut;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(cx,cy,s.r*sc,0,7);ctx.stroke();ctx.setLineDash([]);
+    const x=cx+Math.cos(s.ang)*s.r*sc,y=cy-Math.sin(s.ang)*s.r*sc;
+    if(vec){const Lv=22+50/Math.sqrt(s.r),Lf=Math.max(12,70/(s.r*s.r)+10);arrow(ctx,x,y,x-Math.sin(s.ang)*Lv,y-Math.cos(s.ang)*Lv,t[s.col],2.6,8);arrow(ctx,x,y,x-Math.cos(s.ang)*Lf,y+Math.sin(s.ang)*Lf,t.acc,2.6,8)}
+    ctx.fillStyle=t[s.col];ctx.beginPath();ctx.arc(x,y,7,0,7);ctx.fill();if(s.lab){font(ctx,12,800);ctx.fillStyle=t.ink;ctx.textAlign='center';ctx.fillText(s.lab,x+Math.cos(s.ang)*16,y-Math.sin(s.ang)*16+4)}}
+}
+const Th=r=>TAU*Math.sqrt((r*RE)**3/GM)/3600, vc=r=>Math.sqrt(GM/(r*RE));
+const hm=h=>{const m=Math.round(h*60);return m<120?m+' min':Math.floor(m/60)+' h '+(m%60)+' min'};
+
+/* ---------- simulations ---------- */
+const SIMS={
+kepler(host,preset){
+  const st={a:1.52,e:.5,sec:true};
+  host.innerHTML=`<div class="stage"><canvas style="cursor:default" aria-label="כוכב לכת במסלול אליפטי סביב השמש"></canvas><span class="hint">חץ: מהירות כוכב הלכת</span></div>`;
+  const T=()=>Math.pow(st.a,1.5),b=()=>st.a*Math.sqrt(1-st.e*st.e);
+  const pos=tt=>{const M=TAU*tt/T();let E=M;for(let i=0;i<8;i++)E-=(E-st.e*Math.sin(E)-M)/(1-st.e*Math.cos(E));return[st.a*(Math.cos(E)-st.e),b()*Math.sin(E)]};
+  let top;const run=Runner(host,T,()=>{run.sync();top.draw()},{unit:' שנים',loop:true});
+  const ctls=el('<div class="ctls"></div>');host.appendChild(ctls);
+  const set=outs(host,[['T','זמן המחזור T'],['r','המרחק מהשמש כעת'],['v','המהירות כעת'],['m','המרחק הקטן ביותר | הגדול ביותר'],['k',u('T² / r³')+' (בשנים וב־AU)']]);
+  top=Canvas(host.querySelector('canvas'),(ctx,t,cv)=>{const sc=Math.min((cv.W-70)/(2*st.a),(cv.H-80)/(2*b())),cx=cv.W/2,cy=cv.H/2+6,sx=cx+st.a*st.e*sc,P=p=>[sx+p[0]*sc,cy-p[1]*sc];
+    if(st.sec){const n=12;for(let k=0;k<n;k+=2){ctx.fillStyle=t.acc;ctx.globalAlpha=.2;ctx.beginPath();ctx.moveTo(sx,cy);for(let i=0;i<=24;i++){const q=P(pos(T()*(k+i/24)/n));ctx.lineTo(q[0],q[1])}ctx.closePath();ctx.fill()}ctx.globalAlpha=1}
+    ctx.strokeStyle=t.mut;ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(cx,cy,st.a*sc,b()*sc,0,0,7);ctx.stroke();
+    const p=pos(run.t),q=P(p),h=T()/4000,p2=pos(run.t+h),r=Math.hypot(p[0],p[1]),v=29.78*Math.sqrt(2/r-1/st.a),d=Math.hypot(p2[0]-p[0],p2[1]-p[1]),L=18+v*1.6*Math.min(1,Math.sqrt(st.a));
+    ctx.setLineDash([3,4]);ctx.strokeStyle=t.mut;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(sx,cy);ctx.lineTo(q[0],q[1]);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=t.acc;ctx.beginPath();ctx.arc(sx,cy,11,0,7);ctx.fill();
+    arrow(ctx,q[0],q[1],q[0]+(p2[0]-p[0])/d*L,q[1]-(p2[1]-p[1])/d*L,t.pos,2.6,8);ctx.fillStyle=t.neg;ctx.beginPath();ctx.arc(q[0],q[1],7,0,7);ctx.fill();
+    font(ctx,11,600);ctx.fillStyle=t.mut;ctx.strokeStyle=t.mut;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(14,cv.H-14);ctx.lineTo(14+sc,cv.H-14);ctx.moveTo(14,cv.H-18);ctx.lineTo(14,cv.H-10);ctx.moveTo(14+sc,cv.H-18);ctx.lineTo(14+sc,cv.H-10);ctx.stroke();ctx.textAlign='left';ctx.fillText('1 AU',14,cv.H-22);
+    set('T',fmt(T())+' שנים');set('r',fmt(r)+' AU');set('v',fmt(v)+' km/s');set('m',fmt(st.a*(1-st.e))+' AU | '+fmt(st.a*(1+st.e))+' AU');set('k',fmt(T()*T()/st.a**3))});
+  const rd=()=>{run.sync();top.draw()};
+  const tg=toggle(run.bar,'שטחים שווים בזמנים שווים',true,v=>{st.sec=v;top.draw()});
+  const s=[slider(ctls,'רדיוס המסלול הממוצע r (חצי הציר הגדול)',.4,5.2,.01,st.a,v=>fmt(v)+' AU',v=>{st.a=v;rd()}),slider(ctls,'מידת הפחיסות של האליפסה (אקסצנטריות)',0,.85,.01,st.e,v=>fmt(v),v=>{st.e=v;rd()})];
+  const load=(a,e)=>{st.a=a;st.e=e;s[0].set(a);s[1].set(e);run.pause();run.t=0;rd()};
+  [['כדור הארץ',1,.017],['מאדים',1.52,.093],['צדק',5.2,.049],['שביט',3,.8]].forEach(([n,a,e])=>{const bt=el(`<button class="btn sm">${n}</button>`);bt.onclick=()=>load(a,e);run.bar.appendChild(bt)});
+  exBtn(host,`טעינת הדוגמה: מאדים, ${u('r = 1.52 AU')}`,()=>load(1.52,.093),preset);
+  note(host,'יחידה אסטרונומית (AU) היא רדיוס המסלול הממוצע של כדור הארץ סביב השמש, '+u('149.6·10⁹ m')+'. כל גזרה צבועה נסרקת באותו פרק זמן, ולכן לכולן אותו שטח: קרוב לשמש הגזרה קצרה ורחבה, וכוכב הלכת נע מהר. שנו את הפחיסות: זמן המחזור לא משתנה, כי הוא תלוי רק ברדיוס הממוצע.');
+},
+newton(host,preset){
+  const st={m1:6,m2:7.4,r:3.8},F=()=>GC*st.m1*1e24*st.m2*1e22/(st.r*1e8)**2;
+  host.innerHTML=`<div class="stage"><canvas style="cursor:default;height:210px" aria-label="שני גופים שמושכים זה את זה בכוח הכבידה"></canvas><canvas class="g" aria-label="גרף כוח הכבידה כפונקציה של המרחק"></canvas><span class="hint">אורך החצים בסולם לוגריתמי</span></div><div class="ctls"></div>`;
+  const[c1,c2]=host.querySelectorAll('canvas'),ctls=host.querySelector('.ctls');let g;
+  const set=outs(host,[['f','גודל כוח הכבידה F'],['a1','תאוצת הגוף הגדול'],['a2','תאוצת הגוף הקטן'],['f2','F אם המרחק יוכפל']]);
+  const top=Canvas(c1,(ctx,t,cv)=>{const cx=cv.W/2,cy=cv.H/2+8,hs=st.r/10*(cv.W/2-56),x1=cx-hs,x2=cx+hs,r1=10+Math.cbrt(st.m1)*7,r2=6+Math.cbrt(st.m2)*3.2,L=Math.min(hs*2-r1-r2-6,Math.max(12,26+22*Math.log10(F()/1e19)));
+    ctx.setLineDash([3,4]);ctx.strokeStyle=t.mut;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x1,cy+r1+16);ctx.lineTo(x2,cy+r1+16);ctx.stroke();ctx.setLineDash([]);font(ctx,12,800);ctx.fillStyle=t.mut;ctx.textAlign='center';ctx.fillText('r',cx,cy+r1+32);
+    ctx.fillStyle=t.neg;ctx.beginPath();ctx.arc(x1,cy,r1,0,7);ctx.fill();ctx.fillStyle=t.mut;ctx.beginPath();ctx.arc(x2,cy,r2,0,7);ctx.fill();
+    if(L>4){arrow(ctx,x1+r1+2,cy,x1+r1+2+L/2,cy,t.pos,3,9);arrow(ctx,x2-r2-2,cy,x2-r2-2-L/2,cy,t.pos,3,9)}
+    ctx.fillStyle=t.ink;ctx.fillText('m₁',x1,cy-r1-8);ctx.fillText('m₂',x2,cy-r2-8);
+    set('f',fmt(F())+' N');set('a1',fmt(F()/(st.m1*1e24))+' m/s²');set('a2',fmt(F()/(st.m2*1e22))+' m/s²');set('f2',fmt(F()/4)+' N');g&&g.draw()});
+  g=Canvas(c2,(ctx,t,cv)=>plot(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{x0:0,x1:10,xl:'r (10⁸ m)',name:'F (10²⁰ N)',series:[{f:x=>x<1?NaN:.667*st.m1*st.m2/(x*x),col:'pos'}],mark:st.r}));
+  const s=[slider(ctls,'מסת הגוף הגדול m₁',1,10,.1,st.m1,v=>fmt(v)+'·10²⁴ kg',v=>{st.m1=v;top.draw()}),slider(ctls,'מסת הגוף הקטן m₂',1,10,.1,st.m2,v=>fmt(v)+'·10²² kg',v=>{st.m2=v;top.draw()}),slider(ctls,'המרחק בין המרכזים r',1,10,.1,st.r,v=>fmt(v)+'·10⁸ m',v=>{st.r=v;top.draw()})];
+  exBtn(host,'טעינת הדוגמה: כדור הארץ והירח',()=>{Object.assign(st,{m1:5.97,m2:7.35,r:3.84});[5.97,7.35,3.84].forEach((v,i)=>s[i].set(v));top.draw()},preset);
+  note(host,'שני החצים תמיד שווים באורכם: הכוח שהגוף הגדול מפעיל על הקטן שווה בגודלו לכוח שהקטן מפעיל על הגדול. התאוצות שונות מאוד, כי המסות שונות. בגרף רואים את התלות ב־1/r²: הכפלת המרחק מקטינה את הכוח פי 4.');
+},
+field(host,preset){
+  const st={M:1,R:1,x:1.06},X1=6,g0=()=>GC*st.M*ME/(st.R*RE)**2;
+  host.innerHTML=`<div class="stage"><canvas style="height:230px;cursor:ew-resize" aria-label="גרם שמיים ונקודה במרחק r ממרכזו"></canvas><canvas class="g" aria-label="גרף עוצמת שדה הכבידה כפונקציה של המרחק מהמרכז"></canvas><span class="hint">גררו את הנקודה · החץ: עוצמת השדה</span></div><div class="simbar"><span class="lab">גרם השמיים:</span></div><div class="ctls"></div>`;
+  const[c1,c2]=host.querySelectorAll('canvas'),bar=host.querySelector('.simbar'),ctls=host.querySelector('.ctls');let g,s;
+  const set=outs(host,[['g0','עוצמת השדה על פני השטח'],['r','המרחק מהמרכז r'],['h','הגובה מעל פני השטח h'],['g','עוצמת השדה בנקודה '+u('g*')],['q','היחס בין '+u('g*')+' לעוצמה על פני השטח']]);
+  const top=Canvas(c1,(ctx,t,cv)=>{radial(ctx,t,cv,X1,{rp:st.x,arrow:8+72/(st.x*st.x),alab:'g*'});
+    set('g0',fmt(g0())+' N/kg');set('r',fmt(st.x*st.R*RE)+' m');set('h',fmt((st.x-1)*st.R*RE)+' m');set('g',fmt(g0()/(st.x*st.x))+' N/kg');set('q',fmt(1/(st.x*st.x)));g&&g.draw()});
+  g=Canvas(c2,(ctx,t,cv)=>plot(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{x0:0,x1:X1,xl:'r / R',name:'g* (N/kg)',series:[{f:x=>x<1?NaN:g0()/(x*x),col:'pos'}],mark:st.x,vline:1}));
+  s=[slider(ctls,'מסת גרם השמיים (במסות כדור הארץ)',.1,5,.1,st.M,v=>fmt(v),v=>{st.M=v;top.draw()}),slider(ctls,'רדיוס גרם השמיים (ברדיוסי כדור הארץ)',.3,3,.1,st.R,v=>fmt(v),v=>{st.R=v;top.draw()}),slider(ctls,'המרחק מהמרכז r (ברדיוסי גרם השמיים)',1,X1,.01,st.x,v=>fmt(v)+' R',v=>{st.x=v;top.draw()})];
+  dragR(c1,X1,1,x=>{st.x=+x.toFixed(2);s[2].set(st.x);top.draw()});
+  [['כדור הארץ',1,1],['הירח',7.35e22/ME,1.74e6/RE],['מאדים',6.417e23/ME,3.396e6/RE]].forEach(([n,M,R])=>{const b=el(`<button class="btn sm">${n}</button>`);b.onclick=()=>{st.M=M;st.R=R;s[0].set(M);s[1].set(R);top.draw()};bar.appendChild(b)});
+  exBtn(host,`טעינת הדוגמה: כדור הארץ, גובה ${u('400 km')}`,()=>{st.M=1;st.R=1;st.x=+(1+4e5/RE).toFixed(3);s[0].set(1);s[1].set(1);s[2].set(st.x);top.draw()},preset);
+  note(host,'המרחק r נמדד ממרכז גרם השמיים, לא מפני השטח. הקו המקווקו בגרף מסמן את פני השטח, r = R. במרחק 2R העוצמה היא רבע מהערך שעל פני השטח, ובמרחק 3R תשיעית.');
+},
+orbit(host,preset){orbSim(host,preset,false)},
+period(host,preset){orbSim(host,preset,true)},
+energy(host,preset){
+  const st={m:1000,x:2},X1=6,A=()=>GM*st.m/RE/1e9,g0=GM/RE/RE;
+  host.innerHTML=`<div class="stage"><canvas style="height:220px;cursor:ew-resize" aria-label="כדור הארץ וגוף במרחק r ממרכזו"></canvas><canvas class="g" style="height:260px" aria-label="גרף האנרגיה הפוטנציאלית הכובדית כפונקציה של המרחק"></canvas><span class="hint">גררו את הגוף</span></div><div class="ctls"></div>`;
+  const[c1,c2]=host.querySelectorAll('canvas'),ctls=host.querySelector('.ctls');let g,s;
+  const set=outs(host,[['u0','U על פני כדור הארץ'],['u','U בנקודה'],['du','ΔU ביחס לפני השטח (מדויק)'],['mgh','הקירוב mgh'],['e','הסטייה של הקירוב']]);
+  const top=Canvas(c1,(ctx,t,cv)=>{radial(ctx,t,cv,X1,{rp:st.x,arrow:0,plab:'M'});const du=A()*(1-1/st.x)*1e9,mgh=st.m*g0*(st.x-1)*RE;
+    set('u0',fmt(-A()*1e9)+' J');set('u',fmt(-A()/st.x*1e9)+' J');set('du',st.x>1?fmt(du)+' J':'0');set('mgh',st.x>1?fmt(mgh)+' J':'0');set('e',st.x>1?'+'+fmt((mgh/du-1)*100,2)+'%':'—');g&&g.draw()});
+  g=Canvas(c2,(ctx,t,cv)=>plot(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{x0:0,x1:X1,xl:'r / R',name:'U (10⁹ J)',series:[{f:x=>x<1?NaN:-A()/x,col:'pos'},{f:x=>x<1?NaN:-A()+A()*(x-1),col:'mut',dash:true,lab:'mgh',at:.3}],mark:st.x,vline:1,ymin:-A()*1.05,ymax:0,fix:true}));
+  s=[slider(ctls,'מסת הגוף m',100,2000,100,st.m,v=>v+' kg',v=>{st.m=v;top.draw()}),slider(ctls,'המרחק ממרכז כדור הארץ r',1,X1,.01,st.x,v=>fmt(v)+' R',v=>{st.x=v;top.draw()})];
+  dragR(c1,X1,1,x=>{st.x=+x.toFixed(2);s[1].set(st.x);top.draw()});
+  exBtn(host,`טעינת הדוגמה: ${u('m = 1000 kg')}, ${u('r = 2R')}`,()=>{st.m=1000;st.x=2;s[0].set(1000);s[1].set(2);top.draw()},preset);
+  note(host,'האנרגיה הפוטנציאלית שלילית בכל מקום, ומתקרבת לאפס כשמתרחקים. הקו המקווקו הוא הקירוב mgh, שמניח ש־g קבוע: קרוב לפני השטח הוא מתלכד עם העקומה, ורחוק ממנו הוא מגזים מאוד. קרבו את הגוף אל r = 1.06R (גובה 400 ק״מ) וראו שהסטייה שם קטנה.');
+},
+satenergy(host,preset){
+  const st={m:1000,r1:1.1,r2:6.62},A=()=>GM*st.m/RE/1e9,X1=8;
+  host.innerHTML=`<div class="stage"><canvas style="cursor:default" aria-label="גרפים של האנרגיה הקינטית, הפוטנציאלית והכוללת של לוויין כפונקציה של רדיוס המסלול"></canvas></div><div class="ctls"></div>`;
+  const ctls=host.querySelector('.ctls');
+  const set=outs(host,[['v','מהירות במסלול 1'],['k','אנרגיה קינטית במסלול 1'],['u','אנרגיה פוטנציאלית במסלול 1'],['e','אנרגיה כוללת במסלול 1'],['e2','אנרגיה כוללת במסלול 2'],['d','ΔE: האנרגיה הדרושה למעבר מ־1 ל־2']]);
+  const top=Canvas(host.querySelector('canvas'),(ctx,t,cv)=>{plot(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{x0:1,x1:X1,xl:'r / R',name:'אנרגיה (10⁹ J)',series:[{f:x=>A()/(2*x),col:'pos',lab:'Ek',at:.5},{f:x=>-A()/x,col:'neg',lab:'U',at:.5,below:true},{f:x=>-A()/(2*x),col:'ink',lab:'E',at:.5}],mark:st.r1,rings:[st.r2]});
+    const E=r=>-A()/(2*r)*1e9;set('v',fmt(vc(st.r1))+' m/s');set('k',fmt(-E(st.r1))+' J');set('u',fmt(2*E(st.r1))+' J');set('e',fmt(E(st.r1))+' J');set('e2',fmt(E(st.r2))+' J');const d=E(st.r2)-E(st.r1);set('d',Math.abs(d)<1?'0':(d>0?'+':'')+fmt(d)+' J')});
+  const s=[slider(ctls,'מסת הלוויין m',100,2000,100,st.m,v=>v+' kg',v=>{st.m=v;top.draw()}),slider(ctls,'רדיוס מסלול 1',1,X1,.01,st.r1,v=>fmt(v)+' R',v=>{st.r1=v;top.draw()}),slider(ctls,'רדיוס מסלול 2',1,X1,.01,st.r2,v=>fmt(v)+' R',v=>{st.r2=v;top.draw()})];
+  exBtn(host,`טעינת הדוגמה: ${u('m = 1000 kg')}, מ־${u('r = 7·10⁶ m')} אל ${u('r = 4.22·10⁷ m')}`,()=>{Object.assign(st,{m:1000,r1:+(7e6/RE).toFixed(3),r2:+(4.22e7/RE).toFixed(3)});[st.m,st.r1,st.r2].forEach((v,i)=>s[i].set(v));top.draw()},preset);
+  note(host,'R הוא רדיוס כדור הארץ. הנקודות המלאות מסמנות את מסלול 1, והעיגולים הריקים את מסלול 2. בכל רדיוס האנרגיה הקינטית שווה לחצי מגודל האנרגיה הפוטנציאלית, ולכן האנרגיה הכוללת היא תמונת ראי של האנרגיה הקינטית. במסלול גבוה יותר הלוויין איטי יותר, ובכל זאת האנרגיה הכוללת שלו גדולה יותר.');
+},
+escape(host,preset){
+  const st={v:8,M:1,R:1},X1=10,P=()=>GC*st.M*ME/(st.R*RE),ve=()=>Math.sqrt(2*P()),xm=()=>{const q=1-(st.v*1e3)**2/(2*P());return q<=1e-9?Infinity:1/q};
+  host.innerHTML=`<div class="stage"><canvas style="height:210px;cursor:default" aria-label="גוף שמשוגר אנכית מפני גרם שמיים, והמרחק המרבי שאליו הוא מגיע"></canvas><canvas class="g" aria-label="גרף מהירות הגוף כפונקציה של המרחק מהמרכז"></canvas><span class="hint">הקו האדום: המסלול עד לנקודה הרחוקה ביותר</span></div><div class="simbar"><span class="lab">גרם השמיים:</span></div><div class="ctls"></div>`;
+  const[c1,c2]=host.querySelectorAll('canvas'),bar=host.querySelector('.simbar'),ctls=host.querySelector('.ctls');let g;
+  const set=outs(host,[['ve','מהירות המילוט מפני השטח'],['e','האנרגיה הכוללת'],['r','המרחק המרבי מהמרכז'],['h','הגובה המרבי מעל פני השטח'],['s','מה יקרה']]);
+  const top=Canvas(c1,(ctx,t,cv)=>{const x=xm(),esc=!isFinite(x);radial(ctx,t,cv,X1,{rp:esc?X1:Math.min(x,X1),arrow:0,path:[1,esc?X1*1.05:x]});
+    set('ve',fmt(ve()/1e3)+' km/s');set('e',rt(esc?(st.v*1e3>ve()*1.0001?'חיובית':'אפס'):'שלילית: הגוף קשור'));set('r',esc?'∞':fmt(x*st.R*RE)+' m');set('h',esc?'∞':fmt((x-1)*st.R*RE)+' m');
+    set('s',rt(esc?'נמלט, ומהירותו רחוק מאוד '+u(fmt(Math.sqrt(Math.max(0,(st.v*1e3)**2-ve()**2))/1e3)+' km/s'):'נעצר לרגע וחוזר'));g&&g.draw()});
+  g=Canvas(c2,(ctx,t,cv)=>plot(ctx,t,{x:0,y:0,w:cv.W,h:cv.H},{x0:0,x1:X1,xl:'r / R',name:'v (km/s)',series:[{f:x=>{if(x<1)return NaN;const q=(st.v*1e3)**2-2*P()*(1-1/x);return q<0?NaN:Math.sqrt(q)/1e3},col:'pos'}],vline:1,ymin:0,ymax:14}));
+  const s=[slider(ctls,'מהירות השיגור v₀',.5,14,.1,st.v,v=>fmt(v)+' km/s',v=>{st.v=v;top.draw()})];
+  [['כדור הארץ',1,1],['הירח',7.35e22/ME,1.74e6/RE],['מאדים',6.417e23/ME,3.396e6/RE]].forEach(([n,M,R])=>{const b=el(`<button class="btn sm">${n}</button>`);b.onclick=()=>{st.M=M;st.R=R;top.draw()};bar.appendChild(b)});
+  exBtn(host,`טעינת הדוגמה: שיגור מכדור הארץ במהירות ${u('8 km/s')}`,()=>{st.M=1;st.R=1;st.v=8;s[0].set(8);top.draw()},preset);
+  note(host,'הגוף משוגר אנכית מפני השטח, בלי התנגדות אוויר ובלי מנוע. הציר האופקי ביחידות של רדיוס גרם השמיים. הגדילו את מהירות השיגור בהדרגה: הנקודה הרחוקה ביותר מתרחקת יותר ויותר מהר, ובמהירות המילוט היא "בורחת לאינסוף". מעל מהירות המילוט נשארת לגוף מהירות גם רחוק מאוד.');
+}
+};
+function orbSim(host,preset,two){
+  const st={r1:1.063,r2:6.62,vec:true},RM=8;
+  host.innerHTML=`<div class="stage"><canvas style="cursor:default" aria-label="${two?'שני לוויינים במסלולים מעגליים סביב כדור הארץ':'לוויין במסלול מעגלי סביב כדור הארץ'}"></canvas><span class="hint">${two?'אדום: לוויין 1 · כהה: לוויין 2':'אדום: מהירות · כתום: כוח הכבידה'}</span></div>`;
+  let top;const Tm=()=>two?Math.max(Th(st.r1),Th(st.r2)):Th(st.r1);
+  const run=Runner(host,Tm,()=>{run.sync();top.draw()},{unit:' h',loop:true,rate:()=>Tm()/(two?12:8)});
+  const ctls=el('<div class="ctls"></div>');host.appendChild(ctls);
+  const set=outs(host,two?[['t1','זמן המחזור T₁'],['t2','זמן המחזור T₂'],['rr',u('(r₂ / r₁)³')],['tt',u('(T₂ / T₁)²')],['v1','מהירות לוויין 1'],['v2','מהירות לוויין 2']]:[['r','רדיוס המסלול r'],['h','הגובה מעל פני כדור הארץ'],['v','מהירות הלוויין'],['T','זמן המחזור'],['a','התאוצה הצנטריפטלית, ששווה ל־'+u('g*')+' במסלול']]);
+  top=Canvas(host.querySelector('canvas'),(ctx,t,cv)=>{const sats=[{r:st.r1,ang:TAU*run.t/Th(st.r1)+Math.PI/2,col:'pos',lab:two?'1':''}];if(two)sats.push({r:st.r2,ang:TAU*run.t/Th(st.r2)+Math.PI/2,col:'ink',lab:'2'});
+    orbDraw(ctx,t,cv,sats,two?Math.max(st.r1,st.r2)*1.18:Math.max(2.2,st.r1*1.3),!two&&st.vec);
+    if(two){set('t1',hm(Th(st.r1)));set('t2',hm(Th(st.r2)));set('rr',fmt((st.r2/st.r1)**3,4));set('tt',fmt((Th(st.r2)/Th(st.r1))**2,4));set('v1',fmt(vc(st.r1))+' m/s');set('v2',fmt(vc(st.r2))+' m/s')}
+    else{set('r',fmt(st.r1*RE)+' m');set('h',fmt((st.r1-1)*RE/1e3)+' km');set('v',fmt(vc(st.r1))+' m/s');set('T',hm(Th(st.r1)));set('a',fmt(GM/(st.r1*RE)**2)+' m/s²')}});
+  const rd=()=>{run.sync();top.draw()};
+  const s=[slider(ctls,two?'רדיוס המסלול של לוויין 1':'רדיוס המסלול r',1.02,RM,.01,st.r1,v=>fmt(v)+' R',v=>{st.r1=v;rd()})];
+  if(two)s.push(slider(ctls,'רדיוס המסלול של לוויין 2',1.02,RM,.01,st.r2,v=>fmt(v)+' R',v=>{st.r2=v;rd()}));
+  else{toggle(run.bar,'חצי מהירות וכוח',true,v=>{st.vec=v;top.draw()});[['תחנת החלל (גובה 400 ק״מ)',1.063],['לוויין גיאוסטציונרי',6.62]].forEach(([n,r])=>{const b=el(`<button class="btn sm">${n}</button>`);b.onclick=()=>{st.r1=r;s[0].set(r);rd()};run.bar.appendChild(b)})}
+  if(two)exBtn(host,'טעינת הדוגמה: תחנת החלל ולוויין גיאוסטציונרי',()=>{st.r1=1.063;st.r2=6.62;s[0].set(1.063);s[1].set(6.62);run.pause();run.t=0;rd()},preset);
+  else exBtn(host,`טעינת הדוגמה: תחנת החלל, גובה ${u('400 km')}`,()=>{st.r1=1.063;s[0].set(1.063);run.pause();run.t=0;rd()},preset);
+  note(host,two?'R הוא רדיוס כדור הארץ. שני הלוויינים נעים לפי אותו שעון, כך שרואים כמה הקפות משלים הלוויין הנמוך בזמן שהגבוה משלים אחת. שני המספרים, '+u('(r₂/r₁)³')+' ו־'+u('(T₂/T₁)²')+', תמיד שווים: זה החוק השלישי של קפלר.':'R הוא רדיוס כדור הארץ, והציור בקנה מידה. כוח הכבידה מכוון תמיד אל מרכז כדור הארץ וניצב למהירות, ולכן הוא משנה רק את כיוון המהירות ולא את גודלה. ככל שהמסלול גבוה יותר, הלוויין איטי יותר וזמן המחזור ארוך יותר.');
+}
+
+
+/* ---------- content ---------- */
+const GMm=`<i>GMm</i>`,r2=`<i>r</i><sup>2</sup>`,UG='<i>U</i><sub>G</sub>',Ek='<i>E</i><sub>k</sub>',gs='<i>g</i>*';
+const e10=(a,e)=>`${a}·10<sup>${String(e).replace('-','−')}</sup>`;
+const cG=m(`<i>G</i> = ${e10('6.67',-11)} N·m<sup>2</sup>/kg<sup>2</sup>`),cM=m(`<i>M</i><sub>E</sub> = ${e10('5.97',24)} kg`),cR=m(`<i>R</i><sub>E</sub> = ${e10('6.38',6)} m`);
+const T=[
+{id:'kepler',title:'חוקי קפלר',sub:'איך נעים כוכבי הלכת סביב השמש',
+ intro:[
+ `יוהנס קפלר ניסח שלושה חוקים שמתארים את תנועת כוכבי הלכת. הוא מצא אותם מתוך תצפיות, עשרות שנים לפני שניוטון הסביר <b>למה</b> הם נכונים.`,
+ `<b>החוק הראשון:</b> כל כוכב לכת נע במסלול אליפטי, והשמש נמצאת באחד משני המוקדים של האליפסה. המסלולים של רוב כוכבי הלכת קרובים מאוד למעגל, ולכן בשאלות מתייחסים אליהם בדרך כלל כאל מעגלים.`,
+ `<b>החוק השני:</b> הקו שמחבר את השמש עם כוכב הלכת מכסה שטחים שווים בפרקי זמן שווים. מכאן שכוכב הלכת נע מהר כשהוא קרוב לשמש, ולאט כשהוא רחוק ממנה.`,
+ `<b>החוק השלישי:</b> ${m(`${fr('<i>r</i><sub>1</sub>','<i>r</i><sub>2</sub>')}<sup>3</sup> = ${fr('<i>T</i><sub>1</sub>','<i>T</i><sub>2</sub>')}<sup>2</sup>`)}, כאשר ${m('<i>r</i>')} הוא רדיוס המסלול הממוצע ו־${m('<i>T</i>')} זמן המחזור. במילים אחרות, היחס ${m(`${fr('<i>r</i><sup>3</sup>','<i>T</i><sup>2</sup>')}`)} זהה לכל הגופים שמקיפים <b>אותו גוף מרכזי</b>.`,
+ `החוקים נכונים לכל מערכת של גופים שמקיפים גוף מרכזי: כוכבי הלכת סביב השמש, הירח והלוויינים סביב כדור הארץ, הירחים של צדק סביב צדק.`],
+ formulas:[[`${fr('<i>r</i><sub>1</sub>','<i>r</i><sub>2</sub>')}<sup>3</sup> = ${fr('<i>T</i><sub>1</sub>','<i>T</i><sub>2</sub>')}<sup>2</sup>`,'החוק השלישי של קפלר'],[`${fr('<i>r</i><sup>3</sup>','<i>T</i><sup>2</sup>')} = קבוע`,'לכל הגופים שמקיפים אותו גוף מרכזי'],[`<i>T</i><sub>2</sub> = <i>T</i><sub>1</sub>${fr('<i>r</i><sub>2</sub>','<i>r</i><sub>1</sub>')}<sup>3/2</sup>`,'זמן מחזור מתוך יחס הרדיוסים']],
+ trap:[`אפשר להשוות בין הירח לבין מאדים?`,`לא. החוק השלישי משווה רק בין גופים שמקיפים <b>אותו גוף מרכזי</b>. הירח מקיף את כדור הארץ ומאדים מקיף את השמש, ולכן היחס ${m(`${fr('<i>r</i><sup>3</sup>','<i>T</i><sup>2</sup>')}`)} שלהם שונה לגמרי. אפשר להשוות את הירח ללוויין תקשורת, או את מאדים לכדור הארץ.`],
+ ex:{given:[`רדיוס המסלול הממוצע של כדור הארץ: ${m(e10('149.6',9)+' m')}, וזמן המחזור שלו שנה אחת`,`רדיוס המסלול הממוצע של מאדים: ${m(e10('227.94',9)+' m')}`],ask:[`א. מה זמן המחזור של מאדים, בשנים?`,`ב. כוכב לכת דמיוני מקיף את השמש פעם ב־8 שנים. מה רדיוס המסלול שלו?`,`ג. היכן במסלול אליפטי כוכב לכת נע במהירות הגדולה ביותר?`],
+  steps:[
+  `<b>סעיף א.</b> יחס הרדיוסים: ${m(`${fr('227.94','149.6')} = 1.524`)}. לפי החוק השלישי: ${M(`<i>T</i> = 1·1.524<sup>3/2</sup> = √(1.524<sup>3</sup>) = 1.88 שנים`)}`,
+  `<b>סעיף ב.</b> ${M(`${fr('<i>r</i>','<i>r</i><sub>E</sub>')}<sup>3</sup> = ${fr('8','1')}<sup>2</sup> = 64 &nbsp;⟹&nbsp; ${fr('<i>r</i>','<i>r</i><sub>E</sub>')} = 4`)} ${m(`<i>r</i> = 4·${e10('149.6',9)} ≈ ${e10('5.98',11)} m`)}.`,
+  `<b>סעיף ג.</b> לפי החוק השני, כדי לכסות אותו שטח באותו זמן כשהמרחק מהשמש קטן, כוכב הלכת חייב לעבור קשת ארוכה יותר. לכן המהירות הגדולה ביותר היא בנקודה הקרובה ביותר לשמש.`],
+  check:`התוצאה של סעיף א מתאימה לערך שבדף הנתונים, 1.881 שנים. בסעיף ב: רדיוס גדול פי 4 נותן זמן מחזור גדול פי ${m('4<sup>3/2</sup> = 8')}.`},
+ qs:[
+ {l:'b',t:'mc',q:`לפי החוק הראשון של קפלר, היכן נמצאת השמש ביחס למסלול של כוכב לכת?`,o:['במרכז האליפסה','באחד המוקדים של האליפסה','על האליפסה עצמה','בנקודה הרחוקה ביותר מכוכב הלכת'],a:1,s:`המסלול הוא אליפסה, והשמש נמצאת באחד משני המוקדים שלה, לא במרכז.`},
+ {l:'b',t:'mc',q:`שביט נע סביב השמש במסלול אליפטי מוארך. היכן המהירות שלו הגדולה ביותר?`,o:['בנקודה הרחוקה ביותר מהשמש','בנקודה הקרובה ביותר לשמש','המהירות קבועה לאורך כל המסלול','באמצע הדרך בין שתי הנקודות'],a:1,s:`לפי החוק השני, הקו מהשמש אל השביט מכסה שטחים שווים בזמנים שווים. קרוב לשמש הקו קצר, ולכן השביט חייב לנוע מהר יותר.`},
+ {l:'b',t:'num',q:`רדיוס המסלול של לוויין אחד גדול פי 4 מרדיוס המסלול של לוויין אחר, ושניהם מקיפים את אותו כוכב לכת. פי כמה גדול זמן המחזור שלו?`,a:8,u:'',s:`${m(`${fr('<i>T</i><sub>2</sub>','<i>T</i><sub>1</sub>')}<sup>2</sup> = 4<sup>3</sup> = 64`)}, ולכן ${m(`${fr('<i>T</i><sub>2</sub>','<i>T</i><sub>1</sub>')} = 8`)}.`},
+ {l:'b',t:'num',q:`רדיוס המסלול של צדק גדול פי ${m('5.2')} מרדיוס המסלול של כדור הארץ. מה זמן המחזור של צדק, בשנים?`,a:11.9,u:'שנים',s:`${m('<i>T</i> = 1·5.2<sup>3/2</sup> = √(5.2<sup>3</sup>) = √140.6 ≈ 11.9')} שנים.`},
+ {l:'a',t:'num',q:`זמן המחזור של שבתאי הוא ${m('29.45')} שנים. פי כמה גדול רדיוס המסלול שלו מרדיוס המסלול של כדור הארץ?`,a:9.54,u:'',s:`${m(`${fr('<i>r</i>','<i>r</i><sub>E</sub>')}<sup>3</sup> = 29.45<sup>2</sup> = 867.3`)}, ולכן ${m(`${fr('<i>r</i>','<i>r</i><sub>E</sub>')} = 867.3<sup>1/3</sup> ≈ 9.54`)}.`},
+ {l:'a',t:'num',q:`לוויין מקיף את כדור הארץ במסלול מעגלי שרדיוסו ${m('<i>r</i>')}, וזמן המחזור שלו שעתיים. מה זמן המחזור של לוויין במסלול שרדיוסו ${m('4<i>r</i>')}? (בשעות)`,a:16,u:'h',s:`${m('<i>T</i><sub>2</sub> = 2·4<sup>3/2</sup> = 2·8 = 16')} שעות.`},
+ {l:'a',t:'num',q:`הירח מקיף את כדור הארץ במסלול שרדיוסו ${m(e10('3.84',8)+' m')}, וזמן המחזור שלו ${m('27.3')} יממות. מה רדיוס המסלול של לוויין שזמן המחזור שלו יממה אחת?`,a:4.24e7,u:'m',s:`שני הגופים מקיפים את כדור הארץ: ${m(`${fr('<i>r</i>',e10('3.84',8))}<sup>3</sup> = ${fr('1','27.3')}<sup>2</sup>`)}.<br>${m(`<i>r</i> = ${e10('3.84',8)}·27.3<sup>−2/3</sup> = ${fr(e10('3.84',8),'9.07')} ≈ ${e10('4.24',7)} m`)}. זה לוויין גיאוסטציונרי.`},
+ {l:'a',t:'mc',q:`מחשבים את היחס ${m(`${fr('<i>r</i><sup>3</sup>','<i>T</i><sup>2</sup>')}`)} עבור הירח, ואחר כך עבור מאדים. מה מצפים לקבל?`,o:['אותו ערך, כי החוק השלישי נכון לכל גוף','ערכים שונים, כי הם מקיפים גופים מרכזיים שונים','אותו ערך, כי שניהם במערכת השמש','ערכים שונים, כי המסות שלהם שונות'],a:1,s:`היחס קבוע רק בין גופים שמקיפים אותו גוף מרכזי. הוא תלוי במסת הגוף המרכזי, ולכן הוא שונה לכדור הארץ ולשמש. המסה של הגוף המקיף לא משפיעה.`}
+ ]},
+{id:'newton',title:'חוק הכבידה העולמי',sub:'כל שני גופים מושכים זה את זה',
+ intro:[
+ `<b>חוק הכבידה העולמי של ניוטון:</b> כל שני גופים בעלי מסה מושכים זה את זה. גודל הכוח הוא ${m(`<i>F</i> = <i>G</i>${fr('<i>m</i><sub>1</sub><i>m</i><sub>2</sub>',r2)}`)}.`,
+ `הכוח יחסי למכפלת המסות ויחסי הפוך לריבוע המרחק. מרחק גדול פי 2 נותן כוח קטן פי 4, ומרחק גדול פי 3 נותן כוח קטן פי 9.`,
+ `${m('<i>r</i>')} הוא המרחק בין <b>המרכזים</b> של הגופים. לגבי גוף כדורי, כמו כוכב לכת, מתייחסים לכל המסה כאילו היא מרוכזת במרכז הכדור.`,
+ `${m('<i>G</i>')} הוא קבוע הכבידה העולמי, ${m(`${e10('6.67',-11)} N·m<sup>2</sup>/kg<sup>2</sup>`)}. הוא קטן מאוד, ולכן מרגישים את כוח הכבידה רק כשלפחות אחד הגופים הוא גרם שמיים.`,
+ `כוח הכבידה הוא תמיד כוח משיכה, והוא פועל לאורך הקו שמחבר את המרכזים. שני הכוחות הם זוג של החוק השלישי של ניוטון: הם שווים בגודלם גם כשהמסות שונות מאוד.`],
+ formulas:[[`<i>F</i> = <i>G</i>${fr('<i>m</i><sub>1</sub><i>m</i><sub>2</sub>',r2)}`,'גודל כוח הכבידה בין שני גופים'],[`<i>G</i> = ${e10('6.67',-11)} ${fr('N·m<sup>2</sup>','kg<sup>2</sup>')}`,'קבוע הכבידה העולמי']],
+ trap:[`כדור הארץ מושך את הירח חזק יותר ממה שהירח מושך אותו?`,`לא. שני הכוחות שווים בדיוק, כי בנוסחה מופיעה המכפלה של שתי המסות, וכי זה זוג כוחות של החוק השלישי. ההבדל הוא בתאוצות: לירח מסה קטנה פי 81, ולכן אותו כוח נותן לו תאוצה גדולה פי 81.`],
+ ex:{given:[`מסת כדור הארץ ${m(e10('5.97',24)+' kg')}, מסת הירח ${m(e10('7.35',22)+' kg')}`,`המרחק בין המרכזים ${m(e10('3.84',8)+' m')}`],ask:[`א. מה גודל כוח הכבידה בין כדור הארץ לירח?`,`ב. מה תאוצת הירח?`,`ג. מה תאוצת כדור הארץ?`,`ד. מה היה הכוח אילו המרחק היה גדול פי 2?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`<i>F</i> = ${e10('6.67',-11)}·${fr(`${e10('5.97',24)}·${e10('7.35',22)}`,`(${e10('3.84',8)})<sup>2</sup>`)} = ${fr(e10('2.93',37),e10('1.47',17))} ≈ ${e10('1.98',20)} N`)}`,
+  `<b>סעיף ב.</b> ${M(`<i>a</i> = ${fr('<i>F</i>','<i>m</i>')} = ${fr(e10('1.98',20),e10('7.35',22))} ≈ ${e10('2.7',-3)} m/s<sup>2</sup>`)}`,
+  `<b>סעיף ג.</b> אותו כוח, מסה אחרת: ${M(`<i>a</i> = ${fr(e10('1.98',20),e10('5.97',24))} ≈ ${e10('3.3',-5)} m/s<sup>2</sup>`)}`,
+  `<b>סעיף ד.</b> הכוח יחסי הפוך לריבוע המרחק, ולכן הוא קטן פי 4: ${m(`${fr(e10('1.98',20),'4')} ≈ ${e10('5',19)} N`)}.`],
+  check:`יחס התאוצות ${m(`${fr(e10('2.7',-3),e10('3.3',-5))} ≈ 81`)} שווה ליחס המסות ${m(`${fr(e10('5.97',24),e10('7.35',22))} ≈ 81`)}, כצפוי משני כוחות שווים.`},
+ qs:[
+ {l:'b',t:'mc',q:`המרחק בין שני גופים גדל פי 3. מה קורה לכוח הכבידה ביניהם?`,o:['קטן פי 3','קטן פי 9','גדל פי 9','לא משתנה'],a:1,s:`הכוח יחסי הפוך לריבוע המרחק: ${m('3<sup>2</sup> = 9')}.`},
+ {l:'b',t:'mc',q:`מכפילים את המסה של כל אחד משני גופים, ומכפילים גם את המרחק ביניהם. מה קורה לכוח הכבידה?`,o:['גדל פי 4','גדל פי 2','לא משתנה','קטן פי 2'],a:2,s:`המונה גדל פי ${m('2·2 = 4')}, והמכנה גדל פי ${m('2<sup>2</sup> = 4')}. הכוח לא משתנה.`},
+ {l:'b',t:'num',q:`שני כדורים, שמסותיהם ${m('100 kg')} ו־${m('50 kg')}, נמצאים במרחק ${m('2 m')} זה מזה (בין המרכזים). מה גודל כוח הכבידה ביניהם? (${cG})`,a:8.34e-8,u:'N',s:`${m(`<i>F</i> = ${e10('6.67',-11)}·${fr('100·50','2<sup>2</sup>')} = ${e10('8.34',-8)} N`)}. כוח זעיר: לכן לא מרגישים כבידה בין גופים רגילים.`},
+ {l:'b',t:'num',q:`מה גודל כוח הכבידה שכדור הארץ מפעיל על אדם שמסתו ${m('70 kg')} ועומד על פני כדור הארץ? (${cG}, ${cM}, ${cR})`,a:685,u:'N',s:`${m(`<i>F</i> = ${e10('6.67',-11)}·${fr(`${e10('5.97',24)}·70`,`(${e10('6.38',6)})<sup>2</sup>`)} ≈ 685 N`)}. זה בדיוק ${m('<i>mg</i>')} עם ${m('<i>g</i> = 9.78 m/s<sup>2</sup>')}.`},
+ {l:'a',t:'num',q:`לוויין שמסתו ${m('500 kg')} נמצא בגובה ששווה לרדיוס כדור הארץ מעל פני כדור הארץ. מה גודל כוח הכבידה שפועל עליו? (על פני כדור הארץ ${m('<i>g</i> = 9.78 m/s<sup>2</sup>')})`,a:1223,u:'N',s:`המרחק מהמרכז הוא ${m('2<i>R</i>')}, פי 2 מאשר על פני כדור הארץ. לכן הכוח קטן פי 4: ${m(`${fr('500·9.78','4')} ≈ 1223 N`)}.`},
+ {l:'a',t:'num',q:`באיזה מרחק ממרכז כדור הארץ, על הקו שבינו לבין הירח, כוחות הכבידה של כדור הארץ ושל הירח על חללית מאזנים זה את זה? (המרחק בין המרכזים ${m(e10('3.84',8)+' m')}, ומסת כדור הארץ גדולה פי ${m('81.2')} ממסת הירח)`,a:3.46e8,u:'m',s:`מסמנים את המרחק מכדור הארץ ב־${m('<i>d</i>')}: ${m(`${fr('<i>M</i><sub>E</sub>','<i>d</i><sup>2</sup>')} = ${fr('<i>M</i><sub>m</sub>','(<i>D</i> − <i>d</i>)<sup>2</sup>')}`)}. מסת החללית ו־${m('<i>G</i>')} מצטמצמים.<br>מוציאים שורש: ${m(`${fr('<i>d</i>','<i>D</i> − <i>d</i>')} = √81.2 = 9.01`)}.<br>${m(`<i>d</i> = ${fr('9.01','10.01')}·${e10('3.84',8)} ≈ ${e10('3.46',8)} m`)}. הנקודה קרובה מאוד לירח.`},
+ {l:'a',t:'num',q:`אדם שוקל ${m('800 N')} על פני כדור הארץ. כמה הוא ישקול על פני כוכב לכת שהמסה שלו גדולה פי 2 ממסת כדור הארץ, והרדיוס שלו גדול פי 2?`,a:400,u:'N',s:`${m(`<i>F</i> ∝ ${fr('<i>M</i>','<i>R</i><sup>2</sup>')}`)}: המסה מכפילה פי 2, והרדיוס מקטין פי 4. סך הכול הכוח קטן פי 2: ${m('400 N')}.`}
+ ]},
+{id:'field',title:'שדה הכבידה',sub:'עוצמת השדה g*: כוח הכבידה על כל קילוגרם',
+ intro:[
+ `סביב כל גרם שמיים יש <b>שדה כבידה</b>. <b>עוצמת השדה</b> בנקודה מסוימת היא כוח הכבידה שפועל שם על כל קילוגרם: ${m(`${gs} = ${fr('<i>F</i>','<i>m</i>')}`)}.`,
+ `מחוק הכבידה מקבלים ${m(`${gs} = ${fr('<i>GM</i>',r2)}`)}. העוצמה תלויה רק במסת גרם השמיים ${m('<i>M</i>')} ובמרחק ${m('<i>r</i>')} מהמרכז שלו. היא לא תלויה במסה של הגוף שנמצא בשדה.`,
+ `היחידות הן ${m('N/kg')}, וזה שקול ל־${m('m/s<sup>2</sup>')}. עוצמת השדה בנקודה שווה לתאוצת הנפילה החופשית באותה נקודה.`,
+ `על פני גרם שמיים שרדיוסו ${m('<i>R</i>')}: ${m(`<i>g</i> = ${fr('<i>GM</i>','<i>R</i><sup>2</sup>')}`)}. לכדור הארץ יוצא ${m('9.8 N/kg')} בערך. בגובה ${m('<i>h</i>')} מעל פני השטח המרחק מהמרכז הוא ${m('<i>r</i> = <i>R</i> + <i>h</i>')}.`,
+ `הנוסחה ${m('<i>F</i> = <i>mg</i>')} עם ${m('<i>g</i>')} קבוע נכונה רק קרוב לפני השטח, כשהגובה קטן בהרבה מהרדיוס. רחוק יותר משתמשים ב־${m(`<i>F</i> = <i>m</i>${gs}`)}.`],
+ formulas:[[`${gs} = ${fr('<i>GM</i>',r2)}`,'עוצמת שדה הכבידה של גרם שמיים'],[`<i>g</i> = ${fr('<i>GM</i>','<i>R</i><sup>2</sup>')}`,'על פני גרם השמיים'],[`${gs} = ${fr('<i>GM</i>','(<i>R</i> + <i>h</i>)<sup>2</sup>')}`,'בגובה <i>h</i> מעל פני השטח'],[`<i>F</i> = <i>m</i>${gs}`,'כוח הכבידה על גוף שמסתו <i>m</i>']],
+ trap:[`מציבים את הגובה במקום r?`,`זו הטעות הנפוצה ביותר בנושא. ${m('<i>r</i>')} הוא המרחק <b>ממרכז</b> גרם השמיים, לא הגובה מעל פני השטח. לוויין בגובה ${m('400 km')} נמצא במרחק ${m(`<i>r</i> = ${e10('6.38',6)} + ${e10('0.4',6)} = ${e10('6.78',6)} m`)} ממרכז כדור הארץ, ושם עוצמת השדה עדיין ${m('8.7 N/kg')}.`],
+ ex:{given:[cG,`${cM}, ${cR}`,`מסת הירח ${m(e10('7.35',22)+' kg')}, רדיוס הירח ${m(e10('1.74',6)+' m')}`],ask:[`א. מה עוצמת שדה הכבידה על פני כדור הארץ?`,`ב. מה העוצמה בגובה ${m('400 km')}, גובה תחנת החלל?`,`ג. באיזה גובה העוצמה היא רבע מהערך שעל פני השטח?`,`ד. מה העוצמה על פני הירח?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`<i>g</i> = ${fr(`${e10('6.67',-11)}·${e10('5.97',24)}`,`(${e10('6.38',6)})<sup>2</sup>`)} = ${fr(e10('3.98',14),e10('4.07',13))} ≈ 9.78 N/kg`)}`,
+  `<b>סעיף ב.</b> ${m(`<i>r</i> = ${e10('6.38',6)} + ${e10('0.4',6)} = ${e10('6.78',6)} m`)}: ${M(`${gs} = ${fr(e10('3.98',14),`(${e10('6.78',6)})<sup>2</sup>`)} ≈ 8.66 N/kg`)}`,
+  `<b>סעיף ג.</b> העוצמה יחסית ל־${m(`${fr('1',r2)}`)}. רבע מהעוצמה מתקבל במרחק כפול מהמרכז, ${m('<i>r</i> = 2<i>R</i>')}, כלומר בגובה ${m(`<i>h</i> = <i>R</i> = ${e10('6.38',6)} m`)}.`,
+  `<b>סעיף ד.</b> ${M(`<i>g</i> = ${fr(`${e10('6.67',-11)}·${e10('7.35',22)}`,`(${e10('1.74',6)})<sup>2</sup>`)} ≈ 1.62 N/kg`)}`],
+  check:`בגובה תחנת החלל העוצמה היא ${m('89%')} מהערך שעל פני כדור הארץ: האסטרונאוטים רחוקים מאוד מ"אפס כבידה". העוצמה על הירח היא בערך שישית מזו שעל כדור הארץ.`},
+ qs:[
+ {l:'b',t:'num',q:`מסת מאדים ${m(e10('6.417',23)+' kg')}, והרדיוס שלו ${m(e10('3.396',6)+' m')}. מה עוצמת שדה הכבידה על פני מאדים? (${cG})`,a:3.71,u:'N/kg',s:`${m(`<i>g</i> = ${fr(`${e10('6.67',-11)}·${e10('6.417',23)}`,`(${e10('3.396',6)})<sup>2</sup>`)} ≈ 3.71 N/kg`)}.`},
+ {l:'b',t:'mc',q:`עוצמת שדה הכבידה על פני כוכב לכת היא ${m('<i>g</i>')}. מה העוצמה במרחק ${m('3<i>R</i>')} ממרכז כוכב הלכת?`,o:[m(`${fr('<i>g</i>','3')}`),m(`${fr('<i>g</i>','9')}`),m(`${fr('<i>g</i>','4')}`),m(`${fr('<i>g</i>','16')}`)],a:1,s:`המרחק מהמרכז גדל פי 3, ולכן העוצמה קטנה פי ${m('3<sup>2</sup> = 9')}.`},
+ {l:'b',t:'mc',q:`במה תלויה עוצמת שדה הכבידה בנקודה מסוימת ליד כוכב לכת?`,o:['במסת הגוף שנמצא בנקודה','במסת כוכב הלכת ובמרחק ממרכזו','רק ברדיוס של כוכב הלכת','במהירות של הגוף שנמצא בנקודה'],a:1,s:`${m(`${gs} = ${fr('<i>GM</i>',r2)}`)}. המסה של הגוף שנמצא בשדה לא מופיעה בנוסחה.`},
+ {l:'b',t:'num',q:`עוצמת שדה הכבידה על פני הירח ${m('1.62 N/kg')}. מה גודל כוח הכבידה שפועל שם על גוף שמסתו ${m('10 kg')}?`,a:16.2,u:'N',s:`${m(`<i>F</i> = <i>m</i>${gs} = 10·1.62 = 16.2 N`)}. על כדור הארץ אותו גוף שוקל ${m('98 N')} בערך.`},
+ {l:'a',t:'num',q:`באיזה גובה מעל פני כדור הארץ עוצמת שדה הכבידה היא ${m('2.45 N/kg')}? (על פני כדור הארץ ${m('9.8 N/kg')}, ${cR})`,a:6.38e6,u:'m',s:`${m('2.45')} הוא רבע מ־${m('9.8')}, ולכן המרחק מהמרכז כפול: ${m('<i>r</i> = 2<i>R</i>')}.<br>הגובה: ${m(`<i>h</i> = <i>r</i> − <i>R</i> = <i>R</i> = ${e10('6.38',6)} m`)}.`},
+ {l:'a',t:'num',q:`כוכב לכת עשוי מחומר שצפיפותו שווה לצפיפות כדור הארץ, והרדיוס שלו גדול פי 2 מרדיוס כדור הארץ. מה עוצמת שדה הכבידה על פניו? (על פני כדור הארץ ${m('9.8 N/kg')})`,a:19.6,u:'N/kg',s:`המסה יחסית לנפח: ${m('<i>M</i> ∝ <i>R</i><sup>3</sup>')}, ולכן היא גדולה פי 8.<br>${m(`<i>g</i> ∝ ${fr('<i>M</i>','<i>R</i><sup>2</sup>')}`)}: פי ${m(`${fr('8','4')} = 2`)}, כלומר ${m('19.6 N/kg')}.`},
+ {l:'a',t:'num',q:`לוויין גיאוסטציונרי נמצא במרחק ${m(e10('4.22',7)+' m')} ממרכז כדור הארץ. מה עוצמת שדה הכבידה שם? (${cG}, ${cM})`,a:.224,u:'N/kg',s:`${m(`${gs} = ${fr(e10('3.98',14),`(${e10('4.22',7)})<sup>2</sup>`)} ≈ 0.224 N/kg`)}. זו גם התאוצה הצנטריפטלית של הלוויין.`},
+ {l:'a',t:'mc',q:`אסטרונאוטים בתחנת החלל, בגובה ${m('400 km')}, מרחפים בתוך התחנה. מה ההסבר?`,o:['בגובה הזה כבר אין כבידה','עוצמת השדה שם קרובה ל־9 N/kg, אבל הם והתחנה נמצאים יחד בנפילה חופשית','התחנה מסתובבת סביב עצמה ומבטלת את הכבידה','כוח הכבידה של הירח מאזן את זה של כדור הארץ'],a:1,s:`עוצמת השדה שם היא ${m('8.7 N/kg')}. האסטרונאוטים והתחנה נעים באותה תאוצה, ולכן הרצפה לא מפעילה עליהם כוח נורמלי. זו תחושת חוסר משקל, כמו במעלית שנופלת חופשית.`}
+ ]},
+{id:'orbit',title:'לוויין במסלול מעגלי',sub:'כוח הכבידה הוא הכוח הצנטריפטלי',
+ intro:[
+ `לוויין שמקיף גרם שמיים במסלול מעגלי נמצא בתנועה מעגלית קצובה. הכוח היחיד שפועל עליו הוא כוח הכבידה, והוא מכוון אל מרכז המעגל.`,
+ `לכן כוח הכבידה הוא שמספק את התאוצה הצנטריפטלית. מהחוק השני של ניוטון: ${m(`${fr(GMm,r2)} = ${fr('<i>mv</i><sup>2</sup>','<i>r</i>')}`)}.`,
+ `מסת הלוויין מצטמצמת, ומקבלים את מהירות הלוויין: ${m(`<i>v</i> = √(${fr('<i>GM</i>','<i>r</i>')})`)}. לכל רדיוס יש מהירות אחת ויחידה שמתאימה למסלול מעגלי.`,
+ `שתי מסקנות: המהירות <b>לא תלויה במסת הלוויין</b>, ו<b>ככל שהמסלול גבוה יותר, הלוויין איטי יותר</b>.`,
+ `הלוויין לא צריך מנוע כדי להישאר במסלול. כוח הכבידה ניצב למהירות, ולכן הוא משנה רק את הכיוון שלה. אפשר לומר שהלוויין "נופל" כל הזמן סביב כדור הארץ בלי להתקרב אליו.`],
+ formulas:[[`${fr(GMm,r2)} = ${fr('<i>mv</i><sup>2</sup>','<i>r</i>')}`,'החוק השני ללוויין במסלול מעגלי'],[`<i>v</i> = √(${fr('<i>GM</i>','<i>r</i>')})`,'מהירות הלוויין'],[`<i>a</i><sub>R</sub> = ${fr('<i>v</i><sup>2</sup>','<i>r</i>')} = ${fr('<i>GM</i>',r2)}`,'התאוצה הצנטריפטלית שווה ל־g* במסלול'],[`<i>v</i> = ${fr('2π<i>r</i>','<i>T</i>')}`,'הקשר בין המהירות לזמן המחזור']],
+ trap:[`על לוויין לא פועלת כבידה?`,`פועלת, והיא הכוח היחיד שמחזיק אותו במסלול. בלי כבידה הלוויין היה ממשיך בקו ישר ומתרחק. האסטרונאוטים מרגישים חוסר משקל כי הם והלוויין נמצאים באותה נפילה חופשית, ולא כי הכבידה נעלמה.`],
+ ex:{given:[`תחנת החלל מקיפה את כדור הארץ במסלול מעגלי בגובה ${m('400 km')}`,`${cG}, ${cM}, ${cR}`],ask:[`א. מה מהירות התחנה?`,`ב. מה זמן המחזור שלה?`,`ג. מה התאוצה הצנטריפטלית שלה?`,`ד. כמה הקפות היא משלימה ביממה?`],
+  steps:[
+  `<b>רדיוס המסלול.</b> ${m(`<i>r</i> = <i>R</i> + <i>h</i> = ${e10('6.38',6)} + ${e10('0.4',6)} = ${e10('6.78',6)} m`)}.`,
+  `<b>סעיף א.</b> ${M(`<i>v</i> = √(${fr('<i>GM</i>','<i>r</i>')}) = √(${fr(e10('3.98',14),e10('6.78',6))}) = √(${e10('5.87',7)}) ≈ 7660 m/s`)}`,
+  `<b>סעיף ב.</b> ${M(`<i>T</i> = ${fr('2π<i>r</i>','<i>v</i>')} = ${fr(`2π·${e10('6.78',6)}`,'7660')} ≈ 5560 s ≈ 93 min`)}`,
+  `<b>סעיף ג.</b> ${M(`<i>a</i><sub>R</sub> = ${fr('<i>v</i><sup>2</sup>','<i>r</i>')} = ${fr(e10('5.87',7),e10('6.78',6))} ≈ 8.66 m/s<sup>2</sup>`)}`,
+  `<b>סעיף ד.</b> ביממה יש ${m('86400 s')}: ${m(`${fr('86400','5560')} ≈ 15.5`)} הקפות.`],
+  check:`התאוצה הצנטריפטלית שהתקבלה שווה לעוצמת שדה הכבידה בגובה ${m('400 km')} (${m('8.66 N/kg')}), כפי שצריך להיות.`},
+ qs:[
+ {l:'b',t:'mc',q:`איזה כוח מספק את הכוח הצנטריפטלי ללוויין שמקיף את כדור הארץ?`,o:['כוח המנוע של הלוויין','כוח הכבידה שכדור הארץ מפעיל עליו','כוח צנטריפוגלי','התנגדות האוויר'],a:1,s:`כוח הכבידה הוא הכוח היחיד שפועל על הלוויין, והוא מכוון אל מרכז המסלול.`},
+ {l:'b',t:'mc',q:`שני לוויינים נעים באותו מסלול מעגלי סביב כדור הארץ. המסה של האחד גדולה פי 10 מזו של האחר. מה נכון לגבי המהירויות שלהם?`,o:['הכבד מהיר יותר','הקל מהיר יותר','המהירויות שוות','תלוי בצורת הלוויינים'],a:2,s:`${m(`<i>v</i> = √(${fr('<i>GM</i>','<i>r</i>')})`)}. מסת הלוויין הצטמצמה, ולכן באותו רדיוס המהירות זהה.`},
+ {l:'b',t:'num',q:`מה מהירותו של לוויין שנע במסלול מעגלי צמוד לפני כדור הארץ, ${m('<i>r</i> ≈ <i>R</i><sub>E</sub>')}? (${cG}, ${cM}, ${cR})`,a:7900,u:'m/s',s:`${m(`<i>v</i> = √(${fr(e10('3.98',14),e10('6.38',6))}) = √(${e10('6.24',7)}) ≈ 7900 m/s`)}, כמעט ${m('8 km/s')}.`},
+ {l:'b',t:'mc',q:`לוויין עובר למסלול מעגלי שרדיוסו גדול פי 4. מה קורה למהירות שלו?`,o:['גדלה פי 2','קטנה פי 2','קטנה פי 4','לא משתנה'],a:1,s:`${m(`<i>v</i> ∝ ${fr('1','√<i>r</i>')}`)}: רדיוס גדול פי 4 נותן מהירות קטנה פי ${m('√4 = 2')}.`},
+ {l:'a',t:'num',q:`הירח מקיף את כדור הארץ במסלול שרדיוסו ${m(e10('3.84',8)+' m')}, וזמן המחזור שלו ${m('27.3')} יממות. מה מהירות הירח במסלולו?`,a:1023,u:'m/s',s:`${m(`<i>T</i> = 27.3·86400 = ${e10('2.36',6)} s`)}.<br>${m(`<i>v</i> = ${fr('2π<i>r</i>','<i>T</i>')} = ${fr(`2π·${e10('3.84',8)}`,e10('2.36',6))} ≈ 1023 m/s`)}.`},
+ {l:'a',t:'num',q:`מה רדיוס המסלול המעגלי סביב כדור הארץ שבו מהירות הלוויין היא ${m('5000 m/s')}? (${cG}, ${cM})`,a:1.59e7,u:'m',s:`${m(`<i>v</i><sup>2</sup> = ${fr('<i>GM</i>','<i>r</i>')}`)}, ולכן ${m(`<i>r</i> = ${fr('<i>GM</i>','<i>v</i><sup>2</sup>')} = ${fr(e10('3.98',14),e10('2.5',7))} ≈ ${e10('1.59',7)} m`)}.`},
+ {l:'a',t:'num',q:`לוויין מקיף את מאדים במסלול מעגלי בגובה ${m('400 km')} מעל פניו. מה מהירותו? (מסת מאדים ${m(e10('6.417',23)+' kg')}, רדיוס מאדים ${m(e10('3.396',6)+' m')}, ${cG})`,a:3358,u:'m/s',s:`${m(`<i>r</i> = ${e10('3.396',6)} + ${e10('0.4',6)} = ${e10('3.796',6)} m`)}.<br>${m(`<i>v</i> = √(${fr(`${e10('6.67',-11)}·${e10('6.417',23)}`,e10('3.796',6))}) ≈ 3360 m/s`)}.`},
+ {l:'a',t:'mc',q:`לוויין עובר ממסלול מעגלי גבוה למסלול מעגלי נמוך יותר, ונשאר בו. איך המהירות שלו במסלול הנמוך משתווה למהירות שהייתה לו במסלול הגבוה?`,o:['קטנה יותר','שווה','גדולה יותר','אי אפשר לדעת בלי המסה'],a:2,s:`${m(`<i>v</i> = √(${fr('<i>GM</i>','<i>r</i>')})`)}: רדיוס קטן יותר פירושו מהירות גדולה יותר. קרוב יותר לכדור הארץ הכבידה חזקה יותר, ונדרשת מהירות גדולה יותר כדי להישאר במסלול.`}
+ ]},
+{id:'period',title:'זמן מחזור וחוק קפלר השלישי',sub:'מניוטון לקפלר, לוויין גיאוסטציונרי ושקילת גרמי שמיים',
+ intro:[
+ `מציבים ${m(`<i>v</i> = ${fr('2π<i>r</i>','<i>T</i>')}`)} במשוואת הלוויין ${m(`${fr(GMm,r2)} = ${fr('<i>mv</i><sup>2</sup>','<i>r</i>')}`)}, ומקבלים ${m(`<i>T</i><sup>2</sup> = ${fr('4π<sup>2</sup>','<i>GM</i>')}<i>r</i><sup>3</sup>`)}.`,
+ `זה בדיוק <b>החוק השלישי של קפלר</b>, ועכשיו ברור גם מהו הקבוע: ${m(`${fr('<i>r</i><sup>3</sup>','<i>T</i><sup>2</sup>')} = ${fr('<i>GM</i>','4π<sup>2</sup>')}`)}. הוא תלוי רק במסת הגוף המרכזי ${m('<i>M</i>')}.`,
+ `זמן המחזור <b>לא תלוי במסת הלוויין</b>: ${m(`<i>T</i> = 2π√(${fr('<i>r</i><sup>3</sup>','<i>GM</i>')})`)}. כל הגופים שנעים באותו מסלול משלימים הקפה באותו זמן.`,
+ `<b>לוויין גיאוסטציונרי</b> הוא לוויין שזמן המחזור שלו שווה ליממה אחת, והוא נע מעל קו המשווה בכיוון הסיבוב של כדור הארץ. מהקרקע הוא נראה תלוי מעל אותה נקודה. יש רק רדיוס אחד שמתאים לכך: ${m(e10('4.22',7)+' m')} ממרכז כדור הארץ.`,
+ `אותה נוסחה מאפשרת <b>"לשקול" גרם שמיים</b>: אם מודדים את הרדיוס ואת זמן המחזור של גוף שמקיף אותו, מקבלים ${m(`<i>M</i> = ${fr('4π<sup>2</sup><i>r</i><sup>3</sup>','<i>GT</i><sup>2</sup>')}`)}.`],
+ formulas:[[`<i>T</i> = 2π√(${fr('<i>r</i><sup>3</sup>','<i>GM</i>')})`,'זמן המחזור של לוויין במסלול מעגלי'],[`${fr('<i>r</i><sup>3</sup>','<i>T</i><sup>2</sup>')} = ${fr('<i>GM</i>','4π<sup>2</sup>')}`,'הקבוע בחוק השלישי של קפלר'],[`<i>M</i> = ${fr('4π<sup>2</sup><i>r</i><sup>3</sup>','<i>GT</i><sup>2</sup>')}`,'מסת הגוף המרכזי מתוך נתוני המסלול']],
+ trap:[`לוויין כבד מקיף לאט יותר?`,`לא. מסת הלוויין מצטמצמת מהמשוואה, ולכן זמן המחזור תלוי רק ברדיוס המסלול ובמסת הגוף המרכזי. אסטרונאוט שיוצא מתחנת החלל ממשיך להקיף את כדור הארץ יחד איתה, באותו מסלול ובאותו זמן מחזור, אף שהמסה שלו קטנה פי אלפים.`],
+ ex:{given:[`לוויין גיאוסטציונרי מקיף את כדור הארץ פעם ביממה: ${m('<i>T</i> = 86400 s')}`,`${cG}, ${cM}, ${cR}`],ask:[`א. מה רדיוס המסלול של הלוויין?`,`ב. מה הגובה שלו מעל פני כדור הארץ?`,`ג. מה המהירות שלו?`],
+  steps:[
+  `<b>סעיף א.</b> מבודדים את ${m('<i>r</i>')} מהנוסחה של זמן המחזור: ${M(`<i>r</i><sup>3</sup> = ${fr('<i>GMT</i><sup>2</sup>','4π<sup>2</sup>')} = ${fr(`${e10('3.98',14)}·86400<sup>2</sup>`,'4π<sup>2</sup>')} ≈ ${e10('7.53',22)} m<sup>3</sup>`)} ${m(`<i>r</i> = (${e10('7.53',22)})<sup>1/3</sup> ≈ ${e10('4.22',7)} m`)}.`,
+  `<b>סעיף ב.</b> ${M(`<i>h</i> = <i>r</i> − <i>R</i> = ${e10('4.22',7)} − ${e10('0.64',7)} ≈ ${e10('3.58',7)} m`)} כמעט ${m('36,000 km')}.`,
+  `<b>סעיף ג.</b> ${M(`<i>v</i> = ${fr('2π<i>r</i>','<i>T</i>')} = ${fr(`2π·${e10('4.22',7)}`,'86400')} ≈ 3070 m/s`)}`],
+  check:`לפי ${m(`<i>v</i> = √(${fr('<i>GM</i>','<i>r</i>')})`)}: ${m(`√(${fr(e10('3.98',14),e10('4.22',7))}) ≈ 3070 m/s`)}. הלוויין הגבוה איטי בהרבה מתחנת החלל (${m('7660 m/s')}).`},
+ qs:[
+ {l:'b',t:'mc',q:`במה תלוי זמן המחזור של לוויין במסלול מעגלי?`,o:['במסת הלוויין וברדיוס המסלול','במסת הגוף המרכזי וברדיוס המסלול','רק במסת הלוויין','במסת הלוויין ובמסת הגוף המרכזי'],a:1,s:`${m(`<i>T</i> = 2π√(${fr('<i>r</i><sup>3</sup>','<i>GM</i>')})`)}. מסת הלוויין לא מופיעה.`},
+ {l:'b',t:'num',q:`מה זמן המחזור של לוויין שנע במסלול מעגלי צמוד לפני כדור הארץ, ${m('<i>r</i> ≈ <i>R</i><sub>E</sub>')}? (${cG}, ${cM}, ${cR})`,a:5074,u:'s',s:`${m(`<i>T</i> = 2π√(${fr(`(${e10('6.38',6)})<sup>3</sup>`,e10('3.98',14))}) = 2π·808 ≈ 5070 s`)}, כ־85 דקות. זה זמן המחזור הקצר ביותר האפשרי סביב כדור הארץ.`},
+ {l:'b',t:'mc',q:`איך נראה לוויין גיאוסטציונרי לצופה שעומד על הקרקע?`,o:['חולף בשמיים פעם ביממה','עומד במקום, מעל אותה נקודה','חולף בשמיים פעם בשעה וחצי','נע ממערב למזרח במהירות גדולה'],a:1,s:`זמן המחזור של הלוויין שווה לזמן הסיבוב של כדור הארץ סביב צירו, והוא נע באותו כיוון. לכן הוא נשאר מעל אותה נקודה. בגלל זה אפשר לכוון אליו צלחת לוויין קבועה.`},
+ {l:'b',t:'num',q:`רדיוס המסלול של לוויין גדל פי 9. פי כמה גדל זמן המחזור שלו?`,a:27,u:'',s:`${m('<i>T</i> ∝ <i>r</i><sup>3/2</sup>')}: ${m('9<sup>3/2</sup> = 27')}.`},
+ {l:'a',t:'num',q:`כדור הארץ מקיף את השמש במסלול שרדיוסו ${m(e10('1.496',11)+' m')}, בזמן מחזור של שנה אחת, ${m(e10('3.156',7)+' s')}. מה מסת השמש? (${cG})`,a:1.99e30,u:'kg',s:`${m(`<i>M</i> = ${fr('4π<sup>2</sup><i>r</i><sup>3</sup>','<i>GT</i><sup>2</sup>')} = ${fr(`4π<sup>2</sup>·(${e10('1.496',11)})<sup>3</sup>`,`${e10('6.67',-11)}·(${e10('3.156',7)})<sup>2</sup>`)} ≈ ${e10('1.99',30)} kg`)}, כמו בדף הנתונים.`},
+ {l:'a',t:'num',q:`הירח מקיף את כדור הארץ במסלול שרדיוסו ${m(e10('3.84',8)+' m')}, בזמן מחזור של ${m('27.3')} יממות (${m(e10('2.36',6)+' s')}). מה מסת כדור הארץ לפי הנתונים האלה? (${cG})`,a:6.02e24,u:'kg',s:`${m(`<i>M</i> = ${fr(`4π<sup>2</sup>·(${e10('3.84',8)})<sup>3</sup>`,`${e10('6.67',-11)}·(${e10('2.36',6)})<sup>2</sup>`)} ≈ ${e10('6.02',24)} kg`)}. קרוב מאוד לערך שבדף הנתונים.`},
+ {l:'a',t:'num',q:`חללית מקיפה את הירח במסלול מעגלי צמוד לפניו. מה זמן המחזור שלה? (מסת הירח ${m(e10('7.35',22)+' kg')}, רדיוס הירח ${m(e10('1.74',6)+' m')}, ${cG})`,a:6513,u:'s',s:`${m(`<i>GM</i> = ${e10('6.67',-11)}·${e10('7.35',22)} = ${e10('4.90',12)}`)}.<br>${m(`<i>T</i> = 2π√(${fr(`(${e10('1.74',6)})<sup>3</sup>`,e10('4.90',12))}) ≈ 6510 s`)}, כ־109 דקות.`},
+ {l:'a',t:'mc',q:`לכוכב לכת X יש ירח שנע במסלול שרדיוסו שווה לרדיוס המסלול של הירח שלנו, אבל זמן המחזור שלו קצר פי 2. מה מסת כוכב הלכת X?`,o:['פי 2 ממסת כדור הארץ','פי 4 ממסת כדור הארץ','חצי ממסת כדור הארץ','רבע ממסת כדור הארץ'],a:1,s:`${m(`<i>M</i> = ${fr('4π<sup>2</sup><i>r</i><sup>3</sup>','<i>GT</i><sup>2</sup>')}`)}. באותו רדיוס ${m(`<i>M</i> ∝ ${fr('1','<i>T</i><sup>2</sup>')}`)}: זמן מחזור קצר פי 2 פירושו מסה גדולה פי 4.`}
+ ]},
+{id:'energy',title:'אנרגיה פוטנציאלית כובדית',sub:'הנוסחה הכללית, והאפס שנמצא באינסוף',
+ intro:[
+ `הנוסחה ${m('<i>U</i> = <i>mgh</i>')} מניחה שכוח הכובד קבוע. זה נכון רק קרוב לפני כדור הארץ. כשמתרחקים מרחקים שאפשר להשוות לרדיוס כדור הארץ, הכוח נחלש, ונדרשת נוסחה כללית.`,
+ `<b>האנרגיה הפוטנציאלית הכובדית</b> של גוף שמסתו ${m('<i>m</i>')}, במרחק ${m('<i>r</i>')} ממרכז גרם שמיים שמסתו ${m('<i>M</i>')}: ${m(`${UG} = −${fr(GMm,'<i>r</i>')}`)}.`,
+ `רמת האפס נבחרה <b>באינסוף</b>: כשהגופים רחוקים מאוד זה מזה, ${m(`${UG} = 0`)}. לכן בכל מרחק סופי האנרגיה <b>שלילית</b>.`,
+ `כשמתרחקים מגרם השמיים האנרגיה הפוטנציאלית <b>גדלה</b>: היא נעשית פחות שלילית ומתקרבת לאפס. זה מתאים למה שמכירים: כדי להרים גוף צריך להשקיע עבודה.`,
+ `בחישובים חשוב רק <b>השינוי</b>: ${m(`Δ${UG} = ${GMm}(${fr('1','<i>r</i><sub>1</sub>')} − ${fr('1','<i>r</i><sub>2</sub>')})`)}. קרוב לפני השטח הביטוי הזה שווה בקירוב ל־${m('<i>mgh</i>')}.`],
+ formulas:[[`${UG} = −${fr(GMm,'<i>r</i>')}`,'אנרגיה פוטנציאלית כובדית, (U<sub>G</sub> = 0 כאשר r → ∞)'],[`Δ${UG} = ${GMm}(${fr('1','<i>r</i><sub>1</sub>')} − ${fr('1','<i>r</i><sub>2</sub>')})`,'השינוי במעבר מ־<i>r</i><sub>1</sub> ל־<i>r</i><sub>2</sub>'],[`<i>W</i> = −Δ${UG}`,'עבודת כוח הכבידה'],[`Δ${UG} ≈ <i>mgh</i>`,'קירוב שנכון רק כאשר <i>h</i> קטן בהרבה מ־<i>R</i>']],
+ trap:[`אנרגיה שלילית? זה אפשרי?`,`כן. הסימן נובע רק מהבחירה של רמת האפס באינסוף. אנרגיה פוטנציאלית שלילית אומרת שהגוף "קשור" לגרם השמיים: כדי להרחיק אותו לאינסוף צריך להשקיע אנרגיה. מה שחשוב פיזיקלית הוא השינוי באנרגיה, והוא לא תלוי בבחירת רמת האפס.`],
+ ex:{given:[`לוויין שמסתו ${m('1000 kg')}`,`${cG}, ${cM}, ${cR}`],ask:[`א. מה האנרגיה הפוטנציאלית שלו על פני כדור הארץ?`,`ב. מה האנרגיה הפוטנציאלית שלו במרחק ${m('2<i>R</i><sub>E</sub>')} ממרכז כדור הארץ?`,`ג. בכמה השתנתה האנרגיה הפוטנציאלית?`,`ד. מה היה נותן החישוב ${m('<i>mgh</i>')} לאותה עלייה?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`${UG} = −${fr(`${e10('3.98',14)}·1000`,e10('6.38',6))} ≈ −${e10('6.24',10)} J`)}`,
+  `<b>סעיף ב.</b> המרחק כפול, ולכן גודל האנרגיה קטן פי 2: ${M(`${UG} ≈ −${e10('3.12',10)} J`)}`,
+  `<b>סעיף ג.</b> ${M(`Δ${UG} = −${e10('3.12',10)} − (−${e10('6.24',10)}) = +${e10('3.12',10)} J`)} האנרגיה גדלה.`,
+  `<b>סעיף ד.</b> הגובה הוא ${m(`<i>h</i> = <i>R</i><sub>E</sub>`)}: ${M(`<i>mgh</i> = 1000·9.78·${e10('6.38',6)} ≈ ${e10('6.24',10)} J`)} פי 2 מהתשובה הנכונה.`],
+  check:`הקירוב ${m('<i>mgh</i>')} מגזים, כי הוא מניח שכוח הכובד נשאר חזק לאורך כל הדרך. למעשה הכוח נחלש עם הגובה, ולכן העבודה הדרושה קטנה יותר.`},
+ qs:[
+ {l:'b',t:'mc',q:`גוף מתרחק מכדור הארץ. מה קורה לאנרגיה הפוטנציאלית הכובדית שלו?`,o:['גדלה: היא נעשית פחות שלילית','קטנה: היא נעשית יותר שלילית','לא משתנה','מתאפסת מיד'],a:0,s:`${m(`${UG} = −${fr(GMm,'<i>r</i>')}`)}. כש־${m('<i>r</i>')} גדל, הערך המוחלט קטן, והמספר השלילי מתקרב לאפס, כלומר גדל.`},
+ {l:'b',t:'num',q:`מה האנרגיה הפוטנציאלית הכובדית של גוף שמסתו ${m('1 kg')} שנמצא על פני כדור הארץ? (${cG}, ${cM}, ${cR})`,a:-6.24e7,u:'J',s:`${m(`${UG} = −${fr(`${e10('3.98',14)}·1`,e10('6.38',6))} ≈ −${e10('6.24',7)} J`)}.`},
+ {l:'b',t:'mc',q:`היכן האנרגיה הפוטנציאלית הכובדית, לפי הנוסחה ${m(`${UG} = −${fr(GMm,'<i>r</i>')}`)}, שווה לאפס?`,o:['על פני כדור הארץ','במרכז כדור הארץ','במרחק אינסופי','בגובה של לוויין גיאוסטציונרי'],a:2,s:`רמת האפס נבחרה באינסוף. בכל מרחק סופי האנרגיה שלילית.`},
+ {l:'b',t:'num',q:`לוויין שמסתו ${m('200 kg')} נמצא במרחק ${m(e10('2',7)+' m')} ממרכז כדור הארץ. מה האנרגיה הפוטנציאלית הכובדית שלו? (${cG}, ${cM})`,a:-3.98e9,u:'J',s:`${m(`${UG} = −${fr(`${e10('3.98',14)}·200`,e10('2',7))} ≈ −${e10('3.98',9)} J`)}.`},
+ {l:'a',t:'num',q:`מה העבודה המזערית הדרושה כדי להעלות גוף שמסתו ${m('500 kg')} מפני כדור הארץ לגובה ששווה לרדיוס כדור הארץ, כך שיהיה שם במנוחה? (${cG}, ${cM}, ${cR})`,a:1.56e10,u:'J',s:`העבודה שווה לשינוי באנרגיה הפוטנציאלית: ${m(`Δ${UG} = ${GMm}(${fr('1','<i>R</i>')} − ${fr('1','2<i>R</i>')}) = ${fr(GMm,'2<i>R</i>')}`)}.<br>${m(`${fr(`${e10('3.98',14)}·500`,`2·${e10('6.38',6)}`)} ≈ ${e10('1.56',10)} J`)}.`},
+ {l:'a',t:'num',q:`גוף משוחרר ממנוחה בגובה ששווה לרדיוס כדור הארץ מעל פני כדור הארץ. באיזו מהירות הוא יפגע בקרקע? (מזניחים את התנגדות האוויר. ${cG}, ${cM}, ${cR})`,a:7900,u:'m/s',s:`שימור אנרגיה: ${m(`−${fr(GMm,'2<i>R</i>')} = ${half}<i>mv</i><sup>2</sup> − ${fr(GMm,'<i>R</i>')}`)}.<br>${m(`<i>v</i><sup>2</sup> = ${fr('<i>GM</i>','<i>R</i>')} = ${e10('6.24',7)}`)}, ולכן ${m('<i>v</i> ≈ 7900 m/s')}. החישוב עם ${m('<i>g</i>')} קבוע היה נותן ${m('11,200 m/s')}, וזו טעות גדולה.`},
+ {l:'a',t:'num',q:`בכמה גדלה האנרגיה הפוטנציאלית של גוף שמסתו ${m('1 kg')} כשהוא עולה מפני כדור הארץ לגובה ${m('400 km')}? חשבו לפי הנוסחה המדויקת. (${cG}, ${cM}, ${cR})`,a:3.68e6,u:'J',s:`${m(`Δ${UG} = ${e10('3.98',14)}·(${fr('1',e10('6.38',6))} − ${fr('1',e10('6.78',6))}) ≈ ${e10('3.68',6)} J`)}.<br>הקירוב ${m(`<i>mgh</i> = 1·9.78·${e10('4',5)} = ${e10('3.91',6)} J`)} גדול ב־6% בערך.`},
+ {l:'a',t:'mc',q:`חללית מתרחקת מכדור הארץ כשהמנועים כבויים. מה נכון לגבי עבודת כוח הכבידה ולגבי האנרגיה הפוטנציאלית?`,o:['העבודה חיובית, והאנרגיה הפוטנציאלית גדלה','העבודה שלילית, והאנרגיה הפוטנציאלית גדלה','העבודה שלילית, והאנרגיה הפוטנציאלית קטנה','העבודה אפס'],a:1,s:`כוח הכבידה מכוון אל כדור הארץ, נגד כיוון התנועה, ולכן העבודה שלו שלילית. ${m(`<i>W</i> = −Δ${UG}`)}, ולכן האנרגיה הפוטנציאלית גדלה. האנרגיה הקינטית של החללית קטנה באותה מידה.`}
+ ]},
+{id:'satenergy',title:'אנרגיה של לוויין',sub:'אנרגיה קינטית, פוטנציאלית וכוללת במסלול מעגלי',
+ intro:[
+ `ללוויין במסלול מעגלי יש אנרגיה קינטית ואנרגיה פוטנציאלית כובדית. מהמשוואה ${m(`${fr(GMm,r2)} = ${fr('<i>mv</i><sup>2</sup>','<i>r</i>')}`)} מקבלים ${m(`<i>mv</i><sup>2</sup> = ${fr(GMm,'<i>r</i>')}`)}.`,
+ `<b>האנרגיה הקינטית:</b> ${m(`${Ek} = ${half}<i>mv</i><sup>2</sup> = ${fr(GMm,'2<i>r</i>')} = −${fr(UG,'2')}`)}. היא תמיד חצי מגודל האנרגיה הפוטנציאלית.`,
+ `<b>האנרגיה הכוללת:</b> ${m(`<i>E</i> = ${Ek} + ${UG} = −${fr(GMm,'2<i>r</i>')}`)}. היא שלילית, וזה הסימן שהלוויין קשור לכדור הארץ.`,
+ `במסלול <b>גבוה</b> יותר: האנרגיה הקינטית קטנה, האנרגיה הפוטנציאלית גדלה, והאנרגיה הכוללת גדלה. הגידול באנרגיה הפוטנציאלית כפול מהירידה באנרגיה הקינטית.`,
+ `כדי להעביר לוויין למסלול גבוה יותר צריך להשקיע אנרגיה: ${m('Δ<i>E</i> = <i>E</i><sub>2</sub> − <i>E</i><sub>1</sub>')}, והיא חיובית. את האנרגיה הזו מספקים המנועים.`],
+ formulas:[[`${Ek} = ${fr(GMm,'2<i>r</i>')} = −${fr(UG,'2')}`,'אנרגיה קינטית של לוויין במסלול מעגלי'],[`<i>E</i> = −${fr(GMm,'2<i>r</i>')}`,'האנרגיה הכוללת'],[`Δ<i>E</i> = ${fr(GMm,'2')}(${fr('1','<i>r</i><sub>1</sub>')} − ${fr('1','<i>r</i><sub>2</sub>')})`,'האנרגיה הדרושה למעבר ממסלול 1 למסלול 2']],
+ trap:[`לוויין שמאבד אנרגיה מאט?`,`להפך. לוויין במסלול נמוך מתחכך באטמוספרה הדלילה ומאבד אנרגיה. האנרגיה הכוללת ${m(`−${fr(GMm,'2<i>r</i>')}`)} קטנה, ולכן רדיוס המסלול קטן. במסלול נמוך יותר המהירות <b>גדולה</b> יותר. הלוויין מאבד אנרגיה ובכל זאת מגביר מהירות, כי האנרגיה הפוטנציאלית שלו יורדת פי 2 ממה שהאנרגיה הקינטית עולה.`],
+ ex:{given:[`לוויין שמסתו ${m('1000 kg')} נע במסלול מעגלי שרדיוסו ${m(e10('7',6)+' m')}`,`מעבירים אותו למסלול גיאוסטציונרי, שרדיוסו ${m(e10('4.22',7)+' m')}`,`${cG}, ${cM}`],ask:[`א. מה האנרגיה הקינטית, הפוטנציאלית והכוללת במסלול הנמוך?`,`ב. מה האנרגיה הכוללת במסלול הגבוה?`,`ג. כמה אנרגיה צריך להשקיע במעבר?`,`ד. מה קרה למהירות הלוויין?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`${Ek} = ${fr(GMm,'2<i>r</i>')} = ${fr(`${e10('3.98',14)}·1000`,`2·${e10('7',6)}`)} ≈ ${e10('2.84',10)} J`)} ${m(`${UG} = −2${Ek} = −${e10('5.69',10)} J`)}, ו־${m(`<i>E</i> = −${Ek} = −${e10('2.84',10)} J`)}.`,
+  `<b>סעיף ב.</b> ${M(`<i>E</i><sub>2</sub> = −${fr(`${e10('3.98',14)}·1000`,`2·${e10('4.22',7)}`)} ≈ −${e10('4.72',9)} J`)}`,
+  `<b>סעיף ג.</b> ${M(`Δ<i>E</i> = −${e10('4.72',9)} − (−${e10('2.84',10)}) ≈ +${e10('2.37',10)} J`)}`,
+  `<b>סעיף ד.</b> ${m(`<i>v</i> = √(${fr('<i>GM</i>','<i>r</i>')})`)}: במסלול הנמוך ${m('7540 m/s')}, ובמסלול הגבוה ${m('3070 m/s')}. המהירות קטנה, אף שהשקענו אנרגיה.`],
+  check:`האנרגיה הקינטית ירדה מ־${m(e10('2.84',10))} ל־${m(e10('0.47',10)+' J')}, כלומר ב־${m(e10('2.37',10)+' J')}. האנרגיה הפוטנציאלית עלתה ב־${m(e10('4.74',10)+' J')}, בדיוק פי 2. ההפרש הוא האנרגיה שהושקעה.`},
+ qs:[
+ {l:'b',t:'mc',q:`מה הסימן של האנרגיה הכוללת של לוויין שנע במסלול מעגלי?`,o:['חיובי','שלילי','אפס','תלוי בכיוון התנועה'],a:1,s:`${m(`<i>E</i> = −${fr(GMm,'2<i>r</i>')}`)}. האנרגיה שלילית, כי הלוויין קשור לגרם השמיים.`},
+ {l:'b',t:'num',q:`האנרגיה הקינטית של לוויין במסלול מעגלי היא ${m(e10('3',9)+' J')}. מה האנרגיה הפוטנציאלית הכובדית שלו?`,a:-6e9,u:'J',s:`${m(`${Ek} = −${fr(UG,'2')}`)}, ולכן ${m(`${UG} = −2${Ek} = −${e10('6',9)} J`)}.`},
+ {l:'b',t:'num',q:`בהמשך לשאלה הקודמת: מה האנרגיה הכוללת של הלוויין?`,a:-3e9,u:'J',s:`${m(`<i>E</i> = ${Ek} + ${UG} = ${e10('3',9)} − ${e10('6',9)} = −${e10('3',9)} J`)}. האנרגיה הכוללת שווה למינוס האנרגיה הקינטית.`},
+ {l:'b',t:'mc',q:`מעבירים לוויין ממסלול מעגלי נמוך למסלול מעגלי גבוה. מה קורה לאנרגיות שלו?`,o:['הקינטית גדלה, הפוטנציאלית גדלה, הכוללת גדלה','הקינטית קטנה, הפוטנציאלית גדלה, הכוללת גדלה','הקינטית קטנה, הפוטנציאלית קטנה, הכוללת קטנה','הקינטית קטנה, הפוטנציאלית גדלה, הכוללת לא משתנה'],a:1,s:`כש־${m('<i>r</i>')} גדל: ${m(`${Ek} = ${fr(GMm,'2<i>r</i>')}`)} קטנה, ${m(`${UG} = −${fr(GMm,'<i>r</i>')}`)} גדלה (פחות שלילית), ו־${m(`<i>E</i> = −${fr(GMm,'2<i>r</i>')}`)} גדלה.`},
+ {l:'a',t:'num',q:`לוויין שמסתו ${m('500 kg')} נע במסלול מעגלי שרדיוסו ${m(e10('8',6)+' m')} סביב כדור הארץ. מה האנרגיה הכוללת שלו? (${cG}, ${cM})`,a:-1.24e10,u:'J',s:`${m(`<i>E</i> = −${fr(GMm,'2<i>r</i>')} = −${fr(`${e10('3.98',14)}·500`,`2·${e10('8',6)}`)} ≈ −${e10('1.24',10)} J`)}.`},
+ {l:'a',t:'num',q:`כמה אנרגיה צריך להשקיע כדי להעביר לוויין שמסתו ${m('200 kg')} ממסלול מעגלי שרדיוסו ${m(e10('7',6)+' m')} למסלול מעגלי שרדיוסו ${m(e10('1.4',7)+' m')}? (${cG}, ${cM})`,a:2.84e9,u:'J',s:`${m(`Δ<i>E</i> = ${fr(GMm,'2')}(${fr('1','<i>r</i><sub>1</sub>')} − ${fr('1','<i>r</i><sub>2</sub>')}) = ${fr(`${e10('3.98',14)}·200`,'2')}·(${fr('1',e10('7',6))} − ${fr('1',e10('1.4',7))}) ≈ ${e10('2.84',9)} J`)}.`},
+ {l:'a',t:'num',q:`מה האנרגיה המזערית הדרושה כדי להעביר לוויין שמסתו ${m('1000 kg')}, שנמצא במנוחה על פני כדור הארץ, למסלול מעגלי שרדיוסו ${m(e10('7',6)+' m')}? (מזניחים את סיבוב כדור הארץ. ${cG}, ${cM}, ${cR})`,a:3.4e10,u:'J',s:`<b>בהתחלה:</b> רק אנרגיה פוטנציאלית, ${m(`−${fr(GMm,'<i>R</i>')} = −${e10('6.24',10)} J`)}.<br><b>בסוף:</b> האנרגיה הכוללת במסלול, ${m(`−${fr(GMm,'2<i>r</i>')} = −${e10('2.84',10)} J`)}.<br>${m(`Δ<i>E</i> = −${e10('2.84',10)} + ${e10('6.24',10)} ≈ ${e10('3.4',10)} J`)}.`},
+ {l:'a',t:'mc',q:`לוויין במסלול נמוך מאבד אנרגיה בהדרגה בגלל חיכוך עם שכבות האטמוספרה העליונות. מה קורה לו?`,o:['רדיוס המסלול גדל והמהירות קטנה','רדיוס המסלול קטן והמהירות קטנה','רדיוס המסלול קטן והמהירות גדלה','רדיוס המסלול לא משתנה והמהירות קטנה'],a:2,s:`האנרגיה הכוללת ${m(`−${fr(GMm,'2<i>r</i>')}`)} קטנה, ולכן ${m('<i>r</i>')} קטן. במסלול נמוך יותר ${m(`<i>v</i> = √(${fr('<i>GM</i>','<i>r</i>')})`)} גדולה יותר.`}
+ ]},
+{id:'escape',title:'מהירות מילוט ושימור אנרגיה',sub:'מתי גוף חוזר, ומתי הוא נמלט לתמיד',
+ intro:[
+ `גוף שנע בחלל כשמנועיו כבויים ובלי התנגדות אוויר מושפע רק מכוח הכבידה. כוח הכבידה הוא כוח משמר, ולכן <b>האנרגיה המכנית נשמרת</b>: ${m(`${half}<i>mv</i><sup>2</sup> − ${fr(GMm,'<i>r</i>')}`)} קבועה לאורך כל התנועה.`,
+ `שימור האנרגיה מאפשר לקשר בין מהירות למרחק בלי לדעת את הזמן. למשל, גוף ששוגר אנכית מפני השטח במהירות ${m(v0)} נעצר לרגע במרחק ${m('<i>r</i><sub>max</sub>')}, שם האנרגיה כולה פוטנציאלית.`,
+ `הסימן של האנרגיה הכוללת קובע את גורל הגוף. אנרגיה <b>שלילית</b>: הגוף קשור, והוא יחזור. אנרגיה <b>אפס או חיובית</b>: הגוף מתרחק לתמיד.`,
+ `<b>מהירות המילוט</b> היא המהירות המזערית שבה צריך לשגר גוף מפני גרם שמיים כדי שלא יחזור. במהירות הזו האנרגיה הכוללת היא בדיוק אפס: ${m(`${half}<i>mv</i><sup>2</sup> − ${fr(GMm,'<i>R</i>')} = 0`)}, ומכאן ${m(`<i>v</i> = √(${fr('2<i>GM</i>','<i>R</i>')})`)}.`,
+ `מהירות המילוט לא תלויה במסת הגוף ולא בכיוון השיגור. היא גדולה פי ${m('√2')} ממהירות הלוויין במסלול מעגלי באותו רדיוס. לכדור הארץ היא ${m('11.2 km/s')}.`],
+ formulas:[[`${half}<i>mv</i><sub>1</sub><sup>2</sup> − ${fr(GMm,'<i>r</i><sub>1</sub>')} = ${half}<i>mv</i><sub>2</sub><sup>2</sup> − ${fr(GMm,'<i>r</i><sub>2</sub>')}`,'שימור האנרגיה המכנית'],[`<i>v</i><sub>מילוט</sub> = √(${fr('2<i>GM</i>','<i>R</i>')})`,'מהירות המילוט מפני גרם שמיים'],[`<i>v</i><sub>מילוט</sub> = √2·<i>v</i><sub>מעגלי</sub>`,'ביחס למהירות במסלול מעגלי באותו רדיוס']],
+ trap:[`אחרי שעוברים את מהירות המילוט הכבידה מפסיקה לפעול?`,`לא. כוח הכבידה ממשיך לפעול על הגוף בכל מרחק, והוא מאט אותו כל הזמן. מהירות המילוט היא פשוט המהירות שבה יש לגוף מספיק אנרגיה קינטית כדי שההאטה הזו לא תעצור אותו לעולם. גוף ששוגר בדיוק במהירות המילוט ימשיך להאט, ומהירותו תתקרב לאפס רק במרחק אינסופי.`],
+ ex:{given:[`משגרים גוף אנכית מפני כדור הארץ, ומזניחים את התנגדות האוויר`,`${cG}, ${cM}, ${cR}`],ask:[`א. מה מהירות המילוט מפני כדור הארץ?`,`ב. לאיזה גובה מרבי יגיע גוף ששוגר במהירות ${m('8000 m/s')}?`,`ג. גוף משוגר במהירות ${m('12,000 m/s')}. מה תהיה מהירותו כשיהיה רחוק מאוד מכדור הארץ?`],
+  steps:[
+  `<b>סעיף א.</b> ${M(`<i>v</i> = √(${fr('2<i>GM</i>','<i>R</i>')}) = √(${fr(`2·${e10('3.98',14)}`,e10('6.38',6))}) = √(${e10('1.25',8)}) ≈ 11,200 m/s`)}`,
+  `<b>סעיף ב.</b> ${m('8000 m/s')} קטן ממהירות המילוט, ולכן הגוף ייעצר. שימור אנרגיה בין פני השטח לנקודה הגבוהה ביותר, אחרי צמצום ${m('<i>m</i>')}: ${M(`${half}${v0}<sup>2</sup> − ${fr('<i>GM</i>','<i>R</i>')} = −${fr('<i>GM</i>','<i>r</i><sub>max</sub>')}`)} ${M(`${fr('1','<i>r</i><sub>max</sub>')} = ${fr('1','<i>R</i>')} − ${fr(`${v0}<sup>2</sup>`,'2<i>GM</i>')} = ${e10('1.567',-7)} − ${e10('0.804',-7)} = ${e10('7.64',-8)} m<sup>−1</sup>`)} ${m(`<i>r</i><sub>max</sub> ≈ ${e10('1.31',7)} m`)}, והגובה ${m(`<i>h</i> = ${e10('1.31',7)} − ${e10('0.64',7)} ≈ ${e10('6.7',6)} m`)}.`,
+  `<b>סעיף ג.</b> רחוק מאוד האנרגיה הפוטנציאלית אפס: ${M(`${half}${v0}<sup>2</sup> − ${fr('<i>GM</i>','<i>R</i>')} = ${half}<i>v</i><sub>∞</sub><sup>2</sup>`)} ${m(`<i>v</i><sub>∞</sub><sup>2</sup> = 12000<sup>2</sup> − 11200<sup>2</sup> ≈ ${e10('1.92',7)}`)}, ולכן ${m('<i>v</i><sub>∞</sub> ≈ 4400 m/s')}.`],
+  check:`בסעיף ב, החישוב עם ${m('<i>g</i>')} קבוע היה נותן ${m(`${fr(`${v0}<sup>2</sup>`,'2<i>g</i>')} ≈ ${e10('3.3',6)} m`)}, רק חצי מהגובה האמיתי. בסעיף ג שימו לב שמחסרים ריבועי מהירויות, לא מהירויות.`},
+ qs:[
+ {l:'b',t:'mc',q:`במה תלויה מהירות המילוט מפני כוכב לכת?`,o:['במסת הגוף המשוגר','במסה וברדיוס של כוכב הלכת','בכיוון השיגור','בצורת הגוף המשוגר'],a:1,s:`${m(`<i>v</i> = √(${fr('2<i>GM</i>','<i>R</i>')})`)}. מסת הגוף המשוגר מצטמצמת, והכיוון לא משפיע, כי מדובר בשיקול של אנרגיה.`},
+ {l:'b',t:'num',q:`מה מהירות המילוט מפני הירח? (מסת הירח ${m(e10('7.35',22)+' kg')}, רדיוס הירח ${m(e10('1.74',6)+' m')}, ${cG})`,a:2374,u:'m/s',s:`${m(`<i>v</i> = √(${fr(`2·${e10('6.67',-11)}·${e10('7.35',22)}`,e10('1.74',6))}) ≈ 2370 m/s`)}. קטנה בהרבה מזו של כדור הארץ, ולכן הירח לא מחזיק אטמוספרה.`},
+ {l:'b',t:'mc',q:`האנרגיה המכנית הכוללת של גוף שנע ליד כוכב לכת שלילית. מה יקרה לו?`,o:['הוא יתרחק לאינסוף','הוא יישאר קשור לכוכב הלכת','הוא ייעצר מיד','אי אפשר לדעת'],a:1,s:`אנרגיה כוללת שלילית פירושה שאין לגוף מספיק אנרגיה קינטית כדי להגיע לאינסוף, ששם האנרגיה הפוטנציאלית אפס. הוא יישאר קשור: יקיף את כוכב הלכת או יחזור אליו.`},
+ {l:'b',t:'num',q:`מהירות לוויין במסלול מעגלי צמוד לפני כוכב לכת היא ${m('5000 m/s')}. מה מהירות המילוט מפני אותו כוכב לכת?`,a:7071,u:'m/s',s:`${m('<i>v</i><sub>מילוט</sub> = √2·<i>v</i><sub>מעגלי</sub> = 1.414·5000 ≈ 7070 m/s')}.`},
+ {l:'a',t:'num',q:`מה מהירות המילוט מפני מאדים? (מסת מאדים ${m(e10('6.417',23)+' kg')}, רדיוס מאדים ${m(e10('3.396',6)+' m')}, ${cG})`,a:5021,u:'m/s',s:`${m(`<i>v</i> = √(${fr(`2·${e10('6.67',-11)}·${e10('6.417',23)}`,e10('3.396',6))}) = √(${e10('2.52',7)}) ≈ 5020 m/s`)}.`},
+ {l:'a',t:'num',q:`משגרים גוף אנכית מפני כדור הארץ במהירות ${m('5000 m/s')}. לאיזה גובה מרבי מעל פני כדור הארץ הוא יגיע? (מזניחים את התנגדות האוויר. ${cG}, ${cM}, ${cR})`,a:1.6e6,u:'m',s:`${m(`${fr('1','<i>r</i><sub>max</sub>')} = ${fr('1','<i>R</i>')} − ${fr(`${v0}<sup>2</sup>`,'2<i>GM</i>')} = ${e10('1.567',-7)} − ${e10('0.314',-7)} = ${e10('1.253',-7)} m<sup>−1</sup>`)}.<br>${m(`<i>r</i><sub>max</sub> ≈ ${e10('7.98',6)} m`)}, ולכן ${m(`<i>h</i> ≈ ${e10('1.6',6)} m`)}. החישוב עם ${m('<i>g</i>')} קבוע היה נותן רק ${m(e10('1.28',6)+' m')}.`},
+ {l:'a',t:'num',q:`לוויין נמצא במרחק ${m(e10('7',6)+' m')} ממרכז כדור הארץ. איזו מהירות צריכה להיות לו בנקודה הזו כדי שיימלט מכדור הארץ? (${cG}, ${cM})`,a:10670,u:'m/s',s:`אנרגיה כוללת אפס במרחק ${m('<i>r</i>')}: ${m(`<i>v</i> = √(${fr('2<i>GM</i>','<i>r</i>')}) = √(${fr(`2·${e10('3.98',14)}`,e10('7',6))}) ≈ 10,670 m/s`)}. המהירות שלו במסלול מעגלי שם היא ${m('7540 m/s')}, קטנה פי ${m('√2')}.`},
+ {l:'a',t:'num',q:`אסטרואיד נמצא במנוחה רחוק מאוד מכדור הארץ, ומתחיל ליפול אליו. באיזו מהירות הוא יפגע בפני כדור הארץ? (מזניחים את האטמוספרה ואת השפעת השמש. ${cG}, ${cM}, ${cR})`,a:11170,u:'m/s',s:`האנרגיה ההתחלתית אפס: ${m(`0 = ${half}<i>mv</i><sup>2</sup> − ${fr(GMm,'<i>R</i>')}`)}.<br>${m(`<i>v</i> = √(${fr('2<i>GM</i>','<i>R</i>')}) ≈ 11,200 m/s`)}. זו בדיוק מהירות המילוט: הנפילה מאינסוף היא התהליך ההפוך למילוט.`}
+ ]}
+];
+
+/* ---------- solving tips per topic ---------- */
+const TIPS={
+kepler:[
+ `<b>קודם בודקים שהגופים מקיפים אותו גוף מרכזי.</b> רק אז מותר להשתמש בחוק השלישי.`,
+ `<b>עובדים ביחסים.</b> לא צריך להמיר יחידות: אם הרדיוסים באותן יחידות והזמנים באותן יחידות, היחסים נכונים.`,
+ `<b>לכוכבי לכת נוח להשוות לכדור הארץ:</b> ${m('<i>T</i> = 1')} שנה, והרדיוס שלו הוא יחידת המרחק.`,
+ `<b>חזקות:</b> ${m('<i>T</i> ∝ <i>r</i><sup>3/2</sup>')} ו־${m('<i>r</i> ∝ <i>T</i><sup>2/3</sup>')}. במחשבון: מעלים בשלישית ואז מוציאים שורש, או להפך.`,
+ `<b>שאלות איכותיות על מסלול אליפטי:</b> קרוב לשמש פירושו מהר, רחוק מהשמש פירושו לאט.`],
+newton:[
+ `<b>המרחק הוא בין המרכזים.</b> לגוף שנמצא בגובה ${m('<i>h</i>')} מעל פני כוכב לכת: ${m('<i>r</i> = <i>R</i> + <i>h</i>')}.`,
+ `<b>יחידות:</b> מסות בקילוגרמים ומרחקים במטרים. קילומטרים ממירים לפני ההצבה.`,
+ `<b>חזקות של 10 מחשבים בנפרד:</b> מכפילים את המספרים לחוד, ומחברים ומחסרים את המעריכים לחוד.`,
+ `<b>שאלות "פי כמה"</b> פותרים ביחסים, בלי להציב את ${m('<i>G</i>')}.`,
+ `<b>נקודת איזון בין שני גרמי שמיים:</b> משווים את שני הכוחות, מצמצמים, ומוציאים שורש לפני שפותרים.`,
+ `<b>שני הכוחות שווים תמיד.</b> אם שואלים על תאוצות, מחלקים את אותו כוח במסה של כל גוף.`],
+field:[
+ `<b>${m('<i>r</i>')} נמדד מהמרכז.</b> כשנתון גובה, מוסיפים לו את הרדיוס.`,
+ `<b>שאלות על גובה שבו העוצמה קטנה פי n:</b> המרחק מהמרכז גדל פי ${m('√<i>n</i>')}. אחר כך מחסרים את הרדיוס כדי לקבל את הגובה.`,
+ `<b>השוואה בין כוכבי לכת:</b> ${m(`<i>g</i> ∝ ${fr('<i>M</i>','<i>R</i><sup>2</sup>')}`)}. כותבים יחס ומצמצמים.`,
+ `<b>כשנתונה צפיפות:</b> ${m('<i>M</i> = <i>ρV</i>')}, והנפח יחסי ל־${m('<i>R</i><sup>3</sup>')}. מכאן ש־${m('<i>g</i> ∝ <i>ρR</i>')}.`,
+ `<b>${m(gs)} הוא גם תאוצת הנפילה החופשית</b> וגם התאוצה הצנטריפטלית של לוויין באותו מקום.`],
+orbit:[
+ `<b>נקודת המוצא לכל שאלה על לוויין:</b> כוח הכבידה שווה למסה כפול התאוצה הצנטריפטלית.`,
+ `<b>רדיוס המסלול הוא ${m('<i>R</i> + <i>h</i>')},</b> לא הגובה.`,
+ `<b>מסת הלוויין מצטמצמת.</b> אם היא לא נתונה, היא כנראה לא נחוצה.`,
+ `<b>כשנתון ${m('<i>g</i>')} על פני השטח</b> ולא נתונה המסה: ${m('<i>GM</i> = <i>gR</i><sup>2</sup>')}.`,
+ `<b>גבוה יותר פירושו איטי יותר.</b> משתמשים בזה כבדיקה לכל תשובה.`,
+ `<b>מקבלים זמן מחזור בשניות.</b> ממירים לדקות או לשעות רק בסוף.`],
+period:[
+ `<b>יחידות:</b> זמן המחזור בשניות. יממה היא ${m('86400 s')}, ושנה היא ${m(e10('3.156',7)+' s')}.`,
+ `<b>כדי למצוא רדיוס</b> מבודדים את ${m('<i>r</i><sup>3</sup>')}, ורק בסוף מוציאים שורש שלישי.`,
+ `<b>"גיאוסטציונרי"</b> מתורגם ל־${m('<i>T</i> = 24 h')}.`,
+ `<b>כדי "לשקול" גרם שמיים</b> צריך רדיוס וזמן מחזור של גוף שמקיף <b>אותו</b>, לא של הגוף עצמו.`,
+ `<b>כשיש שני גופים סביב אותו מרכז,</b> חוק קפלר ביחסים מהיר יותר מהצבה מלאה.`,
+ `<b>בדיקה:</b> לוויין קרוב לכדור הארץ מקיף אותו בשעה וחצי בערך, והירח בחודש בערך.`],
+energy:[
+ `<b>לא שוכחים את המינוס.</b> האנרגיה הפוטנציאלית הכובדית שלילית בכל מרחק סופי.`,
+ `<b>שינוי הוא תמיד "סופי פחות התחלתי".</b> כשמתרחקים התוצאה חיובית.`,
+ `<b>מתי מותר ${m('<i>mgh</i>')}?</b> רק כשהגובה קטן מאוד ביחס לרדיוס. כשנתון גובה של מאות קילומטרים ומעלה, משתמשים בנוסחה הכללית.`,
+ `<b>שאלות על מהירות ומרחק בלי זמן:</b> שימור אנרגיה, ${m(`${half}<i>mv</i><sup>2</sup> − ${fr(GMm,'<i>r</i>')}`)} קבוע.`,
+ `<b>המסה ${m('<i>m</i>')} מצטמצמת</b> בשימור אנרגיה כשאין כוחות נוספים.`],
+satenergy:[
+ `<b>שלושה ביטויים שכדאי לזכור יחד:</b> ${m(`${Ek} = ${fr(GMm,'2<i>r</i>')}`)}, ${m(`${UG} = −${fr(GMm,'<i>r</i>')}`)}, ${m(`<i>E</i> = −${fr(GMm,'2<i>r</i>')}`)}.`,
+ `<b>מספיק לחשב אחד מהם:</b> ${m(`${UG} = −2${Ek}`)} ו־${m(`<i>E</i> = −${Ek}`)}.`,
+ `<b>הנוסחאות האלה נכונות רק למסלול מעגלי.</b> לגוף שנע אנכית או במסלול אחר משתמשים בשימור אנרגיה רגיל.`,
+ `<b>מעבר בין מסלולים:</b> האנרגיה הדרושה היא ההפרש בין האנרגיות הכוללות, סופי פחות התחלתי.`,
+ `<b>שיגור מהקרקע למסלול:</b> בהתחלה יש רק אנרגיה פוטנציאלית על פני השטח, ובסוף האנרגיה הכוללת במסלול.`],
+escape:[
+ `<b>כותבים שימור אנרגיה בין שתי נקודות:</b> נקודת ההתחלה והנקודה שעליה שואלים.`,
+ `<b>"גובה מרבי"</b> מתורגם למהירות אפס. <b>"רחוק מאוד"</b> מתורגם לאנרגיה פוטנציאלית אפס.`,
+ `<b>קודם משווים את המהירות למהירות המילוט.</b> אם היא קטנה ממנה, הגוף ייעצר ויחזור.`,
+ `<b>מחסרים ריבועי מהירויות,</b> לא מהירויות.`,
+ `<b>מהירות מילוט ממרחק ${m('<i>r</i>')}</b> שאינו פני השטח: מציבים ${m('<i>r</i>')} במקום ${m('<i>R</i>')}.`,
+ `<b>קשר מהיר:</b> מהירות המילוט גדולה פי ${m('√2')} מהמהירות במסלול מעגלי באותו רדיוס.`]
+};
+
+/* ---------- rendering ---------- */
+const app=document.getElementById('app');
+function topicStats(t){const b=t.qs.filter(q=>q.l==='b'),a=t.qs.filter(q=>q.l==='a');const s=l=>l.filter(q=>solved[t.id+'-'+t.qs.indexOf(q)]).length;return{b:b.length,a:a.length,sb:s(b),sa:s(a)}}
+function home(){
+  app.innerHTML=`<div class="wrap"><section class="hero"><div><div class="eyebrow">פיזיקה 5 יח״ל · מכניקה · כבידה</div><h1>כבידה <span class="p">ולוויינים</span></h1><p class="lead">יחידת לימוד בכבידה: חוקי קפלר, חוק הכבידה העולמי, שדה הכבידה, לוויינים במסלול מעגלי, אנרגיה פוטנציאלית כובדית ומהירות מילוט. בכל נושא יש הסבר קצר, סימולציה, דוגמה פתורה צעד אחר צעד, ושאלות תרגול בשתי רמות: בסיסית ומתקדמת.</p><div class="cta"><a class="btn pri" href="#kepler">להתחיל מחוקי קפלר</a><a class="btn" href="#formulas">דף הנוסחאות</a></div></div>
+  <figure class="hfig"><div class="stage"><canvas style="cursor:default" aria-label="שני לוויינים במסלולים מעגליים סביב כדור הארץ"></canvas></div><figcaption>שני לוויינים סביב כדור הארץ. החץ האדום הוא המהירות, והחץ הכתום הוא כוח הכבידה, שמכוון תמיד אל המרכז. הלוויין הגבוה איטי יותר, והכוח עליו חלש יותר.</figcaption></figure></section>
+  <div class="secth"><h2>הנושאים לפי סדר הלימוד</h2><span>ההתקדמות נשמרת בדפדפן הזה</span></div>
+  <div class="tg">${T.map((t,i)=>{const s=topicStats(t);return `<a class="tc" href="#${t.id}"><span class="tn">${i+1}</span><b>${t.title}</b><span class="ts">${t.sub}</span><span class="pg"><span>בסיסיות <em>${s.sb}/${s.b}</em></span><span>מתקדמות <em>${s.sa}/${s.a}</em></span></span></a>`}).join('')}</div></div>`;
+  const still=matchMedia('(prefers-reduced-motion: reduce)').matches;let tn=still?.6:0,raf=0,last=0,on=!still;const ra=2,rb=4.4,k=1/Math.pow(ra,1.5);
+  const c=Canvas(app.querySelector('canvas'),(ctx,t,cv)=>orbDraw(ctx,t,cv,[{r:ra,ang:tn+Math.PI/2,col:'pos'},{r:rb,ang:tn*Math.pow(ra/rb,1.5)+2.4,col:'pos'}],5,true));
+  const step=ts=>{if(!on)return;if(!document.body.contains(c.cv)){on=false;return}const dt=Math.min(.05,(ts-(last||ts))/1000);last=ts;tn+=dt*.9;c.draw();raf=requestAnimationFrame(step)};
+  if(on)raf=requestAnimationFrame(step);anims.push({stop(){on=false;cancelAnimationFrame(raf)}});
+}
+function formulas(){
+  const rows=[
+  ['החוק השלישי של קפלר',`${fr('<i>r</i><sub>1</sub>','<i>r</i><sub>2</sub>')}<sup>3</sup> = ${fr('<i>T</i><sub>1</sub>','<i>T</i><sub>2</sub>')}<sup>2</sup>`,'kepler'],
+  ['חוק הכבידה האוניברסלי',`<i>F</i> = <i>G</i>${fr('<i>m</i><sub>1</sub><i>m</i><sub>2</sub>',r2)}`,'newton'],
+  ['עוצמת שדה כבידה של גרם שמיים',`${gs} = ${fr('<i>GM</i>',r2)}`,'field'],
+  ['אנרגיה פוטנציאלית כובדית',`${UG} = −${fr(GMm,'<i>r</i>')} , (<i>U</i><sub>G(r→∞)</sub> = 0)`,'energy'],
+  ['אנרגיה קינטית של לוויין במסלול מעגלי',`${Ek} = ${fr(GMm,'2<i>r</i>')} = −${fr(UG,'2')}`,'satenergy'],
+  ['אנרגיה כוללת של לוויין במסלול מעגלי',`<i>E</i> = −${fr(GMm,'2<i>r</i>')}`,'satenergy'],
+  ['גודל מהירות קווית בתנועה מעגלית קצובה',`<i>v</i> = ${fr('2π<i>r</i>','<i>T</i>')} = 2π<i>rf</i>`,'orbit'],
+  ['תאוצה רדיאלית (צנטריפטלית)',`<i>a</i><sub>R</sub> = ${fr('<i>v</i><sup>2</sup>','<i>r</i>')} = <i>ω</i><sup>2</sup><i>r</i>`,'orbit']];
+  const tt=id=>T.find(t=>t.id===id).title;
+  app.innerHTML=`<div class="wrap"><div class="th"><a class="crumb" href="#">כל הנושאים</a><h1>דף הנוסחאות</h1><p>הנוסחאות של "כבידה", ושתי נוסחאות של תנועה מעגלית שמשתמשים בהן בנושא, כפי שהן מופיעות בדף "נוסחאות ונתונים בפיזיקה" לבחינת הבגרות.</p></div>
+  <div class="tscroll"><table class="ftab"><tbody>${rows.map(r=>`<tr><td>${r[0]}<small><a href="#${r[2]}">← ${tt(r[2])}</a></small></td><td class="fx">${M(r[1])}</td></tr>`).join('')}</tbody></table></div>
+  <div class="secth"><h2>תוצאות שכדאי לזכור</h2><span>נובעות מהנוסחאות שלמעלה, ואינן מופיעות בדף</span></div>
+  <div class="fgrid" style="margin-top:14px"><div class="fc">${M(`<i>v</i> = √(${fr('<i>GM</i>','<i>r</i>')})`)}<small>מהירות לוויין במסלול מעגלי</small></div><div class="fc">${M(`<i>T</i> = 2π√(${fr('<i>r</i><sup>3</sup>','<i>GM</i>')})`)}<small>זמן המחזור של לוויין</small></div><div class="fc">${M(`${fr('<i>r</i><sup>3</sup>','<i>T</i><sup>2</sup>')} = ${fr('<i>GM</i>','4π<sup>2</sup>')}`)}<small>הקבוע בחוק השלישי של קפלר</small></div><div class="fc">${M(`<i>v</i> = √(${fr('2<i>GM</i>','<i>R</i>')})`)}<small>מהירות המילוט מפני גרם שמיים</small></div></div>
+  <div class="secth"><h2>נתונים</h2><span>מתוך דף הנוסחאות</span></div>
+  <div class="fgrid" style="margin-top:14px"><div class="fc">${M(`<i>G</i> = ${e10('6.67',-11)} ${fr('N·m<sup>2</sup>','kg<sup>2</sup>')}`)}<small>קבוע הכבידה העולמי</small></div><div class="fc">${M(`${e10('5.97',24)} kg , ${e10('6.38',6)} m`)}<small>כדור הארץ: מסה ורדיוס</small></div><div class="fc">${M(`${e10('7.35',22)} kg , ${e10('1.74',6)} m`)}<small>הירח: מסה ורדיוס</small></div><div class="fc">${M(`${e10('3.84',8)} m , 27.3 יממות`)}<small>הירח: רדיוס המסלול וזמן המחזור</small></div><div class="fc">${M(`${e10('1.99',30)} kg`)}<small>מסת השמש</small></div><div class="fc">${M(`${e10('149.6',9)} m , 1 שנה`)}<small>כדור הארץ: רדיוס המסלול סביב השמש וזמן המחזור</small></div></div></div>`;
+}
+let curTab='learn';
+function topic(id,tab){
+  const i=T.findIndex(t=>t.id===id),t=T[i];curTab=tab||'learn';
+  const tabs=[['learn','הסבר'],['sim','סימולציה'],['ex','דוגמה פתורה'],['qs','תרגול']];
+  app.innerHTML=`<div class="wrap"><div class="th"><a class="crumb" href="#">כל הנושאים</a><h1>${i+1}. ${t.title}</h1><p>${t.sub}</p></div>
+  <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button class="tab" role="tab" data-t="${k}" aria-selected="${k===curTab}">${l}</button>`).join('')}</div>
+  <div class="panel" id="panel"></div>
+  <nav class="pn">${i>0?`<a class="btn" href="#${T[i-1].id}">→ ${T[i-1].title}</a>`:'<span></span>'}${i<T.length-1?`<a class="btn pri" href="#${T[i+1].id}">${T[i+1].title} ←</a>`:`<a class="btn pri" href="#formulas">לדף הנוסחאות ←</a>`}</nav></div>`;
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{curTab=b.dataset.t;app.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===b));panel(t,curTab)});
+  panel(t,curTab);
+}
+function panel(t,tab,preset){
+  killScenes();const p=document.getElementById('panel');
+  if(tab==='learn'){p.innerHTML=`<div class="prose">${t.intro.map(x=>`<p>${x}</p>`).join('')}</div>${t.formulas.length?`<div><h2>הנוסחאות בנושא</h2><div class="fgrid">${t.formulas.map(f=>`<div class="fc">${M(f[0])}<small>${f[1]}</small></div>`).join('')}</div></div>`:''}${TIPS[t.id]?`<div class="tips"><h2>טיפים לפתרון</h2><ul>${TIPS[t.id].map(x=>`<li>${x}</li>`).join('')}</ul></div>`:''}<div class="trap"><h2>${t.trap[0]}</h2><p>${t.trap[1]}</p></div><div><button class="btn pri" data-go="sim">לסימולציה ←</button></div>`}
+  if(tab==='sim'){p.innerHTML='<div class="panel" style="padding:0" id="simhost"></div>';SIMS[t.id](p.querySelector('#simhost'),preset)}
+  if(tab==='ex'){const e=t.ex;p.innerHTML=`<article class="ex"><div class="gf"><div><h3>נתונים</h3>${e.given.map(g=>`<p>${g}</p>`).join('')}</div><div><h3>מבוקש</h3>${e.ask.map(g=>`<p>${g}</p>`).join('')}</div></div><div><h3>פתרון</h3><ol class="steps">${e.steps.map(s=>`<li>${s}</li>`).join('')}</ol></div><div class="chk"><h3>בדיקה</h3><p>${e.check}</p></div></article><div><button class="btn pri" data-pre="1">פתיחת הדוגמה בסימולציה ←</button></div>`}
+  if(tab==='qs')practice(t,p);
+  p.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>setTab(t,b.dataset.go));
+  p.querySelectorAll('[data-pre]').forEach(b=>b.onclick=()=>setTab(t,'sim',true));
+}
+function setTab(t,k,preset){curTab=k;app.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x.dataset.t===k));panel(t,k,preset);document.querySelector('.tabs').scrollIntoView({block:'nearest'})}
+function practice(t,p){
+  const lv=[['b','שאלות בסיסיות','הבנת המושגים והצבה ישירה'],['a','שאלות מתקדמות','ברמת בגרות, משלבות כמה רעיונות']];
+  p.innerHTML=`<div class="score" id="score"></div>`+lv.map(([l,h,s])=>`<section class="panel" style="padding:0;gap:14px" data-l="${l}"><div class="lvl"><h2>${h}</h2><span>${s}</span></div></section>`).join('')+`<p class="note">בשאלות חישוב אפשר לכתוב מספרים כמו <span class="mx">1.98e20</span> או <span class="mx">1.98*10^20</span>, ומספר שלילי עם סימן מינוס. תשובה נחשבת נכונה בטווח של 3%.</p>`;
+  const upd=()=>{const s=topicStats(t);p.querySelector('#score').innerHTML=`נפתרו: בסיסיות ${s.sb}/${s.b} · מתקדמות ${s.sa}/${s.a}`};upd();
+  const n={b:0,a:0};
+  t.qs.forEach((q,qi)=>{const id=t.id+'-'+qi;n[q.l]++;const box=el(`<div class="q ${q.l==='a'?'adv':''}"><div class="qn"><span>${q.l==='a'?'מתקדמת':'בסיסית'} ${n[q.l]}</span><span class="st ${solved[id]?'ok':''}">${solved[id]?'✓ נפתרה':''}</span></div><p>${q.q}</p>${q.fig?q.fig():''}</div>`);
+    const st=box.querySelector('.st');const good=()=>{markSolved(id);st.textContent='✓ נפתרה';st.classList.add('ok');upd()};
+    const sol=el(`<div class="sol" hidden><b>פתרון</b><p>${q.s}</p></div>`);
+    if(q.t==='mc'){const o=el('<div class="opts"></div>');const fb=el('<div class="fb" hidden></div>');q.o.forEach((txt,k)=>{const b=el(`<button class="opt">${txt}</button>`);b.onclick=()=>{o.querySelectorAll('.opt').forEach((x,j)=>{x.disabled=true;if(j===q.a)x.classList.add('ok')});if(k===q.a){fb.className='fb ok';fb.textContent='נכון.';good()}else{b.classList.add('no');fb.className='fb no';fb.textContent='לא נכון. התשובה הנכונה מסומנת בירוק.'}fb.hidden=false;sol.hidden=false};o.appendChild(b)});box.append(o,fb,sol)}
+    else{const fid='a'+id;const row=el(`<div class="ansrow"><label class="tip" for="${fid}">התשובה שלכם:</label><input id="${fid}" inputmode="decimal" autocomplete="off"><span class="u">${q.u}</span><button class="btn sm pri">בדיקה</button><button class="btn sm">הצגת פתרון</button></div>`);const fb=el('<div class="fb" hidden></div>');const[inp]=row.querySelectorAll('input');const[chk,show]=row.querySelectorAll('button');
+      const check=()=>{const v=parseNum(inp.value);fb.hidden=false;if(isNaN(v)){fb.className='fb';fb.textContent='לא הצלחנו לקרוא את המספר. נסו למשל 12.5 או ‎−6.';return}const ok=Math.abs(v-q.a)<=Math.abs(q.a)*.03+1e-12;if(ok){fb.className='fb ok';fb.innerHTML='נכון. ';good();sol.hidden=false}else{const sign=Math.sign(v)!==Math.sign(q.a)&&v!==0;fb.className='fb no';fb.textContent=sign?'הסימן לא נכון. זכרו שהאנרגיה הפוטנציאלית הכובדית שלילית.':Math.abs(Math.log10(Math.abs(v/q.a))%1)<.02&&(Math.abs(v/q.a)>5||Math.abs(v/q.a)<.2)?'הספרות נכונות אבל סדר הגודל לא. בדקו את היחידות.':'עדיין לא. נסו שוב, או פתחו את הפתרון.'}};
+      chk.onclick=check;inp.addEventListener('keydown',e=>{if(e.key==='Enter')check()});show.onclick=()=>{sol.hidden=!sol.hidden};box.append(row,fb,sol)}
+    p.querySelector(`[data-l="${q.l}"]`).appendChild(box)});
+}
+function route(){killScenes();const h=location.hash.replace('#','');document.getElementById('nav-f').toggleAttribute('aria-current',h==='formulas');document.getElementById('nav-home').toggleAttribute('aria-current',!h);
+  if(T.some(t=>t.id===h))topic(h);else if(h==='formulas')formulas();else home();window.scrollTo(0,0)}
+addEventListener('hashchange',route);route();
+
+</script>
+</body></html>
